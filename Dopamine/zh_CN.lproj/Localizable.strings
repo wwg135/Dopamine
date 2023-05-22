@@ -8,7 +8,7 @@
 
 "Button_Jailbreak_Title" = "越狱";
 
-"Button_Remove_Jailbreak" = "清除越狱";
+"Button_Remove_Jailbreak" = "清除越狱文件";
 
 "Button_Set_Mobile_Password" = " 设定用户密码 ";
 
@@ -170,6 +170,6 @@
 
 "Sure_Reboot_Userspace" = "确定要重启用户空间吗？";
 
-"Sure_Reboot_Userspace_Message" = "重启用户空间将重启内核外的所有进程；特别地，将重启所有运行在后台的守护进程。在内存不够或插件冲突导致有后台守护进程重启失败时，则将重启设备并退出越狱环境。";
+"Sure_Reboot_Userspace_Message" = "保持内核持续运行，但杀死所有运行在用户空间的进程，包括 launchd，然后重启。这种情况下，因为内核未受影响，所以重启用户空间后仍处于越狱状态。在 iDevice 命令行中运行 launchctl reboot userspace 可使设备重启用户空间。";
 
 "Menu_Reboot_Title" = "重启";
