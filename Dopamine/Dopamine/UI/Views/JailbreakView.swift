@@ -202,9 +202,16 @@ struct JailbreakView: View {
           Button("Button_Cancel") {}
           Button("Button_Set") { respring() }
         }
-        .alert("Sure_Reboot_Userspace", isPresented: $userspaceRebootAlert) {
-          Button("Button_Cancel") {}
-          Button("Button_Set") { userspaceReboot() }
+        .alert(isPresented: $userspaceRebootAlert) {
+          Alert(
+            title: Text("Sure_Reboot_Userspace"),
+            message: Text("Sure_Reboot_Userspace_Message"),
+            primaryButton: .cancel (Text("Button_Cancel")),
+            secondaryButton: .destructive (
+              Text("Button_Set"),
+              action: userspaceReboot
+            )
+          )
         }
     }
     
