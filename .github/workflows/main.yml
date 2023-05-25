@@ -1,28 +1,12 @@
-name: "Dopamine: build and upload"
-
+name: build_Release
 on:
   push:
     branches:
       - master
     paths-ignore:
       - ".gitignore"
-  pull_request:
-    branches:
-      - master
-    paths-ignore:
-      - ".gitignore"
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 1 1 *'
-    - cron: '0 0 1 4 *'
-    - cron: '0 0 30 6 *'
-    - cron: '0 0 28 9 *'
-    - cron: '0 0 27 12 *'
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
+ 
 jobs:
   build:
     runs-on: macos-latest
@@ -35,7 +19,7 @@ jobs:
         with:
           packages: ldid findutils sed coreutils trustcache make
 
-      - name: Install THEOS (without SDKs)
+      - name: Install THEOS
         run: |
           set -x
           export BASEDIR="$(pwd)"
@@ -46,7 +30,7 @@ jobs:
           bash install-theos.sh
           cd $BASEDIR
 
-      - name: Set Environment Variables
+      - name: Set Env
         run: |
           set -x
           T2=$(TZ=UTC-8 date +'%Y%m%d_%H%M%S')
@@ -56,7 +40,7 @@ jobs:
           echo "ctimestamp=${TS}" >> $GITHUB_ENV
           echo "shorthash=${SHASH}" >> $GITHUB_ENV
 
-      - name: Build
+      - name: Build ipa
         run: |
           set -x
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
