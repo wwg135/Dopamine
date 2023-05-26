@@ -205,10 +205,12 @@ func isEnvironmentHidden() -> Bool {
     return !FileManager.default.fileExists(atPath: "/var/jb")
 }
 
-func update(tipaURL: URL) {
-    DispatchQueue.global(qos: .userInitiated).async {
-        jbdUpdateFromTIPA(tipaURL.path, true)
-    }
+func update(ipaURL: URL) {
+    //jbdUpdateFromTIPA(ipaURL.path, true)
+	guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
+            return
+        }
+        _ = execCmd(args: [jbctlPath, "update", "ipa", ipaURL.path])
 }
 
 func installedEnvironmentVersion() -> String {
