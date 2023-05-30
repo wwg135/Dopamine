@@ -60,13 +60,13 @@ uint64_t xpaci(uint64_t a)
 
 // Virtual to physical address translation
 
-uint64_t va_to_pa(uint64_t table, uint64_t virt, bool *err)
+uint64_t walkPageTable(uint64_t table, uint64_t virt, bool *err)
 {
-	JBLogDebug("va_to_pa(table:0x%llX, virt:0x%llX)", table, virt);
+	JBLogDebug("walkPageTable(table:0x%llX, virt:0x%llX)", table, virt);
 	uint64_t table1Off = (virt >> 36ULL) & 0x7ULL;
 	uint64_t table1Entry = physread64(table + (8ULL * table1Off));
 	if ((table1Entry & 0x3) != 3) {
-		JBLogError("[va_to_pa] table1 lookup failure, table:0x%llX virt:0x%llX", table, virt);
+		JBLogError("[walkPageTable] table1 lookup failure, table:0x%llX virt:0x%llX", table, virt);
 		if (err) *err = true;
 		return 0;
 	}
@@ -77,29 +77,30 @@ uint64_t va_to_pa(uint64_t table, uint64_t virt, bool *err)
 	switch (table2Entry & 0x3) {
 		case 1:
 			// Easy, this is a block
-			JBLogDebug("[va_to_pa] translated [tbl2] 0x%llX to 0x%llX", virt, (table2Entry & 0xFFFFFE000000ULL) | (virt & 0x1FFFFFFULL));
+			JBLogDebug("[walkPageTable] translated [tbl2] 0x%llX to 0x%llX", virt, (table2Entry & 0xFFFFFE000000ULL) | (virt & 0x1FFFFFFULL));
+			if (err) *err = true;
 			return (table2Entry & 0xFFFFFE000000ULL) | (virt & 0x1FFFFFFULL);
 			
 		case 3: {
 			uint64_t table3 = table2Entry & 0xFFFFFFFFC000ULL;
 			uint64_t table3Off = (virt >> 14ULL) & 0x7FFULL;
-			JBLogDebug("[va_to_pa] table3: 0x%llX, table3Off: 0x%llX", table3, table3Off);
+			JBLogDebug("[walkPageTable] table3: 0x%llX, table3Off: 0x%llX", table3, table3Off);
 			uint64_t table3Entry = physread64(table3 + (8ULL * table3Off));
-			JBLogDebug("[va_to_pa] table3Entry: 0x%llX", table3Entry);
+			JBLogDebug("[walkPageTable] table3Entry: 0x%llX", table3Entry);
 			
 			if ((table3Entry & 0x3) != 3) {
-				JBLogError("[va_to_pa] table3 lookup failure, table:0x%llX virt:0x%llX", table3, virt);
+				JBLogDebug("[walkPageTable] table3 lookup failure, table:0x%llX virt:0x%llX", table3, virt);
 				if (err) *err = true;
 				return 0;
 			}
 			
-			JBLogDebug("[va_to_pa] translated [tbl3] 0x%llX to 0x%llX", virt, (table3Entry & 0xFFFFFFFFC000ULL) | (virt & 0x3FFFULL));
+			JBLogDebug("[walkPageTable] translated [tbl3] 0x%llX to 0x%llX", virt, (table3Entry & 0xFFFFFFFFC000ULL) | (virt & 0x3FFFULL));
 			return (table3Entry & 0xFFFFFFFFC000ULL) | (virt & 0x3FFFULL);
 		}
 
 		default:
-			JBLogError("[va_to_pa] table2 lookup failure, table:0x%llX virt:0x%llX", table2, virt);
-			if (err) *err = true;
+			JBLogDebug("[walkPageTable] table2 lookup failure, table:0x%llX virt:0x%llX", table2, virt);
+			
 			return 0;
 	}
 }
@@ -218,7 +219,7 @@ uint8_t *mapInPhysical(uint64_t page, PPLWindow* window)
 void *mapIn(uint64_t pageVirt, PPLWindow* window)
 {
 	bool error = false;
-	uint64_t pagePhys = va_to_pa(gCpuTTEP, pageVirt, &error);
+	uint64_t pagePhys = walkPageTable(gCpuTTEP, pageVirt, &error);
 	if (error)
 	{
 		JBLogError("[mapIn] lookup failure when trying to resolve address 0x%llX", pageVirt);
@@ -348,7 +349,7 @@ int kreadbuf(uint64_t kaddr, void* output, size_t size)
 		uint64_t readSize = min(sizeLeft, P_PAGE_SIZE - pageOffset);
 
 		bool failure = false;
-		uint64_t pa = va_to_pa(gCpuTTEP, page, &failure);
+		uint64_t pa = walkPageTable(gCpuTTEP, page, &failure);
 		if (failure)
 		{
 			JBLogError("[kreadbuf] Lookup failure when trying to read %zu bytes at 0x%llX, aborting", size, kaddr);
@@ -387,7 +388,7 @@ int kwritebuf(uint64_t kaddr, const void* input, size_t size)
 		uint64_t writeSize = min(sizeLeft, P_PAGE_SIZE - pageOffset);
 
 		bool failure = false;
-		uint64_t pa = va_to_pa(gCpuTTEP, page, &failure);
+		uint64_t pa = walkPageTable(gCpuTTEP, page, &failure);
 		if (failure)
 		{
 			JBLogError("[kwritebuf] Lookup failure when trying to write %zu bytes to 0x%llX, aborting", size, kaddr);
