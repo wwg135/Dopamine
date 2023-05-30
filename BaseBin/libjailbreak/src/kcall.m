@@ -46,7 +46,6 @@ KcallStatus gKCallStatus = kKcallStatusNotInitialized;
 
 uint64_t gUserReturnThreadContext = 0;
 volatile uint64_t gUserReturnDidHappen = 0;
-static NSLock *gKcallLock;
 
 uint64_t getUserReturnThreadContext(void) {
 	if (gUserReturnThreadContext != 0) {
@@ -113,8 +112,6 @@ void Fugu14Kcall_prepareThreadState(Fugu14KcallThread *callThread, KcallThreadSt
 
 uint64_t Fugu14Kcall_withThreadState(Fugu14KcallThread *callThread, KcallThreadState *threadState)
 {
-	[gKcallLock lock];
-
 	// Restore signed state first
 	kwritebuf(callThread->actContext, &callThread->signedState, sizeof(kRegisterState));
 	
@@ -148,11 +145,7 @@ uint64_t Fugu14Kcall_withThreadState(Fugu14KcallThread *callThread, KcallThreadS
 	MEMORY_BARRIER
 
 	// Copy return value
-	uint64_t retval = callThread->scratchMemoryMapped[0];
-
-	[gKcallLock unlock];
-	
-	return retval;
+	return callThread->scratchMemoryMapped[0];
 }
 
 uint64_t Fugu14Kcall_withArguments(Fugu14KcallThread *callThread, uint64_t func, uint64_t argc, uint64_t *argv)
@@ -162,8 +155,6 @@ uint64_t Fugu14Kcall_withArguments(Fugu14KcallThread *callThread, uint64_t func,
 	KcallThreadState threadState = { 0 };
 	Fugu14Kcall_prepareThreadState(&gFugu14KcallThread, &threadState);
 	threadState.pc = func;
-
-	[gKcallLock lock];
 
 	uint64_t regArgc = 0;
 	uint64_t stackArgc = 0;
@@ -187,8 +178,6 @@ uint64_t Fugu14Kcall_withArguments(Fugu14KcallThread *callThread, uint64_t func,
 		uint64_t argKaddr = (threadState.sp + i * 0x8);
 		kwrite64(argKaddr, argv[8+i]);
 	}
-
-	[gKcallLock unlock];
 
 	return Fugu14Kcall_withThreadState(callThread, &threadState);
 }
@@ -233,8 +222,6 @@ uint64_t initPACPrimitives(uint64_t kernelAllocation)
 	if (gKCallStatus != kKcallStatusNotInitialized || kernelAllocation == 0) {
 		return 0;
 	}
-
-	gKcallLock = [[NSLock alloc] init];
 
 	thread_t thread = 0;
 	kern_return_t kr = thread_create(mach_task_self_, &thread);
