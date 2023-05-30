@@ -6,7 +6,6 @@ typedef enum {
 } PPLRWStatus;
 extern PPLRWStatus gPPLRWStatus;
 
-uint64_t va_to_pa(uint64_t table, uint64_t virt, bool *err);
 void *mapInRange(uint64_t pageStart, uint32_t pageCount, uint8_t** mappingStart);
 void mappingDestroy(void* ctx);
 
