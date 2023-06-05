@@ -166,10 +166,6 @@
 
 "Sure_Respring" = "确 定 要 注 销 吗 ？";
 
-"Sure_Respring_Message" = "注销将杀死所有应用程序并重启主界面。";
-
 "Sure_Reboot_Userspace" = "确 定 要 重 启 用 户 空 间 吗 ？";
-
-"Sure_Reboot_Userspace_Message" = "1.保持内核持续运行，但杀死所有运行在用户空间的进程，包括 launchd，然后重启。这种情况下，因为内核未受影响，所以重启用户空间后仍处于越狱状态。 \n2.在 iDevice 命令行中运行 launchctl reboot userspace 可使设备重启用户空间。";
 
 "Menu_Reboot_Title" = "重 启";
