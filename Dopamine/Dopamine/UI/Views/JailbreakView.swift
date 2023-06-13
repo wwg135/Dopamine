@@ -45,8 +45,8 @@ struct JailbreakView: View {
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?
     
-    @State var updateAvailable = false
-    @State var showingUpdatePopupType: UpdateType? = nil
+    @State var isCheckingForUpdates = false
+    @State var shouldUpdate = false
     
     
     @State var updateChangelog: String? = nil
