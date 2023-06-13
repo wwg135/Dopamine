@@ -444,23 +444,37 @@ struct JailbreakView: View {
     
     @ViewBuilder
     var updateButton: some View {
-        Button {
-            showingUpdatePopupType = .regular
-        } label: {
-            Label(title: { Text("Button_Update_Available") }, icon: {
+        Button(action: {
+            isCheckingForUpdates = true
+            // Perform update check logic here
+            // Set shouldUpdate to true or false based on whether an update is available
+        }, label: {
+            Label(title: { Text("Button_Check_For_Update") }, icon: {
                 ZStack {
-                    if jailbreakingProgress == .jailbreaking {
+                    if isCheckingForUpdates {
                         LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
                     } else {
-                        Image(systemName: "arrow.down.circle")
+                        Image(systemName: updateAvailable ? "arrow.down.circle" : "arrow.clockwise.circle")
                     }
                 }
             })
-            .foregroundColor(whatCouldThisVariablePossiblyEvenMean ? .black : .white)
+            .foregroundColor(.white)
             .padding()
+        })
+        .disabled(isCheckingForUpdates)
+        .opacity(isCheckingForUpdates ? 0.5 : 1.0)
+        .animation(.spring(), value: isCheckingForUpdates)
+        .onChange(of: shouldUpdate) { newValue in
+            // Perform update logic here, if the user has chosen to update
+            // You can use the new value of shouldUpdate to determine whether to perform the update
         }
-        .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
-        .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
+        .alert(isPresented: $shouldUpdate) {
+            Alert(title: Text("Update Available"), message: Text("An update is available. Do you want to update now?"), primaryButton: .default(Text("Update"), action: {
+                shouldUpdate = true
+            }), secondaryButton: .cancel(Text("Later")))
+        }
+        .frame(maxHeight: updateAvailable ? nil : 0)
+        .opacity(updateAvailable ? 1 : 0)
         .animation(.spring(), value: updateAvailable)
     }
     
