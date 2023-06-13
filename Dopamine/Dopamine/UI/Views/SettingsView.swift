@@ -160,6 +160,16 @@ struct SettingsView: View {
                         .padding(.horizontal, 32)
                         .opacity(0.25)
                     VStack(spacing: 6) {
+                        Text("fuck sudo & fuck cypwn")
+                            .font(.footnote)
+                            .opacity(0.6)
+                    }
+                    
+                    Divider()
+                        .background(.white)
+                        .padding(.horizontal, 32)
+                        .opacity(0.25)
+                    VStack(spacing: 6) {
                         Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             .font(.footnote)
                             .opacity(0.6)
