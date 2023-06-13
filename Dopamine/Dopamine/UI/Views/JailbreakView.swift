@@ -54,9 +54,6 @@ struct JailbreakView: View {
     
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
     
-    @State var respringAlert = false
-    @State var userspaceRebootAlert = false
-    
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
