@@ -191,8 +191,8 @@ struct UpdateDownloadingView: View {
             return;
         }
         
-        let owner = "wwg135"
-        let repo = "Dopamine"
+        //let owner = "wwg135"
+        //let repo = "Dopamine"
         
         // Get the releases
         let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
