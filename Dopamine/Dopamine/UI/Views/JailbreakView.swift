@@ -540,8 +540,8 @@ struct JailbreakView: View {
     
     func checkForUpdates() async throws {
         if let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            //let owner = "wwg135"
-            //let repo = "Dopamine"
+            let owner = "wwg137"
+            let repo = "Dopamine"
             
             // Get the releases
             let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
