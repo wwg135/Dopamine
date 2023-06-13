@@ -504,6 +504,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 	// Check if we can find at least one reason to not insert jailbreak related environment variables
 	// In this case we also need to remove pre existing environment variables if they are already set
 	bool shouldInsertJBEnv = true;
+	bool hasSafeModeVariable = false;
 	do {
 		if (binaryConfig & kBinaryConfigDontInject) {
 			shouldInsertJBEnv = false;
@@ -517,12 +518,14 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 		if (safeModeValue) {
 			if (!strcmp(safeModeValue, "1")) {
 				shouldInsertJBEnv = false;
+				hasSafeModeVariable = true;
 				break;
 			}
 		}
 		if (msSafeModeValue) {
 			if (!strcmp(msSafeModeValue, "1")) {
 				shouldInsertJBEnv = false;
+				hasSafeModeVariable = true;
 				break;
 			}
 		}
@@ -561,7 +564,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 		}
 	}
 
-	if ((shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 3) || (!shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 0)) {
+	if ((shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 3) || (!shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 0 && !hasSafeModeVariable)) {
 		// we already good, just call orig
 		return pspawn_orig(pid, path, file_actions, attrp, argv, envp);
 	}
