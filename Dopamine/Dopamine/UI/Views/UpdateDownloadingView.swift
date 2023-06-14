@@ -191,7 +191,7 @@ struct UpdateDownloadingView: View {
             return;
         }
         
-        let owner = "xxx"
+        let owner = "wwg135"
         let repo = "Dopamine"
         
         // Get the releases
