@@ -6,7 +6,7 @@
 
 "Button_Hide_Logs_Title" = "隐 藏 日 志";
 
-"Button_Jailbreak_Title" = " 越 狱 ";
+"Button_Jailbreak_Title" = " 越  狱 ";
 
 "Button_Remove_Jailbreak" = "清 除 越 狱 ";
 
@@ -74,15 +74,15 @@
 
 "Loading Basebin Trustcache" = "等 待 Basebin 信 任 缓 存";
 
-"Menu_Credits_Title" = " 关 于 ";
+"Menu_Credits_Title" = " 关  于 ";
 
-"Menu_Settings_Title" = "设 置";
+"Menu_Settings_Title" = "设  置";
 
-"Settings" = "设 置";
+"Settings" = "设  置";
 
-"Menu_Reboot_Userspace_Title" = " 重 启 ";
+"Menu_Reboot_Userspace_Title" = " 重  启 ";
 
-"Menu_Restart_SpringBoard_Title" = " 注 销 ";
+"Menu_Restart_SpringBoard_Title" = " 注  销 ";
 
 "Settings_iDownload" = "iDownload (开 发 者 终 端)";
 
