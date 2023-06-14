@@ -163,3 +163,5 @@
 "Reboot_Userspace_Finish" = "重新啟動使用者空間";
 
 "Restarting Userspace" = "正在重新啟動使用者空間";
+
+"Options_Block_Dopamine_Updates" = "屏 蔽 更 新";
