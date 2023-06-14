@@ -2,19 +2,19 @@
 
 "Button_Cancel" = "取 消";
 
-"Button_Hide_Jailbreak" = " 隐 藏 越 狱 检 测 ";
+"Button_Hide_Jailbreak" = " 隐 藏 越 狱 ";
 
 "Button_Hide_Logs_Title" = "隐 藏 日 志";
 
-"Button_Jailbreak_Title" = "越 狱";
+"Button_Jailbreak_Title" = " 越 狱 ";
 
-"Button_Remove_Jailbreak" = "清 除 越 狱 文 件";
+"Button_Remove_Jailbreak" = "清 除 越 狱 ";
 
-"Button_Set_Mobile_Password" = " 设 定 用 户 密 码 ";
+"Button_Set_Mobile_Password" = " 设 置 密 码 ";
 
 "Popup_Change_Mobile_Password_Message" = "设定你设备上的 mobile 用户密码。该密码也可用于通过 sudo 命令访问 root 用户权限。若你想要修改 root 用户密码，可在设备 shell 中执行 \"sudo passwd root\"。";
 
-"Button_Reinstall_Package_Managers" = " 重 装 越 狱 商 店 ";
+"Button_Reinstall_Package_Managers" = " 重 装 商 店 ";
 
 "Button_Set" = "确 定";
 
@@ -22,11 +22,11 @@
 
 "Button_Unhide_Jailbreak" = "取 消 隐 藏 越 狱";
 
-"Button_Update" = "立 即 更 新";
+"Button_Update" = " 立 即 更 新 ";
 
 "Button_Update_Available" = "有 新 版 本，请 点 击 更 新";
 
-"Button_Update_Environment" = "更 新 越 狱 环 境";
+"Button_Update_Environment" = " 更 新 越 狱 环 境 ";
 
 "Bypassing PAC" = "绕 过 PAC";
 
@@ -80,13 +80,13 @@
 
 "Settings" = "设 置";
 
-"Menu_Reboot_Userspace_Title" = " 重 启 用 户 空 间 ";
+"Menu_Reboot_Userspace_Title" = " 重 启 ";
 
 "Menu_Restart_SpringBoard_Title" = " 注 销 ";
 
 "Settings_iDownload" = "iDownload (开 发 者 终 端)";
 
-"Settings_Tweak_Injection" = "启 用 插 件 注 入";
+"Settings_Tweak_Injection" = "插 件 注 入";
 
 "Settings_Verbose_Logs" = "详 细 日 志";
 
@@ -146,7 +146,7 @@
 
 "Select_Package_Managers_Install_Message" = "若你不确定如何选择，请使用 Sileo";
 
-"Select_Package_Managers_Reinstall_Message" = "选 定 需 要 重 新 安 装 的 越 狱 商 店";
+"Select_Package_Managers_Reinstall_Message" = "选 择 需 要 重 新 安 装 的 越 狱 商 店";
 
 "Reinstall" = "重 新 安 装";
 
@@ -163,9 +163,5 @@
 "Reboot_Userspace_Finish" = "重 启 用 户 空 间";
 
 "Restarting Userspace" = "正 在 重 启 用 户 空 间";
-
-"Sure_Respring" = "确 定 要 注 销 吗 ？";
-
-"Sure_Reboot_Userspace" = "确 定 要 重 启 用 户 空 间 吗 ？";
 
 "Menu_Reboot_Title" = "重 启";
