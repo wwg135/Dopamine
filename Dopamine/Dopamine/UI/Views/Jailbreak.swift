@@ -102,15 +102,8 @@ func isBootstrapped() -> Bool {
 
 func jailbreak(completion: @escaping (Error?) -> ()) {
     do {
-        if #available(iOS 15.4, *) {
-            // No Wifi fixup needed
-        }
-        else {
-            if wifiIsEnabled() {
-                setWifiEnabled(false)
-                Logger.log("Disabling Wi-Fi", isStatus: true)
-                sleep(5)
-            }
+        handleWifiFixBeforeJailbreak {message in 
+            Logger.log(message, isStatus: true)
         }
         
         Logger.log("Launching kexploitd", isStatus: true)
@@ -128,14 +121,6 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
 
                 Logger.log(toPrint, isStatus: !verbose)
             }
-        }
-
-        if #available(iOS 15.4, *) {
-            // No Wifi fixup needed
-        }
-        else {
-            setWifiEnabled(true)
-            Logger.log("Enabling Wi-Fi", isStatus: true)
         }
         
         try Fugu15.startEnvironment()
