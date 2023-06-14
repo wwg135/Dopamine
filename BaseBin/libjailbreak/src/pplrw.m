@@ -95,7 +95,6 @@ uint64_t walkPageTable(uint64_t table, uint64_t virt, bool *err)
 
 		default:
 			JBLogDebug("[walkPageTable] table2 lookup failure, table:0x%llX virt:0x%llX", table2, virt);
-			
 			return 0;
 	}
 }
