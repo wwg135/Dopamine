@@ -162,7 +162,7 @@ struct SettingsView: View {
                         .padding(.horizontal, 32)
                         .opacity(0.25)
                     VStack(spacing: 6) {
-                        Text("fuck sudo & fuck cypwn")
+                        Text("Welcome_To_Use_Dopamine_Development_Version")
                             .font(.footnote)
                             .opacity(0.6)
                     }
