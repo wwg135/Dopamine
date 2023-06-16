@@ -15,6 +15,7 @@ struct SettingsView: View {
     
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
+    @AppStorage("shouldXinamine", store: dopamineDefaults()) var shouldXinamine: Bool = false
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     
     @Binding var isPresented: Bool
@@ -55,6 +56,9 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
+                            if !isJailbroken() {
+                                Toggle("Settings_Should_Xinamine", isOn: $shouldXinamine)
+                            }
                             if !isJailbroken() {
                                 Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                             }
