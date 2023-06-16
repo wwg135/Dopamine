@@ -116,7 +116,7 @@ struct SettingsView: View {
                                         }
                                         .padding(.horizontal, 4)
                                         .padding(8)
-                                        .frame(maxWidth: .infinity)
+                                        .frame(maxWidth: 32)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
