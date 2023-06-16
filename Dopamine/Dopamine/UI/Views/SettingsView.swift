@@ -107,7 +107,7 @@ struct SettingsView: View {
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
                                         }
-                                        .padding(.horizontal, 4)
+                                        .padding(.horizontal, 8)
                                         .padding(8)
                                         .frame(maxWidth: .infinity)
                                         .overlay(
@@ -160,6 +160,9 @@ struct SettingsView: View {
                         Text("Welcome_To_Use_Dopamine_Development_Version")
                             .font(.footnote)
                             .opacity(0.6)
+                            .padding(.top, 8)
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
                     }
                     
                     Divider()
