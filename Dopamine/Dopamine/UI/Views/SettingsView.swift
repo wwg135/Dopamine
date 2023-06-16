@@ -114,9 +114,9 @@ struct SettingsView: View {
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
                                         }
-                                        .padding(.horizontal, 4)
+                                        .padding(.horizontal, 8)
                                         .padding(8)
-                                        .frame(maxWidth: 32)
+                                        .frame(maxWidth: .infinity)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
