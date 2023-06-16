@@ -164,6 +164,6 @@
 
 "Menu_Reboot_Title" = "重 启";
 
-"Options_Block_Dopamine_Updates" = "屏 蔽 更 新";
+"Options_No_Update" = "屏 蔽 更 新";
 
 "Welcome_To_Use_Dopamine_Development_Version" = "贴心提醒：\n1.欢迎使用由M哥编译修改的Dopamine.\n2.任何第三方编译修改包与开发者opa334大神无关，请勿打扰开发者.";
