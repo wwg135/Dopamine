@@ -21,7 +21,8 @@ struct SettingsView: View {
     
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
-    
+
+    @AppStorage("noUpdateEnabled", store: dopamineDefaults()) var noUpdate: Bool = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
@@ -41,6 +42,10 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
+                            Toggle("Options_No_Update", isOn: $noUpdate)
+                                .onChange(of: noUpdate) { newValue in
+                                    clearTmpDirectory()
+                                }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
@@ -48,12 +53,14 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            Toggle("Settings_iDownload", isOn: $enableiDownload)
+                            if !isJailbroken() {
+                                Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 .onChange(of: enableiDownload) { newValue in
                                     if isJailbroken() {
                                         jailbrokenUpdateIDownloadEnabled()
                                     }
                                 }
+                            }
                             if !isJailbroken() {
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
                             }
@@ -78,9 +85,6 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
                                     }
-                                    .padding(.bottom)
-                                    
-                                    
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         isSelectingPackageManagers = true
@@ -112,7 +116,7 @@ struct SettingsView: View {
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
                                         }
-                                        .padding(.horizontal, 4)
+                                        .padding(.horizontal, 8)
                                         .padding(8)
                                         .frame(maxWidth: .infinity)
                                         .overlay(
@@ -120,23 +124,25 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
                                     }
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        removeJailbreakAlertShown = true
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "trash")
-                                            Text("Button_Remove_Jailbreak")
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.5)
-                                        }
-                                        .padding(.horizontal, 4)
-                                        .padding(8)
-                                        .frame(maxWidth: .infinity)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                        )
+                                    if !isJailbroken() {
+                                      Button(action: {
+                                          UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                          removeJailbreakAlertShown = true
+                                      }) {
+                                          HStack {
+                                              Image(systemName: "trash")
+                                              Text("Button_Remove_Jailbreak")
+                                                  .lineLimit(1)
+                                                  .minimumScaleFactor(0.5)
+                                          }
+                                          .padding(.horizontal, 4)
+                                          .padding(8)
+                                          .frame(maxWidth: .infinity)
+                                          .overlay(
+                                              RoundedRectangle(cornerRadius: 8)
+                                                  .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                          )
+                                      }
                                     }
                                     Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak")
                                         .font(.footnote)
@@ -154,6 +160,19 @@ struct SettingsView: View {
                     .tint(.accentColor)
                     .padding(.vertical, 16)
                     .padding(.horizontal, 32)
+                    
+                    Divider()
+                        .background(.white)
+                        .padding(.horizontal, 32)
+                        .opacity(0.25)
+                    VStack(spacing: 6) {
+                        Text("Welcome_To_Use_Dopamine_Development_Version")
+                            .font(.footnote)
+                            .opacity(0.6)
+                            .padding(.top, 8)
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
+                    }
                     
                     Divider()
                         .background(.white)
