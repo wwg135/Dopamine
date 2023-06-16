@@ -56,7 +56,7 @@ struct SettingsView: View {
                                     }
                                 }
                             if !isJailbroken() {
-                                Toggle("Rebuild Environment", isOn: $rebuildEnvironment)
+                                Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                             }
                             if !isJailbroken() {
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
