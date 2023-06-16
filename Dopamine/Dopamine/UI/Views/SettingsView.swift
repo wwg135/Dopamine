@@ -208,12 +208,12 @@ struct SettingsView: View {
                         }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })
                         .alert("Button_Hide_Jailbreak", isPresented: $hideJailbreakAlertShown, actions: {
                             Button("Button_Cancel", role: .cancel) { }
-                            Button("Alert_Button_Hide", role: .destructive) {
-                                hideJailbreak()
+                            Button("Button_Set", role: .destructive) {
+                                isEnvironmentHidden()
                             }
                         }, message: { Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak") })
                         .frame(maxHeight: 0)
-                    
+        
                 }
                 .foregroundColor(.white)
                 
