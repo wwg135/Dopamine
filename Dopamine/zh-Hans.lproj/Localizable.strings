@@ -56,7 +56,7 @@
 
 "Hint_Hide_Jailbreak" = "「隐 藏 越 狱」将在下次越狱前临时移除越狱相关的文件。";
 
-"Hint_Hide_Jailbreak_Jailbroken" = "在已越狱状态下，「隐 藏 越 狱」将部分禁用越狱功能以提升检测越狱的难度。但是，它并非总是有效，也并没有隐藏所有东西。";
+"Hint_Hide_Jailbreak_Jailbroken" = "在已越狱状态下，「隐 藏 越 狱」将部分\n禁用越狱功能以提升检测越狱的难度。但\n是，它并非总是有效，也并没有隐藏所有\n东西。";
 
 "Initializing Environment" = "初 始 化 环 境";
 
