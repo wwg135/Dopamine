@@ -167,6 +167,9 @@ struct SettingsView: View {
                         Text("Welcome_To_Use_Dopamine_Development_Version")
                             .font(.footnote)
                             .opacity(0.6)
+                            .padding(.top, 8)
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
                     }
                     
                     Divider()
