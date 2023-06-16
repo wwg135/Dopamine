@@ -118,7 +118,7 @@ struct SettingsView: View {
                                         HStack {
                                             Image(systemName: isEnvironmentHiddenState ? "eye" : "eye.slash")
                                             Text(isEnvironmentHiddenState ? "Button_Unhide_Jailbreak" : "Button_Hide_Jailbreak")
-                                                .lineLimit(1)
+                                                .lineLimit(3)
                                                 .minimumScaleFactor(0.5)
                                         }
                                         .padding(.horizontal, 8)
