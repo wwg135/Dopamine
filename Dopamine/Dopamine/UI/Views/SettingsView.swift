@@ -24,7 +24,6 @@ struct SettingsView: View {
 
     @AppStorage("noUpdateEnabled", store: dopamineDefaults()) var noUpdate: Bool = false
     @State var removeJailbreakAlertShown = false
-    @State var hideJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
     
@@ -108,7 +107,6 @@ struct SettingsView: View {
                                 VStack {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        hideJailbreakAlertShown = true
                                         isEnvironmentHiddenState.toggle()
                                         changeEnvironmentVisibility(hidden: !isEnvironmentHidden())
                                     }) {
@@ -145,7 +143,16 @@ struct SettingsView: View {
                                                   .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                           )
                                       }
-                                   }
+                                    }
+                                    Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak")
+                                        .font(.footnote)
+                                        .opacity(0.6)
+                                        .padding(.top, 8)
+                                        .frame(maxWidth: .infinity)
+                                        .multilineTextAlignment(.center)
+                                        .onLongPressGesture(minimumDuration: 3, perform: {
+                                            easterEgg.toggle()
+                                        })
                                 }
                             }
                         }
@@ -206,14 +213,8 @@ struct SettingsView: View {
                                 userspaceReboot()
                             }
                         }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })
-                        .alert("Button_Hide_Jailbreak", isPresented: $hideJailbreakAlertShown, actions: {
-                            Button("Button_Cancel", role: .cancel) { }
-                            Button("Button_Set", role: .destructive) {
-                                isEnvironmentHidden()
-                            }
-                        }, message: { Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak") })
                         .frame(maxHeight: 0)
-        
+                    
                 }
                 .foregroundColor(.white)
                 
