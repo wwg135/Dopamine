@@ -51,12 +51,14 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            Toggle("Settings_iDownload", isOn: $enableiDownload)
+                            if !isJailbroken() {
+                                Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 .onChange(of: enableiDownload) { newValue in
                                     if isJailbroken() {
                                         jailbrokenUpdateIDownloadEnabled()
                                     }
                                 }
+                            }
                             if !isJailbroken() {
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
                             }
