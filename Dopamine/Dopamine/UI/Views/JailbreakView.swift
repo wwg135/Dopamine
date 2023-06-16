@@ -55,6 +55,7 @@ struct JailbreakView: View {
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
     
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    @AppStorage("noUpdateEnabled", store: dopamineDefaults()) var noUpdate: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -181,14 +182,13 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            Task {
-                do {
-                    let dpDefaults = dopamineDefaults()
-                    if !dpDefaults.bool(forKey: "blockDopamineUpdates") {
+            if !noUpdate {
+                Task {
+                    do {
                         try await checkForUpdates()
+                    } catch {
+                        Logger.log(error, type: .error, isStatus: false)
                     }
-                } catch {
-                    Logger.log(error, type: .error, isStatus: false)
                 }
             }
         }
