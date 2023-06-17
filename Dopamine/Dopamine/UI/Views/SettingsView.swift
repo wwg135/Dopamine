@@ -58,14 +58,12 @@ struct SettingsView: View {
                             if !isJailbroken() {
                                 Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                             }
-                            if !isJailbroken() {
-                                Toggle("Settings_iDownload", isOn: $enableiDownload)
+                            Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 .onChange(of: enableiDownload) { newValue in
                                     if isJailbroken() {
                                         jailbrokenUpdateIDownloadEnabled()
                                     }
                                 }
-                            }
                             if !isJailbroken() {
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
                             }
