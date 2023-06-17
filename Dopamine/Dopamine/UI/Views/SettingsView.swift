@@ -177,9 +177,11 @@ struct SettingsView: View {
                         Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             .font(.footnote)
                             .opacity(0.6)
-                        Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
-                            .font(.footnote)
-                            .opacity(0.6)
+                        if isJailbroken() {
+                            Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
+                                .font(.footnote)
+                                .opacity(0.6)
+                        }
                     }
                     .padding(.top, 2)
                     
