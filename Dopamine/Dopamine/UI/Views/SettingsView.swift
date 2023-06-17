@@ -58,18 +58,14 @@ struct SettingsView: View {
                                 }
                             if !isJailbroken() {
                                 Toggle("Settings_Should_Xinamine", isOn: $shouldXinamine)
-                            }
-                            if !isJailbroken() {
                                 Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                             }
-                            if !isJailbroken() {
-                                Toggle("Settings_iDownload", isOn: $enableiDownload)
+                            Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 .onChange(of: enableiDownload) { newValue in
                                     if isJailbroken() {
                                         jailbrokenUpdateIDownloadEnabled()
                                     }
                                 }
-                            }
                             if !isJailbroken() {
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
                             }
@@ -122,7 +118,7 @@ struct SettingsView: View {
                                         HStack {
                                             Image(systemName: isEnvironmentHiddenState ? "eye" : "eye.slash")
                                             Text(isEnvironmentHiddenState ? "Button_Unhide_Jailbreak" : "Button_Hide_Jailbreak")
-                                                .lineLimit(3)
+                                                .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
                                         }
                                         .padding(.horizontal, 8)
