@@ -19,6 +19,7 @@ struct SettingsView: View {
     
     @Binding var isPresented: Bool
 
+    @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
     @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
     
     @State var mobilePasswordChangeAlertShown = false
@@ -56,6 +57,7 @@ struct SettingsView: View {
                                     }
                                 }
                             if !isJailbroken() {
+                                Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
                                 Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
