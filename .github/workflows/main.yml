@@ -1,4 +1,4 @@
-name: build_Release
+name: build_Release_Xinamine
 on:
   push:
     branches:
