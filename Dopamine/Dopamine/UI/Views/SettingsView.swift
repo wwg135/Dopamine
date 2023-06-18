@@ -71,7 +71,7 @@ struct SettingsView: View {
                                     }) {
                                         HStack {
                                             Image(systemName: "trash")
-                                            Text("Button_Set")
+                                            Text("Button_Remove_Zplist")
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
                                         }
@@ -217,7 +217,7 @@ struct SettingsView: View {
                     ZStack {}
                         .alert("Settings_Remove_Zplist_Alert_Title", isPresented: $removeZplistAlertShown, actions: {
                             Button("Button_Cancel", role: .cancel) { }
-                            Button("Alert_Button_Zplist", role: .destructive) {
+                            Button("Button_Set", role: .destructive) {
                                 removeZplist()
                             }
                         }, message: { Text("Settings_Remove_Zplist_Alert_Body") })
