@@ -71,7 +71,7 @@ struct SettingsView: View {
                                     }) {
                                         HStack {
                                             Image(systemName: "trash")
-                                            Text("Button_Remove_Zplist")
+                                            Text("Button_Set")
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
                                         }
