@@ -28,9 +28,9 @@
 
 "Button_Update_Environment" = " 更 新 越 狱 环 境 ";
 
-"Bypassing PAC" = "绕 过 PAC";
+"Bypassing PAC" = "绕 过 指 针 认 证 码";
 
-"Bypassing PPL" = "绕 过 PPL";
+"Bypassing PPL" = "绕 过 受 保 护 进 程 轻 型 验 证";
 
 "Changelog_Unavailable_Text" = "更 新 日 志 不 可 用";
 
@@ -70,9 +70,9 @@
 
 "Disabling Wi-Fi" = "禁 用 无 线 局 域 网";
 
-"Launching oobPCI" = "启 动 oobPCI";
+"Launching oobPCI" = "启 动 任 意 内 核 r/w";
 
-"Loading Basebin Trustcache" = "等 待 Basebin 信 任 缓 存";
+"Loading Basebin Trustcache" = "等 待 基 本 文 件 系 统 信 任 缓 存";
 
 "Menu_Credits_Title" = " 关   于 ";
 
@@ -92,7 +92,7 @@
 
 "Patchfinding" = "补 丁 查 找 中";
 
-"PM_Reinstall_Done_Text" = "选中的越狱商店已被重新安装";
+"PM_Reinstall_Done_Text" = "选 中 的 越 狱 商 店 已 被 重 新 安 装";
 
 "Rebuilding TrustCache" = "重 建 信 任 缓 存";
 
@@ -136,7 +136,7 @@
 
 "Alert_Tweak_Injection_Toggled_Body" = "为使变更生效需要重启用户空间，立即执行？";
 
-"Popup_Change_Mobile_Password_Title" = "修 改 mobile 用 户 密 码";
+"Popup_Change_Mobile_Password_Title" = "修 改 手 机 用 户 密 码";
 
 "Settings_Remove_Jailbreak_Alert_Body" = "「清 除 越 狱」将清除所有和越狱相关的文件，但将保留普通 App、文件、数据。请注意，此操作无法撤销。确认清除越狱吗？";
 
@@ -144,7 +144,7 @@
 
 "Settings_Tweak_Injection_Toggled_Alert_Title" = "需 要 重 启 用 户 空 间";
 
-"Select_Package_Managers_Install_Message" = "若你不确定如何选择，请使用 Sileo";
+"Select_Package_Managers_Install_Message" = "若 你 不 确 定 如 何 选 择，请 使 用 Sileo";
 
 "Select_Package_Managers_Reinstall_Message" = "选 择 需 要 重 新 安 装 的 越 狱 商 店";
 
@@ -168,4 +168,4 @@
 
 "Options_No_Update" = "屏 蔽 更 新";
 
-"Welcome_To_Use_Dopamine_Development_Version" = "贴心提醒：\n1.欢迎使用由M哥编译修改的Dopamine.\n2.任何第三方编译修改包与开发者opa334大神无关，请勿打扰开发者.";
+"Welcome_To_Use_Dopamine_Development_Version" = "贴 心 提 醒：\n1.欢迎使用由M哥编译修改的Dopamine.\n2.任何第三方编译修改包与开发者opa334大神无关，请勿打扰开发者。";
