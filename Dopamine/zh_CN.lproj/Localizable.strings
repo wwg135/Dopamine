@@ -171,3 +171,9 @@
 "Welcome_To_Use_Dopamine_Development_Version" = "贴心提醒：\n1.欢迎使用由M哥编译修改的Dopamine.\n2.任何第三方编译修改包与开发者opa334大神无关，请勿打扰开发者.";
 
 "Options_bridgeToXinA" = "桥 接 心 浪 (beta)";
+
+"Button_Remove_Zplist" = "清 除 屏 蔽";
+
+"Settings_Remove_Zplist_Alert_Title" = "删除屏蔽注入的配置文件";
+
+"Settings_Remove_Zplist_Alert_Body" = "此操作仅删除/var/mobile/下的配置文件\nzp.unject.plist";
