@@ -19,7 +19,6 @@ struct SettingsView: View {
     
     @Binding var isPresented: Bool
 
-    @AppStorage("shouldXinamine", store: dopamineDefaults()) var shouldXinamine: Bool = false
     @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
     
     @State var mobilePasswordChangeAlertShown = false
@@ -57,7 +56,6 @@ struct SettingsView: View {
                                     }
                                 }
                             if !isJailbroken() {
-                                Toggle("Settings_Should_Xinamine", isOn: $shouldXinamine)
                                 Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
