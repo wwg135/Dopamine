@@ -52,7 +52,7 @@ jobs:
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
-          sed -i '' "s/CCC/TG巨魔商店-M哥优化修改/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/CCC/更新：优化UI、提高稳定性./g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           export BASEDIR="$(pwd)"
           export THEOS="${BASEDIR}/theos"
           gmake -j$(sysctl -n hw.physicalcpu)
