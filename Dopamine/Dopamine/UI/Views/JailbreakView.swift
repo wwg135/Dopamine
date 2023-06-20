@@ -182,13 +182,14 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            if !noUpdate {
-                Task {
-                    do {
+            Task {
+                do {
+                    let dpDefaults = dopamineDefaults()
+                    if !dpDefaults.bool(forKey: "noUpdates") {
                         try await checkForUpdates()
-                    } catch {
-                        Logger.log(error, type: .error, isStatus: false)
                     }
+                } catch {
+                    Logger.log(error, type: .error, isStatus: false)
                 }
             }
         }
