@@ -24,7 +24,7 @@ struct SettingsView: View {
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
 
-    @AppStorage("noUpdateEnabled", store: dopamineDefaults()) var noUpdate: Bool = false
+    @AppStorage("noUpdates", store: dopamineDefaults()) var noUpdates: Bool = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
@@ -45,10 +45,7 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            Toggle("Options_No_Update", isOn: $noUpdate)
-                                .onChange(of: noUpdate) { newValue in
-                                    clearTmpDirectory()
-                                }
+                            Toggle("Options_No_Update", isOn: $noUpdates)
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
