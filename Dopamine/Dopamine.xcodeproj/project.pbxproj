@@ -581,7 +581,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Dopamine/bootstrap",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.1_0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
@@ -625,7 +625,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Dopamine/bootstrap",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.1_0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					IOKit,
