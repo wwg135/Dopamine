@@ -62,6 +62,30 @@ func reboot() {
     _ = execCmd(args: [CommandLine.arguments[0], "reboot"])
 }
 
+func doReboot() {
+    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+
+    // MARK: Fade out Animation
+
+    let view = UIView(frame: UIScreen.main.bounds)
+    view.backgroundColor = .black
+    view.alpha = 0
+
+    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
+        window.addSubview(view)
+        UIView.animate(withDuration: 0.2, delay: 0, animations: {
+            view.alpha = 1
+        })
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+        guard let rebootPath = rootifyPath(path: "/usr/sbin/reboot") else {
+            return
+        }
+        _ = execCmd(args: [rebootPath])
+    })
+}
+
 func isJailbroken() -> Bool {
     if isSandboxed() { return false } // ui debugging
     
@@ -81,7 +105,7 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
         handleWifiFixBeforeJailbreak {message in 
             Logger.log(message, isStatus: true)
         }
-
+        
         Logger.log("Launching kexploitd", isStatus: true)
 
         try Fugu15.launchKernelExploit(oobPCI: Bundle.main.bundleURL.appendingPathComponent("oobPCI")) { msg in
@@ -112,6 +136,20 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
             NSLog("Fugu15 error: \(error)")
         }
     }
+}
+
+func clearTmpDirectory() {
+    let tmpDirectory = NSTemporaryDirectory()
+    let fileManager = FileManager.default
+    guard let files = try? fileManager.contentsOfDirectory(atPath: tmpDirectory) else { return }
+    for file in files {
+        let path = "\(tmpDirectory)/\(file)"
+        try? fileManager.removeItem(atPath: path)
+    }
+}
+
+func removeZplist() {
+    _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zplist"])
 }
 
 func removeJailbreak() {

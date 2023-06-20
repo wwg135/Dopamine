@@ -18,13 +18,18 @@ struct SettingsView: View {
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     
     @Binding var isPresented: Bool
+
+    @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
+    @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
     
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
-    
+
+    @AppStorage("noUpdateEnabled", store: dopamineDefaults()) var noUpdate: Bool = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
+    @State var removeZplistAlertShown = false
     
     @State var isEnvironmentHiddenState = isEnvironmentHidden()
     
@@ -41,6 +46,10 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
+                            Toggle("Options_No_Update", isOn: $noUpdate)
+                                .onChange(of: noUpdate) { newValue in
+                                    clearTmpDirectory()
+                                }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
@@ -48,19 +57,39 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            Toggle("Settings_iDownload", isOn: $enableiDownload)
-                                .onChange(of: enableiDownload) { newValue in
-                                    if isJailbroken() {
-                                        jailbrokenUpdateIDownloadEnabled()
+                            if !isJailbroken() {
+                                Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
+                                Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
+                                Toggle("Settings_iDownload", isOn: $enableiDownload)
+                                    .onChange(of: enableiDownload) { newValue in
+                                        if isJailbroken() {
+                                            jailbrokenUpdateIDownloadEnabled()
                                     }
                                 }
-                            if !isJailbroken() {
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
                             }
                         }
                         if isBootstrapped() {
                             VStack {
                                 if isJailbroken() {
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        removeZplistAlertShown = true
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "trash")
+                                            Text("Button_Remove_Zplist")
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.5)
+                                        }
+                                        .padding(.horizontal, 4)
+                                        .padding(8)
+                                        .frame(maxWidth: .infinity)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                        )
+                                    }
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         mobilePasswordChangeAlertShown = true
@@ -78,9 +107,6 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
                                     }
-                                    .padding(.bottom)
-                                    
-                                    
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         isSelectingPackageManagers = true
@@ -109,7 +135,7 @@ struct SettingsView: View {
                                         HStack {
                                             Image(systemName: isEnvironmentHiddenState ? "eye" : "eye.slash")
                                             Text(isEnvironmentHiddenState ? "Button_Unhide_Jailbreak" : "Button_Hide_Jailbreak")
-                                                .lineLimit(1)
+                                                .lineLimit(3)
                                                 .minimumScaleFactor(0.5)
                                         }
                                         .padding(.horizontal, 4)
@@ -120,23 +146,25 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
                                     }
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        removeJailbreakAlertShown = true
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "trash")
-                                            Text("Button_Remove_Jailbreak")
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.5)
-                                        }
-                                        .padding(.horizontal, 4)
-                                        .padding(8)
-                                        .frame(maxWidth: .infinity)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                        )
+                                    if !isJailbroken() {
+                                      Button(action: {
+                                          UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                          removeJailbreakAlertShown = true
+                                      }) {
+                                          HStack {
+                                              Image(systemName: "trash")
+                                              Text("Button_Remove_Jailbreak")
+                                                  .lineLimit(1)
+                                                  .minimumScaleFactor(0.5)
+                                          }
+                                          .padding(.horizontal, 4)
+                                          .padding(8)
+                                          .frame(maxWidth: .infinity)
+                                          .overlay(
+                                              RoundedRectangle(cornerRadius: 8)
+                                                  .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                          )
+                                      }
                                     }
                                     Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak")
                                         .font(.footnote)
@@ -155,6 +183,21 @@ struct SettingsView: View {
                     .padding(.vertical, 16)
                     .padding(.horizontal, 32)
                     
+                    if isJailbroken() {
+                        Divider()
+                            .background(.white)
+                            .padding(.horizontal, 32)
+                            .opacity(0.25)
+                        VStack(spacing: 6) {
+                            Text("Welcome_To_Use_Dopamine_Development_Version")
+                                .font(.footnote)
+                                .opacity(0.6)
+                                .padding(.top, 8)
+                                .frame(maxWidth: .infinity)
+                                .multilineTextAlignment(.center)
+                        }
+                    }
+                    
                     Divider()
                         .background(.white)
                         .padding(.horizontal, 32)
@@ -163,9 +206,11 @@ struct SettingsView: View {
                         Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             .font(.footnote)
                             .opacity(0.6)
-                        Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
-                            .font(.footnote)
-                            .opacity(0.6)
+                        if isJailbroken() {
+                            Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
+                                .font(.footnote)
+                                .opacity(0.6)
+                        }
                     }
                     .padding(.top, 2)
                     
@@ -177,6 +222,12 @@ struct SettingsView: View {
                     }
                     
                     ZStack {}
+                        .alert("Settings_Remove_Zplist_Alert_Title", isPresented: $removeZplistAlertShown, actions: {
+                            Button("Button_Cancel", role: .cancel) { }
+                            Button("Button_Set", role: .destructive) {
+                                removeZplist()
+                            }
+                        }, message: { Text("Settings_Remove_Zplist_Alert_Body") })
                         .textFieldAlert(isPresented: $mobilePasswordChangeAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Popup_Change_Mobile_Password_Title", comment: ""), message: NSLocalizedString("Popup_Change_Mobile_Password_Message", comment: ""), text: Binding<String?>($mobilePasswordInput), onSubmit: {
                                 changeMobilePassword(newPassword: mobilePasswordInput)
