@@ -221,9 +221,6 @@ struct JailbreakView: View {
                 Text("AAA：AAB")
                     .font(.subheadline)
                     .foregroundColor(tint)
-                Text("CCC")
-                    .font(.subheadline)
-                    .foregroundColor(tint)
             }
             Spacer()
         }
