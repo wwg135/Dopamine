@@ -175,3 +175,5 @@
 "Settings_Remove_Zplist_Alert_Title" = "删除屏蔽注入的配置文件";
 
 "Settings_Remove_Zplist_Alert_Body" = "此操作仅删除/var/mobile/下的配置文件\nzp.unject.plist";
+
+"Options_bridgeToXinA" = "桥 接 心 浪 (beta)";
