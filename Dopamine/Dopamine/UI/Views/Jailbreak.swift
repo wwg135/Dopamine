@@ -66,6 +66,7 @@ func doReboot() {
     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
 
     // MARK: Fade out Animation
+    
     let view = UIView(frame: UIScreen.main.bounds)
     view.backgroundColor = .black
     view.alpha = 0
