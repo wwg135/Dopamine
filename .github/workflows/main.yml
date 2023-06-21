@@ -33,12 +33,8 @@ jobs:
       - name: Set Env
         run: |
           set -x
-          T2=$(TZ=UTC-8 date +'%Y%m%d_%H%M%S')
-          TS=$(date -j -f "%Y%m%d_%H%M%S" "${T2}" +%s)
           SHASH=$(git rev-parse --short HEAD)
           echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
-          echo "ctime=${T2}" >> $GITHUB_ENV
-          echo "ctimestamp=${TS}" >> $GITHUB_ENV
           echo "shorthash=${SHASH}" >> $GITHUB_ENV
 
       - name: Print Env
