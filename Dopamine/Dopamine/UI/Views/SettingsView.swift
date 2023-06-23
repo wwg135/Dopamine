@@ -61,7 +61,7 @@ struct SettingsView: View {
                                 }
                             if !isJailbroken() {
                                 Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
-                                Toggle("Options_Mount_Path", isOn: $enableMount)
+                                Toggle("Options_Enable_Mount", isOn: $enableMount)
                                 Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 .onChange(of: enableiDownload) { newValue in
@@ -75,6 +75,7 @@ struct SettingsView: View {
                         if isBootstrapped() {
                             VStack {
                                 if isJailbroken() {
+                                    if (isEnableMount()) {
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                             mountPathAlertShown = true
@@ -111,6 +112,7 @@ struct SettingsView: View {
                                                     .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                             )
                                         }
+                                    }
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         removeZplistAlertShown = true
