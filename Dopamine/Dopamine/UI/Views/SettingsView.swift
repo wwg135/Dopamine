@@ -81,7 +81,7 @@ struct SettingsView: View {
                                             mountPathAlertShown = true
                                         }) {
                                             HStack {
-                                                Image(systemName: "mappin.circle")
+                                                Image(systemName: "doc")
                                                 Text("Button_Set_Mount_Path")
                                                     .lineLimit(1)
                                                     .minimumScaleFactor(0.5)
@@ -99,7 +99,7 @@ struct SettingsView: View {
                                             removeZmountAlertShown = true
                                         }) {
                                             HStack {
-                                                Image(systemName: "mappin.slash.circle")
+                                                Image(systemName: "trash")
                                                 Text("Button_Remove_Zmount")
                                                     .lineLimit(1)
                                                     .minimumScaleFactor(0.5)
