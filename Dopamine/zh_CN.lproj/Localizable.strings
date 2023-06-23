@@ -168,8 +168,6 @@
 
 "Options_No_Update" = "屏 蔽 更 新";
 
-"Welcome_To_Use_Dopamine_Development_Version" = "贴 心 提 醒：\n1.欢迎使用由M哥编译修改的Dopamine.\n2.任何第三方编译修改包与开发者opa334大神无关，请勿打扰开发者.";
-
 "Options_bridgeToXinA" = "桥 接 心 浪 (beta)";
 
 "Button_Remove_Zplist" = "清 除 屏 蔽";
@@ -188,6 +186,6 @@
 
 "Button_Remove_Zmount" = "解 除 挂 载";
 
-"Remove_Zmount_Alert_Shown_Title" = "请输入想取消的挂载目录(原始路径)";
+"Remove_Zmount_Alert_Shown_Title" = "请输入要解除的挂载目录(原始路径)";
 
 "Remove_Zmount_Message" = "此举会删除系统挂载的文件\n\n如果在越狱状态,请立即重启用户空间";
