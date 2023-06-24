@@ -4,11 +4,11 @@
 
 "Button_Hide_Jailbreak" = " 隐 藏 越 狱 ";
 
-"Button_Hide_Logs_Title" = "隐 藏 日 志";
+"Button_Hide_Logs_Title" = " 隐 藏 日 志 ";
 
 "Button_Jailbreak_Title" = " 越  狱 ";
 
-"Button_Remove_Jailbreak" = "清 除 越 狱 ";
+"Button_Remove_Jailbreak" = " 清 除 越 狱 ";
 
 "Button_Set_Mobile_Password" = " 设 置 密 码 ";
 
@@ -132,7 +132,7 @@
 
 "Update_Status_Subtitle_Restart_Soon" = "设 备 即 将 重 启 用 户 空 间...";
 
-"Alert_Button_Uninstall" = "清 除 越 狱";
+"Alert_Button_Uninstall" = " 清 除 越 狱 ";
 
 "Alert_Tweak_Injection_Toggled_Body" = "为使变更生效需要重启用户空间，立即执行？";
 
@@ -140,7 +140,7 @@
 
 "Settings_Remove_Jailbreak_Alert_Body" = "「清 除 越 狱」将清除所有和越狱相关的文件，但将保留普通 App、文件、数据。请注意，此操作无法撤销。确认清除越狱吗？";
 
-"Settings_Remove_Jailbreak_Alert_Title" = "清 除 越 狱";
+"Settings_Remove_Jailbreak_Alert_Title" = " 清 除 越 狱 ";
 
 "Settings_Tweak_Injection_Toggled_Alert_Title" = "需 要 重 启 用 户 空 间";
 
@@ -148,7 +148,7 @@
 
 "Select_Package_Managers_Reinstall_Message" = "选 择 需 要 重 新 安 装 的 越 狱 商 店";
 
-"Reinstall" = "重 新 安 装";
+"Reinstall" = " 重 新 安 装 ";
 
 "Continue" = "继 续";
 
