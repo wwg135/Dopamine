@@ -141,6 +141,10 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
     }
 }
 
+func removeZmount(rmpath: String) {
+    _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
+}
+
 func removeZplist() {
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zplist"])
 }
