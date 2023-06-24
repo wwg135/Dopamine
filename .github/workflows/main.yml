@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - ".gitignore"
   workflow_dispatch:
  
 jobs:
@@ -16,10 +18,6 @@ jobs:
         uses: wwg135/procursus-action@main
         with:
           packages: ldid findutils sed coreutils trustcache make
-          cache: true
-          cache-path: ~/__cache
-        env:
-          DEBIAN_FRONTEND: noninteractive
 
       - name: Install THEOS
         run: |
@@ -50,7 +48,7 @@ jobs:
           set -x
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
-          cp Dopamine/Dopamine.tipa Dopamine.ipa
+          cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine.ipa
 
       - name: Upload Artifact
         id: dopamine-upload
