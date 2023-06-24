@@ -82,13 +82,13 @@
 
 "Menu_Restart_SpringBoard_Title" = " 注   销 ";
 
-"Settings_iDownload" = "开 发 者 终 端";
+"Settings_iDownload" = "开  发  者  终  端";
 
 "Settings_Tweak_Injection" = "插  件  注  入";
 
-"Options_Rebuild_Environment" = "  重  建  环  境 ";
+"Options_Rebuild_Environment" = "重  建  环  境 ";
 
-"Settings_Verbose_Logs" = "详 细 日 志";
+"Settings_Verbose_Logs" = "详  细  日  志";
 
 "Patchfinding" = "补 丁 查 找 中";
 
@@ -98,7 +98,7 @@
 
 "Refreshing Icon Cache" = "刷 新 图 标 缓 存";
 
-"Settings_Footer_Device_Bootstrapped" = "设 备 已 安 装 越 狱 环 境";
+"Settings_Footer_Device_Bootstrapped" = "设  备  已  安  装  越  狱  环  境";
 
 "Settings_Footer_Device_Not_Bootstrapped" = "设 备 未 安 装 越 狱 环 境";
 
