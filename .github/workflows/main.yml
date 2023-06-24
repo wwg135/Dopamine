@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - ".gitignore"
   workflow_dispatch:
  
 jobs:
@@ -38,16 +36,21 @@ jobs:
         run: |
           echo ${{ env.shT }}
 
+      - name: Pre code
+        run: |
+          sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          
+      - name: Pre keychain
+        run: |
+          sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
+      
       - name: Build ipa
         run: |
           set -x
-          sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
-          sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
-          sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
-          export BASEDIR="$(pwd)"
-          export THEOS="${BASEDIR}/theos"
+          export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
-          cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine.ipa
+          cp Dopamine/Dopamine.tipa Dopamine.ipa
 
       - name: Upload Artifact
         id: dopamine-upload
