@@ -44,7 +44,8 @@ jobs:
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
-          export THEOS=$HOME/theos"
+          export BASEDIR="$(pwd)"
+          export THEOS="${BASEDIR}/theos"
           gmake -j$(sysctl -n hw.physicalcpu)
           cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine.ipa
 
