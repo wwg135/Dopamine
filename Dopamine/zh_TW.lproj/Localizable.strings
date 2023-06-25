@@ -168,8 +168,6 @@
 
 "Options_No_Update" = "屏 蔽 更 新";
 
-"Options_bridgeToXinA" = "橋 接 心 浪 (beta)";
-
 "Button_Remove_Zplist" = "清 除 屏 蔽";
 
 "Settings_Remove_Zplist_Alert_Title" = "刪除遮罩注入的配置檔";
