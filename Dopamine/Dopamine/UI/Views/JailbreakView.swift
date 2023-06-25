@@ -219,7 +219,7 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
-                Text("AAA:AAB")
+                Text("AAA : AAB")
                     .font(.subheadline)
                     .foregroundColor(tint)
             }
