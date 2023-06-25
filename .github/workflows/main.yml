@@ -27,7 +27,7 @@ jobs:
 
       - name: Set env
         run: |
-          echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
+          echo "shT=$(TZ=UTC-8 date +'%Y - %m - %d''  ''%H : %M : %S')" >> $GITHUB_ENV
           echo "shorthash=${SHASH}" >> $GITHUB_ENV
 
       - name: Print env
