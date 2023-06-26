@@ -168,7 +168,7 @@
 
 "Options_No_Update" = "屏  蔽  更  新";
 
-"Button_Remove_Zplist" = "  清  除  屏  蔽 ";
+"Button_Remove_Zplist" = "  清  除  配  置 ";
 
 "Settings_Remove_Zplist_Alert_Title" = "删除屏蔽注入的配置文件";
 
