@@ -16,7 +16,6 @@ struct SettingsView: View {
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
-    @AppStorage("unjectToggle", store: dopamineDefaults()) var unjectToggle: Bool = false
     
     @Binding var isPresented: Bool
 
@@ -45,7 +44,6 @@ struct SettingsView: View {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
                             Toggle("Options_No_Update", isOn: $noUpdates)
-                            Toggle("Unject_Toggle", isOn: $unjectToggle)
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
