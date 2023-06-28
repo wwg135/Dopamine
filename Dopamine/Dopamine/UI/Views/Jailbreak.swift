@@ -145,16 +145,6 @@ func removeZplist() {
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zplist"])
 }
 
-func toggleUnject(_ str: String, _ enabled: Bool) -> Bool {
-    let path = "/var/mobile/zp.unject.plist"
-    let dict = NSMutableDictionary(contentsOfFile: path)
-    if dict == nil {
-        return false
-    }
-    dict!.setValue(enabled, forKey: str)
-    return dict!.write(toFile: path, atomically: true)
-}
-
 func removeJailbreak() {
     dopamineDefaults().removeObject(forKey: "selectedPackageManagers")
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
