@@ -406,6 +406,9 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 		if (!strcmp(processBlacklist[i], path)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 	}
 
+	if (unjectToggle) {
+                return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+        }
         if (!strncmp(path, "/Dev", 4)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 	
         if (access("/var/mobile/zp.unject.plist", F_OK) == 0) {
