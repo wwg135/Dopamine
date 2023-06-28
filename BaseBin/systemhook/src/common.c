@@ -406,21 +406,18 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 		if (!strcmp(processBlacklist[i], path)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 	}
 
-	let dpDefaults = dopamineDefaults()
-        if !dpDefaults.bool(forKey: "unjectToggle") {
-                if (!strncmp(path, "/Dev", 4)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+        if (!strncmp(path, "/Dev", 4)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 	
-                if (access("/var/mobile/zp.unject.plist", F_OK) == 0) {
-                        if (!strstr(path, "/var/jb") && !strstr(path, "procursus")) {
-                        // unject Plugins
-                        if (strstr(path, ".appex/") != NULL) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+        if (access("/var/mobile/zp.unject.plist", F_OK) == 0) {
+                if (!strstr(path, "/var/jb") && !strstr(path, "procursus")) {
+                // unject Plugins
+                if (strstr(path, ".appex/") != NULL) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 
-                        // unject in the blacklist
-                        char *exe_name = strrchr(path, '/');
-                        if (exe_name != NULL) {
-                                exe_name++;
-                                if (unject(exe_name)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
-                                }
+                // unject in the blacklist
+                char *exe_name = strrchr(path, '/');
+                if (exe_name != NULL) {
+                        exe_name++;
+                        if (unject(exe_name)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
                         }
                 }
 	}
