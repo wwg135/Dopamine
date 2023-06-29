@@ -143,7 +143,8 @@ void windowWaitUntilMapped(PPLWindow *window, uint64_t page)
 			worked = true;
 			break;
 		}
-
+        }
+	
 	if (!worked) {
 		// If shit is broken, just do an old flavour flush (not aware of a single instance of this ever not working) and continue
 		tlbFlush();
