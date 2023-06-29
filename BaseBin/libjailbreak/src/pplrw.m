@@ -279,7 +279,7 @@ void *mapInVirtual(uint64_t pageVirtStart, uint32_t pageCount, uint8_t **mapping
 	uint64_t pagesToMap[pageCount];
 	for (int i = 0; i < pageCount; i++) {
 		bool err = false;
-		uint64_t page = va_to_pa(gCpuTTEP, pageVirtStart + (i * 0x4000), &err);
+		uint64_t page = walkPageTable(gCpuTTEP, pageVirtStart + (i * 0x4000), &err);
 		if (err) {
 			JBLogError("[mapInRange] fatal error, aborting");
 			return NULL;
