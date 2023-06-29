@@ -165,7 +165,7 @@ struct SettingsView: View {
                                 .opacity(1)
                         }
                     }
-                    .padding(.top, 2)
+                    .padding(.top, 1)
                     
                     if easterEgg {
                         Image("fr")
