@@ -6,7 +6,7 @@ typedef enum {
 } PPLRWStatus;
 extern PPLRWStatus gPPLRWStatus;
 
-void *mapInRange(uint64_t pageStart, uint32_t pageCount, uint8_t** mappingStart);
+void *mapInVirtual(uint64_t pageStart, uint32_t pageCount, uint8_t** mappingStart);
 void mappingDestroy(void* ctx);
 
 int physreadbuf(uint64_t physaddr, void* output, size_t size);
@@ -37,5 +37,5 @@ int kwrite32(uint64_t va, uint32_t v);
 int kwrite16(uint64_t va, uint16_t v);
 int kwrite8(uint64_t va, uint8_t v);
 
+void PPLRW_updatePlaceholderPage(uint64_t kaddr);
 void initPPLPrimitives(uint64_t magicPage);
-
