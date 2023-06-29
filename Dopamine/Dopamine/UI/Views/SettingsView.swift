@@ -162,7 +162,7 @@ struct SettingsView: View {
                         if isJailbroken() {
                             Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
                                 .font(.footnote)
-                                .opacity(0.6)
+                                .opacity(1)
                         }
                     }
                     .padding(.top, 2)
@@ -236,7 +236,7 @@ extension View {
         @ViewBuilder placeholder: () -> Content) -> some View {
             
             ZStack(alignment: alignment) {
-                placeholder().opacity(shouldShow ? 1 : 0)
+                placeholder().opacity(shouldShow ? 0)
                 self
             }
         }
