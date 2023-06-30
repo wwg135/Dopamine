@@ -2,21 +2,53 @@
 #import <libjailbreak/libjailbreak.h>
 #import <libjailbreak/handoff.h>
 #import <libjailbreak/kcall.h>
+#import <libjailbreak/launchd.h>
 #import <libfilecom/FCHandler.h>
 #import <mach-o/dyld.h>
 #import <spawn.h>
 
+#import <sandbox.h>
 #import "spawn_hook.h"
 #import "xpc_hook.h"
 #import "daemon_hook.h"
 #import "ipc_hook.h"
+#import "../systemhook/src/common.h"
 
 int gLaunchdImageIndex = -1;
+
+NSString *generateSystemWideSandboxExtensions(void)
+{
+	NSMutableString *extensionString = [NSMutableString new];
+
+	// Make /var/jb readable
+	[extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_file("com.apple.app-sandbox.read", prebootPath(nil).fileSystemRepresentation, 0)]];
+	[extensionString appendString:@"|"];
+
+	// Make binaries in /var/jb executable
+	[extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_file("com.apple.sandbox.executable", prebootPath(nil).fileSystemRepresentation, 0)]];
+	[extensionString appendString:@"|"];
+
+	// Ensure the whole system has access to com.opa334.jailbreakd.systemwide
+	[extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_mach("com.apple.app-sandbox.mach", "com.opa334.jailbreakd.systemwide", 0)]];
+	[extensionString appendString:@"|"];
+	[extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_mach("com.apple.security.exception.mach-lookup.global-name", "com.opa334.jailbreakd.systemwide", 0)]];
+
+	return extensionString;
+}
 
 __attribute__((constructor)) static void initializer(void)
 {
 	bool comingFromUserspaceReboot = bootInfo_getUInt64(@"environmentInitialized");
 	if (comingFromUserspaceReboot) {
+
+		// super hacky fix to support OTA updates from 1.0.x to 1.1
+		// I hate it, but there is no better way :/
+		NSURL *disabledLaunchDaemonURL = [NSURL fileURLWithPath:prebootPath(@"basebin/LaunchDaemons/Disabled") isDirectory:YES];
+		NSArray<NSURL *> *disabledLaunchDaemonPlistURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:disabledLaunchDaemonURL includingPropertiesForKeys:nil options:0 error:nil];
+		for (NSURL *disabledLaunchDaemonPlistURL in disabledLaunchDaemonPlistURLs) {
+			patchBaseBinLaunchDaemonPlist(disabledLaunchDaemonPlistURL.path);
+		}
+
 		// Launchd was already initialized before, we are coming from a userspace reboot... recover primitives
 		// First get PPLRW primitives
 		__block pid_t boomerangPid = 0;
@@ -59,7 +91,13 @@ __attribute__((constructor)) static void initializer(void)
 		}
 	}
 
-	proc_set_debugged(getpid());
+	// System wide sandbox extensions and root path
+	setenv("JB_SANDBOX_EXTENSIONS", generateSystemWideSandboxExtensions().UTF8String, 1);
+	setenv("JB_ROOT_PATH", prebootPath(nil).fileSystemRepresentation, 1);
+	JB_SandboxExtensions = strdup(getenv("JB_SANDBOX_EXTENSIONS"));
+	JB_RootPath = strdup(getenv("JB_ROOT_PATH"));
+
+	proc_set_debugged_pid(getpid(), false);
 	initXPCHooks();
 	initDaemonHooks();
 	initSpawnHooks();
