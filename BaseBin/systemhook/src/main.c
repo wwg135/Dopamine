@@ -359,9 +359,10 @@ __attribute__((constructor)) static void initializer(void)
 	if (shouldEnableTweaks()) {
 		int64_t debugErr = jbdswDebugMe();
 		if (debugErr == 0) {
-			if(access("/var/jb/usr/lib/TweakLoader.dylib", F_OK) == 0)
+			char *tweakLoaderPath = "/var/jb/usr/lib/TweakLoader.dylib";
+			if(access(tweakLoaderPath, F_OK) == 0)
 			{
-				void *tweakLoaderHandle = dlopen_hook("/var/jb/usr/lib/TweakLoader.dylib", RTLD_NOW);
+				void *tweakLoaderHandle = dlopen_hook(tweakLoaderPath, RTLD_NOW);
 				if (tweakLoaderHandle != NULL) {
 					dlclose(tweakLoaderHandle);
 				}
