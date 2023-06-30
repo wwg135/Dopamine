@@ -9,7 +9,7 @@ sign: $(TARGET)
 
 $(TARGET): $(wildcard src/*.c src/*.S)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
-        install_name_tool -change "systemhook.dylib" "/usr/lib/systemhook.dylib" $@
+	install_name_tool -change "systemhook.dylib" "/usr/lib/systemhook.dylib" $@
 
 clean:
 	@rm -f $(TARGET)
