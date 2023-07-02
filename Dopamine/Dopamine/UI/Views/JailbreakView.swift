@@ -481,7 +481,8 @@ struct JailbreakView: View {
                 jailbreakingError = e
                 
                 if e == nil {
-                    dpDefaults.set(dpDefaults.integer(forKey: "successfulJailbreaks") + 1, forKey: "successfulJailbreaks")
+                    dpDefaults.set(dpDefaults.integer(forKey: "successful_jailbreaks") + 1, forKey: "successful_jailbreaks")
+                    dpDefaults.synchronize()
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                 } else {
                     UINotificationFeedbackGenerator().notificationOccurred(.error)
