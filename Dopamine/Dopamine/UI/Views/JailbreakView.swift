@@ -55,6 +55,7 @@ struct JailbreakView: View {
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
     
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    @State private var upTime = ""
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -167,13 +168,19 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                upTime = formatUptime()
+            }
             Task {
                 do {
-                    try await checkForUpdates()
+                    let dpDefaults = dopamineDefaults()
+                    if dpDefaults.bool(forKey: "checkForUpdates") {
+                        try await checkForUpdates()
+                    }
                 } catch {
                     Logger.log(error, type: .error, isStatus: false)
                 }
-            }
+            }   
         }
         .alert("🤑 NEW SPONSORSHIP OFFER 🤑 \n\n⚠️ Hello iOS \(UIDevice.current.systemVersion) user! 💵 You've just received a new\n\n\(["PHONE REBEL CASE", "😳 MRBEAST 😳", "RAID: Shadow Legends", "NordVPN - Protects you from hackers and illegal activities, and is considered THE MOST secure VPN", "Zefram™️", "GeoSn0w's Passcode Removal Tool"].randomElement()!)\n\nsponsorship offer 💰💰💰 Would you like to accept it? 💸", isPresented: $aprilFirstAlert) {
             Button("Ignore for now") { }
@@ -201,6 +208,14 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
+                Text("AAA : AAB")
+                    .font(.subheadline)
+                    .foregroundColor(tint)
+                if isJailbroken() {
+                    Text(upTime)
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                }
             }
             Spacer()
         }
@@ -541,6 +556,17 @@ struct JailbreakView: View {
                 mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: installedEnvironmentVersion(), toVersion: currentAppVersion), environmentMismatch: true)
             }
         }
+    }
+
+    func formatUptime() -> String {
+        var ts = timespec()
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
+        let uptimeInt = Int(ts.tv_sec)
+        let seconds = uptimeInt % 60
+        let minutes = (uptimeInt / 60) % 60
+        let hours = (uptimeInt / 3600) % 24
+        let days = uptimeInt / 86400
+        return "系统已运行：\(days)天\(hours)时\(minutes)分\(seconds)秒"
     }
 }
 
