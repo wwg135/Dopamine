@@ -100,11 +100,12 @@ BOOL isCdHashInTrustCache(NSData *cdHash)
 		io_connect_t connect;
 		io_service_t amfiService = IOServiceGetMatchingService(kIOMainPortDefault, amfiServiceDict);
 		kr = IOServiceOpen(amfiService, mach_task_self(), 0, &connect);
-		if(kr != KERN_SUCCESS)
-		{
-			JBLogError("Failed to open amfi service %d %s", kr, mach_error_string(kr));
-			return -2;
-		}
+		assert(kr == KERN_SUCCESS);
+		// if(kr != KERN_SUCCESS)
+		// {
+		// 	JBLogError("Failed to open amfi service %d %s", kr, mach_error_string(kr));
+		// 	return -2; //??
+		// }
 
 		uint64_t includeLoadedTC = YES;
 		kr = IOConnectCallMethod(connect, AMFI_IS_CD_HASH_IN_TRUST_CACHE, &includeLoadedTC, 1, CFDataGetBytePtr((__bridge CFDataRef)cdHash), CFDataGetLength((__bridge CFDataRef)cdHash), 0, 0, 0, 0);

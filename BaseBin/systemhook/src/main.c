@@ -361,6 +361,9 @@ __attribute__((constructor)) static void initializer(void)
 	unsetenv("JB_SANDBOX_EXTENSIONS");
 	JB_RootPath = strdup(getenv("JB_ROOT_PATH"));
 
+	JBRAND = strdup(getenv("JBRAND"));
+	JBROOT = strdup(getenv("JBROOT"));
+
 	if (!strcmp(getenv("DYLD_INSERT_LIBRARIES"), "/usr/lib/systemhook.dylib")) {
 		// Unset DYLD_INSERT_LIBRARIES, but only if we are the only thing contained in it
 		unsetenv("DYLD_INSERT_LIBRARIES");
