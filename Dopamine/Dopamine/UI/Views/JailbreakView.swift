@@ -227,7 +227,7 @@ struct JailbreakView: View {
                     .foregroundColor(tint)
                 Text(upTime)
                     .font(.subheadline)
-                    .foregroundColor(tint.opacity(0.8))
+                    .foregroundColor(tint)
             }
             Spacer()
         }
