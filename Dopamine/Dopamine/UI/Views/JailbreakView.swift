@@ -225,9 +225,11 @@ struct JailbreakView: View {
                 Text("AAA : AAB")
                     .font(.subheadline)
                     .foregroundColor(tint)
-                Text(upTime)
-                    .font(.subheadline)
-                    .foregroundColor(tint)
+                if isJailbroken() {
+                    Text(upTime)
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                }
             }
             Spacer()
         }
