@@ -582,7 +582,7 @@ struct JailbreakView: View {
         let minutes = (uptimeInt / 60) % 60
         let hours = (uptimeInt / 3600) % 24
         let days = uptimeInt / 86400
-        return "系统运行了\(days)天\(hours)小时\(minutes)分钟\(seconds)秒"
+        return "系统已运行：\(days)天\(hours)小时\(minutes)分钟\(seconds)秒"
     }
 }
 
