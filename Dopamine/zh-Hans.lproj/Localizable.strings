@@ -42,7 +42,7 @@
 
 "Credits_Button_Source_Code" = "源代码";
 
-"Credits_Footer_Dopamine_Version %@\nOS:%@" = "Dopamine 版本 %@ 稳定版\n%@";
+"Credits_Footer_Dopamine_Version %@\nOS:%@" = "Dopamine 版本 %@ \n%@";
 
 "Credits_Header_Special_Thanks" = "特别感谢 ：";
 
@@ -116,7 +116,7 @@
 
 "Title_Changelog" = "更新日志";
 
-"Title_Made_By" = "开 发 者 : opa334 、 évelyne \nUI 设 计 : sourceloc \nDopamine 越 狱 基 于 Fugu 15";
+"Title_Made_By" = "开发者 : opa334 、 évelyne \nUI设计 : sourceloc \nDopamine越狱基于 Fugu 15";
 
 "Title_Supported_iOS_Versions" = "iOS 15.0 - 15.4.1 | A12 - A15 、 M1";
 
