@@ -575,7 +575,9 @@ struct JailbreakView: View {
             if isInstalledEnvironmentVersionMismatching() {
                 mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: installedEnvironmentVersion(), toVersion: currentAppVersion), environmentMismatch: true)
             }
-        }    
+        }
+    }
+        
     func formatUptime() -> String {
         var ts = timespec()
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
@@ -586,7 +588,6 @@ struct JailbreakView: View {
         let days = uptimeInt / 86400
         return "系统已运行:\(days)天\(hours)小时\(minutes)分钟\(seconds)秒"
     }
-}
  
 struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
