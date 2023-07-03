@@ -55,7 +55,6 @@ struct JailbreakView: View {
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
     
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var upTime = ""
     
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
@@ -226,9 +225,6 @@ struct JailbreakView: View {
                 Text("AAA : AAB")
                     .font(.subheadline)
                     .foregroundColor(tint)
-                Text(upTime)
-                    .font(.subheadline)
-                    .foregroundColor(tint.opacity(0.8))
             }
             Spacer()
         }
@@ -574,20 +570,10 @@ struct JailbreakView: View {
 
             if isInstalledEnvironmentVersionMismatching() {
                 mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: installedEnvironmentVersion(), toVersion: currentAppVersion), environmentMismatch: true)
-            }
-        }    
-    func formatUptime() -> String {
-        var ts = timespec()
-        clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
-        let uptimeInt = Int(ts.tv_sec)
-        let seconds = uptimeInt % 60
-        let minutes = (uptimeInt / 60) % 60
-        let hours = (uptimeInt / 3600) % 24
-        let days = uptimeInt / 86400
-        return "System running\(days)\(hours)\(minutes)\(seconds)"
+        }
     }
 }
-    
+ 
 struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
         JailbreakView()
