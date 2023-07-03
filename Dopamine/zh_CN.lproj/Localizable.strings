@@ -176,6 +176,8 @@
 
 "Options_Enable_Mount_Path" = "启用挂载";
 
+"Options_Rebuild_Environment" = "重建环境";
+
 "Button_Set_Mount_Path" = "  新增挂载";
 
 "Set_Mount_Path_Alert_Shown_Title" = "请输入要新增的挂载目录(原始路径)";
