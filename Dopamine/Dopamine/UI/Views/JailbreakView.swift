@@ -572,6 +572,8 @@ struct JailbreakView: View {
                 mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: installedEnvironmentVersion(), toVersion: currentAppVersion), environmentMismatch: true)
             }
         }
+    }
+
     func formatUptime() -> String {
         var ts = timespec()
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
