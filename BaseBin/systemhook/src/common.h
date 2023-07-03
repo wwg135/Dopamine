@@ -1,6 +1,11 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <spawn.h>
 
+#define JB_ENV_REQUIRED_COUNT 5
+
+extern char* JBRAND;
+extern char* JBROOT;
+
 extern char *JB_SandboxExtensions;
 extern char *JB_RootPath;
 #define JB_ROOT_PATH(path) ({ \

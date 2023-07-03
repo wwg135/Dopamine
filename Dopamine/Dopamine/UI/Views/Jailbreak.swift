@@ -6,18 +6,19 @@
 //
 
 import UIKit
+import Foundation
 import Fugu15KernelExploit
 import CBindings
 
-var fakeRootPath: String? = nil
 public func rootifyPath(path: String) -> String? {
+    var fakeRootPath: String? = nil
     if fakeRootPath == nil {
         fakeRootPath = Bootstrapper.locateExistingFakeRoot()
     }
     if fakeRootPath == nil {
         return nil
     }
-    return fakeRootPath! + "/procursus/" + path
+    return fakeRootPath! + "/" + path
 }
 
 func getBootInfoValue(key: String) -> Any? {
@@ -191,20 +192,20 @@ func changeMobilePassword(newPassword: String) {
 
 
 func changeEnvironmentVisibility(hidden: Bool) {
-    if hidden {
-        _ = execCmd(args: [CommandLine.arguments[0], "hide_environment"])
-    }
-    else {
-        _ = execCmd(args: [CommandLine.arguments[0], "unhide_environment"])
-    }
+   if hidden {
+       _ = execCmd(args: [CommandLine.arguments[0], "hide_environment"])
+   }
+   else {
+       _ = execCmd(args: [CommandLine.arguments[0], "unhide_environment"])
+   }
 
-    if isJailbroken() {
-        jbdSetFakelibVisible(!hidden)
-    }
+//   if isJailbroken() {
+//       jbdSetFakelibVisible(!hidden)
+//   }
 }
 
 func isEnvironmentHidden() -> Bool {
-    return !FileManager.default.fileExists(atPath: "/var/jb")
+   return !FileManager.default.fileExists(atPath: "/var/jb")
 }
 
 func update(tipaURL: URL) {

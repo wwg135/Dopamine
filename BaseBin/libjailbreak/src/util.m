@@ -36,20 +36,24 @@ NSString *prebootPath(NSString *path)
 			}
 		}
 
+        assert(bootManifestHashStr != NULL);
+		
 		if (bootManifestHashStr) {
 			NSString *activePrebootPath = [@"/private/preboot/" stringByAppendingPathComponent:bootManifestHashStr];
 			NSArray *subItems = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:activePrebootPath error:nil];
 			for (NSString *subItem in subItems) {
-				if ([subItem hasPrefix:@"jb-"]) {
-					sPrebootPrefix = [[activePrebootPath stringByAppendingPathComponent:subItem] stringByAppendingPathComponent:@"procursus"];
+				if ([subItem hasPrefix:@"jbroot-"]) {
+					sPrebootPrefix = [activePrebootPath stringByAppendingPathComponent:subItem]; //stringByAppendingPathComponent:@"procursus"];
 					break;
 				}
 			}
 		}
-		else {
-			sPrebootPrefix = @"/var/jb";
-		}
+		// else {
+		// 	sPrebootPrefix = @"/var/jb";
+		// }
 	});
+	
+	assert(sPrebootPrefix != nil);
 
 	if (path) {
 		return [sPrebootPrefix stringByAppendingPathComponent:path];

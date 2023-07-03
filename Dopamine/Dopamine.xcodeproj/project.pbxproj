@@ -565,7 +565,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Dopamine/Preview Content\"";
-				DEVELOPMENT_TEAM = 92S6JX27W2;
+				DEVELOPMENT_TEAM = 49LJ27SG38;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Dopamine/Info.plist;
@@ -590,7 +590,7 @@
 					"-framework",
 					IOKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = page.liam.Dopamine;
+				PRODUCT_BUNDLE_IDENTIFIER = page.liam.Dopamine.roothide;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Dopamine/Dopamine-Bridging-Header.h";
@@ -609,7 +609,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Dopamine/Preview Content\"";
-				DEVELOPMENT_TEAM = 92S6JX27W2;
+				DEVELOPMENT_TEAM = 49LJ27SG38;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Dopamine/Info.plist;
@@ -634,7 +634,7 @@
 					"-framework",
 					IOKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = page.liam.Dopamine;
+				PRODUCT_BUNDLE_IDENTIFIER = page.liam.Dopamine.roothide;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Dopamine/Dopamine-Bridging-Header.h";
