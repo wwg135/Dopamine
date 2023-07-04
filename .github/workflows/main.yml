@@ -51,7 +51,7 @@ jobs:
       
       - name: Pre body
         run: |
-          echo -e "版本：${{ env.VERSION }} (尝鲜版)\n更新时间：${{ env.shT }}" >> body.txt
+          echo -e "版本：${{ env.VERSION }} (尝鲜版)\n\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.VERSION }}/Dopamine.ipa)" >> body.txt
           echo -e "\n增删改：" >> body.txt
           echo -e "\n${{ env.logT }}" >> body.txt
       
@@ -61,7 +61,7 @@ jobs:
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
           cp Dopamine/Dopamine.tipa Dopamine/Dopamine.ipa
-          mv Dopamine/Dopamine.tipa Dopamine_${{ env.msT }}.ipa
+          mv Dopamine/Dopamine.tipa Dopamine.ipa
 
       - name: Release
         uses: softprops/action-gh-release@v1
