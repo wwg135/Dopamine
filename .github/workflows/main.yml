@@ -2,7 +2,7 @@ name: build_Release
 on:
   push:
     branches:
-      - master
+      - 1.1-Dev
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -62,7 +62,7 @@ jobs:
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
           cp Dopamine/Dopamine.tipa Dopamine/Dopamine.ipa
-          mv Dopamine/Dopamine.tipa Dopamine_${{ env.msT }}.ipa
+          mv Dopamine/Dopamine.tipa Dopamine.ipa
 
       - name: Release
         uses: softprops/action-gh-release@v1
