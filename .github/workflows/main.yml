@@ -72,7 +72,7 @@ jobs:
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
-           *.ipa
+           *.tipa
 
       - name: Upload Artifact
         id: dopamine-upload
