@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1_7'
+  VERSION: '1.1_6'
  
 jobs:
   build:
@@ -51,9 +51,10 @@ jobs:
       
       - name: Pre body
         run: |
-          echo -e "版本：${{ env.VERSION }} (尝鲜版)\n\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.VERSION }}/Dopamine.ipa)" >> body.txt
+          echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.VERSION }}/Dopamine.ipa)" >> body.txt
           echo -e "\n增删改：" >> body.txt
           echo -e "\n${{ env.logT }}" >> body.txt
+          echo -e "> - 同步官方最新代码" >> body.txt
       
       - name: Build ipa
         run: |
