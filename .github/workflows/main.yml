@@ -51,7 +51,7 @@ jobs:
       
       - name: Pre body
         run: |
-          echo -e "版本：${{ env.VERSION }} (尝鲜版)\n更新时间戳：${{ env.msT }}\n北京时间：${{ env.shT }}" >> body.txt
+          echo -e "版本：${{ env.VERSION }} (尝鲜版)\n更新时间：${{ env.shT }}" >> body.txt
           echo -e "\n增删改：" >> body.txt
           echo -e "\n${{ env.logT }}" >> body.txt
       
