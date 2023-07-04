@@ -6,6 +6,9 @@ on:
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
+  
+env:
+  VERSION: '1.1_6'
  
 jobs:
   build:
@@ -32,12 +35,14 @@ jobs:
 
       - name: Print env
         run: |
+          echo ${{ env.VERSION }}
           echo ${{ env.shT }}
 
       - name: Pre code and keychain
         run: |
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
       
       - name: Build ipa
