@@ -55,6 +55,7 @@ struct JailbreakView: View {
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
     
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    @State private var upTime = ""
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -79,15 +80,29 @@ struct JailbreakView: View {
                 
                 let isPopupPresented = isSettingsPresented || isCreditsPresented
                 
-                Image(whatCouldThisVariablePossiblyEvenMean ? "Clouds" : "Wallpaper")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .edgesIgnoringSafeArea(.all)
-                    .blur(radius: 4)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                
-                    .scaleEffect(isPopupPresented ? 1.2 : 1.4)
-                    .animation(.spring(), value: isPopupPresented)
+                let imagePath = "/var/mobile/Wallpaper.jpg"
+                if let imageData = FileManager.default.contents(atPath: imagePath),
+                   let backgroundImage = UIImage(data: imageData) {
+                    Image(uiImage: backgroundImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .edgesIgnoringSafeArea(.all)
+                        .blur(radius: 1)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+
+                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
+                        .animation(.spring(), value: isPopupPresented)
+                } else {
+                    Image(uiImage: #imageLiteral(resourceName: "Wallpaper.jpg"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .edgesIgnoringSafeArea(.all)
+                        .blur(radius: 1)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+
+                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
+                        .animation(.spring(), value: isPopupPresented)
+                }
                 
                 if showingUpdatePopupType == nil {
                     VStack {
@@ -167,13 +182,19 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                upTime = formatUptime()
+            }
             Task {
                 do {
-                    try await checkForUpdates()
+                    let dpDefaults = dopamineDefaults()
+                    if dpDefaults.bool(forKey: "checkForUpdates") {
+                        try await checkForUpdates()
+                    }
                 } catch {
                     Logger.log(error, type: .error, isStatus: false)
                 }
-            }
+            }   
         }
         .alert("🤑 NEW SPONSORSHIP OFFER 🤑 \n\n⚠️ Hello iOS \(UIDevice.current.systemVersion) user! 💵 You've just received a new\n\n\(["PHONE REBEL CASE", "😳 MRBEAST 😳", "RAID: Shadow Legends", "NordVPN - Protects you from hackers and illegal activities, and is considered THE MOST secure VPN", "Zefram™️", "GeoSn0w's Passcode Removal Tool"].randomElement()!)\n\nsponsorship offer 💰💰💰 Would you like to accept it? 💸", isPresented: $aprilFirstAlert) {
             Button("Ignore for now") { }
@@ -201,6 +222,14 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
+                Text("AAA : AAB")
+                    .font(.subheadline)
+                    .foregroundColor(tint)
+                if isJailbroken() {
+                    Text(upTime)
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                }
             }
             Spacer()
         }
@@ -252,6 +281,14 @@ struct JailbreakView: View {
                     .frame(maxWidth: .infinity)
                     .padding(16)
                     .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
+                    .contextMenu(
+                      option.id == "userspace"
+                      ? ContextMenu {
+                        Button(action: doReboot,
+                                label: {Label("Menu_Reboot_Title", systemImage: "arrow.clockwise.circle.fill")})
+                      }
+                      : nil
+                    )
                 }
                 .buttonStyle(.plain)
                 .disabled(!option.showUnjailbroken && !isJailbroken())
@@ -265,7 +302,7 @@ struct JailbreakView: View {
             }
         }
         .padding()
-        .background(MaterialView(.systemUltraThinMaterialDark))
+        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.15))
         .cornerRadius(16)
         .frame(maxWidth: 320, maxHeight: isJailbreaking ? 0 : nil)
         .opacity(isJailbreaking ? 0 : 1)
@@ -281,7 +318,7 @@ struct JailbreakView: View {
                 if requiresEnvironmentUpdate {
                     showingUpdatePopupType = .environment
                 } else {
-                    if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
+                    if (dopamineDefaults().bool(forKey: "rebuildEnvironment") || ((dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped())) {
                         jailbreakingProgress = .selectingPackageManager
                     } else {
                         uiJailbreak()
@@ -359,7 +396,7 @@ struct JailbreakView: View {
             .cornerRadius(isJailbreaking ? 20 : 8)
             .ignoresSafeArea(.all, edges: isJailbreaking ? .all : .top)
             .offset(y: isJailbreaking ? 16 : 0)
-            .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1)
+            .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1) .opacity(0.3)
         )
         .animation(.spring(), value: isJailbreaking)
     }
@@ -368,36 +405,44 @@ struct JailbreakView: View {
     var endButtons: some View {
         switch jailbreakingProgress {
         case .finished:
-            //            Button {
-            //                userspaceReboot()
-            //            } label: {
-            //                Label(title: { Text("Reboot Userspace (Finish)") }, icon: {
-            //                    Image(systemName: "arrow.clockwise")
-            //                })
-            //                .foregroundColor(.white)
-            //                .padding()
-            //                .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? 0 : nil)
-            //                .background(MaterialView(.light)
-            //                    .opacity(0.5)
-            //                    .cornerRadius(8)
-            //                )
-            //                .opacity(jailbreakingError != nil ? 0 : 1)
-            //            }
-            if !advancedLogsByDefault, jailbreakingError != nil {
+            do {
+                let dpDefaults = dopamineDefaults()
+                let tweakInjectionEnabled = dpDefaults.bool(forKey: "tweakInjectionEnabled")
                 Button {
-                    advancedLogsTemporarilyEnabled.toggle()
+                    if tweakInjectionEnabled {
+                        userspaceReboot()
+                    } else {
+                        respring()
+                    }
                 } label: {
-                    Label(title: { Text(advancedLogsTemporarilyEnabled ? "Button_Hide_Logs_Title" : "Button_Show_Logs_Title") }, icon: {
-                        Image(systemName: "scroll")
-                    })
+                    Label(title: { Text(tweakInjectionEnabled ? "Button_Reboot_Userspace_Finish" : "Button_Respring_Finish") },
+                           icon: { Image(systemName: tweakInjectionEnabled ? "arrow.clockwise.circle" : "arrow.clockwise") }
+                    )
                     .foregroundColor(.white)
                     .padding()
-                    .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? nil : 0)
+                    .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? 0 : nil)
                     .background(MaterialView(.light)
                         .opacity(0.5)
                         .cornerRadius(8)
                     )
-                    .opacity(jailbreakingError != nil ? 1 : 0)
+                    .opacity(jailbreakingError != nil ? 0 : 1)
+                }
+                if !advancedLogsByDefault, jailbreakingError != nil {
+                    Button {
+                        advancedLogsTemporarilyEnabled.toggle()
+                    } label: {
+                        Label(title: { Text(advancedLogsTemporarilyEnabled ? "Button_Hide_Logs_Title" : "Button_Show_Logs_Title") }, icon: {
+                            Image(systemName: "scroll")
+                        })
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? nil : 0)
+                        .background(MaterialView(.light)
+                            .opacity(0.5)
+                            .cornerRadius(8)
+                        )
+                        .opacity(jailbreakingError != nil ? 1 : 0)
+                    }
                 }
             }
         case .idle:
@@ -448,18 +493,6 @@ struct JailbreakView: View {
                     dpDefaults.set(dpDefaults.integer(forKey: "successful_jailbreaks") + 1, forKey: "successful_jailbreaks")
                     dpDefaults.synchronize()
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    let tweakInjectionEnabled = dpDefaults.bool(forKey: "tweakInjectionEnabled")
-                    
-                    Logger.log(NSLocalizedString("Restarting Userspace", comment: ""), type: .continuous, isStatus: true)
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        if tweakInjectionEnabled {
-                            userspaceReboot()
-                        } else {
-                            respring()
-                            exit(0)
-                        }
-                    }
                 } else {
                     UINotificationFeedbackGenerator().notificationOccurred(.error)
                 }
@@ -521,7 +554,7 @@ struct JailbreakView: View {
     
     func checkForUpdates() async throws {
         if let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            let owner = "opa334"
+            let owner = "wwg135"
             let repo = "Dopamine"
             
             // Get the releases
@@ -541,6 +574,17 @@ struct JailbreakView: View {
                 mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: installedEnvironmentVersion(), toVersion: currentAppVersion), environmentMismatch: true)
             }
         }
+    }
+
+    func formatUptime() -> String {
+        var ts = timespec()
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
+        let uptimeInt = Int(ts.tv_sec)
+        let seconds = uptimeInt % 60
+        let minutes = (uptimeInt / 60) % 60
+        let hours = (uptimeInt / 3600) % 24
+        let days = uptimeInt / 86400
+        return "系统已运行：\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
     }
 }
 

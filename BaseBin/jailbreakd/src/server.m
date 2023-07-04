@@ -511,6 +511,7 @@ int main(int argc, char* argv[])
 			if (bootInfo_getUInt64(@"jbdIconCacheNeedsRefresh")) {
 				spawn(prebootPath(@"usr/bin/uicache"), @[@"-a"]);
 				bootInfo_setObject(@"jbdIconCacheNeedsRefresh", nil);
+                                sleep(1);
 			}
 
 			if (bootInfo_getUInt64(@"jbdShowUserspacePanicMessage")) {
