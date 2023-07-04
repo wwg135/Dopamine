@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   
 env:
-  VERSION: '1.1_6'
+  VERSION: '1.1_7'
  
 jobs:
   build:
@@ -30,13 +30,17 @@ jobs:
 
       - name: Set env
         run: |
+          echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
           echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
+          echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
           echo "shorthash=${SHASH}" >> $GITHUB_ENV
 
       - name: Print env
         run: |
           echo ${{ env.VERSION }}
+          echo ${{ env.msT }}
           echo ${{ env.shT }}
+          echo ${{ env.logT }}
 
       - name: Pre code and keychain
         run: |
@@ -44,6 +48,12 @@ jobs:
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
+          
+      - name: Pre body
+        run: |
+          echo -e "版本：${{ env.VERSION }} (尝鲜版)\n更新时间戳：${{ env.msT }}\n北京时间：${{ env.shT }}" >> body.txt
+          echo -e "\n增删改：" >> body.txt
+          echo -e "\n${{ env.logT }}" >> body.txt
       
       - name: Build ipa
         run: |
@@ -51,6 +61,18 @@ jobs:
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
           cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine.ipa
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}
+          target_commitish: Dev
+          body_path: body.txt
+          prerelease: true
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          files: |
+           *.ipa
 
       - name: Upload Artifact
         id: dopamine-upload
