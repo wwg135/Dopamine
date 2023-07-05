@@ -2,11 +2,11 @@ name: build_Release
 on:
   push:
     branches:
-      - master
+      - 1.0.5
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
- 
+
 env:
   VERSION: '1.0.5_2'
  
@@ -20,7 +20,7 @@ jobs:
       - name: Install Procursus
         uses: wwg135/procursus-action@main
         with:
-          packages: ldid findutils sed coreutils trustcache make
+          packages: ldid trustcache make findutils coreutils
 
       - name: Install THEOS
         run: |
@@ -30,13 +30,17 @@ jobs:
 
       - name: Set env
         run: |
+          sT=$(TZ=UTC-8 date +'%S')
+          echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
           echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
-          echo "shorthash=${SHASH}" >> $GITHUB_ENV
+          echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
 
       - name: Print env
         run: |
           echo ${{ env.VERSION }}
+          echo ${{ env.msT }}
           echo ${{ env.shT }}
+          echo ${{ env.logT }}
 
       - name: Pre code and keychain
         run: |
@@ -45,12 +49,31 @@ jobs:
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
       
+      - name: Pre body
+        run: |
+          echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
+          echo -e "\n更新时间：${{ env.logT }}" >> body.txt
+          echo -e "\n更新日志如下：" >> body.txt
+          echo -e "> - 维护更新1.0.5版本，1.1以上版本可忽略更新" >> body.txt
+      
       - name: Build ipa
         run: |
           set -x
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
-          cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine.ipa
+          mv Dopamine/Dopamine.tipa Dopamine.ipa
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ env.VERSION }}
+          tag_name: ${{ env.msT }}
+          target_commitish: Dev
+          body_path: body.txt
+          prerelease: true
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          files: |
+           *.ipa
 
       - name: Upload Artifact
         id: dopamine-upload
@@ -58,4 +81,4 @@ jobs:
         with:
           name: Dopamine
           path: |
-            ${{ github.workspace }}/Dopamine/Dopamine.ipa
+            Dopamine.ipa
