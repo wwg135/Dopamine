@@ -18,7 +18,7 @@ void machoEnumerateLoadCommands(FILE *machoFile, uint32_t archOffset, void (^enu
 void machoFindLoadCommand(FILE *machoFile, uint32_t cmd, void *lcOut, size_t lcSize);
 void machoFindCSData(FILE* machoFile, uint32_t archOffset, uint32_t* outOffset, uint32_t* outSize);
 
-void machoEnumerateDependencies(FILE *machoFile, uint32_t archOffset, NSString *machoPath, void (^enumerateBlock)(NSString *dependencyPath));
+void machoEnumerateDependencies(FILE *machoFile, uint32_t archOffset, NSString *machoPath, NSString *executablePath, void (^enumerateBlock)(NSString *dependencyPath));
 
 void machoCSDataEnumerateBlobs(FILE *machoFile, uint32_t CSDataStart, uint32_t CSDataSize, void (^enumerateBlock)(struct CSBlob blobDescriptor, uint32_t blobDescriptorOffset, BOOL *stop));
 NSData *machoCSDataCalculateCDHash(FILE *machoFile, uint32_t CSDataStart, uint32_t CSDataSize);

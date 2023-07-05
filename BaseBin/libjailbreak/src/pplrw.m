@@ -7,6 +7,10 @@
 #import "kcall.h"
 #import "libjailbreak.h"
 
+
+#define JBLogDebug(format ...)
+#define JBLogError(format ...)
+
 #import <Foundation/Foundation.h>
 #define min(a,b) (((a)<(b))?(a):(b))
 
