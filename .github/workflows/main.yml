@@ -79,7 +79,7 @@ jobs:
           tag_name: ${{ env.msT }}
           target_commitish: Dev
           body_path: body.txt
-          prerelease: true
+          latest: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
