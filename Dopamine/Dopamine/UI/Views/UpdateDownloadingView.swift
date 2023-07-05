@@ -184,7 +184,7 @@ struct UpdateDownloadingView: View {
         let repo = "Dopamine"
         
         // Get the releases
-        let releasesURL = URL(string: "https://CCC/"+"https://api.github.com/repos/\(owner)/\(repo)/releases")!
+        let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
         let releasesRequest = URLRequest(url: releasesURL)
         let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
         let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as! [[String: Any]]
@@ -196,7 +196,7 @@ struct UpdateDownloadingView: View {
               let assets = latestRelease["assets"] as? [[String: Any]],
               let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
               let downloadURLString = asset["browser_download_url"] as? String,
-              let downloadURL = URL(string: "https://CCC/"+downloadURLString) else {
+              let downloadURL = URL(string: downloadURLString) else {
             throw "Could not find download URL for ipa"
         }
         
