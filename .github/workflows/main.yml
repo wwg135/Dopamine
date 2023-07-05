@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1_6'
+  VERSION: '1.1_7'
  
 jobs:
   build:
@@ -51,8 +51,7 @@ jobs:
       - name: Pre body
         run: |
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.VERSION }}/Dopamine.ipa)" >> body.txt
-          echo -e "\n更新时间：" >> body.txt
-          echo -e "\n${{ env.logT }}" >> body.txt
+          echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n更新日志如下：" >> body.txt
           echo -e "> - 同步官方最新代码" >> body.txt
       
@@ -61,7 +60,7 @@ jobs:
           set -x
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
-          cp Dopamine/Dopamine.tipa Dopamine/Dopamine.ipa
+          cp Dopamine/Dopamine.tipa Dopamine.ipa
           mv Dopamine/Dopamine.tipa Dopamine.ipa
 
       - name: Release
@@ -82,4 +81,4 @@ jobs:
         with:
           name: Dopamine
           path: |
-            ${{ github.workspace }}/Dopamine/Dopamine.ipa
+            Dopamine.ipa
