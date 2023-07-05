@@ -421,18 +421,15 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 	}
 
 	if (!strcmp(path, "/usr/libexec/xpcproxy")) {
-		if (argv) {
-			if (argv[0]) {
-				if (argv[1]) {
-					if (!strcmp(argv[1], "com.opa334.jailbreakd")) {
-						// Don't do anything for xpcproxy if it's called on jailbreakd because this also implies jbd is not running currently
-						return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
-					}
-					else if (!strcmp(argv[1], "com.apple.ReportCrash")) {
-						// Skip ReportCrash too as it might need to execute while jailbreakd is in a crashed state
-						return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
-					}
-				}
+		if (argv && argv[0] && argv[1]) {
+			if (!strcmp(argv[1], "com.opa334.jailbreakd")) {
+				return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+			}
+			if (!strcmp(argv[1], "com.apple.CrashReporter")) {
+				return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+			}
+			if (!strcmp(argv[1], "com.apple.ReportCrash")) {
+				return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 			}
 		}
 	}
@@ -440,6 +437,7 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 	// Blacklist to ensure general system stability
 	// I don't like this but for some processes it seems neccessary
 	const char *processBlacklist[] = {
+		"/System/Library/CoreServices/ReportCrash",
 		"/System/Library/Frameworks/GSS.framework/Helpers/GSSCred",
 		"/System/Library/PrivateFrameworks/IDSBlastDoorSupport.framework/XPCServices/IDSBlastDoorService.xpc/IDSBlastDoorService",
 		"/System/Library/PrivateFrameworks/MessagesBlastDoorSupport.framework/XPCServices/MessagesBlastDoorService.xpc/MessagesBlastDoorService",
@@ -611,7 +609,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 
 			envbuf_setenv(&envc, "JB_SANDBOX_EXTENSIONS", JB_SandboxExtensions);
 			envbuf_setenv(&envc, "JB_ROOT_PATH", JB_RootPath);
-			
+
 			envbuf_setenv(&envc, "JBRAND", JBRAND);
 			envbuf_setenv(&envc, "JBROOT", JBROOT);
 		}

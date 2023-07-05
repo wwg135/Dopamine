@@ -47,11 +47,14 @@ void setTweaksEnabled(bool enabled)
 #include <libgen.h>
 void ensure_jbroot_symlink(const char* atpath)
 {
+	if(access(atpath, F_OK) !=0 )
+		return;
+
 	char* jbrootpath = prebootPath(nil).UTF8String;
 
 	struct stat jbrootst;
 	assert(stat(jbrootpath, &jbrootst) == 0);
-	
+
 	char sympath[PATH_MAX];
 	snprintf(sympath,sizeof(sympath),"%s/.jbroot", atpath);
 
@@ -62,23 +65,48 @@ void ensure_jbroot_symlink(const char* atpath)
 		{
 			if(stat(sympath, &symst) == 0)
 			{
-				if(symst.st_dev==jbrootst.st_dev 
+				if(symst.st_dev==jbrootst.st_dev
 					&& symst.st_ino==jbrootst.st_ino)
 					return;
 			}
 
 			assert(unlink(sympath) == 0);
-			
+
 		} else {
 			//just let it go
 			return;
 		}
 	}
 
-	assert(symlink(jbrootpath, sympath) == 0);
+	if(symlink(jbrootpath, sympath) !=0 )
+		JBLogError("symlink error @ %s\n", sympath);
 }
 
-int processBinary(NSString *binaryPath)
+#include <libjailbreak/vnode.h>
+void ensure_mappable_in_var(const char* path)
+{
+	JBLogDebug("ensure_mappable_in_var %s\n", path);
+
+	int fd = open(path, O_RDONLY);
+	if(fd < 0) return;
+
+	uint64_t vp = proc_get_vnode_by_file_descriptor(self_proc(), fd);
+	assert(vp != 0);
+
+	struct vnode v={0};
+	kreadbuf(vp, &v, sizeof(v));
+
+	kwrite32(vp+offsetof(struct vnode, v_usecount), v.v_usecount+1);
+	kwrite32(vp+offsetof(struct vnode, v_flag), v.v_flag|0x000200); //VSHARED_DYLD
+
+	close(fd);
+
+	JBLogDebug("ensure_mappable_in_var=%x\n", v.v_flag);
+
+	return;
+}
+
+int processBinary(int pid, NSString *binaryPath)
 {
 	if (!binaryPath) return 0;
 	if (![[NSFileManager defaultManager] fileExistsAtPath:binaryPath]) return 0;
@@ -116,12 +144,15 @@ int processBinary(NSString *binaryPath)
 						}
 
 						ensure_jbroot_symlink(dirname(dependencyPath.UTF8String));
+						ensure_mappable_in_var(dependencyPath.UTF8String);
 					}
 				};
 
 				tcCheckBlock(binaryPath);
 
-				machoEnumerateDependencies(machoFile, bestArch, binaryPath, tcCheckBlock);
+				NSString* executablePath = isLibrary ? proc_get_path(pid) : binaryPath;
+
+				machoEnumerateDependencies(machoFile, bestArch, binaryPath, executablePath, tcCheckBlock);
 
 				dynamicTrustCacheUploadCDHashesFromArray(nonTrustCachedCDHashes);
 			}
@@ -402,7 +433,7 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 							const char* filePath = xpc_dictionary_get_string(message, "filePath");
 							if (filePath) {
 								NSString *nsFilePath = [NSString stringWithUTF8String:filePath];
-								result = processBinary(nsFilePath);
+								result = processBinary(clientPid, nsFilePath);
 							}
 						}
 						else {
