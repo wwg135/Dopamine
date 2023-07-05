@@ -20,7 +20,7 @@ jobs:
       - name: Install Procursus
         uses: wwg135/procursus-action@main
         with:
-          packages: ldid findutils sed coreutils trustcache make
+          packages: ldid trustcache make findutils coreutils
 
       - name: Install THEOS
         run: |
@@ -33,7 +33,6 @@ jobs:
           sT=$(TZ=UTC-8 date +'%S')
           echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
           echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
-          echo "shorthash=${SHASH}" >> $GITHUB_ENV
 
       - name: Print env
         run: |
