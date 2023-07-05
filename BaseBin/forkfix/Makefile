@@ -12,4 +12,3 @@ $(TARGET): $(wildcard src/*.c src/*.S)
 
 clean:
 	@rm -f $(TARGET)
-
