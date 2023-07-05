@@ -54,15 +54,15 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n当前更新日志如下：" >> body.txt
-          echo -e "> - 维护更新1.0.5版本，1.1以上版本可忽略更新" >> body.txt
+          echo -e "> - **维护更新1.0.5版本，1.1以上版本可忽略更新**" >> body.txt
           echo -e "\n1.0.5_2的修改版功能如下：" >> body.txt
-          echo -e "> - 注意：追求稳定，此版本无【桥接心浪】、【映射挂载】、【重建环境】、【底层屏蔽】功能" >> body.txt
-          echo -e "> - →→→→→新增【检查更新】功能，设置里面打开即可检查更新，默认关闭！！！" >> body.txt
-          echo -e "> - →→→→→新增初次越狱/重建越狱时，默认安装 【ElleKit_1.0】 和 【PreferenceLoader_2.2.6.1】。感谢liam0205大佬的代码！！！" >> body.txt
-          echo -e "> - →→→→→首页新增【系统运行时间】----越狱后显示，打开多巴胺即弹出！！！" >> body.txt
-          echo -e "> - →→→→→长按【重启用户空间】3Dtouch弹出的【重启】功能才是真正重启手机（此操作重启后处于非越狱状态，谨慎操作）！！！" >> body.txt
-          echo -e "> - →→→→→增加：【自定义dopamine首页背景】--将图片命名为：Wallpaper.jpg放置在目录：/var/mobile/！！！" >> body.txt
-          echo -e "> - →→→→→其他设置UI、显示细节优化。。。" >> body.txt
+          echo -e "> - 注意：追求稳定，此版本无【桥接心浪】、【映射挂载】、【重建环境】、【底层屏蔽】功能**" >> body.txt
+          echo -e "> - **1、新增【检查更新】功能，设置里面打开即可检查更新，默认关闭**！！！" >> body.txt
+          echo -e "> - **2、新增初次越狱/重建越狱时，默认安装 【ElleKit_1.0】 和 【PreferenceLoader_2.2.6.1】。感谢liam0205大佬的代码！！！**" >> body.txt
+          echo -e "> - **3、首页新增【系统运行时间】----越狱后显示，打开多巴胺即弹出！！！**" >> body.txt
+          echo -e "> - **4、长按【重启用户空间】3Dtouch弹出的【重启】功能才是真正重启手机（此操作重启后处于非越狱状态，谨慎操作）！！！**" >> body.txt
+          echo -e "> - **5、增加：【自定义dopamine首页背景】--将图片命名为：Wallpaper.jpg放置在目录：/var/mobile/！！！**" >> body.txt
+          echo -e "> - **6、其他设置UI、显示细节优化。。。**" >> body.txt
       
       - name: Build ipa
         run: |
