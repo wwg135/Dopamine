@@ -31,14 +31,12 @@ jobs:
       - name: Set env
         run: |
           sT=$(TZ=UTC-8 date +'%S')
-          echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
           echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
           echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
 
       - name: Print env
         run: |
           echo ${{ env.VERSION }}
-          echo ${{ env.msT }}
           echo ${{ env.shT }}
           echo ${{ env.logT }}
 
@@ -51,7 +49,7 @@ jobs:
       
       - name: Pre body
         run: |
-          echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
+          echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.VERSION }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
           echo -e "\n> - 同步官方最新代码" >> body.txt
@@ -80,7 +78,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ env.VERSION }}
-          tag_name: ${{ env.msT }}
+          tag_name: ${{ env.VERSION }}
           target_commitish: Dev
           body_path: body.txt
           prerelease: true
