@@ -556,12 +556,12 @@ struct JailbreakView: View {
     }
     
     func checkForUpdates() async throws {
-            let currentAppVersion = "AAC"
+        if let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
             let owner = "wwg135"
             let repo = "Dopamine"
             
             // Get the releases
-            let releasesURL = URL(string: "https://CCC/"+"https://api.github.com/repos/\(owner)/\(repo)/releases")!
+            let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
             let releasesRequest = URLRequest(url: releasesURL)
             let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
             guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
