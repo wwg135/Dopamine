@@ -2,13 +2,13 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.0.5_2-bridge
+      - 1.0.5-bridge
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
 
 env:
-  VERSION: '1.0.5_2-bridge'
+  VERSION: '1.0.5-bridge'
  
 jobs:
   build:
