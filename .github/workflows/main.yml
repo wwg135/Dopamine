@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1_7'
+  VERSION: '1.1'
 
 jobs:
   build:
@@ -54,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方最新代码" >> body.txt
+          echo -e "\n> - 更新OTA升级逻辑，同步官方最新代码" >> body.txt
           echo -e "\n1.1的修改版功能如下：" >> body.txt
           echo -e "**注意：追求稳定，此版本无【桥接心浪】、【映射挂载】、【重建环境】功能**" >> body.txt
           echo -e "> - 1、新增【检查更新】功能，设置里面打开即可检查更新，默认关闭！！！" >> body.txt
@@ -71,6 +71,18 @@ jobs:
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
           mv Dopamine/Dopamine.tipa Dopamine.ipa
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ env.VERSION }}
+          tag_name: ${{ env.msT }}
+          target_commitish: 1.1
+          body_path: body.txt
+          prerelease: true
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          files: |
+           *.ipa
 
       - name: Upload Artifact
         id: dopamine-upload
