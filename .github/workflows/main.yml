@@ -83,7 +83,7 @@ jobs:
           tag_name: ${{ env.msT }}
           target_commitish: 1.0.5-bridge
           body_path: body.txt
-          prerelease: true
+          prerelease: false
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
