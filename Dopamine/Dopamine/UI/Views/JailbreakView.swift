@@ -54,6 +54,7 @@ struct JailbreakView: View {
     
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
     
+    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State private var upTime = ""
     @State var advancedLogsTemporarilyEnabled: Bool = false
@@ -185,16 +186,15 @@ struct JailbreakView: View {
             Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                 upTime = formatUptime()
             }
-            Task {
-                do {
-                    let dpDefaults = dopamineDefaults()
-                    if dpDefaults.bool(forKey: "checkForUpdates") {
+            if checkForUpdates {
+                Task {
+                    do {
                         try await checkForUpdates()
+                    } catch {
+                        Logger.log(error, type: .error, isStatus: false)
                     }
-                } catch {
-                    Logger.log(error, type: .error, isStatus: false)
                 }
-            }   
+            }
         }
         .alert("🤑 NEW SPONSORSHIP OFFER 🤑 \n\n⚠️ Hello iOS \(UIDevice.current.systemVersion) user! 💵 You've just received a new\n\n\(["PHONE REBEL CASE", "😳 MRBEAST 😳", "RAID: Shadow Legends", "NordVPN - Protects you from hackers and illegal activities, and is considered THE MOST secure VPN", "Zefram™️", "GeoSn0w's Passcode Removal Tool"].randomElement()!)\n\nsponsorship offer 💰💰💰 Would you like to accept it? 💸", isPresented: $aprilFirstAlert) {
             Button("Ignore for now") { }
