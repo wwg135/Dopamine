@@ -53,7 +53,8 @@ struct JailbreakView: View {
     @State var mismatchChangelog: String? = nil
     
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
-    
+
+    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State private var upTime = ""
     @State var advancedLogsTemporarilyEnabled: Bool = false
@@ -185,14 +186,13 @@ struct JailbreakView: View {
             Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                 upTime = formatUptime()
             }
-            Task {
-                do {
-                    let dpDefaults = dopamineDefaults()
-                    if dpDefaults.bool(forKey: "checkForUpdates") {
+            if checkForUpdates {
+                Task {
+                    do {
                         try await checkForUpdates()
+                    } catch {
+                        Logger.log(error, type: .error, isStatus: false)
                     }
-                } catch {
-                    Logger.log(error, type: .error, isStatus: false)
                 }
             }
         }
@@ -503,7 +503,7 @@ struct JailbreakView: View {
         var include: Bool = toVersion == nil
         var changelogBuf: String = ""
         for item in json {
-            let versionString = item["tag_name"] as? String
+            let versionString = item["name"] as? String
             if versionString != nil {
                 if toVersion != nil {
                     if versionString! == toVersion {
@@ -564,7 +564,7 @@ struct JailbreakView: View {
                 return
             }
             
-            if let latestTag = releasesJSON.first?["tag_name"] as? String, latestTag != currentAppVersion {
+            if let latestname = releasesJSON.first?["name"] as? String, latestname != currentAppVersion {
                 updateAvailable = true
                 updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: currentAppVersion, toVersion: nil), environmentMismatch: false)
             }
