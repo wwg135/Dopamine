@@ -13,6 +13,7 @@ This project is the RootHide implementation based on Dopamine Jailbreak.
 - [x]  Unsandbox systemhook.dylib before injected it
 - [x]  Randomize systemhook.dylib file name
 - [x]  Randomize the /var/jb/ fixed path
+- [x]  Move all stuffs from preboot to var
 - [x]  Add jailbreak environment variable
 - [x]  linker/loader works with randomized /var/jb/
 - [x]  symlinks works with randomized /var/jb/
@@ -32,15 +33,28 @@ This project is the RootHide implementation based on Dopamine Jailbreak.
 
 [@opa334](https://github.com/opa334/)
 
-[@CRKatri](https://github.com/CRKatri)
+[@cameron](https://github.com/CRKatri)
+
+[@kirb](https://github.com/kirb)
+
+[@fugu15](https://github.com/pinauten/Fugu15)
+
+[@jakejames](https://github.com/jakeajames)
+
+[@coolstar](https://github.com/coolstar)
 
 [@procursus](https://github.com/ProcursusTeam/Procursus)
 
 [@theos](https://github.com/theos/theos)
 
+[@sileo](https://github.com/Sileo/Sileo)
 
 # Info
 
-[theos_discord_server](https://theos.dev/discord)
+[theos-discord-server](https://theos.dev/discord)
 
-[procursus_discord_server](https://discord.gg/QJDrrAJPDY)
+[sileo-discrod-server](https://discord.com/invite/Udn4kQg)
+
+[chariz-discord-server](https://discord.com/invite/sEzwNF9)
+
+[procursus-discord-server](https://discord.gg/QJDrrAJPDY)

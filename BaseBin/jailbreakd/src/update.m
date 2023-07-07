@@ -146,15 +146,15 @@ int basebinUpdateFromTar(NSString *basebinPath, bool rebootWhenDone)
 
 	bootInfo_setObject(@"basebin_trustcache_kaddr", @(newTCKaddr));
 
-	NSString *idownloaddEnabledPath = prebootPath(@"basebin/LaunchDaemons/com.opa334.idownloadd.plist");
-	NSString *idownloaddDisabledPath = prebootPath(@"basebin/LaunchDaemons/Disabled/com.opa334.idownloadd.plist");
+	NSString *idownloaddEnabledPath = jbrootPath(@"/basebin/LaunchDaemons/com.opa334.idownloadd.plist");
+	NSString *idownloaddDisabledPath = jbrootPath(@"/basebin/LaunchDaemons/Disabled/com.opa334.idownloadd.plist");
 	BOOL iDownloadWasEnabled = [[NSFileManager defaultManager] fileExistsAtPath:idownloaddEnabledPath];
 
 	// Copy new basebin over old basebin
 	NSArray *basebinItems = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpBasebinPath error:nil];
 	for (NSString *basebinItem in basebinItems) {
 		@autoreleasepool {
-			NSString *oldBasebinPath = [prebootPath(@"basebin") stringByAppendingPathComponent:basebinItem];
+			NSString *oldBasebinPath = [jbrootPath(@"/basebin") stringByAppendingPathComponent:basebinItem];
 			NSString *newBasebinPath = [tmpBasebinPath stringByAppendingPathComponent:basebinItem];
 			if ([[NSFileManager defaultManager] fileExistsAtPath:oldBasebinPath]) {
 				[[NSFileManager defaultManager] removeItemAtPath:oldBasebinPath error:nil];
@@ -169,10 +169,10 @@ int basebinUpdateFromTar(NSString *basebinPath, bool rebootWhenDone)
 	}
 
 	// Update systemhook.dylib on bind mount
-	if ([[NSFileManager defaultManager] fileExistsAtPath:prebootPath(@"basebin/.fakelib/systemhook.dylib")]) {
-		[[NSFileManager defaultManager] removeItemAtPath:prebootPath(@"basebin/.fakelib/systemhook.dylib") error:nil];
+	if ([[NSFileManager defaultManager] fileExistsAtPath:jbrootPath(@"/basebin/.fakelib/systemhook.dylib")]) {
+		[[NSFileManager defaultManager] removeItemAtPath:jbrootPath(@"/basebin/.fakelib/systemhook.dylib") error:nil];
 	}
-	[[NSFileManager defaultManager] copyItemAtPath:prebootPath(@"basebin/systemhook.dylib") toPath:prebootPath(@"basebin/.fakelib/systemhook.dylib") error:nil];
+	[[NSFileManager defaultManager] copyItemAtPath:jbrootPath(@"/basebin/systemhook.dylib") toPath:jbrootPath(@"/basebin/.fakelib/systemhook.dylib") error:nil];
 
 	trustCacheListRemove(existingTCKaddr);
 

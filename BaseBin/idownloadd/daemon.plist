@@ -6,7 +6,7 @@
 	<string>com.opa334.idownloadd</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>basebin/idownloadd</string>
+		<string>idownloadd</string>
 	</array>
 	<key>UserName</key>
 	<string>root</string>

@@ -22,7 +22,7 @@ public func rootifyPath(path: String) -> String? {
 }
 
 func getBootInfoValue(key: String) -> Any? {
-    guard let bootInfoPath = rootifyPath(path: "/basebin/boot_info.plist") else {
+    guard let bootInfoPath = rootifyPath(path: "/var/.boot_info.plist") else {
         return nil
     }
     guard let bootInfo = NSDictionary(contentsOfFile: bootInfoPath) else {

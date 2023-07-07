@@ -1,4 +1,5 @@
 #import <spawn.h>
+#import <libjailbreak/log.h>
 #import "../systemhook/src/common.h"
 #import "boomerang.h"
 #import "substrate.h"
@@ -6,7 +7,7 @@
 #import <Foundation/Foundation.h>
 
 void *posix_spawn_orig;
-int posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
+int posix_spawn_hook(pid_t *restrict pidp, const char *restrict path,
 					   const posix_spawn_file_actions_t *restrict file_actions,
 					   const posix_spawnattr_t *restrict attrp,
 					   char *const argv[restrict],
@@ -37,7 +38,7 @@ int posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 
 			// Say goodbye to this process
 			int (*orig)(pid_t *restrict, const char *restrict, const posix_spawn_file_actions_t *restrict, const posix_spawnattr_t *restrict, char *const[restrict], char *const[restrict]) = posix_spawn_orig;
-			return orig(pid, path, file_actions, attrp, argv, envp);
+			return orig(pidp, path, file_actions, attrp, argv, envp);
 		}
 	}
 
@@ -70,7 +71,52 @@ int posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 		}
 	}*/
 
-	return spawn_hook_common(pid, path, file_actions, attrp, argv, envp, posix_spawn_orig);
+
+	if (strcmp(path, "/usr/libexec/xpcproxy")==0 && access("/var/containers/Bundle/xpcproxy", F_OK)==0) {
+		if(argv[0] && argv[1]) {
+
+			if(
+			 strstr(argv[1], "jailbreakd")==NULL
+
+			&& strstr(argv[1], ".apple.")==NULL
+			&& strstr(argv[1], "/Applications/")!=argv[1]
+			&& strstr(argv[1], "/Developer/")!=argv[1]
+			&& strstr(argv[1], "/System/")!=argv[1]
+			&& strstr(argv[1], "/Library/")!=argv[1]
+			&& strstr(argv[1], "/usr/")!=argv[1]
+			&& strstr(argv[1], "/bin/")!=argv[1]
+			&& strstr(argv[1], "/sbin/")!=argv[1]
+			&& strstr(argv[1], "/private/preboot/")!=argv[1]
+			&& strstr(argv[1], "/var/containers/Bundle/Application/")!=argv[1]
+			&& strstr(argv[1], "/private/var/containers/Bundle/Application/")!=argv[1]
+
+			
+			)
+			{
+				JBLogDebug("use patched xpcproxy: %s", argv[1]);
+				path = "/var/containers/Bundle/xpcproxy";
+			}
+		}
+	}
+
+	posix_spawnattr_t attr;
+	if(!attrp) {
+		attrp = &attr;
+		posix_spawnattr_init(&attr);
+	}
+
+	short flags = 0;
+    posix_spawnattr_getflags(attrp, &flags);
+
+	int pid=0;
+	int ret = spawn_hook_common(&pid, path, file_actions, attrp, argv, envp, posix_spawn_orig);
+	if(pidp) *pidp=pid;
+
+	JBLogDebug("launchd spawn ret=%d pid=%d path=%s flags=%x", ret, pid, path, flags);
+	if(argv) for(int i=0; argv[i]; i++) JBLogDebug("\targs[%d] = %s", i, argv[i]);
+	if(envp) for(int i=0; envp[i]; i++) JBLogDebug("\tenvp[%d] = %s", i, envp[i]);
+
+	return ret;
 }
 
 void initSpawnHooks(void)

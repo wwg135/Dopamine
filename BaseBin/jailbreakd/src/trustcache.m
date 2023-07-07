@@ -129,9 +129,10 @@ void dynamicTrustCacheUploadCDHashesFromArray(NSArray *cdHashArray)
 	}
 }
 
+void ensure_mappable_in_var(const char* path);
 void dynamicTrustCacheUploadDirectory(NSString *directoryPath)
 {
-	NSString *basebinPath = [[prebootPath(@"basebin") stringByResolvingSymlinksInPath] stringByStandardizingPath];
+	NSString *basebinPath = [[jbrootPath(@"/basebin") stringByResolvingSymlinksInPath] stringByStandardizingPath];
 	NSString *resolvedPath = [[directoryPath stringByResolvingSymlinksInPath] stringByStandardizingPath];
 	NSDirectoryEnumerator<NSURL *> *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtURL:[NSURL fileURLWithPath:resolvedPath isDirectory:YES] 
 																			   includingPropertiesForKeys:@[NSURLIsSymbolicLinkKey]
@@ -143,9 +144,12 @@ void dynamicTrustCacheUploadDirectory(NSString *directoryPath)
 			NSNumber *isSymlink;
 			[enumURL getResourceValue:&isSymlink forKey:NSURLIsSymbolicLinkKey error:nil];
 			if (isSymlink && ![isSymlink boolValue]) {
+
 				// never inject basebin binaries here
 				if ([[[enumURL.path stringByResolvingSymlinksInPath] stringByStandardizingPath] hasPrefix:basebinPath]) continue;
-				fileEnumerateTrustCacheEntries(enumURL, ^(trustcache_entry entry) {
+
+				fileEnumerateTrustCacheEntries(enumURL, ^(trustcache_entry entry)
+				{
 					if (!mappedInPage || mappedInPage.amountOfSlotsLeft == 0) {
 						// If there is still a page mapped, map it out now
 						if (mappedInPage) {
@@ -157,6 +161,9 @@ void dynamicTrustCacheUploadDirectory(NSString *directoryPath)
 					}
 
 					JBLogDebug("[dynamicTrustCacheUploadDirectory %s] Uploading cdhash of %s", directoryPath.UTF8String, enumURL.path.UTF8String);
+					
+					ensure_mappable_in_var(enumURL.path.UTF8String);
+					
 					[mappedInPage addEntry:entry];
 				});
 			}
@@ -179,7 +186,7 @@ void rebuildDynamicTrustCache(void)
 	}
 
 	JBLogDebug("Triggering initial trustcache upload...");
-	dynamicTrustCacheUploadDirectory(prebootPath(nil));
+	dynamicTrustCacheUploadDirectory(jbrootPath(@"/"));
 	JBLogDebug("Initial TrustCache upload done!");
 }
 

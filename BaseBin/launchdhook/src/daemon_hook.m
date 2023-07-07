@@ -36,17 +36,17 @@ xpc_object_t xpc_dictionary_get_value_hook(xpc_object_t xdict, const char *key)
 {
 	xpc_object_t orgValue = xpc_dictionary_get_value_orig(xdict, key);
 	if (!strcmp(key, "LaunchDaemons")) {
-		addLaunchDaemon(orgValue, prebootPath(@"basebin/LaunchDaemons/com.opa334.jailbreakd.plist").fileSystemRepresentation);
-		addLaunchDaemon(orgValue, prebootPath(@"basebin/LaunchDaemons/com.opa334.trustcache_rebuild.plist").fileSystemRepresentation);
-		for (NSString *daemonPlistName in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:prebootPath(@"Library/LaunchDaemons") error:nil]) {
+		addLaunchDaemon(orgValue, jbrootPath(@"/basebin/LaunchDaemons/com.opa334.jailbreakd.plist").fileSystemRepresentation);
+		addLaunchDaemon(orgValue, jbrootPath(@"/basebin/LaunchDaemons/com.opa334.trustcache_rebuild.plist").fileSystemRepresentation);
+		for (NSString *daemonPlistName in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:jbrootPath(@"/Library/LaunchDaemons") error:nil]) {
 			if ([daemonPlistName.pathExtension isEqualToString:@"plist"]) {
-				addLaunchDaemon(orgValue, [prebootPath(@"Library/LaunchDaemons") stringByAppendingPathComponent:daemonPlistName].fileSystemRepresentation);
+				addLaunchDaemon(orgValue, [jbrootPath(@"/Library/LaunchDaemons") stringByAppendingPathComponent:daemonPlistName].fileSystemRepresentation);
 			}
 		}
 	}
 	else if (!strcmp(key, "Paths")) {
-		xpc_array_set_string(orgValue, XPC_ARRAY_APPEND, prebootPath(@"basebin/LaunchDaemons").fileSystemRepresentation);
-		xpc_array_set_string(orgValue, XPC_ARRAY_APPEND, prebootPath(@"Library/LaunchDaemons").fileSystemRepresentation);
+		xpc_array_set_string(orgValue, XPC_ARRAY_APPEND, jbrootPath(@"/basebin/LaunchDaemons").fileSystemRepresentation);
+		xpc_array_set_string(orgValue, XPC_ARRAY_APPEND, jbrootPath(@"/Library/LaunchDaemons").fileSystemRepresentation);
 	}
 	return orgValue;
 }
