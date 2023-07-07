@@ -214,7 +214,7 @@ int64_t jbdProcessBinary(const char *filePath)
 	struct statfs fs;
 	int sfsret = statfs(filePath, &fs);
 	if (sfsret == 0) {
-		if (!strcmp(fs.f_mntonname, "/") || !strcmp(fs.f_mntonname, "/usr/lib")) return -1;
+		if (!strcmp(fs.f_mntonname, "/") || !strcmp(fs.f_mntonname, "/usr/lib") || !strcmp(fs.f_mntonname, "/Developer")) return -1;
 	}
 
 	char absolutePath[PATH_MAX];

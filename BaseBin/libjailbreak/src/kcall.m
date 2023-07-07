@@ -413,8 +413,8 @@ int signStateOverLaunchd(uint64_t actContext)
 // boomerang <-> launchd (using libfilecom)
 int signStateLibFileCom(uint64_t actContext, NSString *from, NSString *to)
 {
-	NSString *fromPath = [NSString stringWithFormat:prebootPath(@"basebin/.communication/%@_to_%@"), from, to];
-	NSString *toPath = [NSString stringWithFormat:prebootPath(@"basebin/.communication/%@_to_%@"), to, from];
+	NSString *fromPath = [NSString stringWithFormat:jbrootPath(@"/var/.communication/%@_to_%@"), from, to];
+	NSString *toPath = [NSString stringWithFormat:jbrootPath(@"/var/.communication/%@_to_%@"), to, from];
 	dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 	FCHandler *handler = [[FCHandler alloc] initWithReceiveFilePath:fromPath sendFilePath:toPath];
 	handler.receiveHandler = ^(NSDictionary *message) {

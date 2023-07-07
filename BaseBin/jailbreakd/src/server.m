@@ -35,7 +35,7 @@ void setJetsamEnabled(bool enabled)
 
 void setTweaksEnabled(bool enabled)
 {
-	NSString *safeModePath = prebootPath(@"basebin/.safe_mode");
+	NSString *safeModePath = jbrootPath(@"/basebin/.safe_mode");
 	if (enabled) {
 		[[NSFileManager defaultManager] removeItemAtPath:safeModePath error:nil];
 	}
@@ -50,7 +50,7 @@ void ensure_jbroot_symlink(const char* atpath)
 	if(access(atpath, F_OK) !=0 )
 		return;
 
-	char* jbrootpath = prebootPath(nil).UTF8String;
+	char* jbrootpath = jbrootPath(@"/").UTF8String;
 
 	struct stat jbrootst;
 	assert(stat(jbrootpath, &jbrootst) == 0);
@@ -178,7 +178,10 @@ int launchdInitPPLRW(void)
 	xpc_dictionary_set_bool(msg, "jailbreak", true);
 	xpc_dictionary_set_uint64(msg, "id", LAUNCHD_JB_MSG_ID_GET_PPLRW);
 	xpc_object_t reply = launchd_xpc_send_message(msg);
-	if (!reply) return -1;
+	if (!reply) {
+		JBLogError("launchdInitPPLRW: xpc failed!");
+		return -1;
+	}
 
 	int error = xpc_dictionary_get_int64(reply, "error");
 	if (error == 0) {
@@ -187,6 +190,7 @@ int launchdInitPPLRW(void)
 		return 0;
 	}
 	else {
+		JBLogError("launchdInitPPLRW: xpc error=%d", error);
 		return error;
 	}
 }
@@ -598,7 +602,7 @@ int main(int argc, char* argv[])
 
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 			if (bootInfo_getUInt64(@"jbdIconCacheNeedsRefresh")) {
-				spawn(prebootPath(@"usr/bin/uicache"), @[@"-a"]);
+				spawn(jbrootPath(@"/usr/bin/uicache"), @[@"-a"]);
 				bootInfo_setObject(@"jbdIconCacheNeedsRefresh", nil);
 			}
 
