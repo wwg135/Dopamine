@@ -62,7 +62,7 @@ jobs:
           echo -e "> - 4、新增初次越狱/重建越狱时，默认安装 【ElleKit_1.0】 、 【PreferenceLoader_2.2.6.1】、【Xinamine】。感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 5、新增「重建环境」功能，开关在设置里面。感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 6、新增【系统运行时间】----越狱后首页显示，打开多巴胺工具即弹出！！！" >> body.txt
-          echo -e "> - 7、新增【重启用户空间】长按3Dtouch弹出的【重启】功能才是真正重启手机（此操作重启后处于非越狱状态，谨慎操作）！！！" >> body.txt
+          echo -e "> - 7、新增【重启用户空间】长按3Dtouch弹出的【重启】功能才是真正重启手机（此操作重启后处于非越狱状态，谨慎操作）。7/8新增弹出【更新越狱环境】，仅针对从trollstore更新安装dopamine有用，覆盖安装更新建议执行该操作，感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 8、新增【自定义dopamine首页背景】--将图片命名为：Wallpaper.jpg放置在目录：/var/mobile/！！！" >> body.txt
           echo -e "> - 9、新增【底层屏蔽】越狱检测，将自定义的屏蔽越狱检测配置文件：zp.unject.plist放置在目录：/var/mobile/！！！" >> body.txt
           echo -e "> - 10、新增【清除屏蔽】功能，清除屏蔽配置文件zp.unject.plist，恢复APP屏蔽前的状态。感谢真皮大佬的代码！！！" >> body.txt
