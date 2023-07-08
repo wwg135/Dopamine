@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1_9'
+  VERSION: '1.1.1_bridge'
  
 jobs:
   build:
@@ -54,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方最新代码" >> body.txt
+          echo -e "\n> - 同步官方正式版1.1.1更新" >> body.txt
           echo -e "\n**1.1的修改版功能如下：**" >> body.txt
           echo -e "> - 1、新增【桥接心浪】功能，以便以 XinA 的模式安装有根插件（内置xinamine依赖）。感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 2、新增【检查更新】功能，设置里面打开即可检查更新，默认关闭！！！" >> body.txt
