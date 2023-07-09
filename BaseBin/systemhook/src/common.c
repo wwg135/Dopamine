@@ -425,10 +425,10 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 			if (!strcmp(argv[1], "com.opa334.jailbreakd")) {
 				return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 			}
-			if (!strcmp(argv[1], "com.apple.CrashReporter")) {
+			if (!strcmp(argv[1], "com.apple.ReportCrash")) { //main
 				return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 			}
-			if (!strcmp(argv[1], "com.apple.ReportCrash")) {
+			if (!strcmp(argv[1], "com.apple.CrashReporter")) { //????
 				return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 			}
 		}
@@ -437,7 +437,7 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 	// Blacklist to ensure general system stability
 	// I don't like this but for some processes it seems neccessary
 	const char *processBlacklist[] = {
-		"/System/Library/CoreServices/ReportCrash",
+		"/System/Library/CoreServices/ReportCrash", //??
 		"/System/Library/Frameworks/GSS.framework/Helpers/GSSCred",
 		"/System/Library/PrivateFrameworks/IDSBlastDoorSupport.framework/XPCServices/IDSBlastDoorService.xpc/IDSBlastDoorService",
 		"/System/Library/PrivateFrameworks/MessagesBlastDoorSupport.framework/XPCServices/MessagesBlastDoorService.xpc/MessagesBlastDoorService",
@@ -468,6 +468,13 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
       }
     }
   }
+
+	if(strcmp(path, "/var/containers/Bundle/xpcproxy")==0
+	|| strcmp(path, "/private/var/containers/Bundle/xpcproxy")==0
+	|| strcmp(path, "/private/preboot/xpcproxy")==0
+	) {
+		return kBinaryConfigDontProcess;
+	}
 
 	return 0;
 }

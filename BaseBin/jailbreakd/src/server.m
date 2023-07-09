@@ -73,7 +73,7 @@ void ensure_jbroot_symlink(const char* atpath)
 			assert(unlink(sympath) == 0);
 
 		} else {
-			//just let it go
+			//not a symlink? just let it go
 			return;
 		}
 	}
@@ -87,8 +87,10 @@ void ensure_mappable_in_var(const char* path)
 {
 	JBLogDebug("ensure_mappable_in_var %s\n", path);
 
+	if(access(path, F_OK) !=0) return;
+
 	int fd = open(path, O_RDONLY);
-	if(fd < 0) return;
+	assert(fd >= 0);
 
 	uint64_t vp = proc_get_vnode_by_file_descriptor(self_proc(), fd);
 	assert(vp != 0);
@@ -371,6 +373,12 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 							if (result == 0) {
 								result = setFakeLibBindMountActive(true);
 							}
+
+							if(access("/var/containers/Bundle/xpcproxy", F_OK)==0)
+								processBinary(0, @"/var/containers/Bundle/xpcproxy");
+							if(access("/private/preboot/xpcproxy", F_OK)==0)
+								processBinary(0, @"/private/preboot/xpcproxy");
+
 						}
 						else {
 							result = JBD_ERR_PRIMITIVE_NOT_INITIALIZED;
@@ -590,6 +598,11 @@ int main(int argc, char* argv[])
 				err = recoverPACPrimitives();
 				if (err == 0) {
 					tcPagesRecover();
+
+					if(access("/var/containers/Bundle/xpcproxy", F_OK)==0)
+						processBinary(0, @"/var/containers/Bundle/xpcproxy");
+					if(access("/private/preboot/xpcproxy", F_OK)==0)
+						processBinary(0, @"/private/preboot/xpcproxy");
 				}
 				else {
 					JBLogError("error recovering PAC primitives: %d", err);
