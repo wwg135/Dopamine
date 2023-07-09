@@ -74,28 +74,8 @@ int posix_spawn_hook(pid_t *restrict pidp, const char *restrict path,
 
 	if (strcmp(path, "/usr/libexec/xpcproxy")==0 && access("/var/containers/Bundle/xpcproxy", F_OK)==0) {
 		if(argv[0] && argv[1]) {
-
-			if(
-			 strstr(argv[1], "jailbreakd")==NULL
-
-			&& strstr(argv[1], ".apple.")==NULL
-			&& strstr(argv[1], "/Applications/")!=argv[1]
-			&& strstr(argv[1], "/Developer/")!=argv[1]
-			&& strstr(argv[1], "/System/")!=argv[1]
-			&& strstr(argv[1], "/Library/")!=argv[1]
-			&& strstr(argv[1], "/usr/")!=argv[1]
-			&& strstr(argv[1], "/bin/")!=argv[1]
-			&& strstr(argv[1], "/sbin/")!=argv[1]
-			&& strstr(argv[1], "/private/preboot/")!=argv[1]
-			&& strstr(argv[1], "/var/containers/Bundle/Application/")!=argv[1]
-			&& strstr(argv[1], "/private/var/containers/Bundle/Application/")!=argv[1]
-
-			
-			)
-			{
-				JBLogDebug("use patched xpcproxy: %s", argv[1]);
-				path = "/var/containers/Bundle/xpcproxy";
-			}
+			JBLogDebug("use patched xpcproxy: %s", argv[1]);
+			path = "/var/containers/Bundle/xpcproxy";
 		}
 	}
 
