@@ -96,6 +96,9 @@ int posix_spawn_hook(pid_t *restrict pidp, const char *restrict path,
 	if(argv) for(int i=0; argv[i]; i++) JBLogDebug("\targs[%d] = %s", i, argv[i]);
 	if(envp) for(int i=0; envp[i]; i++) JBLogDebug("\tenvp[%d] = %s", i, envp[i]);
 
+    // NSArray *csss = [NSThread callStackSymbols];
+    // JBLogDebug("callstack=\n%s\n", [NSString stringWithFormat:@"%@", csss].UTF8String);
+
 	return ret;
 }
 
