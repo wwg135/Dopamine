@@ -28,6 +28,8 @@
 
 "Button_Update_Environment" = "更新越狱环境";
 
+"Unsupported" = "不支持";
+
 "Bypassing PAC" = "绕过指针认证码";
 
 "Bypassing PPL" = "绕过受保护进程轻型验证";
