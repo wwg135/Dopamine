@@ -595,10 +595,6 @@ struct JailbreakView: View {
         var ts = timespec()
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
         let uptimeInt = Int(ts.tv_sec + dopamineDefaults().integer(forKey: "presetUptimeInDay") * 86400)
-        let seconds = uptimeInt % 60
-        let minutes = (uptimeInt / 60) % 60
-        let hours = (uptimeInt / 3600) % 24
-        let days = uptimeInt / 86400
         if uptimeInt < 60 {
             formatted = "\(uptimeInt) 秒"
         } else if uptimeInt < 3600 { // 1 hour
