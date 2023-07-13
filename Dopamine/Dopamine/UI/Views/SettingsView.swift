@@ -17,6 +17,7 @@ struct SettingsView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
+    @AppStorage("presetUptimeInDay", store: dopamineDefaults()) var presetUptimeInDay: Int = 0
     
     @Binding var isPresented: Bool
     
