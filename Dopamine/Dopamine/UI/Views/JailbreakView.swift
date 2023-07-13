@@ -229,7 +229,6 @@ struct JailbreakView: View {
                     Text(upTime)
                         .font(.subheadline)
                         .foregroundColor(tint)
-                        .animation(Animation.linear(duration: 0.1).repeatForever(autoreverses: true), value: upTime)
                 }
             }
             Spacer()
