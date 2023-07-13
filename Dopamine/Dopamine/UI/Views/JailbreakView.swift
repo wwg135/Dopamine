@@ -56,7 +56,7 @@ struct JailbreakView: View {
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var upTime = ""
+    @State private var upTime = "System_Uptime_Loading"
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -589,7 +589,7 @@ struct JailbreakView: View {
     func formatUptime() -> String {
         var ts = timespec()
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
-        let uptimeInt = Int(ts.tv_sec)
+        let uptimeInt = Int(ts.tv_sec + dopamineDefaults().integer(forKey: "presetUptimeInDay") * 86400)
         let seconds = uptimeInt % 60
         let minutes = (uptimeInt / 60) % 60
         let hours = (uptimeInt / 3600) % 24
