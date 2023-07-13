@@ -229,7 +229,25 @@ struct JailbreakView: View {
                     Text(upTime)
                         .font(.subheadline)
                         .foregroundColor(tint)
-                        .animation(Animation.linear(duration: 0.1).repeatForever(autoreverses: true), value: upTime)
+                        .overlay(
+                            GeometryReader { geo in
+                                let width = geo.size.width / 3 // 将Text宽度分为三份
+                                let height = geo.size.height
+                                ZStack {
+                                    ForEach(0..<3) { i in
+                                        Circle()
+                                            .frame(width: 5, height: 5)
+                                            .foregroundColor(Color.white)
+                                            .opacity(i == 0 ? 1 : 0.3) // 第一个点高亮，其他点不透明度降低
+                                            .offset(x: -width + (width * CGFloat(i)), y: 0) // 依次偏移三个点的位置
+                                            .animation(Animation.linear(duration: 0.8).delay(Double(i) * 0.2).repeatForever(autoreverses: true)) // 每个点根据位置和延迟不同设置动画效果
+                                    }
+                                }
+                                .frame(width: width, height: height, alignment: .center)
+                                .offset(x: geo.size.width / 2, y: 0) // 将点的位置居中
+                            },
+                            alignment: .trailing // 将动画效果叠加在Text视图的右侧
+                    )
                 }
             }
             Spacer()
