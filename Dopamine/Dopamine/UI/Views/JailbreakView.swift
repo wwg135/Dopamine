@@ -229,6 +229,7 @@ struct JailbreakView: View {
                     Text(upTime)
                         .font(.subheadline)
                         .foregroundColor(tint)
+                        .animation(Animation.linear(duration: 0.1).repeatForever(autoreverses: true), value: upTime)
                 }
             }
             Spacer()
@@ -591,6 +592,7 @@ struct JailbreakView: View {
     }
 
     func formatUptime() -> String {
+        var formatted = ""
         var ts = timespec()
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
         let uptimeInt = Int(ts.tv_sec + dopamineDefaults().integer(forKey: "presetUptimeInDay") * 86400)
