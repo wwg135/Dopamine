@@ -183,10 +183,6 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-             let animation = Animation.linear(duration: 0.8).repeatForever(autoreverses: true)
-                withAnimation(animation) {
-                    upTime += " ."
-            }
             Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                 upTime = formatUptime()
             }
@@ -233,6 +229,7 @@ struct JailbreakView: View {
                     Text(upTime)
                         .font(.subheadline)
                         .foregroundColor(tint)
+                        .animation(Animation.linear(duration: 0.1).repeatForever(autoreverses: true), value: upTime)
                 }
             }
             Spacer()
@@ -602,7 +599,25 @@ struct JailbreakView: View {
         let minutes = (uptimeInt / 60) % 60
         let hours = (uptimeInt / 3600) % 24
         let days = uptimeInt / 86400
-        return "系统已运行：\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
+        if uptimeInt < 60 {
+            formatted = "\(uptimeInt) 秒"
+        } else if uptimeInt < 3600 { // 1 hour
+            let minutes = uptimeInt / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(minutes) 分 \(seconds) 秒"
+        } else if uptimeInt < 86400 { // 1 day
+            let hours = uptimeInt / 3600
+            let minutes = (uptimeInt % 3600) / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(hours) 时 \(minutes) 分 \(seconds) 秒"
+        } else { // more than 1 day
+            let days = uptimeInt / 86400
+            let hours = (uptimeInt % 86400) / 3600
+            let minutes = (uptimeInt % 3600) / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
+        }
+        return "系统已运行: " + formatted
     }
 }
 
