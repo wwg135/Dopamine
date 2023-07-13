@@ -183,6 +183,10 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
+             let animation = Animation.linear(duration: 0.8).repeatForever(autoreverses: true)
+                withAnimation(animation) {
+                    upTime += " ."
+            }
             Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                 upTime = formatUptime()
             }
@@ -598,15 +602,7 @@ struct JailbreakView: View {
         let minutes = (uptimeInt / 60) % 60
         let hours = (uptimeInt / 3600) % 24
         let days = uptimeInt / 86400
-        let dynamicDotsCount = seconds % 4 + 1
-        // 生成动态点号字符串
-        let dynamicDots = String(repeating: ".", count: dynamicDotsCount)
-        // 将 "载入中" 字符串转换为动态字符串
-        let dynamicLoadingText = "载入中" + dynamicDots
-        // 将系统运行时间格式化为字符串
-        let uptimeText = "系统已运行：\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
-        let dynamicUptime = uptimeText.replacingOccurrences(of: "载入中...", with: dynamicLoadingText)
-        return dynamicUptime
+        return "系统已运行：\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
     }
 }
 
