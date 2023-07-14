@@ -1,28 +1,15 @@
-name: "Dopamine: build and upload"
-
+name: build_Release
 on:
   push:
     branches:
-      - master
-    paths-ignore:
-      - ".gitignore"
-  pull_request:
-    branches:
-      - master
+      - 1.1.1_bridge
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 1 1 *'
-    - cron: '0 0 1 4 *'
-    - cron: '0 0 30 6 *'
-    - cron: '0 0 28 9 *'
-    - cron: '0 0 27 12 *'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
+env:
+  VERSION: '1.1.2_bridge'
+ 
 jobs:
   build:
     runs-on: macos-latest
@@ -31,52 +18,80 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install Procursus
-        uses: dhinakg/procursus-action@main
+        uses: wwg135/procursus-action@main
         with:
-          packages: ldid findutils sed coreutils trustcache make
+          packages: ldid trustcache make findutils coreutils
 
-      - name: Install THEOS (without SDKs)
+      - name: Install THEOS
         run: |
-          set -x
-          export BASEDIR="$(pwd)"
-          export THEOS="${BASEDIR}/theos"
-          mkdir -p $THEOS
-          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos >> install-theos.sh
-          gsed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
-          bash install-theos.sh
-          cd $BASEDIR
+         curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos > theos
+         sed -i '' 's/get_sdks$//g' theos
+         bash theos
 
-      - name: Set Environment Variables
+      - name: Set env
         run: |
-          set -x
-          T2=$(TZ=UTC-2 date +'%Y%m%d_%H%M%S')
-          TS=$(date -j -f "%Y%m%d_%H%M%S" "${T2}" +%s)
-          SHASH=$(git rev-parse --short HEAD)
-          echo "ctime=${T2}" >> $GITHUB_ENV
-          echo "ctimestamp=${TS}" >> $GITHUB_ENV
-          echo "shorthash=${SHASH}" >> $GITHUB_ENV
+          sT=$(TZ=UTC-8 date +'%S')
+          echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
+          echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
+          echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
 
-      - name: Build
+      - name: Print env
         run: |
-          set -x
+          echo ${{ env.VERSION }}
+          echo ${{ env.msT }}
+          echo ${{ env.shT }}
+          echo ${{ env.logT }}
+
+      - name: Pre code and keychain
+        run: |
+          sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
-          export BASEDIR="$(pwd)"
-          export THEOS="${BASEDIR}/theos"
+      
+      - name: Pre body
+        run: |
+          echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
+          echo -e "\n更新时间：${{ env.logT }}" >> body.txt
+          echo -e "\n**当前版本更新日志如下：**" >> body.txt
+          echo -e "\n> - 同步官方正式版1.1.2更新\n1.首页系统已运行改为动态加载中。\n2.优化显示时间：如果＜1分钟，只显示秒数。如果＜1小时，只显示分+秒。如果＜1天，只显示时+分+秒。如果＞1天，显示天+时+分+秒" >> body.txt
+          echo -e "\n**1.1的修改版功能如下：**" >> body.txt
+          echo -e "> - 1、新增【桥接心浪】功能，以便以 XinA 的模式安装有根插件（内置xinamine依赖）。感谢liam0205大佬的代码！！！" >> body.txt
+          echo -e "> - 2、新增【检查更新】功能，设置里面打开即可检查更新，默认关闭！！！" >> body.txt
+          echo -e "> - 3、新增【映射挂载】功能，开关在设置里面，默认不开启。要挂载什么，自己添加路径挂载。" >> body.txt
+          echo -e "> - 4、新增初次越狱/重建越狱时，默认安装 【ElleKit_1.0】 、 【PreferenceLoader_2.2.6.1】、【Xinamine】。感谢liam0205大佬的代码！！！" >> body.txt
+          echo -e "> - 5、新增「重建环境」功能，开关在设置里面。感谢liam0205大佬的代码！！！" >> body.txt
+          echo -e "> - 6、新增【系统运行时间】----越狱后首页显示，打开多巴胺工具即弹出！！！" >> body.txt
+          echo -e "> - 7、新增【重启用户空间】长按3Dtouch弹出的【重启】功能才是真正重启手机（此操作重启后处于非越狱状态，谨慎操作）。7/8新增弹出【更新越狱环境】，仅针对从trollstore更新安装dopamine有用，覆盖安装更新建议执行该操作，感谢liam0205大佬的代码！！！" >> body.txt
+          echo -e "> - 8、新增【自定义dopamine首页背景】--将图片命名为：Wallpaper.jpg放置在目录：/var/mobile/！！！" >> body.txt
+          echo -e "> - 9、新增【底层屏蔽】越狱检测，将自定义的屏蔽越狱检测配置文件：zp.unject.plist放置在目录：/var/mobile/！！！" >> body.txt
+          echo -e "> - 10、新增【清除屏蔽】功能，清除屏蔽配置文件zp.unject.plist，恢复APP屏蔽前的状态。感谢真皮大佬的代码！！！" >> body.txt
+          echo -e "> - 11、新增【重启用户空间】越狱成功后显示按钮，防止自动重启用户空间后、插件不兼容导致黑屏开不了机。感谢liam0205大佬的代码！！！" >> body.txt
+          echo -e "> - 12、其他设置UI、显示细节优化。。。" >> body.txt
+      
+      - name: Build ipa
+        run: |
+          set -x
+          export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
-          cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine_${{ env.shorthash }}_${{ env.ctime }}.tipa
-          cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine_Latest.tipa
+          mv Dopamine/Dopamine.tipa Dopamine.ipa
 
-      - name: Upload Latest Artifact
-        id: dopamine-latest-upload
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ env.VERSION }}
+          tag_name: ${{ env.msT }}
+          target_commitish: 1.1.1_bridge
+          body_path: body.txt
+          prerelease: true
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          files: |
+           *.ipa
+
+      - name: Upload Artifact
+        id: dopamine-upload
         uses: actions/upload-artifact@v3
         with:
-          name: Dopamine_Latest
+          name: Dopamine
           path: |
-            ${{ github.workspace }}/Dopamine/Dopamine_Latest.tipa
-      - name: Upload Hashed Artifact
-        id: dopamine-hashed-upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: Dopamine_${{ env.shorthash }}_${{ env.ctime }}
-          path: |
-            ${{ github.workspace }}/Dopamine/Dopamine_${{ env.shorthash }}_${{ env.ctime }}.tipa
+            Dopamine.ipa
