@@ -56,7 +56,7 @@ struct JailbreakView: View {
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var upTime = ""
+    @State private var upTime = "系统已运行：载入中. . ."
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -182,20 +182,11 @@ struct JailbreakView: View {
             }
             .animation(.default, value: showingUpdatePopupType == nil)
         }
-        .onAppear {{
-            var count = 0
-                let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-                    count += 1
-                    if count <= 10 { // 载入10次
-                        let loadingText = "系统已运行: 载入中."
-                        let index = loadingText.index(loadingText.startIndex, offsetBy: count)
-                        upTime = String(loadingText.prefix(upTo: index))
-                    } else {
-                        timer.invalidate() // 停止计时器
-                        startUptimeTimer() // 开始显示系统已运行的时间
-                    }
+        .onAppear {
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                withAnimation(.linear(duration: 1)) {
+                    upTime = formatUptime()
                 }
-                timer.fire()
             }
             if checkForUpdates {
                 Task {
@@ -237,13 +228,16 @@ struct JailbreakView: View {
                     Text("AAA : AAB")
                         .font(.subheadline)
                         .foregroundColor(tint)
-                    if showText {
-                        Text(upTime)
-                            .font(.subheadline)
-                            .foregroundColor(tint)
-                            .transition(.move(edge: .leading))
-                            .animation(.default)
-                    }
+                    Text(String(upTime.prefix(6)))
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                        .overlay(
+                            Text(String(upTime.dropFirst(6)))
+                                .font(.subheadline)
+                                .foregroundColor(tint)
+                                .opacity(upTime.count > 6 ? 1 : 0)
+                                .animation(.linear(duration: Double(upTime.count - 6) * 0.1))
+                    )
                 }
             }
             Spacer()
@@ -604,17 +598,6 @@ struct JailbreakView: View {
             }
         }
     }
-
-    func startUptimeTimer() {
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-            let formatted = formatUptime()
-            if formatted != "" { // 确保已计算出实际的已运行时间
-                timer.invalidate() // 停止计时器
-                let finalText = "系统已运行: " + formatted
-                upTime = finalText
-            }
-        }
-    }
     
     func formatUptime() -> String {
         var formatted = ""
@@ -639,7 +622,7 @@ struct JailbreakView: View {
             let seconds = uptimeInt % 60
                 formatted = "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
         }
-        return formatted
+        return "系统已运行: " + formatted
     }
 }
 
