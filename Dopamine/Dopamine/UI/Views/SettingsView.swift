@@ -14,6 +14,7 @@ struct SettingsView: View {
     @AppStorage("successful_jailbreaks", store: dopamineDefaults()) var successfulJailbreaks: Int = 0
     
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
+    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     
@@ -41,6 +42,7 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
+                            Toggle("Check_For_Updates", isOn: $checkForUpdates)
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
@@ -48,13 +50,13 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            Toggle("Settings_iDownload", isOn: $enableiDownload)
-                                .onChange(of: enableiDownload) { newValue in
-                                    if isJailbroken() {
-                                        jailbrokenUpdateIDownloadEnabled()
-                                    }
-                                }
                             if !isJailbroken() {
+                                Toggle("Settings_iDownload", isOn: $enableiDownload)
+                                    .onChange(of: enableiDownload) { newValue in
+                                        if isJailbroken() {
+                                            jailbrokenUpdateIDownloadEnabled()
+                                        }
+                                    }
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
                             }
                         }
@@ -78,9 +80,6 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
                                     }
-                                    .padding(.bottom)
-                                    
-                                    
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         isSelectingPackageManagers = true
@@ -164,10 +163,12 @@ struct SettingsView: View {
                     VStack(spacing: 6) {
                         Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             .font(.footnote)
-                            .opacity(0.6)
-                        Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
-                            .font(.footnote)
-                            .opacity(0.6)
+                            .opacity(1)
+                        if isJailbroken() {
+                            Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
+                                .font(.footnote)
+                                .opacity(1)
+                        }
                     }
                     .padding(.top, 2)
                     
