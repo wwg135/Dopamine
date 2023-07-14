@@ -184,7 +184,7 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            let uptimeString = "载入中. . ."
+            let uptimeString = "加载中. . ."
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
                 if index < uptimeString.count {
                     upTime += String(uptimeString[uptimeString.index(uptimeString.startIndex, offsetBy: index)])  
@@ -601,7 +601,7 @@ struct JailbreakView: View {
         var formatted = ""
         var ts = timespec()
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
-        let uptimeInt = Int(ts.tv_sec + dopamineDefaults().integer(forKey: "presetUptimeInDay") * 86400)
+        let uptimeInt = Int(ts.tv_sec)
         if uptimeInt < 60 {
             formatted = "\(uptimeInt) 秒"
         } else if uptimeInt < 3600 { // 1 hour
