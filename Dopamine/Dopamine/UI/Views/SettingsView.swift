@@ -20,7 +20,6 @@ struct SettingsView: View {
     @Binding var isPresented: Bool
 
     @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
-    @AppStorage("presetUptimeInDay", store: dopamineDefaults()) var presetUptimeInDay: Int = 0
 
     @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
     @State var mountPathAlertShown = false

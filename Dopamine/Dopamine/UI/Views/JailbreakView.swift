@@ -56,7 +56,8 @@ struct JailbreakView: View {
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var upTime = "系统已运行：载入中. . ."
+    @State private var upTime = "系统已运行:"  
+    @State private var index = 0
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -183,8 +184,14 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                upTime = formatUptime()
+            let uptimeString = "加载中. . ."
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
+                if index < uptimeString.count {
+                    upTime += String(uptimeString[uptimeString.index(uptimeString.startIndex, offsetBy: index)])  
+                    index += 1
+                } else {
+                    upTime = formatUptime()  
+                }
             }
             if checkForUpdates {
                 Task {
@@ -587,14 +594,29 @@ struct JailbreakView: View {
     }
 
     func formatUptime() -> String {
+        var formatted = ""
         var ts = timespec()
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
-        let uptimeInt = Int(ts.tv_sec + dopamineDefaults().integer(forKey: "presetUptimeInDay") * 86400)
-        let seconds = uptimeInt % 60
-        let minutes = (uptimeInt / 60) % 60
-        let hours = (uptimeInt / 3600) % 24
-        let days = uptimeInt / 86400
-        return "系统已运行：\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
+        let uptimeInt = Int(ts.tv_sec)
+        if uptimeInt < 60 {
+            formatted = "\(uptimeInt) 秒"
+        } else if uptimeInt < 3600 { // 1 hour
+            let minutes = uptimeInt / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(minutes) 分 \(seconds) 秒"
+        } else if uptimeInt < 86400 { // 1 day
+            let hours = uptimeInt / 3600
+            let minutes = (uptimeInt % 3600) / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(hours) 时 \(minutes) 分 \(seconds) 秒"
+        } else { // more than 1 day
+            let days = uptimeInt / 86400
+            let hours = (uptimeInt % 86400) / 3600
+            let minutes = (uptimeInt % 3600) / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
+        }
+        return "系统已运行: " + formatted
     }
 }
 
