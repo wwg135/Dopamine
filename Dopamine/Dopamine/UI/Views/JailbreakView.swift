@@ -184,7 +184,7 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            let uptimeString = "载入中..."
+            let uptimeString = "载入中. . ."
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
                 if index < uptimeString.count {
                     upTime += String(uptimeString[uptimeString.index(uptimeString.startIndex, offsetBy: index)])  
