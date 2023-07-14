@@ -57,6 +57,7 @@ struct JailbreakView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State private var upTime = "系统已运行：载入中. . ."
+    @State private var showText = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -184,7 +185,9 @@ struct JailbreakView: View {
         }
         .onAppear {
             Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                showText = false
                 upTime = formatUptime()
+                showText = true
             }
             if checkForUpdates {
                 Task {
@@ -226,10 +229,13 @@ struct JailbreakView: View {
                     Text("AAA : AAB")
                         .font(.subheadline)
                         .foregroundColor(tint)
-                    Text(upTime)
-                        .font(.subheadline)
-                        .foregroundColor(tint)
-                        .animation(Animation.linear(duration: 0.5).repeatForever(autoreverses: true), value: upTime)
+                    if showText {
+                        Text(upTime)
+                            .font(.subheadline)
+                            .foregroundColor(tint)
+                            .transition(.move(edge: .leading))
+                            .animation(.default)
+                    }
                 }
             }
             Spacer()
