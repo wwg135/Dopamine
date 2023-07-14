@@ -56,8 +56,7 @@ struct JailbreakView: View {
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var upTime = "系统已运行：载入中. . ."
-    @State private var showText = false
+    @State private var upTime = ""
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -183,11 +182,20 @@ struct JailbreakView: View {
             }
             .animation(.default, value: showingUpdatePopupType == nil)
         }
-        .onAppear {
-            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                showText = false
-                upTime = formatUptime()
-                showText = true
+        .onAppear {{
+            var count = 0
+                let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+                    count += 1
+                    if count <= 10 { // 载入10次
+                        let loadingText = "系统已运行: 载入中."
+                        let index = loadingText.index(loadingText.startIndex, offsetBy: count)
+                        upTime = String(loadingText.prefix(upTo: index))
+                    } else {
+                        timer.invalidate() // 停止计时器
+                        startUptimeTimer() // 开始显示系统已运行的时间
+                    }
+                }
+                timer.fire()
             }
             if checkForUpdates {
                 Task {
@@ -597,6 +605,17 @@ struct JailbreakView: View {
         }
     }
 
+    func startUptimeTimer() {
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+            let formatted = formatUptime()
+            if formatted != "" { // 确保已计算出实际的已运行时间
+                timer.invalidate() // 停止计时器
+                let finalText = "系统已运行: " + formatted
+                upTime = finalText
+            }
+        }
+    }
+    
     func formatUptime() -> String {
         var formatted = ""
         var ts = timespec()
@@ -620,7 +639,7 @@ struct JailbreakView: View {
             let seconds = uptimeInt % 60
                 formatted = "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
         }
-        return "系统已运行: " + formatted
+        return formatted
     }
 }
 
