@@ -56,7 +56,7 @@ struct JailbreakView: View {
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var upTime = "系统已运行:"  
+    @State private var upTime = "系统已运行: 加载中"  
     @State private var index = 0
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
@@ -184,7 +184,7 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            let uptimeString = "加载中. . ."
+            let uptimeString = ". . ."
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
                 if index < uptimeString.count {
                     upTime += String(uptimeString[uptimeString.index(uptimeString.startIndex, offsetBy: index)])  
