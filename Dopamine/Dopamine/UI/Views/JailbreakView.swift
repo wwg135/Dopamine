@@ -56,7 +56,8 @@ struct JailbreakView: View {
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var upTime = "系统已运行：载入中. . ."
+    @State private var upTime = "系统已运行:"  
+    @State private var index = 0
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -183,9 +184,13 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                withAnimation(.linear(duration: 1)) {
-                    upTime = formatUptime()
+            let uptimeString = "载入中..."
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
+                if index < uptimeString.count {
+                    upTime += String(uptimeString[uptimeString.index(uptimeString.startIndex, offsetBy: index)])  
+                    index += 1
+                } else {
+                    upTime = formatUptime()  
                 }
             }
             if checkForUpdates {
@@ -228,16 +233,9 @@ struct JailbreakView: View {
                     Text("AAA : AAB")
                         .font(.subheadline)
                         .foregroundColor(tint)
-                    Text(String(upTime.prefix(6)))
+                    Text(upTime)
                         .font(.subheadline)
                         .foregroundColor(tint)
-                        .overlay(
-                            Text(String(upTime.dropFirst(6)))
-                                .font(.subheadline)
-                                .foregroundColor(tint)
-                                .opacity(upTime.count > 6 ? 1 : 0)
-                                .animation(.linear(duration: Double(upTime.count - 6) * 0.1))
-                    )
                 }
             }
             Spacer()
