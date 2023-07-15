@@ -54,10 +54,12 @@ struct JailbreakView: View {
     
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
 
+    @State private var upTime = "系统启动于: 加载中"
+    @State private var index = 0
+    @State private var showLaunchTime = true
+    
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var upTime = "系统已运行: 加载中"
-    @State private var index = 0
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -184,13 +186,20 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            let uptimeString = ". . ."
-            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
-                if index < uptimeString.count {
-                    upTime += String(uptimeString[uptimeString.index(uptimeString.startIndex, offsetBy: index)])  
+            let timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
+                let dots = ". . . "                                                                    
+                if index < dots.count {
+                    upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
                     index += 1
                 } else {
-                    upTime = formatUptime()  
+                    if showLaunchTime {
+                        upTime = getLaunchTime()
+                    } else {
+                        upTime = formatUptime()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        showLaunchTime = false
+                    }
                 }
             }
             if checkForUpdates {
@@ -229,14 +238,12 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
-                if isJailbroken() {
-                    Text("AAA : AAB")
-                        .font(.subheadline)
-                        .foregroundColor(tint)
-                    Text(upTime)
-                        .font(.subheadline)
-                        .foregroundColor(tint)
-                }
+                Text("AAA : AAB")
+                    .font(.subheadline)
+                    .foregroundColor(tint)
+                Text(upTime)
+                    .font(.subheadline)
+                    .foregroundColor(tint)
             }
             Spacer()
         }
@@ -597,6 +604,20 @@ struct JailbreakView: View {
         }
     }
     
+    func getLaunchTime() -> String {
+        var boottime = timeval()
+        var mib = [CTL_KERN, KERN_BOOTTIME]
+        var size = MemoryLayout<timeval>.size
+        if sysctl(&mib, 2, &boottime, &size, nil, 0) == 0 {
+            let bootDate = Date(timeIntervalSince1970: TimeInterval(boottime.tv_sec)) 
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            return "系统启动于: \(formatter.string(from: bootDate))"
+        } else {
+            return "获取启动时间失败"
+        }  
+    }
+    
     func formatUptime() -> String {
         var formatted = ""
         var ts = timespec()
@@ -623,7 +644,6 @@ struct JailbreakView: View {
         return "系统已运行: " + formatted
     }
 }
-
 struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
         JailbreakView()
