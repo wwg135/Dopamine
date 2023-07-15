@@ -77,7 +77,7 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.1
+          target_commitish: 1.1
           body_path: body.txt
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
