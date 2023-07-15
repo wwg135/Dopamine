@@ -53,7 +53,12 @@ struct JailbreakView: View {
     @State var mismatchChangelog: String? = nil
     
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
+
+    @State private var upTime = "系统启动于: 加载中"
+    @State private var index = 0
+    @State private var showLaunchTime = true
     
+    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
@@ -79,15 +84,29 @@ struct JailbreakView: View {
                 
                 let isPopupPresented = isSettingsPresented || isCreditsPresented
                 
-                Image(whatCouldThisVariablePossiblyEvenMean ? "Clouds" : "Wallpaper")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .edgesIgnoringSafeArea(.all)
-                    .blur(radius: 4)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                
-                    .scaleEffect(isPopupPresented ? 1.2 : 1.4)
-                    .animation(.spring(), value: isPopupPresented)
+               let imagePath = "/var/mobile/Wallpaper.jpg"
+                if let imageData = FileManager.default.contents(atPath: imagePath),
+                   let backgroundImage = UIImage(data: imageData) {
+                    Image(uiImage: backgroundImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .edgesIgnoringSafeArea(.all)
+                        .blur(radius: 1)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+
+                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
+                        .animation(.spring(), value: isPopupPresented)
+                } else {
+                    Image(uiImage: #imageLiteral(resourceName: "Wallpaper.jpg"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .edgesIgnoringSafeArea(.all)
+                        .blur(radius: 1)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+
+                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
+                        .animation(.spring(), value: isPopupPresented)
+                }
                 
                 if showingUpdatePopupType == nil {
                     VStack {
@@ -167,11 +186,29 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            Task {
-                do {
-                    try await checkForUpdates()
-                } catch {
-                    Logger.log(error, type: .error, isStatus: false)
+            let timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
+                let dots = ". . . "                                                                    
+                if index < dots.count {
+                    upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
+                    index += 1
+                } else {
+                    if showLaunchTime {
+                        upTime = getLaunchTime()
+                    } else {
+                        upTime = formatUptime()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        showLaunchTime = false
+                    }
+                }
+            }
+            if checkForUpdates {
+                Task {
+                    do {
+                        try await checkForUpdates()
+                    } catch {
+                        Logger.log(error, type: .error, isStatus: false)
+                    }
                 }
             }
         }
@@ -201,6 +238,12 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
+                Text("AAA : AAB")
+                    .font(.subheadline)
+                    .foregroundColor(tint)
+                Text(upTime)
+                    .font(.subheadline)
+                    .foregroundColor(tint)
             }
             Spacer()
         }
@@ -252,6 +295,16 @@ struct JailbreakView: View {
                     .frame(maxWidth: .infinity)
                     .padding(16)
                     .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
+                    .contextMenu(
+                      option.id == "userspace"
+                      ? ContextMenu {
+                        Button(action: doReboot,
+                                label: {Label("Menu_Reboot_Title", systemImage: "arrow.clockwise.circle.fill")})
+                        Button(action: doUpdateEnvironment,
+                                label: {Label("Button_Update_Environment", systemImage: "arrow.counterclockwise.circle.fill")})
+                      }
+                      : nil
+                    )
                 }
                 .buttonStyle(.plain)
                 .disabled(!option.showUnjailbroken && !isJailbroken())
@@ -479,7 +532,7 @@ struct JailbreakView: View {
         var include: Bool = toVersion == nil
         var changelogBuf: String = ""
         for item in json {
-            let versionString = item["tag_name"] as? String
+            let versionString = item["name"] as? String
             if versionString != nil {
                 if toVersion != nil {
                     if versionString! == toVersion {
@@ -529,7 +582,7 @@ struct JailbreakView: View {
     
     func checkForUpdates() async throws {
         if let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            let owner = "opa334"
+            let owner = "wwg135"
             let repo = "Dopamine"
             
             // Get the releases
@@ -540,7 +593,7 @@ struct JailbreakView: View {
                 return
             }
             
-            if let latestTag = releasesJSON.first?["tag_name"] as? String, latestTag != currentAppVersion {
+            if let latestname = releasesJSON.first?["name"] as? String, latestname != currentAppVersion {
                 updateAvailable = true
                 updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: currentAppVersion, toVersion: nil), environmentMismatch: false)
             }
@@ -550,8 +603,47 @@ struct JailbreakView: View {
             }
         }
     }
+    
+    func getLaunchTime() -> String {
+        var boottime = timeval()
+        var mib = [CTL_KERN, KERN_BOOTTIME]
+        var size = MemoryLayout<timeval>.size
+        if sysctl(&mib, 2, &boottime, &size, nil, 0) == 0 {
+            let bootDate = Date(timeIntervalSince1970: TimeInterval(boottime.tv_sec)) 
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            return "系统启动于: \(formatter.string(from: bootDate))"
+        } else {
+            return "获取启动时间失败"
+        }  
+    }
+    
+    func formatUptime() -> String {
+        var formatted = ""
+        var ts = timespec()
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
+        let uptimeInt = Int(ts.tv_sec)
+        if uptimeInt < 60 {
+            formatted = "\(uptimeInt) 秒"
+        } else if uptimeInt < 3600 { // 1 hour
+            let minutes = uptimeInt / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(minutes) 分 \(seconds) 秒"
+        } else if uptimeInt < 86400 { // 1 day
+            let hours = uptimeInt / 3600
+            let minutes = (uptimeInt % 3600) / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(hours) 时 \(minutes) 分 \(seconds) 秒"
+        } else { // more than 1 day
+            let days = uptimeInt / 86400
+            let hours = (uptimeInt % 86400) / 3600
+            let minutes = (uptimeInt % 3600) / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
+        }
+        return "系统已运行: " + formatted
+    }
 }
-
 struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
         JailbreakView()
