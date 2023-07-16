@@ -611,29 +611,22 @@ struct JailbreakView: View {
     }
     
     func formatUptime() -> String {
-        var formatted = ""
         var ts = timespec()
         clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
         let uptimeInt = Int(ts.tv_sec)
-        if uptimeInt < 60 {
-            formatted = "\(uptimeInt) 秒"
-        } else if uptimeInt < 3600 { // 1 hour
-            let minutes = uptimeInt / 60
-            let seconds = uptimeInt % 60
-                formatted = "\(minutes) 分 \(seconds) 秒"
-        } else if uptimeInt < 86400 { // 1 day
-            let hours = uptimeInt / 3600
-            let minutes = (uptimeInt % 3600) / 60
-            let seconds = uptimeInt % 60
-                formatted = "\(hours) 时 \(minutes) 分 \(seconds) 秒"
-        } else { // more than 1 day
-            let days = uptimeInt / 86400
-            let hours = (uptimeInt % 86400) / 3600
-            let minutes = (uptimeInt % 3600) / 60
-            let seconds = uptimeInt % 60
-                formatted = "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
+        let seconds = uptimeInt % 60
+        var minutes = (uptimeInt / 60) % 60
+        let hours = (uptimeInt / 3600) % 24
+        let days = uptimeInt / 86400
+        if minutes == 0 {
+            return "系统已运行: \(seconds) 秒"
+        } else if hours == 0 { 
+            return "系统已运行: \(minutes) 分 \(seconds) 秒"
+        } else if days == 0 {
+            return "系统已运行: \(hours) 小时 \(minutes) 分 \(seconds) 秒"
+        } else {
+            return "系统已运行: \(days) 天 \(hours) 小时 \(minutes) 分 \(seconds) 秒"
         }
-        return "系统已运行: " + formatted
     }
 }
  
