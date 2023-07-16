@@ -623,9 +623,9 @@ struct JailbreakView: View {
         } else if hours == 0 { 
             return "系统已运行: \(minutes) 分 \(seconds) 秒"
         } else if days == 0 {
-            return "系统已运行: \(hours) 小时 \(minutes) 分 \(seconds) 秒"
+            return "系统已运行: \(hours) 时 \(minutes) 分 \(seconds) 秒"
         } else {
-            return "系统已运行: \(days) 天 \(hours) 小时 \(minutes) 分 \(seconds) 秒"
+            return "系统已运行: \(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
         }
     }
 }
