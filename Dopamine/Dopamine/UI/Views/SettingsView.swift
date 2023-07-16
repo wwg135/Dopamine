@@ -51,6 +51,7 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
+                            Toggle("Options_developmentMode", isOn: $developmentMode)
                             if !isJailbroken() {
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
