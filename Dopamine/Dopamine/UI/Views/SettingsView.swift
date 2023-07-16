@@ -23,6 +23,7 @@ struct SettingsView: View {
     @State var mobilePasswordInput = "alpine"
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
+    @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
