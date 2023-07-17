@@ -137,6 +137,16 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
     }
 }
 
+func clearTmpDirectory() {
+    let tmpDirectory = NSTemporaryDirectory()
+    let fileManager = FileManager.default
+    guard let files = try? fileManager.contentsOfDirectory(atPath: tmpDirectory) else { return }
+    for file in files {
+        let path = "\(tmpDirectory)/\(file)"
+        try? fileManager.removeItem(atPath: path)
+    }
+}
+
 func removeJailbreak() {
     dopamineDefaults().removeObject(forKey: "selectedPackageManagers")
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
