@@ -23,7 +23,6 @@ struct SettingsView: View {
     @State var mobilePasswordInput = "alpine"
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
-    @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
@@ -54,7 +53,6 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            Toggle("Options_developmentMode", isOn: $developmentMode)
                             if !isJailbroken() {
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
