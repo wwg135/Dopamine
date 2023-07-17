@@ -44,6 +44,9 @@ struct SettingsView: View {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
                             Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                                .onChange(of: checkForUpdates) { newValue in
+                                    clearTmpDirectory()
+                                }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
