@@ -258,7 +258,6 @@ struct JailbreakView: View {
                 .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
                 .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
-                .init(id: "env_manager", imageName: "square.stack.3d.forward.dottedline.fill", title: "Environment_Manager"),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
             ]
             ForEach(menuOptions) { option in
@@ -307,8 +306,7 @@ struct JailbreakView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .disabled(option.id == "env_manager" ? !dopamineDefaults().bool(forKey: "developmentMode")
-                                                     : (!option.showUnjailbroken && !isJailbroken()))
+                .disabled(!option.showUnjailbroken && !isJailbroken())
                 
                 if menuOptions.last != option {
                     Divider()
