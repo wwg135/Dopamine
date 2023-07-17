@@ -343,64 +343,56 @@ struct JailbreakView: View {
                 }
             } label: {
                 Label(title: {
-                    if Fugu15.supportsThisDeviceBool() {
-                        if !requiresEnvironmentUpdate {
-                            if isJailbroken() {
-                                Text("Status_Title_Jailbroken")
-                            } else {
-                                switch jailbreakingProgress {
-                                case .idle:
-                                    Text("Button_Jailbreak_Title")
-                                case .jailbreaking:
-                                    Text("Status_Title_Jailbreaking")
-                                case .selectingPackageManager:
-                                    Text("Status_Title_Select_Package_Managers")
-                                case .finished:
-                                    if jailbreakingError == nil {
-                                        Text("Status_Title_Jailbroken")
-                                    } else {
-                                        Text("Status_Title_Unsuccessful")
-                                    }
+                    if !requiresEnvironmentUpdate {
+                        if isJailbroken() {
+                            Text("Status_Title_Jailbroken")
+                        } else {
+                            switch jailbreakingProgress {
+                            case .idle:
+                                Text("Button_Jailbreak_Title")
+                            case .jailbreaking:
+                                Text("Status_Title_Jailbreaking")
+                            case .selectingPackageManager:
+                                Text("Status_Title_Select_Package_Managers")
+                            case .finished:
+                                if jailbreakingError == nil {
+                                    Text("Status_Title_Jailbroken")
+                                } else {
+                                    Text("Status_Title_Unsuccessful")
                                 }
                             }
-                        } else {
-                            Text("Button_Update_Environment")
                         }
                     } else {
-                        Text("Unsupported")
+                        Text("Button_Update_Environment")
                     }
                     
                 }, icon: {
-                    if Fugu15.supportsThisDeviceBool() {
-                        if !requiresEnvironmentUpdate {
-                            ZStack {
-                                switch jailbreakingProgress {
-                                case .jailbreaking:
-                                    LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                                case .selectingPackageManager:
-                                    Image(systemName: "shippingbox")
-                                case .finished:
-                                    if jailbreakingError == nil {
-                                        Image(systemName: "lock.open")
-                                    } else {
-                                        Image(systemName: "lock.slash")
-                                    }
-                                case .idle:
+                    if !requiresEnvironmentUpdate {
+                        ZStack {
+                            switch jailbreakingProgress {
+                            case .jailbreaking:
+                                LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
+                            case .selectingPackageManager:
+                                Image(systemName: "shippingbox")
+                            case .finished:
+                                if jailbreakingError == nil {
                                     Image(systemName: "lock.open")
+                                } else {
+                                    Image(systemName: "lock.slash")
                                 }
+                            case .idle:
+                                Image(systemName: "lock.open")
                             }
-                        } else {
-                            Image(systemName: "doc.badge.arrow.up")
                         }
                     } else {
-                        Image(systemName: "lock.slash")
+                        Image(systemName: "doc.badge.arrow.up")
                     }
                 })
                 .foregroundColor(whatCouldThisVariablePossiblyEvenMean ? .black : .white)
                 .padding()
                 .frame(maxWidth: isJailbreaking ? .infinity : 280)
             }
-            .disabled((isJailbroken() || isJailbreaking || !Fugu15.supportsThisDeviceBool()) && !requiresEnvironmentUpdate)
+            .disabled((isJailbroken() || isJailbreaking) && !requiresEnvironmentUpdate)
             .drawingGroup()
             
             if jailbreakingProgress == .finished || jailbreakingProgress == .jailbreaking {
