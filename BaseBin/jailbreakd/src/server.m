@@ -44,6 +44,40 @@ void setTweaksEnabled(bool enabled)
 	}
 }
 
+#include <libgen.h>
+void ensure_jbroot_symlink(const char* atpath)
+{
+	char* jbrootpath = prebootPath(nil).UTF8String;
+
+	struct stat jbrootst;
+	assert(stat(jbrootpath, &jbrootst) == 0);
+
+	char sympath[PATH_MAX];
+	snprintf(sympath,sizeof(sympath),"%s/.jbroot", atpath);
+
+	struct stat symst;
+	if(lstat(sympath, &symst)==0)
+	{
+		if(S_ISLNK(symst.st_mode))
+		{
+			if(stat(sympath, &symst) == 0)
+			{
+				if(symst.st_dev==jbrootst.st_dev 
+					&& symst.st_ino==jbrootst.st_ino)
+					return;
+			}
+
+			assert(unlink(sympath) == 0);
+
+		} else {
+			//just let it go
+			return;
+		}
+	}
+
+	assert(symlink(jbrootpath, sympath) == 0);
+}
+
 int processBinary(NSString *binaryPath)
 {
 	if (!binaryPath) return 0;
@@ -80,6 +114,8 @@ int processBinary(NSString *binaryPath)
 								[nonTrustCachedCDHashes addObject:cdHash];
 							}
 						}
+
+                                                ensure_jbroot_symlink(dirname(dependencyPath.UTF8String));
 					}
 				};
 
@@ -457,6 +493,12 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 
 int main(int argc, char* argv[])
 {
+
+        char* JBRAND = strdup(((NSString*)bootInfo_getObject(@"JBRAND")).UTF8String);
+	char* JBROOT = strdup(((NSString*)bootInfo_getObject(@"JBROOT")).UTF8String);
+	setenv("JBRAND", JBRAND, 1);
+	setenv("JBROOT", JBROOT, 1);
+
 	@autoreleasepool {
 		JBLogDebug("Hello from the other side!");
 		gIsJailbreakd = YES;
