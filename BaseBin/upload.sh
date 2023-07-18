@@ -1,6 +1,6 @@
 #!/bin/sh
 
-./pack.sh
+./pack.sh || exit
 
 DEVICE=root@iphone13.local
 PORT=22
