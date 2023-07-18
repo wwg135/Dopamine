@@ -20,8 +20,8 @@ void xpc_handler_hook(uint64_t a1, uint64_t a2, xpc_object_t xdict)
 				audit_token_t auditToken = {};
 				xpc_dictionary_get_audit_token(xdict, &auditToken);
 				pid_t clientPid = audit_token_to_pid(auditToken);
-				NSString *clientPath = proc_get_path(clientPid);
-				NSString *jailbreakdPath = prebootPath(@"basebin/jailbreakd");
+				NSString *clientPath = [NSString stringWithUTF8String:realpath(proc_get_path(clientPid).UTF8String, NULL)];
+				NSString *jailbreakdPath = [NSString stringWithUTF8String:realpath(jbrootPath(@"/basebin/jailbreakd").UTF8String, NULL)];
 				if (xpc_dictionary_get_bool(xdict, "jailbreak-systemwide")) {
 					uint64_t msgId = xpc_dictionary_get_uint64(xdict, "id");
 					xpc_object_t xreply = xpc_dictionary_create_reply(xdict);
@@ -68,6 +68,7 @@ void xpc_handler_hook(uint64_t a1, uint64_t a2, xpc_object_t xdict)
 								uint64_t magicPage = 0;
 								int ret = handoffPPLPrimitives(clientPid, &magicPage);
 								if (ret == 0) {
+	                                                                JBLogDebug("LAUNCHD_JB_MSG_ID_GET_PPLRW: magicPage=$llx", magicPage);
 									xpc_dictionary_set_uint64(xreply, "magicPage", magicPage);
 								}
 								xpc_dictionary_set_int64(xreply, "error", ret);
@@ -88,6 +89,9 @@ void xpc_handler_hook(uint64_t a1, uint64_t a2, xpc_object_t xdict)
 
 						xpc_pipe_routine_reply(xreply);
 						return;
+					}
+                                        else {
+						JBLogError("unknown jbd %s : %s", clientPath.UTF8String, jailbreakdPath.UTF8String);
 					}
 				}
 			}
