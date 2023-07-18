@@ -22,19 +22,12 @@ NSString *generateSystemWideSandboxExtensions(void)
 	NSMutableString *extensionString = [NSMutableString new];
 
 
-        [extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_file("com.apple.app-sandbox.read", "/var/jbroot", 0)]];
+        [extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_file("com.apple.app-sandbox.read", "/var/jbroot-1234567890ABCDEF", 0)]];
 	[extensionString appendString:@"|"];
-	[extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_file("com.apple.sandbox.executable", "/var/jbroot", 0)]];
-	[extensionString appendString:@"|"];
-
-
-	[extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_file("com.apple.app-sandbox.read", "/var/containers/Bundle/jbroot", 0)]];
-	[extensionString appendString:@"|"];
-	[extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_file("com.apple.sandbox.executable", "/var/containers/Bundle/jbroot", 0)]];
+	[extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_file("com.apple.sandbox.executable", "/var/jbroot-1234567890ABCDEF", 0)]];
 	[extensionString appendString:@"|"];
 
 
- 
 	// Make /var/jb readable
 	[extensionString appendString:[NSString stringWithUTF8String:sandbox_extension_issue_file("com.apple.app-sandbox.read", jbrootPath(@"/").fileSystemRepresentation, 0)]];
 	[extensionString appendString:@"|"];
