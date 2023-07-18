@@ -16,6 +16,9 @@ int posix_spawnattr_getprocesstype_np(const posix_spawnattr_t * __restrict, int 
 char *JB_SandboxExtensions = NULL;
 char *JB_RootPath = NULL;
 
+char* JBRAND=NULL;
+char* JBROOT=NULL;
+
 #define HOOK_DYLIB_PATH "/usr/lib/systemhook.dylib"
 #define JBD_MSG_SETUID_FIX 21
 #define JBD_MSG_PROCESS_BINARY 22
@@ -502,6 +505,13 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 		JBEnvAlreadyInsertedCount++;
 	}
 
+	if (envbuf_getenv((const char **)envp, "JBRAND")) {
+		JBEnvAlreadyInsertedCount++;
+	}
+	if (envbuf_getenv((const char **)envp, "JBROOT")) {
+		JBEnvAlreadyInsertedCount++;
+	}
+	
 	// Check if we can find at least one reason to not insert jailbreak related environment variables
 	// In this case we also need to remove pre existing environment variables if they are already set
 	bool shouldInsertJBEnv = true;
@@ -565,7 +575,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 		}
 	}
 
-	if ((shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 3) || (!shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 0 && !hasSafeModeVariable)) {
+	if ((shouldInsertJBEnv && JBEnvAlreadyInsertedCount == JB_ENV_REQUIRED_COUNT) || (!shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 0 && !hasSafeModeVariable)) {
 		// we already good, just call orig
 		return pspawn_orig(pid, path, file_actions, attrp, argv, envp);
 	}
@@ -587,6 +597,9 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 
 			envbuf_setenv(&envc, "JB_SANDBOX_EXTENSIONS", JB_SandboxExtensions);
 			envbuf_setenv(&envc, "JB_ROOT_PATH", JB_RootPath);
+
+			envbuf_setenv(&envc, "JBRAND", JBRAND);
+			envbuf_setenv(&envc, "JBROOT", JBROOT);
 		}
 		else {
 			if (systemHookAlreadyInserted && existingLibraryInserts) {
@@ -619,6 +632,9 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 			envbuf_unsetenv(&envc, "_MSSafeMode");
 			envbuf_unsetenv(&envc, "JB_SANDBOX_EXTENSIONS");
 			envbuf_unsetenv(&envc, "JB_ROOT_PATH");
+
+			envbuf_unsetenv(&envc, "JBRAND");
+			envbuf_unsetenv(&envc, "JBROOT");
 		}
 
 		int retval = pspawn_orig(pid, path, file_actions, attrp, argv, envc);
