@@ -72,17 +72,7 @@ jobs:
           gmake -j$(sysctl -n hw.physicalcpu)
           mv Dopamine/Dopamine.tipa Dopamine.ipa
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: ${{ env.VERSION }}
-          tag_name: ${{ env.msT }}
-          target_commitish: 1.0.5
-          body_path: body.txt
-          prerelease: true
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          files: |
-           *.ipa
+           *
 
       - name: Upload Artifact
         id: dopamine-upload
