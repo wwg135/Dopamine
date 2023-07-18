@@ -54,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方正式版1.1.2更新\n优化首页显示启动时间、运行时间UI" >> body.txt
+          echo -e "\n> - 同步官方正式版1.1.2更新\n新增清除越狱提示" >> body.txt
           echo -e "\n**1.1的修改版功能如下：**" >> body.txt
           echo -e "> - 1、新增【桥接心浪】功能，以便以 XinA 的模式安装有根插件（内置xinamine依赖）。感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 2、新增【检查更新】功能，设置里面打开即可检查更新，默认关闭！！！" >> body.txt
@@ -67,7 +67,8 @@ jobs:
           echo -e "> - 9、新增【底层屏蔽】越狱检测，将自定义的屏蔽越狱检测配置文件：zp.unject.plist放置在目录：/var/mobile/！！！" >> body.txt
           echo -e "> - 10、新增【清除屏蔽】功能，清除屏蔽配置文件zp.unject.plist，恢复APP屏蔽前的状态。感谢真皮大佬的代码！！！" >> body.txt
           echo -e "> - 11、新增【重启用户空间】越狱成功后显示按钮，防止自动重启用户空间后、插件不兼容导致黑屏开不了机。感谢liam0205大佬的代码！！！" >> body.txt
-          echo -e "> - 12、其他设置UI、显示细节优化。。。" >> body.txt
+          echo -e "> - 12、设置新增【清除越狱】确认。若处于越狱状态，提示确认重启设备后再清除操作，否则不允许清除越狱！！！" >> body.txt
+          echo -e "> - 13、其他设置UI、显示细节优化。。。" >> body.txt
       
       - name: Build ipa
         run: |
