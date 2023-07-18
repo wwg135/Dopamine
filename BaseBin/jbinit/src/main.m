@@ -5,8 +5,8 @@
 
 int main(int argc, char* argv[])
 {
-	NSString *idownloaddEnabledPath = prebootPath(@"basebin/LaunchDaemons/com.opa334.idownloadd.plist");
-	NSString *idownloaddDisabledPath = prebootPath(@"basebin/LaunchDaemons/Disabled/com.opa334.idownloadd.plist");
+	NSString *idownloaddEnabledPath = jbrootPath(@"/basebin/LaunchDaemons/com.opa334.idownloadd.plist");
+	NSString *idownloaddDisabledPath = jbrootPath(@"/basebin/LaunchDaemons/Disabled/com.opa334.idownloadd.plist");
 	if (argc == 2) {
 		char *cmd = argv[1];
 		if (!strcmp(cmd, "start_idownload")) {
@@ -24,6 +24,6 @@ int main(int argc, char* argv[])
 			return 0;
 		}
 	}
-	launchctl_load(prebootPath(@"basebin/LaunchDaemons/com.opa334.jailbreakd.plist").fileSystemRepresentation, false);
-	launchctl_load(prebootPath(@"basebin/LaunchDaemons/com.opa334.trustcache_rebuild.plist").fileSystemRepresentation, false);
+	launchctl_load(jbrootPath(@"/basebin/LaunchDaemons/com.opa334.jailbreakd.plist").fileSystemRepresentation, false);
+	launchctl_load(jbrootPath(@"/basebin/LaunchDaemons/com.opa334.trustcache_rebuild.plist").fileSystemRepresentation, false);
 }
