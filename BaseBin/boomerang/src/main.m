@@ -31,11 +31,14 @@ void getPrimitives(void)
 	// Receive PPLRW
 	gHandler.receiveHandler = ^(NSDictionary *message)
 	{
+                JBLogDebug("receiveHandler: message=%p", message);
 		NSString *identifier = message[@"id"];
 		if (identifier) {
+                        JBLogDebug("receiveHandler: identifier=%s", identifier.UTF8String);
 			if ([identifier isEqualToString:@"receivePPLRW"])
 			{
 				uint64_t magicPage = [(NSNumber*)message[@"magicPage"] unsignedLongLongValue];
+                                JBLogDebug("receiveHandler: magicPage=%llx", magicPage);
 				if (magicPage) {
 					initPPLPrimitives(magicPage);
 				}
@@ -47,7 +50,8 @@ void getPrimitives(void)
 
 	dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
-	recoverPACPrimitives();
+	int ret = recoverPACPrimitives();
+	JBLogDebug("recoverPACPrimitives=%d", ret);
 
 	// Tell launchd we're done, this will trigger the userspace reboot (that this process should survive)
 	[gHandler sendMessage:@{ @"id" : @"primitivesInitialized" }];
@@ -62,11 +66,13 @@ void sendPrimitives(void)
 			if ([identifier isEqualToString:@"getPPLRW"]) {
 				uint64_t magicPage = 0;
 				int ret = handoffPPLPrimitives(1, &magicPage);
+                                JBLogDebug("handoffPPLPrimitives=%d", ret);
 				[gHandler sendMessage:@{@"id" : @"receivePPLRW", @"magicPage" : @(magicPage), @"errorCode" : @(ret), @"boomerangPid" : @(getpid())}];
 			}
 			else if ([identifier isEqualToString:@"signThreadState"]) {
 				uint64_t actContextKptr = [(NSNumber*)message[@"actContext"] unsignedLongLongValue];
-				signState(actContextKptr);
+				int ret = signState(actContextKptr);
+				JBLogDebug("signState=%d", ret);
 				[gHandler sendMessage:@{@"id" : @"signedThreadState"}];
 			}
 			else if ([identifier isEqualToString:@"primitivesInitialized"])
@@ -81,7 +87,7 @@ void sendPrimitives(void)
 int main(int argc, char* argv[])
 {
 	setsid();
-	gHandler = [[FCHandler alloc] initWithReceiveFilePath:prebootPath(@"basebin/.communication/launchd_to_boomerang") sendFilePath:prebootPath(@"basebin/.communication/boomerang_to_launchd")];
+	gHandler = [[FCHandler alloc] initWithReceiveFilePath:jbrootPath(@"/var/.communication/launchd_to_boomerang") sendFilePath:jbrootPath(@"/var/.communication/boomerang_to_launchd")];
 	getPrimitives();
 	sendPrimitives();
 	return 0;
