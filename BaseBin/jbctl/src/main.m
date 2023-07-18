@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 			printf("Update applied, userspace rebooting to finalize it...\n");
 			sleep(2);
 			return reboot3(RB2_USERREBOOT);
-			// execve(prebootPath(@"usr/bin/launchctl").fileSystemRepresentation, (char *const[]){ (char *const)prebootPath(@"usr/bin/launchctl").fileSystemRepresentation, "reboot", "userspace", NULL }, environ);
+			// execve(jbrootPath(@"/usr/bin/launchctl").fileSystemRepresentation, (char *const[]){ (char *const)jbrootPath(@"/usr/bin/launchctl").fileSystemRepresentation, "reboot", "userspace", NULL }, environ);
 			// return 0;
 		}
 		else {
@@ -67,9 +67,9 @@ int main(int argc, char* argv[])
 			return result;
 		}
 	} else if (!strcmp(cmd, "userspace_reboot")) {
-		execve(prebootPath(@"usr/bin/launchctl").fileSystemRepresentation,
+		execve(jbrootPath(@"/usr/bin/launchctl").fileSystemRepresentation,
 			(char *const[]){
-				(char *const)prebootPath(@"usr/bin/launchctl").fileSystemRepresentation, "reboot", "userspace", NULL
+				(char *const)jbrootPath(@"/usr/bin/launchctl").fileSystemRepresentation, "reboot", "userspace", NULL
 			}, environ);
 	} else if (!strcmp(cmd, "bindmount_path")) {
 		if (argc != 3) {
