@@ -287,7 +287,7 @@ struct JailbreakView: View {
                                 Image(systemName: Locale.characterDirection(forLanguage: Locale.current.languageCode ?? "") == .rightToLeft ? "chevron.left" : "chevron.right")
                                     .font(.body)
                                     .symbolRenderingMode(.palette)
-                                    .foregroundStyle(.white.opacity((1))
+                                    .foregroundStyle(.white.opacity(1))
                                     // .onLongPressGesture {
                                     //     UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
                                     // }
@@ -295,7 +295,7 @@ struct JailbreakView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(16)
-                        .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
+                        .background(Color(red: 1, green: 1, blue: 1, opacity: 1))
                         .contextMenu(
                           option.id == "userspace"
                           ? ContextMenu {
