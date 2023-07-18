@@ -52,6 +52,7 @@ void ensure_jbroot_symlink(const char* atpath)
   
 	char jbrootpath[PATH_MAX];
 	assert(realpath(jbrootPath(@"/").UTF8String, jbrootpath) != NULL);
+        if(jbrootpath[strlen(jbrootpath)] != '/') strcat(jbrootpath, "/");
 
 	char atrp[PATH_MAX];
 	assert(realpath(atpath, atrp) != NULL);
