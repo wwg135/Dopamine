@@ -1,0 +1,113 @@
+name: "RootHide (Prerelease): build, upload, release"
+
+on:
+  push:
+    branches:
+      - jbroot
+    paths-ignore:
+      - ".gitignore"
+  pull_request:
+    branches:
+      - jbroot
+    paths-ignore:
+      - ".gitignore"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    environment: Patch AutoBuildRelease
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Procursus
+        uses: dhinakg/procursus-action@main
+        with:
+          packages: ldid trustcache findutils coreutils sed make
+
+      - name: Install THEOS (without SDKs)
+        run: |
+          set -x
+          export BASEDIR="$(pwd)"
+          export THEOS="${BASEDIR}/theos"
+          mkdir -p $THEOS
+          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos >> install-theos.sh
+          gsed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
+          bash install-theos.sh
+          cd $BASEDIR
+
+      - name: Set Environment Variables
+        run: |
+          set -x
+          T8=$(TZ=UTC-8 date +'%Y%m%d_%H%M%S')
+          TS=$(date -j -f "%Y%m%d_%H%M%S" "${T8}" +%s)
+          SHASH=$(git rev-parse --short HEAD)
+          LAST_TAG=$(git describe --tags --abbrev=0)
+          echo "Git commit log since last tag:" > commit_logs.txt
+          echo "\`\`\`" >> commit_logs.txt
+          git log --graph --pretty=format:'%h - %s <%an>' --abbrev-commit ${LAST_TAG}.. >> commit_logs.txt
+          echo "" >> commit_logs.txt
+          echo "\`\`\`" >> commit_logs.txt
+          echo "ctime=${T8}" >> $GITHUB_ENV
+          echo "ctimestamp=${TS}" >> $GITHUB_ENV
+          echo "shorthash=${LAST_TAG}_${SHASH}" >> $GITHUB_ENV
+
+      - name: Print Environment Variables
+        run: |
+          set -x
+          echo ${{ env.ctime }}
+          echo ${{ env.ctimestamp }}
+          echo ${{ env.shorthash }}
+          cat ./commit_logs.txt
+
+      - name: Build
+        run: |
+          set -x
+          sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
+
+          sed -i '' "s/COMPILE_TIME=\`TZ=UTC-8 date \\\\\"+%Y%m%d_%H%M%S\\\\\"\`/COMPILE_TIME=0${{ env.ctime }}/g" ./Dopamine/Makefile
+          sed -i '' "s/SECRETS_REVERSE_PROXY/${{ secrets.REVERSE_PROXY }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/SECRETS_REVERSE_PROXY/${{ secrets.REVERSE_PROXY }}/g" ./Dopamine/Dopamine/UI/Views/UpdateDownloadingView.swift
+          sed -i '' "s/SECRETS_DOWNLOAD_REVERSE_PROXY/${{ secrets.DOWNLOAD_REVERSE_PROXY }}/g" ./Dopamine/Dopamine/UI/Extensions/URLExtension+download.swift
+
+          export BASEDIR="$(pwd)"
+          export THEOS="${BASEDIR}/theos"
+          gmake -j$(sysctl -n hw.physicalcpu)
+          mv Dopamine/Dopamine.tipa Dopamine_${{ env.ctime }}.tipa
+
+      - name: Prepare Release Notes
+        run: |
+          set -x
+          echo "" >> ./roothide_release.md
+          echo "## Recent changes" >> ./roothide_release.md
+          echo "" >> ./roothide_release.md
+          cat ./commit_logs.txt >> ./roothide_release.md
+
+          echo "" >> ./roothide_release.md
+
+          echo "## Mirrors" >> ./roothide_release.md
+          echo "" >> ./roothide_release.md
+          echo "* Reverse proxy: <https://dopamine.liam.science/${{ env.ctime }}/t>" >> ./roothide_release.md
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.ctime }}
+          name: "RootHide (不要安装！DO NOT INSTALL! 不要安装！): ${{ env.shorthash }}_${{ env.ctime }}"
+          body_path: ./roothide_release.md
+          draft: false
+          prerelease: true
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          target_commitish: dev
+          files: |
+           *.tipa
