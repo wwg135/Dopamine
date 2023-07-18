@@ -259,20 +259,20 @@ func isSandboxed() -> Bool {
 
 func bindMount(path: String) {
     if path.count > 0 && !(path.starts(with:"/var/jb/")) {
-        _ = execCmd(args: ["/var/jb/basebin/jbctl", "bindmount_path", path])
+        _ = execCmd(args: [jbrootPath("/basebin/jbctl"), "bindmount_path", path])
     }
 }
 
 func bindUnmount(path: String) {
     if path.count > 0 && !(path.starts(with:"/var/jb/")) {
-        _ = execCmd(args: ["/var/jb/basebin/jbctl", "bindunmount_path", path])
+        _ = execCmd(args: [jbrootPath("/basebin/jbctl"), "bindunmount_path", path])
     }
 }
 
 func isPathMappingEnabled() -> Bool {
     let dpDefaults = dopamineDefaults()
     let enableMount = dpDefaults.bool(forKey: "pathMappingEnabled")
-    let prefixersPlist = "/var/jb/var/mobile/Library/Preferences/page.liam.prefixers.plist"
+    let prefixersPlist = jbrootPath("/var/mobile/Library/Preferences/page.liam.prefixers.plist")!
     let isMappingPlistExists = FileManager.default.fileExists(atPath: prefixersPlist)
     return enableMount && isMappingPlistExists;
 }

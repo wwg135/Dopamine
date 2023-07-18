@@ -189,7 +189,7 @@ int setFakeLibBindMountActive(bool active)
 }
 
 int64_t registerJbPrefixedPath(NSString *sourcePath, int retry) {
-  NSString *jbPrefixedPath = prebootPath(sourcePath);
+  NSString *jbPrefixedPath = jbrootPath(sourcePath);
 
   NSFileManager *fm = [NSFileManager defaultManager];
 
@@ -235,12 +235,12 @@ int64_t bindMountPath(NSString *sourcePath, bool check_existances) {
   }
 
   if (!([sourcePath length] > 0 && [sourcePath hasPrefix:@"/"] &&
-          ![sourcePath hasPrefix:@"/var/jb/"] && ![sourcePath hasPrefix:prebootPath(nil)])) {
+          ![sourcePath hasPrefix:@"/var/jb/"] && ![sourcePath hasPrefix:jbrootPath(@"/")])) {
     return -1;
   }
 
   NSFileManager *fm = [NSFileManager defaultManager];
-  NSString *prefixersPlist = @"/var/jb/var/mobile/Library/Preferences/page.liam.prefixers.plist";
+  NSString *prefixersPlist = jbrootPath(@"/var/mobile/Library/Preferences/page.liam.prefixers.plist");
   if (check_existances && [fm fileExistsAtPath:prefixersPlist]) {
     NSDictionary *plistDict = [[NSDictionary alloc] initWithContentsOfFile:prefixersPlist];
     NSArray *sources = [plistDict objectForKey:@"source"];
@@ -280,13 +280,13 @@ int64_t bindUnmountPath(NSString *sourcePath) {
 
   // 0x01. param check
   if (!([sourcePath length] > 0 && [sourcePath hasPrefix:@"/"] &&
-          ![sourcePath hasPrefix:@"/var/jb/"] && ![sourcePath hasPrefix:prebootPath(nil)])) {
+          ![sourcePath hasPrefix:@"/var/jb/"] && ![sourcePath hasPrefix:jbrootPath(@"/")])) {
     return -1;
   }
 
   // 0x02. file check
   NSFileManager *fm = [NSFileManager defaultManager];
-  NSString *prefixersPlist = @"/var/jb/var/mobile/Library/Preferences/page.liam.prefixers.plist";
+  NSString *prefixersPlist = jbrootPath(@"/var/mobile/Library/Preferences/page.liam.prefixers.plist");
   if (![fm fileExistsAtPath:prefixersPlist]) {
     return -2;
   }
@@ -315,7 +315,7 @@ int64_t bindUnmountPath(NSString *sourcePath) {
   run_unsandboxed(^{
     unmount(sourcePath.fileSystemRepresentation, 0);
   });
-  NSString *jbPrefixedPath = prebootPath(sourcePath);
+  NSString *jbPrefixedPath = jbrootPath(sourcePath);
   if ([fm fileExistsAtPath:jbPrefixedPath]) {
     // two cases: 1) this is the first time we need to create this path; 2) just removed an empty directory.
     for (int i = 0; i != 3 && [fm removeItemAtPath:jbPrefixedPath error:nil]; ++i) {}
