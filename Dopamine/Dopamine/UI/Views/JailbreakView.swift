@@ -295,7 +295,7 @@ struct JailbreakView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(16)
-                        .background(Color(red: 1, green: 1, blue: 1, opacity: 1))
+                        .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
                         .contextMenu(
                           option.id == "userspace"
                           ? ContextMenu {
