@@ -302,7 +302,7 @@ struct JailbreakView: View {
                             Button(action: doReboot,
                                     label: {Label("Menu_Reboot_Title", systemImage: "arrow.clockwise.circle.fill")})
                             Button(action: doUpdateEnvironment,
-                                    label: {Label("Menu_Update_Environment_Title", systemImage: "arrow.counterclockwise.circle.fill")})
+                                    label: {Label("Button_Update_Environment", systemImage: "arrow.counterclockwise.circle.fill")})
                           }
                           : nil
                         )
