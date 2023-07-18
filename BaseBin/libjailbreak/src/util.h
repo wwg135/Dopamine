@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-NSString *prebootPath(NSString *path);
+NSString *jbrootPath(NSString *path);
 
 typedef struct __attribute__((__packed__)) _vm_map_flags {
     unsigned int
