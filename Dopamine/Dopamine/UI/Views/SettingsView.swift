@@ -16,12 +16,14 @@ struct SettingsView: View {
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
+    @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
+    @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
     
     @Binding var isPresented: Bool
 
     @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
 
-    @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
+    @State var rebootRequiredAlertShown = false
     @State var mountPathAlertShown = false
     @State var mountPathInput = ""
     @State var removeZmountAlertShown = false
@@ -164,13 +166,35 @@ struct SettingsView: View {
                                 }
                                 VStack {
                                     Button(action: {
+                                       UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                       isEnvironmentHiddenState.toggle()
+                                       changeEnvironmentVisibility(hidden: !isEnvironmentHidden())
+                                   }) {
+                                       HStack {
+                                           Image(systemName: isEnvironmentHiddenState ? "eye" : "eye.slash")
+                                           Text(isEnvironmentHiddenState ? "Button_Unhide_Jailbreak" : "Button_Hide_Jailbreak")
+                                               .lineLimit(1)
+                                               .minimumScaleFactor(0.5)
+                                       }
+                                       .padding(.horizontal, 4)
+                                       .padding(8)
+                                       .frame(maxWidth: .infinity)
+                                       .overlay(
+                                           RoundedRectangle(cornerRadius: 8)
+                                               .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                       )
+                                   }
+                                    Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        isEnvironmentHiddenState.toggle()
-                                        changeEnvironmentVisibility(hidden: !isEnvironmentHidden())
+                                        if isJailbroken() {
+                                            rebootRequiredAlertShown = true
+                                        } else {
+                                            removeJailbreakAlertShown = true
+                                        }
                                     }) {
                                         HStack {
-                                            Image(systemName: isEnvironmentHiddenState ? "eye" : "eye.slash")
-                                            Text(isEnvironmentHiddenState ? "Button_Unhide_Jailbreak" : "Button_Hide_Jailbreak")
+                                            Image(systemName: "trash")
+                                            Text("Button_Remove_Jailbreak")
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
                                         }
@@ -181,26 +205,6 @@ struct SettingsView: View {
                                             RoundedRectangle(cornerRadius: 8)
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
-                                    }
-                                    if !isJailbroken() {
-                                      Button(action: {
-                                          UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                          removeJailbreakAlertShown = true
-                                      }) {
-                                          HStack {
-                                              Image(systemName: "trash")
-                                              Text("Button_Remove_Jailbreak")
-                                                  .lineLimit(1)
-                                                  .minimumScaleFactor(0.5)
-                                          }
-                                          .padding(.horizontal, 4)
-                                          .padding(8)
-                                          .frame(maxWidth: .infinity)
-                                          .overlay(
-                                              RoundedRectangle(cornerRadius: 8)
-                                                  .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                          )
-                                      }
                                     }
                                     Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak")
                                         .font(.footnote)
@@ -257,6 +261,12 @@ struct SettingsView: View {
                                 }
                             })
                         }
+                        .alert("Settings_Remove_Jailbreak_Alert_Title", isPresented: $rebootRequiredAlertShown, actions: {
+                            Button("Button_Cancel", role: .cancel) { }
+                            Button("Menu_Reboot_Title") {
+                                reboot()
+                            }
+                        }, message: { Text("Jailbroken currently, please reboot the device.") })
                         .alert("Settings_Remove_Zplist_Alert_Title", isPresented: $removeZplistAlertShown, actions: {
                             Button("Button_Cancel", role: .cancel) { }
                             Button("Button_Set", role: .destructive) {
