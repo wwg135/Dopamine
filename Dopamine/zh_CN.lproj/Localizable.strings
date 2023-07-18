@@ -8,7 +8,7 @@
 
 "Button_Jailbreak_Title" = "越狱";
 
-"Button_Remove_Jailbreak" = "清除越狱";
+"Button_Remove_Jailbreak" = "  清除越狱";
 
 "Button_Set_Mobile_Password" = "  设置密码";
 
@@ -26,7 +26,7 @@
 
 "Button_Update_Available" = "有新版本，请点击更新";
 
-"Button_Update_Environment" = "更新越狱环境";
+"Button_Update_Environment" = "更新环境";
 
 "Unsupported" = "不支持";
 
@@ -167,3 +167,5 @@
 "Menu_Reboot_Title" = "重启";
 
 "Check_For_Updates" = "检查更新";
+
+"Jailbroken currently, please reboot the device." = "当前为越狱状态，请重启设备后再清除越狱。确定重启吗？";
