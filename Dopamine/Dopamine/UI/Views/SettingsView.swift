@@ -16,6 +16,7 @@ struct SettingsView: View {
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
+    @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
     
     @Binding var isPresented: Bool
 
@@ -28,6 +29,7 @@ struct SettingsView: View {
     @State var removeZmountInput = ""
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
+    @State var rebootRequiredAlertShown = false
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
@@ -169,13 +171,35 @@ struct SettingsView: View {
                                 }
                                 VStack {
                                     Button(action: {
+                                       UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                       isEnvironmentHiddenState.toggle()
+                                       changeEnvironmentVisibility(hidden: !isEnvironmentHidden())
+                                   }) {
+                                       HStack {
+                                           Image(systemName: isEnvironmentHiddenState ? "eye" : "eye.slash")
+                                           Text(isEnvironmentHiddenState ? "Button_Unhide_Jailbreak" : "Button_Hide_Jailbreak")
+                                               .lineLimit(1)
+                                               .minimumScaleFactor(0.5)
+                                       }
+                                       .padding(.horizontal, 4)
+                                       .padding(8)
+                                       .frame(maxWidth: .infinity)
+                                       .overlay(
+                                           RoundedRectangle(cornerRadius: 8)
+                                               .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                       )
+                                   }
+                                    Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        isEnvironmentHiddenState.toggle()
-                                        changeEnvironmentVisibility(hidden: !isEnvironmentHidden())
+                                        if isJailbroken() {
+                                            rebootRequiredAlertShown = true
+                                        } else {
+                                            removeJailbreakAlertShown = true
+                                        }
                                     }) {
                                         HStack {
-                                            Image(systemName: isEnvironmentHiddenState ? "eye" : "eye.slash")
-                                            Text(isEnvironmentHiddenState ? "Button_Unhide_Jailbreak" : "Button_Hide_Jailbreak")
+                                            Image(systemName: "trash")
+                                            Text("Button_Remove_Jailbreak")
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
                                         }
@@ -186,26 +210,6 @@ struct SettingsView: View {
                                             RoundedRectangle(cornerRadius: 8)
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
-                                    }
-                                    if !isJailbroken() {
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            removeJailbreakAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "trash")
-                                                Text("Button_Remove_Jailbreak")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
-                                            }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
-                                        }
                                     }
                                     Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak")
                                         .font(.footnote)
@@ -255,6 +259,12 @@ struct SettingsView: View {
                                 }
                             })
                         }
+                        .alert("Settings_Remove_Jailbreak_Alert_Title", isPresented: $rebootRequiredAlertShown, actions: {
+                            Button("Button_Cancel", role: .cancel) { }
+                            Button("Menu_Reboot_Title") {
+                                reboot()
+                            }
+                        }, message: { Text("Jailbroken currently, please reboot the device.") })
                         .textFieldAlert(isPresented: $removeZmountAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Remove_Zmount_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Remove_Zmount_Message", comment: ""), text: Binding<String?>($removeZmountInput), onSubmit: {
                                 if removeZmountInput.count > 1 {
