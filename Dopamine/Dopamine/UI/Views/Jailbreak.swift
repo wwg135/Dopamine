@@ -21,7 +21,7 @@ public func rootifyPath(path: String) -> String? {
 }
 
 func getBootInfoValue(key: String) -> Any? {
-    guard let bootInfoPath = rootifyPath(path: "/basebin/boot_info.plist") else {
+    guard let bootInfoPath = jbrootPath("/var/.boot_info.plist") else {
         return nil
     }
     guard let bootInfo = NSDictionary(contentsOfFile: bootInfoPath) else {
@@ -31,10 +31,10 @@ func getBootInfoValue(key: String) -> Any? {
 }
 
 func respring() {
-    guard let sbreloadPath = rootifyPath(path: "/usr/bin/sbreload") else {
-        return
-    }
-    _ = execCmd(args: [sbreloadPath])
+    // guard let sbreloadPath = jbrootPath("/usr/bin/sbreload") else {
+    //     return
+    // }
+    _ = execCmd(args: [jbrootPath("/usr/bin/killall")!, "SpringBoard"])
 }
 
 func userspaceReboot() {
@@ -54,7 +54,7 @@ func userspaceReboot() {
     }
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-        _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
+        _ = execCmd(args: [jbrootPath("/basebin/jbctl")!, "reboot_userspace"])
     })
 }
 
@@ -79,7 +79,7 @@ func doLdrestart() {
     }
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-        guard let ldrestartPath = rootifyPath(path: "/usr/bin/ldrestart") else {
+        guard let ldrestartPath = jbrootPath("/usr/bin/ldrestart") else {
             return
         }
         _ = execCmd(args: [ldrestartPath])
@@ -103,7 +103,7 @@ func doReboot() {
     }
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-        guard let rebootPath = rootifyPath(path: "/usr/sbin/reboot") else {
+        guard let rebootPath = jbrootPath("/usr/sbin/reboot") else {
             return
         }
         _ = execCmd(args: [rebootPath])
@@ -176,14 +176,14 @@ func jailbrokenUpdateTweakInjectionPreference() {
 
 func jailbrokenUpdateIDownloadEnabled() {
     let iDownloadEnabled = dopamineDefaults().bool(forKey: "iDownloadEnabled")
-    _ = execCmd(args: [rootifyPath(path: "basebin/jbinit")!, iDownloadEnabled ? "start_idownload" : "stop_idownload"])
+    _ = execCmd(args: [jbrootPath("/basebin/jbinit")!, iDownloadEnabled ? "start_idownload" : "stop_idownload"])
 }
 
 func changeMobilePassword(newPassword: String) {
-    guard let dashPath = rootifyPath(path: "/usr/bin/dash") else {
+    guard let dashPath = jbrootPath("/usr/bin/dash") else {
         return;
     }
-    guard let pwPath = rootifyPath(path: "/usr/sbin/pw") else {
+    guard let pwPath = jbrootPath("/usr/sbin/pw") else {
         return;
     }
     _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
