@@ -149,7 +149,7 @@ int basebinUpdateFromTar(NSString *basebinPath, bool rebootWhenDone)
 	NSArray *basebinItems = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpBasebinPath error:nil];
 	for (NSString *basebinItem in basebinItems) {
 		@autoreleasepool {
-			NSString *oldBasebinPath = [prebootPath(@"basebin") stringByAppendingPathComponent:basebinItem];
+			NSString *oldBasebinPath = [jbrootPath(@"/basebin") stringByAppendingPathComponent:basebinItem];
 			NSString *newBasebinPath = [tmpBasebinPath stringByAppendingPathComponent:basebinItem];
 			if ([[NSFileManager defaultManager] fileExistsAtPath:oldBasebinPath]) {
 				[[NSFileManager defaultManager] removeItemAtPath:oldBasebinPath error:nil];
