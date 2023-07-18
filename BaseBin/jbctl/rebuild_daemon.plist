@@ -8,7 +8,7 @@
 	<string>com.opa334.trustcache_rebuild</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>basebin/jbctl</string>
+		<string>jbctl</string>
 		<string>rebuild_trustcache</string>
 	</array>
 	<key>RunAtLoad</key>
