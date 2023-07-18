@@ -99,6 +99,9 @@ __attribute__((constructor)) static void initializer(void)
 	JB_SandboxExtensions = strdup(getenv("JB_SANDBOX_EXTENSIONS"));
 	JB_RootPath = strdup(getenv("JB_ROOT_PATH"));
 
+        JBRAND = strdup(((NSString*)bootInfo_getObject(@"JBRAND")).UTF8String);
+	JBROOT = strdup(((NSString*)bootInfo_getObject(@"JBROOT")).UTF8String);
+ 
 	proc_set_debugged_pid(getpid(), false);
 	initXPCHooks();
 	initDaemonHooks();
