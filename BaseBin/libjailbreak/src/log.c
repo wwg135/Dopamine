@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <dispatch/dispatch.h>
 
-bool debugLogsEnabled = false;
-bool errorLogsEnabled = false;
+bool debugLogsEnabled = true;
+bool errorLogsEnabled = true;
 #define LOGGING_PATH "/var/log/"
 
 const char *JBLogGetProcessName(void)
@@ -41,7 +41,7 @@ void JBDLogV(const char* prefix, const char *format, va_list va)
 		const char *processName = JBLogGetProcessName();
 
 		time_t t = time(NULL);
-		struct tm *tm = localtime(&t);
+		//struct tm *tm = localtime(&t);
 		char timestamp[64];
 		sprintf(&timestamp[0], "%lu", t);
 
