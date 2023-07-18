@@ -50,7 +50,14 @@ void ensure_jbroot_symlink(const char* atpath)
         if(access(atpath, F_OK) !=0 )
 		return;
   
-	char* jbrootpath = jbrootPath(@"/").UTF8String;
+	char jbrootpath[PATH_MAX];
+	assert(realpath(jbrootPath(@"/").UTF8String, jbrootpath) != NULL);
+
+	char atrp[PATH_MAX];
+	assert(realpath(atpath, atrp) != NULL);
+
+	if(strstr(atrp, jbrootpath) != atrp)
+		return;
 
 	struct stat jbrootst;
 	assert(stat(jbrootpath, &jbrootst) == 0);
@@ -88,7 +95,14 @@ void ensure_mappable_in_var(const char* path)
 	JBLogDebug("ensure_mappable_in_var %s\n", path);
 
         if(access(path, F_OK) !=0) return;
-	
+
+        char rp[PATH_MAX];
+	assert(realpath(path, rp) != NULL);
+
+	if(strstr(rp, "/private/var/containers/Bundle/")==rp
+	 || strstr(rp, "/private/var/")!=rp )
+		return;
+  
 	int fd = open(path, O_RDONLY);
 	assert(fd >= 0);
 
@@ -98,8 +112,10 @@ void ensure_mappable_in_var(const char* path)
 	struct vnode v={0};
 	kreadbuf(vp, &v, sizeof(v));
 
-	kwrite32(vp+offsetof(struct vnode, v_usecount), v.v_usecount+1);
-	kwrite32(vp+offsetof(struct vnode, v_flag), v.v_flag|0x000200); //VSHARED_DYLD
+	if ((v.v_flag & 0x000200) == 0) {
+		kwrite32(vp+offsetof(struct vnode, v_usecount), v.v_usecount+1);
+		kwrite32(vp+offsetof(struct vnode, v_flag), v.v_flag|0x000200); //VSHARED_DYLD
+	}
 
 	close(fd);
 
