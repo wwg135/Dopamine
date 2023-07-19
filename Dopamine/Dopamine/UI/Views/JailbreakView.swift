@@ -90,7 +90,7 @@ struct JailbreakView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .edgesIgnoringSafeArea(.all)
-                        .blur(radius: 1)
+                        .blur(radius: 0.3)
                         .frame(width: geometry.size.width, height: geometry.size.height)
 
                         .scaleEffect(isPopupPresented ? 1.2 : 1.4)
@@ -100,7 +100,7 @@ struct JailbreakView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .edgesIgnoringSafeArea(.all)
-                        .blur(radius: 1)
+                        .blur(radius: 0.3)
                         .frame(width: geometry.size.width, height: geometry.size.height)
 
                         .scaleEffect(isPopupPresented ? 1.2 : 1.4)
