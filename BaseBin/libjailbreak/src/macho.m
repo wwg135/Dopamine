@@ -195,49 +195,56 @@ void _machoEnumerateDependencies(FILE *machoFile, uint32_t archOffset, NSString 
 			NSString *imagePath = [NSString stringWithUTF8String:imagePathC];
 			free(imagePathC);
 
-			BOOL inDSC = _dyld_shared_cache_contains_path(imagePath.fileSystemRepresentation);
-			if (!inDSC) {
-				NSString *resolvedPath = resolveLoadPath(imagePath, machoPath, sourceExecutablePath, rpaths);
-				resolvedPath = [[resolvedPath stringByResolvingSymlinksInPath] stringByStandardizingPath];
-				if (![enumeratedCache containsObject:resolvedPath] && [[NSFileManager defaultManager] fileExistsAtPath:resolvedPath]) {
-					[enumeratedCache addObject:resolvedPath];
-					enumerateBlock(resolvedPath);
+			if(_dyld_shared_cache_contains_path(imagePath.fileSystemRepresentation)) {
+				JBLogDebug("[_machoEnumerateDependencies] Skipped dependency %s, in dyld_shared_cache", imagePath.UTF8String);
+				return;
+			}
+			
+			NSString *resolvedPath = resolveLoadPath(imagePath, machoPath, executablePath, rpaths); 
 
-					JBLogDebug("[_machoEnumerateDependencies] Found depdendency %s, recursively enumerating over it...", resolvedPath.UTF8String);
-					FILE *nextFile = fopen(resolvedPath.fileSystemRepresentation, "rb");
-					if (nextFile) {
-						BOOL nextFileIsMacho = NO;
-						machoGetInfo(nextFile, &nextFileIsMacho, NULL);
-						if (nextFileIsMacho) {
-							int64_t nextBestArchCandidate = machoFindBestArch(nextFile);
-							if (nextBestArchCandidate >= 0) {
-								_machoEnumerateDependencies(nextFile, nextBestArchCandidate, resolvedPath, sourceExecutablePath, enumeratedCache, enumerateBlock);
-							}
-							else {
-								JBLogError("[_machoEnumerateDependencies] Failed to find best arch of dependency %s", resolvedPath.UTF8String);
-							}
-						}
-						else {
-							JBLogError("[_machoEnumerateDependencies] Dependency %s does not seem to be a macho", resolvedPath.UTF8String);
-						}
-						fclose(nextFile);
-					}
-					else {
-						JBLogError("[_machoEnumerateDependencies] Dependency %s does not seem to exist, maybe path resolving failed?", resolvedPath.UTF8String);
-					}
+			if(!resolvedPath) {
+				JBLogError("[_machoEnumerateDependencies] Skipped dependency %s, invalid", imagePath.UTF8String);
+				return;
+			}
+
+			resolvedPath = [[resolvedPath stringByResolvingSymlinksInPath] stringByStandardizingPath];
+
+			if (![[NSFileManager defaultManager] fileExistsAtPath:resolvedPath]) {
+				JBLogError("[_machoEnumerateDependencies] Skipped dependency %s, non existant", resolvedPath.UTF8String);
+				return;
+			}
+
+			if([enumeratedCache containsObject:resolvedPath]) {
+				JBLogDebug("[_machoEnumerateDependencies] Skipped dependency %s, already cached", resolvedPath.UTF8String);
+				return;
+			}
+
+			[enumeratedCache addObject:resolvedPath];
+			enumerateBlock(resolvedPath);
+
+			JBLogDebug("[_machoEnumerateDependencies] Found depdendency %s, recursively enumerating over it...", resolvedPath.UTF8String);
+			FILE *nextFile = fopen(resolvedPath.fileSystemRepresentation, "rb");
+			if (!nextFile) {
+				JBLogError("[_machoEnumerateDependencies] Dependency %s does not seem to exist, maybe path resolving failed?", resolvedPath.UTF8String);
+				return;
+			}
+
+			BOOL nextFileIsMacho = NO;
+			machoGetInfo(nextFile, &nextFileIsMacho, NULL);
+			if (nextFileIsMacho) {
+				int64_t nextBestArchCandidate = machoFindBestArch(nextFile);
+				if (nextBestArchCandidate >= 0) {
+					_machoEnumerateDependencies(nextFile, nextBestArchCandidate, resolvedPath, executablePath, enumeratedCache, enumerateBlock);
 				}
 				else {
-					if (![[NSFileManager defaultManager] fileExistsAtPath:resolvedPath]) {
-						JBLogError("[_machoEnumerateDependencies] Skipped dependency %s, non existant", resolvedPath.UTF8String);
-					}
-					else {
-						JBLogDebug("[_machoEnumerateDependencies] Skipped dependency %s, already cached", resolvedPath.UTF8String);
-					}
+					JBLogError("[_machoEnumerateDependencies] Failed to find best arch of dependency %s", resolvedPath.UTF8String);
 				}
 			}
 			else {
-				JBLogDebug("[_machoEnumerateDependencies] Skipped dependency %s, in dyld_shared_cache", imagePath.UTF8String);
+				JBLogError("[_machoEnumerateDependencies] Dependency %s does not seem to be a macho", resolvedPath.UTF8String);
 			}
+			fclose(nextFile);
+
 		}
 	});
 }
