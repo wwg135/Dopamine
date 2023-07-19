@@ -101,7 +101,7 @@ struct SettingsView: View {
                                     }
                                 }
                                 VStack {
-                                    Button(action: {
+                                   Button(action: {
                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                        isEnvironmentHiddenState.toggle()
                                        changeEnvironmentVisibility(hidden: !isEnvironmentHidden())
