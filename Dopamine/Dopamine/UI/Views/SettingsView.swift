@@ -23,6 +23,7 @@ struct SettingsView: View {
     
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
+    
     @State var rebootRequiredAlertShown = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
