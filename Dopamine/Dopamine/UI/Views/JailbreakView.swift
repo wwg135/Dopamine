@@ -240,7 +240,6 @@ struct JailbreakView: View {
                 Text("AAA : AAB")
                     .font(.subheadline)
                     .foregroundColor(tint)
-                    .padding(.top)
                 Text(upTime)
                     .font(.subheadline)
                     .foregroundColor(tint)
