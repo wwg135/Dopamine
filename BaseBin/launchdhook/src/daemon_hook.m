@@ -27,7 +27,6 @@ void addLaunchDaemon(xpc_object_t xdict, const char *path)
 				xpc_dictionary_set_value(xdict, path, daemonXdict);
 			}
 		}
-                munmap(addr,len);
 		close(ldFd);
 	}
 }
