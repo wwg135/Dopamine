@@ -415,7 +415,7 @@ struct JailbreakView: View {
             .cornerRadius(isJailbreaking ? 20 : 8)
             .ignoresSafeArea(.all, edges: isJailbreaking ? .all : .top)
             .offset(y: isJailbreaking ? 16 : 0)
-            .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1) .opacity(0.3)
+            .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1)
         )
         .animation(.spring(), value: isJailbreaking)
     }
