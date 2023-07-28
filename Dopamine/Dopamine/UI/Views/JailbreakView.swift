@@ -83,9 +83,9 @@ struct JailbreakView: View {
                 
                 let isPopupPresented = isSettingsPresented || isCreditsPresented
                 
-               let imagePath = "/var/mobile/Wallpaper.jpg"
+                let imagePath = "/var/mobile/Wallpaper.jpg"
                 if let imageData = FileManager.default.contents(atPath: imagePath),
-                   let backgroundImage = UIImage(data: imageData) {
+                    let backgroundImage = UIImage(data: imageData) {
                     Image(uiImage: backgroundImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
