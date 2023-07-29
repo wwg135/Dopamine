@@ -270,7 +270,7 @@ struct SettingsView: View {
                     
                     ZStack {}
                         .textFieldAlert(isPresented: $forbidunjectAlertShown) { () -> TextFieldAlert in
-                            TextFieldAlert(title: NSLocalizedString("Set_Forbid_unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Forbid_unject_Message", comment: ""), text: Binding<String?>($forbidunjectInput), onSubmit: {
+                            TextFieldAlert(title: NSLocalizedString("Set_Forbid_unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Forbid_unject_Message", comment: ""), text: Binding<key?>($forbidunjectInput), onSubmit: {
                                 newforbidunject(newunject: forbidunjectInput)
                             })
                         }
