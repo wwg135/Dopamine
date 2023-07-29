@@ -182,14 +182,14 @@ func newMountPath(newPath: String) {// zqbb_flag
     }
 }
 
-func newforbidunject(newunject: String) {
+func newforbidunject(newPath: String) {
     guard let plist = NSDictionary(contentsOfFile: "/var/mobile/zp.upject.plist") else {
         return
     }
     guard let pathArray = plist["path"] as? [String] else {
         return
     }
-    _ = execCmd(args: [newunject])
+    _ = execCmd(args: [newPath])
 
 func changeEnvironmentVisibility(hidden: Bool) {
     if hidden {
