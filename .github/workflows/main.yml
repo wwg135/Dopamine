@@ -88,11 +88,3 @@ jobs:
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
-
-      - name: Upload Artifact
-        id: dopamine-upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: Dopamine
-          path: |
-            Dopamine.ipa
