@@ -182,10 +182,6 @@ func newMountPath(newPath: String) {
     }
 }
 
-func newforbidunject(newunject: dict) {
-    _ = execCmd(args: [newunject])
-}
-
 func changeEnvironmentVisibility(hidden: Bool) {
     if hidden {
         _ = execCmd(args: [CommandLine.arguments[0], "hide_environment"])
