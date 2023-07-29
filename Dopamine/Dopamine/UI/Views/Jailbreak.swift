@@ -182,14 +182,8 @@ func newMountPath(newPath: String) {
     }
 }
 
-func newforbidunject(newPath: String) {
-    guard let plist = NSDictionary(contentsOfFile: "/var/mobile/zp.upject.plist") else {
-        return
-    }
-    guard let pathArray = plist["path"] as? [String] else {
-        return
-    }
-    _ = execCmd(args: [newPath])
+func newforbidunject(newunject: String) {
+    _ = execCmd(args: [newunject])
 }
 
 func changeEnvironmentVisibility(hidden: Bool) {
