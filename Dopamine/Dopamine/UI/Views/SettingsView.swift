@@ -272,7 +272,7 @@ struct SettingsView: View {
                         .textFieldAlert(isPresented: $forbidunjectAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Set_Forbid_unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Forbid_unject_Message", comment: ""), text: Binding<String?>($forbidunjectInput), onSubmit: {
                                 if forbidunjectInput.count > 1 {
-                                    newMountPath(newunject: forbidunjectInput)
+                                    newforbidunject(newunject: forbidunjectInput)
                                 }
                             })
                         }
