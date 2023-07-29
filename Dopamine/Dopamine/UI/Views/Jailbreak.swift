@@ -171,7 +171,7 @@ func changeMobilePassword(newPassword: String) {
     _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
 }
 
-func newMountPath(newPath: String) {// zqbb_flag
+func newMountPath(newPath: String) {
     let plist = NSDictionary(contentsOfFile: "/var/mobile/newFakePath.plist")
     let pathArray = plist?["path"] as? [String]
     if pathArray?.firstIndex(of: newPath) == nil {
@@ -190,6 +190,7 @@ func newforbidunject(newPath: String) {
         return
     }
     _ = execCmd(args: [newPath])
+}
 
 func changeEnvironmentVisibility(hidden: Bool) {
     if hidden {
