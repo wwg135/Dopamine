@@ -198,4 +198,4 @@
 
 "Jailbroken currently, please reboot the device." = "当前为越狱状态，请重启设备后再清除越狱。确定重启吗？";
 
-"Options_Forbid_Unject" = "禁止注入";
+"Options_Forbid_Unject" = "自定义App禁止注入";
