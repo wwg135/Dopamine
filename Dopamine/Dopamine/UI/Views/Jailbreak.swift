@@ -182,7 +182,7 @@ func newMountPath(newPath: String) {
     }
 }
 
-func newforbidunject(newunject: Key) {
+func newforbidunject(newunject: dict) {
     _ = execCmd(args: [newunject])
 }
 
