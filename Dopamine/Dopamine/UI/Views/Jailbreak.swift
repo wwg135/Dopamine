@@ -182,9 +182,9 @@ func newMountPath(newPath: String) {
     }
 }
 
-func newforbidunject(newunject: dict) {
+func newforbidunject(newunject: key) {
     let plist = NSDictionary(contentsOfFile: "/var/mobile/zp.unject.plist")
-    let dict = plist?[dict]
+    let key = plist?[key]
     _ = execCmd(args: [newunject])
 }
 
