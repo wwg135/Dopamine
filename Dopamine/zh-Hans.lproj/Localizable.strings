@@ -197,3 +197,5 @@
 "Button_Reboot_Userspace_Finish" = "重启用户空间";
 
 "Jailbroken currently, please reboot the device." = "当前为越狱状态，请重启设备后再清除越狱。确定重启吗？";
+
+"Options_Forbid_Unject" = "底层屏蔽";
