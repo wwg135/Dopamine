@@ -18,6 +18,7 @@ struct SettingsView: View {
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
+    @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
     
     @Binding var isPresented: Bool
 
@@ -56,6 +57,7 @@ struct SettingsView: View {
                                     }
                                 }
                             if !isJailbroken() {
+                                Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
                             }
