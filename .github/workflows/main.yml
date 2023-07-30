@@ -54,20 +54,20 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方正式版1.1.2更新\n新增清除越狱提示" >> body.txt
+          echo -e "\n> - 1.同步官方正式版1.1.2代码\n> - 2.新增越狱后默认配置底层屏蔽文件" >> body.txt
           echo -e "\n**1.1的修改版功能如下：**" >> body.txt
           echo -e "> - 1、新增【桥接心浪】功能，以便以 XinA 的模式安装有根插件（内置xinamine依赖）。感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 2、新增【检查更新】功能，设置里面打开即可检查更新，默认关闭！！！" >> body.txt
-          echo -e "> - 3、新增【映射挂载】功能，开关在设置里面，默认不开启。要挂载什么，自己添加路径挂载。" >> body.txt
+          echo -e "> - 3、新增【映射挂载】功能，开关在设置里面，默认不开启。要挂载什么，自己添加路径挂载。感谢真皮大佬的代码！！！" >> body.txt
           echo -e "> - 4、新增初次越狱/重建越狱时，默认安装 【ElleKit_1.0】 、 【PreferenceLoader_2.2.6.1】、【Xinamine】。感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 5、新增「重建环境」功能，开关在设置里面。感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 6、新增【系统运行时间】----越狱后首页显示，打开多巴胺工具即弹出！！！" >> body.txt
           echo -e "> - 7、新增【重启用户空间】长按3Dtouch弹出的【重启】功能才是真正重启手机（此操作重启后处于非越狱状态，谨慎操作）。7/8新增弹出【更新越狱环境】，仅针对从trollstore更新安装dopamine有用，覆盖安装更新建议执行该操作，感谢liam0205大佬的代码！！！" >> body.txt
-          echo -e "> - 8、新增【自定义dopamine首页背景】--将图片命名为：Wallpaper.jpg放置在目录：/var/mobile/！！！" >> body.txt
-          echo -e "> - 9、新增【底层屏蔽】越狱检测，将自定义的屏蔽越狱检测配置文件：zp.unject.plist放置在目录：/var/mobile/！！！" >> body.txt
-          echo -e "> - 10、新增【清除屏蔽】功能，清除屏蔽配置文件zp.unject.plist，恢复APP屏蔽前的状态。感谢真皮大佬的代码！！！" >> body.txt
-          echo -e "> - 11、新增【重启用户空间】越狱成功后显示按钮，防止自动重启用户空间后、插件不兼容导致黑屏开不了机。感谢liam0205大佬的代码！！！" >> body.txt
-          echo -e "> - 12、设置新增【清除越狱】确认。若处于越狱状态，提示确认重启设备后再清除操作，否则不允许清除越狱！！！" >> body.txt
+          echo -e "> - 8、新增【自定义dopamine首页背景】--将图片命名为：Wallpaper.jpg放置在目录：/var/mobile/，感谢真皮大佬的代码！！！" >> body.txt
+          echo -e "> - 9、新增【清除屏蔽】功能，清除屏蔽配置文件zp.unject.plist，恢复APP屏蔽前的状态。感谢真皮大佬的代码！！！" >> body.txt
+          echo -e "> - 10、新增【重启用户空间】越狱成功后显示按钮，防止自动重启用户空间后、插件不兼容导致黑屏开不了机。感谢liam0205大佬的代码！！！" >> body.txt
+          echo -e "> - 11、设置新增【清除越狱】确认。若处于越狱状态，提示确认重启设备后再清除操作，否则不允许清除越狱！！！" >> body.txt
+          echo -e "> - 12、新增越狱后默认配置底层屏蔽文件【zp.unject.plist】，路径为：/var/mobile/，可自定义app屏蔽越狱检测！！！" >> body.txt
           echo -e "> - 13、其他设置UI、显示细节优化。。。" >> body.txt
       
       - name: Build ipa
@@ -88,11 +88,3 @@ jobs:
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
-
-      - name: Upload Artifact
-        id: dopamine-upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: Dopamine
-          path: |
-            Dopamine.ipa
