@@ -17,6 +17,7 @@ struct SettingsView: View {
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
+    @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
     
     @Binding var isPresented: Bool
 
@@ -64,6 +65,7 @@ struct SettingsView: View {
                             if !isJailbroken() {
                                 Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
                                 Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
+                                Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
                                 Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 .onChange(of: enableiDownload) { newValue in
