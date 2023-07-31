@@ -147,6 +147,21 @@ func clearTmpDirectory() {
     }
 }
 
+func changBoolean() {
+    let fileManager = FileManager.default
+    let filePath = "/var/mobile/zp.unject.plist"
+    if fileManager.fileExists(atPath: filePath) {
+        if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
+            for (key, value) in dict { 
+                if let boolValue = value as? Bool { 
+                    dict[key] = !boolValue   
+                } 
+            }
+            dict.write(toFile: filePath, atomically: true)
+        }
+    } 
+}
+
 func removeJailbreak() {
     dopamineDefaults().removeObject(forKey: "selectedPackageManagers")
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
