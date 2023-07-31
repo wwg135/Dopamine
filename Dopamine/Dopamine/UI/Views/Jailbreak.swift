@@ -150,22 +150,18 @@ func removeZplist() {
 }
 
 func changBoolean() {
+    let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
-    if !FileManager.default.fileExists(atPath: filePath) {
-        if let dict = NSMutableDictionary(contentsOfFile: filePath) {
-            for (key, value) in dict {
-                if let number = value as? NSNumber {
-                   dict[key] = NSNumber(value: !number.boolValue)
-                }
+    if fileManager.fileExists(atPath: filePath) {
+        if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
+            for (key, value) in dict { 
+                if let boolValue = value as? Bool { 
+                    dict[key] = !boolValue   
+                } 
             }
             dict.write(toFile: filePath, atomically: true)
-            print("Modification completed successfully.")
-        } else {
-            print("Error: Unable to read dictionary from file.")
-        }              
-    } else {
-        print("Error: File not found at path.")
-    }
+        }
+    } 
 }
 
 func removeJailbreak() {
