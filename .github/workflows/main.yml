@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1.2_2'
+  VERSION: '1.1.2_3'
  
 jobs:
   build:
@@ -54,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.同步官方代码更新\n> - 2.新增一键启用自定义app屏蔽越狱检测（开关在越狱后设置里面）" >> body.txt
+          echo -e "\n> - 1.同步官方代码更新\n> - 2.新增自定义App屏蔽越狱检测，功能和说明在设置里面" >> body.txt
           echo -e "\n1.1的修改版功能如下：" >> body.txt
           echo -e "**注意：追求稳定，此版本无【桥接心浪】、【映射挂载】、【重建环境】功能**" >> body.txt
           echo -e "> - 1、新增【检查更新】功能，设置里面打开即可检查更新，默认关闭！！！" >> body.txt
@@ -65,7 +65,8 @@ jobs:
           echo -e "> - 7、设置新增【清除越狱】确认。若处于越狱状态，提示确认重启设备后再清除操作，否则不允许清除越狱！！！" >> body.txt
           echo -e "> - 8、新增越狱后默认配置底层屏蔽文件【zp.unject.plist】，路径为：/var/mobile/，可自定义app屏蔽越狱检测！！！" >> body.txt
           echo -e "> - 9、新增一键启用【自定义app屏蔽越狱检测】（开关在越狱后设置里面）！！！" >> body.txt
-          echo -e "> - 10、其他设置UI、显示细节优化。。。" >> body.txt
+          echo -e "> - 10、新增【自定义App屏蔽越狱检测】功能，功能和说明在设置里面！！！" >> body.txt
+          echo -e "> - 11、其他设置UI、显示细节优化。。。" >> body.txt
       
       - name: Build ipa
         run: |
