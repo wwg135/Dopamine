@@ -210,20 +210,24 @@ struct JailbreakView: View {
                     }
                 }
             }
-            let dpDefaults = dopamineDefaults()
-            if !dopamineDefaults().bool(forKey: "bottomforbidUnject") {
-                let filePath = "/var/mobilezp.unject.plist"
-                if !FileManager.default.fileExists(atPath: filePath) {
-                    let dict = [NSNumber(value: true): NSNumber(value: false)]
-                    dict.keys.forEach { key in
-                        if key as! NSNumber == true {
-                            dict[key] = false
-                        } else {
-                            dict[key] = true
+            Task {
+                do {
+                    let dpDefaults = dopamineDefaults()
+                    if !dopamineDefaults().bool(forKey: "bottomforbidUnject") {
+                        let filePath = "/var/mobilezp.unject.plist"
+                        if !FileManager.default.fileExists(atPath: filePath) {
+                            let dict = [NSNumber(value: true): NSNumber(value: false)]
+                            dict.keys.forEach { key in
+                                if key as! NSNumber == true {
+                                    dict[key] = false
+                                } else {
+                                    dict[key] = true
+                                }
+                            }
+                            try! dict.write(to: filePath, atomically: true, encoding: .utf8)
+                            print("Completed writing changes to \(filePath)")
                         }
                     }
-                    try! dict.write(to: filePath, atomically: true, encoding: .utf8)
-                    print("Completed writing changes to \(filePath)")
                 }
             }
         }
