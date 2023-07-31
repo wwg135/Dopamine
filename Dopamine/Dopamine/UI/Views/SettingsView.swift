@@ -19,6 +19,7 @@ struct SettingsView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
+    @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
     
     @Binding var isPresented: Bool
 
@@ -56,6 +57,12 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
+                            if isJailbroken() {
+                                Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
+                                    .onChange(of: bottomforbidUnject) { newValue in
+                                        changBoolean()
+                                    }
+                            }
                             if !isJailbroken() {
                                 Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
