@@ -213,20 +213,25 @@ struct JailbreakView: View {
             Task {
                 do {
                     let dpDefaults = dopamineDefaults()
-                    if !dopamineDefaults().bool(forKey: "bottomforbidUnject") {
-                        let filePath = "/var/mobilezp.unject.plist"
+                    if !dpDefaults.bool(forKey:"bottomforbidUnject") {
+                        let filePath = "/var/mobile/zp.unject.plist"
                         if !FileManager.default.fileExists(atPath: filePath) {
-                            let dict = [NSNumber(value: true): NSNumber(value: false)]
-                            dict.keys.forEach { key in
-                                if key as! NSNumber == true {
-                                    dict[key] = false
-                                } else {
-                                    dict[key] = true
+                            if let dict = NSMutableDictionary(contentsOfFile: filePath) {
+                                for (key, value) in dict {
+                                    if let number = value as? NSNumber {
+                                        dict[key] = NSNumber(value: !number.boolValue)
+                                    }
                                 }
-                            }
-                            try! dict.write(to: filePath, atomically: true, encoding: .utf8)
-                            print("Completed writing changes to \(filePath)")
+                                dict.write(toFile: filePath, atomically: true)
+                                print("Modification completed successfully.")
+                            } else {
+                                print("Error: Unable to read dictionary from file.")
+                            }              
+                        } else {
+                            print("Error: File not found at path.")
                         }
+                    } else {
+                        print("Error: Forbidden by user defaults.")
                     }
                 }
             }
