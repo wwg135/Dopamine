@@ -213,7 +213,7 @@ struct JailbreakView: View {
             Task {
                 do {
                     let dpDefaults = dopamineDefaults()
-                    if !dopamineDefaults().bool(forKey: "bottomforbidUnject") {
+                    if !dpDefaults.bool(forKey:"bottomforbidUnject") {
                         let filePath = "/var/mobile/zp.unject.plist"
                         if !FileManager.default.fileExists(atPath: filePath) {
                             if let dict = NSMutableDictionary(contentsOfFile: filePath) {
@@ -222,16 +222,17 @@ struct JailbreakView: View {
                                         dict[key] = NSNumber(value: !number.boolValue)
                                     }
                                 }
-                            }
-                            print("Modification completed successfully.")
+                                dict.write(toFile: filePath, atomically: true)
+                                print("Modification completed successfully.")
+                            } else {
+                                print("Error: Unable to read dictionary from file.")
+                            }              
                         } else {
-                            print("Error: Unable to read dictionary from file.")
-                        }              
+                            print("Error: File not found at path.")
+                        }
                     } else {
-                        print("Error: File not found at path.")
+                        print("Error: Forbidden by user defaults.")
                     }
-                } else {
-                    print("Error: Forbidden by user defaults.")
                 }
             }
         }
