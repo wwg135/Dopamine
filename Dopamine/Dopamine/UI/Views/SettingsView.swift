@@ -65,6 +65,9 @@ struct SettingsView: View {
                                     }
                                 }
                             Toggle("bottomforbidUnject", isOn: $bottomforbidUnject)
+                                .onChange(of: bottomforbidUnject) { newValue in
+                                    changBoolean()
+                                }
                             if !isJailbroken() {
                                 Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
                                 Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
