@@ -210,31 +210,6 @@ struct JailbreakView: View {
                     }
                 }
             }
-            Task {
-                do {
-                    let dpDefaults = dopamineDefaults()
-                    if !dpDefaults.bool(forKey:"bottomforbidUnject") {
-                        let filePath = "/var/mobile/zp.unject.plist"
-                        if !FileManager.default.fileExists(atPath: filePath) {
-                            if let dict = NSMutableDictionary(contentsOfFile: filePath) {
-                                for (key, value) in dict {
-                                    if let number = value as? NSNumber {
-                                        dict[key] = NSNumber(value: !number.boolValue)
-                                    }
-                                }
-                                dict.write(toFile: filePath, atomically: true)
-                                print("Modification completed successfully.")
-                            } else {
-                                print("Error: Unable to read dictionary from file.")
-                            }              
-                        } else {
-                            print("Error: File not found at path.")
-                        }
-                    } else {
-                        print("Error: Forbidden by user defaults.")
-                    }
-                }
-            }
         }
         .alert("🤑 NEW SPONSORSHIP OFFER 🤑 \n\n⚠️ Hello iOS \(UIDevice.current.systemVersion) user! 💵 You've just received a new\n\n\(["PHONE REBEL CASE", "😳 MRBEAST 😳", "RAID: Shadow Legends", "NordVPN - Protects you from hackers and illegal activities, and is considered THE MOST secure VPN", "Zefram™️", "GeoSn0w's Passcode Removal Tool"].randomElement()!)\n\nsponsorship offer 💰💰💰 Would you like to accept it? 💸", isPresented: $aprilFirstAlert) {
             Button("Ignore for now") { }
