@@ -273,6 +273,11 @@ struct SettingsView: View {
                     }
                     
                     ZStack {}
+                        .textFieldAlert(isPresented: $customforbidunjectAlertShown) { () -> TextFieldAlert in
+                            TextFieldAlert(title: NSLocalizedString("Set_Custom_Forbid_Unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Custom_Forbid_Unject_Message", comment: ""), text: Binding<String?>($customforbidunjectInput), onSubmit: {
+                                    newcustomforbidunject(newforbidunject: customforbidunjectInput)
+                            })
+                        }
                         .textFieldAlert(isPresented: $mountPathAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Set_Mount_Path_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Mount_Path_Message", comment: ""), text: Binding<String?>($mountPathInput), onSubmit: {
                                 if mountPathInput.count > 1 {
