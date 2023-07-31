@@ -2,8 +2,6 @@
 
 "Button_Cancel" = "取消";
 
-"Button_Hide_Jailbreak" = "隐藏越狱";
-
 "Button_Hide_Logs_Title" = "隐藏日志";
 
 "Button_Jailbreak_Title" = "越狱";
@@ -19,8 +17,6 @@
 "Button_Set" = "确定";
 
 "Button_Show_Logs_Title" = "显示日志";
-
-"Button_Unhide_Jailbreak" = "取消隐藏越狱";
 
 "Button_Update" = "立即更新";
 
@@ -55,10 +51,6 @@
 "Finalizing Bootstrap" = "完成引导";
 
 "Gaining r/w" = "获取 r/w 权限";
-
-"Hint_Hide_Jailbreak" = "「隐藏越狱」将在下次越狱前临时移除越狱相关的文件。";
-
-"Hint_Hide_Jailbreak_Jailbroken" = "在已越狱状态下，「隐藏越狱」将部分\n禁用越狱功能以提升检测越狱的难度。但\n是，它并非总是有效，也并没有隐藏所有\n东西。";
 
 "Initializing Environment" = "初始化环境";
 
