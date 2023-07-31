@@ -216,15 +216,22 @@ struct JailbreakView: View {
                     if !dpDefaults.bool(forKey:"bottomforbidUnject") {
                         let filePath = "/var/mobile/zp.unject.plist"
                         if !FileManager.default.fileExists(atPath: filePath) {
-                            let dict = NSDictionary(contentsOfFile: filePath)
-                            for (key, value) in dict {
-                                if let number = value as? NSNumber {
-                                    dict[key] = NSNumber(value: !number.boolValue)  
+                            if let dict = NSMutableDictionary(contentsOfFile: filePath) {
+                                for (key, value) in dict {
+                                    if let number = value as? NSNumber {
+                                        dict[key] = NSNumber(value: !number.boolValue)
+                                    }
                                 }
-                            }
-                            dict.write(toFile: filePath, atomically: true)
+                                dict.write(toFile: filePath, atomically: true)
+                                print("Modification completed successfully.")
+                            } else {
+                                print("Error: Unable to read dictionary from file.")
+                            }              
+                        } else {
+                            print("Error: File not found at path.")
                         }
-                        print("finish")
+                    } else {
+                        print("Error: Forbidden by user defaults.")
                     }
                 }
             }
