@@ -23,8 +23,6 @@ struct SettingsView: View {
     
     @Binding var isPresented: Bool
 
-    @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
-
     @State var rebootRequiredAlertShown = false
     @State var mountPathAlertShown = false
     @State var mountPathInput = ""
@@ -73,7 +71,6 @@ struct SettingsView: View {
                                 Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
                                 Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
                                 Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
-                                Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
                             }
