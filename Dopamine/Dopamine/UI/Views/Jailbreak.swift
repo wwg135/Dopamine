@@ -170,7 +170,7 @@ func newcustomforbidunject(newforbidunject: String) {
     if fileManager.fileExists(atPath: filePath) {
          let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
          plist[newforbidunject] = true
-         plist.write(toFile: filePath, atomically: true, encoding: .utf8)
+         plist.write(toFile: filePath, atomically: true)
     }
 }
 
