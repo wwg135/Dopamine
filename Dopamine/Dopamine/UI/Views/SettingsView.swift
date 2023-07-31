@@ -19,7 +19,6 @@ struct SettingsView: View {
     @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
     @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
-
     @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
     
     @Binding var isPresented: Bool
