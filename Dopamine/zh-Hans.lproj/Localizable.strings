@@ -199,3 +199,9 @@
 "Options_Forbid_Unject" = "底层屏蔽";
 
 "Options_Enble_Bottom_Forbid_Unject" = "启用App越狱屏蔽";
+
+"Options_Custom_Forbid_Unject" = "自定义App屏蔽越狱检测";
+
+"Set_Custom_Forbid_Unject_Alert_Shown_Title" = "请输入要屏蔽越狱检测的App名称Bundle";
+
+"Set_Custom_Forbid_Unject_Message" = "输入说明：在越狱商店源https://repo.initnil.com/下载插件AppData-Rootless安装，上划要屏蔽越狱检测的app图标→→点击“应用安装目录”进去→→复制XXXXX.app中的“XXXXX”粘贴到这里确定即可";
