@@ -169,8 +169,7 @@ func newcustomforbidunject(newforbidunject: String) {
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) {
          let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
-         let existingValue = plist.allValues.contains(true)
-	 plist[newforbidunject] = existingValue
+         plist[newforbidunject] = true
          plist.write(toFile: filePath, atomically: true)
     }
 }
