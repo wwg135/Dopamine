@@ -54,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.维护更新1.0.5_2（桥接心浪）版本，1.1以上版本可忽略更新\n> - 2.新增自定义App屏蔽越狱检测，功能和说明在设置里面" >> body.txt
+          echo -e "\n> - 1.维护更新1.0.5_2（桥接心浪）版本，1.1以上版本可忽略更新\n> - 2.因已有自定义app屏蔽功能，删除官方的隐藏越狱功能，避免功能重复" >> body.txt
           echo -e "\n**1.0.5的修改版功能如下：**" >> body.txt
           echo -e "> - 1、新增【桥接心浪】功能，以便以 XinA 的模式安装有根插件（内置xinamine依赖）。感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 2、新增【检查更新】功能，设置里面打开即可检查更新，默认关闭！！！" >> body.txt
