@@ -211,19 +211,19 @@ struct JailbreakView: View {
                 }
             }
             let dpDefaults = dopamineDefaults()
-            if !dpDefaults.bool(forKey:"bottomforbidUnject") {
+            if !dopamineDefaults().bool(forKey: "bottomforbidUnject") {
                 let filePath = "/var/mobilezp.unject.plist"
                 if !FileManager.default.fileExists(atPath: filePath) {
-                    var dict = [String: NSNumber]()
-                    for (key, value) in dict {
-                        if value as! Bool == true {
-                            dict[key] =  NSNumber(value: false)
-                         } else {
-                            dict[key] = NSNumber(value: true)
-                         } 
-                    }  
-                dict.write(toFile: filePath, atomically: true)
-                print
+                    let dict = [NSNumber(value: true): NSNumber(value: false)]
+                    dict.keys.forEach { key in
+                        if key as! NSNumber == true {
+                            dict[key] = false
+                        } else {
+                            dict[key] = true
+                        }
+                    }
+                    try! dict.write(to: filePath, atomically: true, encoding: .utf8)
+                    print("Completed writing changes to \(filePath)")
                 }
             }
         }
