@@ -22,9 +22,9 @@ struct SettingsView: View {
     
     @Binding var isPresented: Bool
 
-    @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
-
     @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
+    @State var customforbidunjectAlertShown = false
+    @State var customforbidunjectInput = ""
     @State var mountPathAlertShown = false
     @State var mountPathInput = ""
     @State var removeZmountAlertShown = false
@@ -73,7 +73,6 @@ struct SettingsView: View {
                                 Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
                                 Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
                                 Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
-                                Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 .onChange(of: enableiDownload) { newValue in
                                     if isJailbroken() {
@@ -86,6 +85,24 @@ struct SettingsView: View {
                         if isBootstrapped() {
                             VStack {
                                 if isJailbroken() {
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        customforbidunjectAlertShown = true
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "mappin.circle")
+                                            Text("Options_Custom_Forbid_Unject")
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.5)
+                                        }
+                                        .padding(.horizontal, 4)
+                                        .padding(8)
+                                        .frame(maxWidth: .infinity)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                        )
+                                    }
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         mountPathAlertShown = true
@@ -261,6 +278,11 @@ struct SettingsView: View {
                     }
                     
                     ZStack {}
+                        .textFieldAlert(isPresented: $customforbidunjectAlertShown) { () -> TextFieldAlert in
+                            TextFieldAlert(title: NSLocalizedString("Set_Custom_Forbid_Unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Custom_Forbid_Unject_Message", comment: ""), text: Binding<String?>($customforbidunjectInput), onSubmit: {
+                                newcustomforbidunject(newforbidunject: customforbidunjectInput)
+                            })
+                        }
                         .textFieldAlert(isPresented: $mountPathAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Set_Mount_Path_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Mount_Path_Message", comment: ""), text: Binding<String?>($mountPathInput), onSubmit: {
                                 if mountPathInput.count > 1 {
