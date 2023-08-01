@@ -32,8 +32,6 @@ struct SettingsView: View {
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
     
-    @State var isEnvironmentHiddenState = isEnvironmentHidden()
-    
     @State var easterEgg = false
     
     init(isPresented: Binding<Bool>?) {
@@ -80,7 +78,7 @@ struct SettingsView: View {
                                         customforbidunjectAlertShown = true
                                     }) {
                                         HStack {
-                                            Image(systemName: "mappin.circle")
+                                            Image(systemName: "eye")
                                             Text("Options_Custom_Forbid_Unject")
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
@@ -131,25 +129,6 @@ struct SettingsView: View {
                                 }
                                 VStack {
                                     Button(action: {
-                                       UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                       isEnvironmentHiddenState.toggle()
-                                       changeEnvironmentVisibility(hidden: !isEnvironmentHidden())
-                                   }) {
-                                       HStack {
-                                           Image(systemName: isEnvironmentHiddenState ? "eye" : "eye.slash")
-                                           Text(isEnvironmentHiddenState ? "Button_Unhide_Jailbreak" : "Button_Hide_Jailbreak")
-                                               .lineLimit(1)
-                                               .minimumScaleFactor(0.5)
-                                       }
-                                       .padding(.horizontal, 4)
-                                       .padding(8)
-                                       .frame(maxWidth: .infinity)
-                                       .overlay(
-                                           RoundedRectangle(cornerRadius: 8)
-                                               .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                       )
-                                   }
-                                    Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         if isJailbroken() {
                                             rebootRequiredAlertShown = true
@@ -171,15 +150,6 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
                                     }
-                                    Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak")
-                                        .font(.footnote)
-                                        .opacity(0.6)
-                                        .padding(.top, 8)
-                                        .frame(maxWidth: .infinity)
-                                        .multilineTextAlignment(.center)
-                                        .onLongPressGesture(minimumDuration: 3, perform: {
-                                            easterEgg.toggle()
-                                        })
                                 }
                             }
                         }
@@ -188,10 +158,6 @@ struct SettingsView: View {
                     .padding(.vertical, 16)
                     .padding(.horizontal, 32)
                     
-                    Divider()
-                        .background(.white)
-                        .padding(.horizontal, 32)
-                        .opacity(0.25)
                     VStack(spacing: 6) {
                         Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             .font(.footnote)
