@@ -141,10 +141,6 @@ func removeZmount(rmpath: String) {
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
 }
 
-func removeZplist() {
-    _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zplist"])
-}
-
 func changBoolean() {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
@@ -206,23 +202,6 @@ func newMountPath(newPath: String) {// zqbb_flag
         }
         _ = execCmd(args: [jbctlPath, "mountPath", newPath])
     }
-}
-
-func changeEnvironmentVisibility(hidden: Bool) {
-    if hidden {
-        _ = execCmd(args: [CommandLine.arguments[0], "hide_environment"])
-    }
-    else {
-        _ = execCmd(args: [CommandLine.arguments[0], "unhide_environment"])
-    }
-
-    if isJailbroken() {
-        jbdSetFakelibVisible(!hidden)
-    }
-}
-
-func isEnvironmentHidden() -> Bool {
-    return !FileManager.default.fileExists(atPath: "/var/jb")
 }
 
 func update(tipaURL: URL) {

@@ -38,9 +38,6 @@ struct SettingsView: View {
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
-    @State var removeZplistAlertShown = false
-    
-    @State var isEnvironmentHiddenState = isEnvironmentHidden()
     
     @State var easterEgg = false
     
@@ -90,7 +87,7 @@ struct SettingsView: View {
                                         customforbidunjectAlertShown = true
                                     }) {
                                         HStack {
-                                            Image(systemName: "mappin.circle")
+                                            Image(systemName: "eye")
                                             Text("Options_Custom_Forbid_Unject")
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
@@ -140,24 +137,6 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                     )
                                 }
-                                Button(action: {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    removeZplistAlertShown = true
-                                }) {
-                                    HStack {
-                                        Image(systemName: "trash")
-                                        Text("Button_Remove_Zplist")
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
-                                    }
-                                    .padding(.horizontal, 4)
-                                    .padding(8)
-                                    .frame(maxWidth: .infinity)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                    )
-                                }
                                 if isJailbroken() {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -197,25 +176,6 @@ struct SettingsView: View {
                                 }
                                 VStack {
                                     Button(action: {
-                                       UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                       isEnvironmentHiddenState.toggle()
-                                       changeEnvironmentVisibility(hidden: !isEnvironmentHidden())
-                                   }) {
-                                       HStack {
-                                           Image(systemName: isEnvironmentHiddenState ? "eye" : "eye.slash")
-                                           Text(isEnvironmentHiddenState ? "Button_Unhide_Jailbreak" : "Button_Hide_Jailbreak")
-                                               .lineLimit(1)
-                                               .minimumScaleFactor(0.5)
-                                       }
-                                       .padding(.horizontal, 4)
-                                       .padding(8)
-                                       .frame(maxWidth: .infinity)
-                                       .overlay(
-                                           RoundedRectangle(cornerRadius: 8)
-                                               .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                       )
-                                   }
-                                    Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         if isJailbroken() {
                                             rebootRequiredAlertShown = true
@@ -237,15 +197,6 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
                                     }
-                                    Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak")
-                                        .font(.footnote)
-                                        .opacity(0.6)
-                                        .padding(.top, 8)
-                                        .frame(maxWidth: .infinity)
-                                        .multilineTextAlignment(.center)
-                                        .onLongPressGesture(minimumDuration: 3, perform: {
-                                            easterEgg.toggle()
-                                    }) 
                                 }
                             }
                         }
@@ -254,14 +205,10 @@ struct SettingsView: View {
                     .padding(.vertical, 16)
                     .padding(.horizontal, 32)
                     
-                    Divider()
-                        .background(.white)
-                        .padding(.horizontal, 32)
-                        .opacity(0.25)
                     VStack(spacing: 6) {
                         Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             .font(.footnote)
-                            .opacity(0.6)
+                            .opacity(1)
                         if isJailbroken() {
                             Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
                                 .font(.footnote)
@@ -303,12 +250,6 @@ struct SettingsView: View {
                                 }
                             })
                         }
-                        .alert("Settings_Remove_Zplist_Alert_Title", isPresented: $removeZplistAlertShown, actions: {
-                            Button("Button_Cancel", role: .cancel) { }
-                            Button("Button_Set", role: .destructive) {
-                                removeZplist()
-                            }
-                        }, message: { Text("Settings_Remove_Zplist_Alert_Body") })
                         .textFieldAlert(isPresented: $mobilePasswordChangeAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Popup_Change_Mobile_Password_Title", comment: ""), message: NSLocalizedString("Popup_Change_Mobile_Password_Message", comment: ""), text: Binding<String?>($mobilePasswordInput), onSubmit: {
                                 changeMobilePassword(newPassword: mobilePasswordInput)
