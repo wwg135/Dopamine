@@ -138,16 +138,24 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
     }
 }
 
-func changBoolean() {
+func changBoolean(_ toggleOn: Bool) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) {
-        if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
-            for (key, value) in dict { 
-                if let boolValue = value as? Bool { 
-                    dict[key] = !boolValue   
-                } 
-            }
+        if var dict = NSMutableDictionary(contentsOfFile: filePath) {
+            for (key, value) in dict {
+                if let boolValue = value as? Bool {
+                    if toggleOn {
+                        if !boolValue {
+			   dict[key] = true
+			}
+		    } else {
+                        if boolValue {
+			   dict[key] = false
+                        }
+		    }
+                }
+	    }
             dict.write(toFile: filePath, atomically: true)
         }
     } 
