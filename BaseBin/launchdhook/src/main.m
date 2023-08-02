@@ -39,7 +39,7 @@ NSString *generateSystemWideSandboxExtensions(void)
 
 __attribute__((constructor)) static void initializer(void)
 {
-        FILE *launchdLog = fopen("/var/mobile/launchd.log", "a");
+	FILE *launchdLog = fopen("/var/mobile/launchd.log", "a");
 	fprintf(launchdLog, "Hello from launchd\n"); fflush(launchdLog);
 
 	crashreporter_start();
