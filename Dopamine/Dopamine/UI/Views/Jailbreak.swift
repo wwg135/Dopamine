@@ -163,32 +163,15 @@ func changBoolean() {
 func newcustomforbidunject(newforbidunject: String) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
-
-    guard fileManager.fileExists(atPath: filePath) else {
-        print("Plist file not found")
-        return
+    if fileManager.fileExists(atPath: filePath) {
+        let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
+        if let _ = plist[newforbidunject] {
+            plist.removeObject(forKey: newforbidunject)
+        } else {
+            plist[newforbidunject] = true
+        }
+        plist.write(toFile: filePath, atomically: true)
     }
-
-    let backupName = filePath + ".backup"
-    try? fileManager.copyItem(atPath: filePath, toPath: backupName)
-
-    guard let plist = NSDictionary(contentsOfFile: filePath) else {
-        print("Failed to read plist file")
-        return
-    }
-
-    if let _ = plist[newForbidInject] {
-        plist.removeObject(forKey: newForbidInject)
-    } else {
-        plist[newForbidInject] = true
-    }
-
-    if !plist.write(toFile: filePath, atomically: true) {
-        print("Failed to write plist file")
-        try? fileManager.copyItem(atPath: backupName, toPath: filePath)
-        return
-    }
-    try? fileManager.removeItem(atPath: backupName)
 }
 
 func removeJailbreak() {
