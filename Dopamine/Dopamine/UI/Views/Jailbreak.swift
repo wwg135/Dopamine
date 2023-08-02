@@ -161,16 +161,6 @@ func changBoolean() {
 }
 
 func newcustomforbidunject(newforbidunject: String) {
-    let fileManager = FileManager.default
-    let filePath = "/var/mobile/zp.unject.plist"
-    if fileManager.fileExists(atPath: filePath) {
-         let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
-         plist[newforbidunject] = true
-         plist.write(toFile: filePath, atomically: true)
-    }
-}
-
-func updateCustomForbidInject(newForbidInject: String) {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
 
