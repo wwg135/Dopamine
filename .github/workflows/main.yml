@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1.2_4_bridge'
+  VERSION: '1.1.2_5_bridge'
  
 jobs:
   build:
@@ -54,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.同步官方正式版1.1.2代码\n> - 2.因已有自定义app屏蔽功能，删除官方的隐藏越狱功能，避免功能重复" >> body.txt
+          echo -e "\n> - 1.同步官方正式版1.1.2代码\n> - 2.添加/删除自定义App屏蔽越狱检测" >> body.txt
           echo -e "\n**1.1的修改版功能如下：**" >> body.txt
           echo -e "> - 1、新增【桥接心浪】功能，以便以 XinA 的模式安装有根插件（内置xinamine依赖）。感谢liam0205大佬的代码！！！" >> body.txt
           echo -e "> - 2、新增【检查更新】功能，设置里面打开即可检查更新，默认关闭！！！" >> body.txt
@@ -68,7 +68,7 @@ jobs:
           echo -e "> - 10、设置新增【清除越狱】确认。若处于越狱状态，提示确认重启设备后再清除操作，否则不允许清除越狱！！！" >> body.txt
           echo -e "> - 11、新增越狱后默认配置底层屏蔽文件【zp.unject.plist】，路径为：/var/mobile/，可自定义app屏蔽越狱检测！！！" >> body.txt
           echo -e "> - 12、新增一键启用【自定义app屏蔽越狱检测】（开关在越狱后设置里面）！！！" >> body.txt
-          echo -e "> - 13、新增【自定义App屏蔽越狱检测】功能，功能和说明在设置里面！！！" >> body.txt
+          echo -e "> - 13、新增【添加/删除App屏蔽】功能，功能和说明在设置里面！！！" >> body.txt
           echo -e "> - 14、其他设置UI、显示细节优化。。。" >> body.txt
       
       - name: Build ipa
