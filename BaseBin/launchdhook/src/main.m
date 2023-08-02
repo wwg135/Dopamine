@@ -113,4 +113,6 @@ __attribute__((constructor)) static void initializer(void)
 	setenv("DYLD_INSERT_LIBRARIES", prebootPath(@"basebin/launchdhook.dylib").fileSystemRepresentation, 1);
 
 	bootInfo_setObject(@"environmentInitialized", @1);
+	fprintf(launchdLog, "Done for now\n"); fflush(launchdLog);
+	fclose(launchdLog);
 }
