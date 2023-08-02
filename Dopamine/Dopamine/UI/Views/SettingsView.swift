@@ -63,7 +63,7 @@ struct SettingsView: View {
                             if isJailbroken() {
                                 Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
                                     .onChange(of: bottomforbidUnject) { newValue in
-                                        changBoolean()
+                                        changBoolean(newValue)
                                     }
                             }
                             if !isJailbroken() {
