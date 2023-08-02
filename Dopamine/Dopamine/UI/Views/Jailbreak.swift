@@ -145,19 +145,21 @@ func removeZmount(rmpath: String) {
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
 }
 
-func changBoolean() {
+func changBoolean(_ toggleOn: Bool) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) {
-        if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
-            for (key, value) in dict { 
-                if let boolValue = value as? Bool { 
-                    dict[key] = !boolValue   
-                } 
+        if var dict = NSMutableDictionary(contentsOfFile: filePath) {
+            for (key, value) in dict {
+                if let boolValue = value as? Bool {
+                    // 如果toggle打开,则设置值为原来的值
+                   // 如果toggle关闭,则设置值为相反的值
+                   dict[key] = toggleOn ? boolValue : !boolValue
+                }
             }
             dict.write(toFile: filePath, atomically: true)
         }
-    } 
+    }
 }
 
 func newcustomforbidunject(newforbidunject: String) {
