@@ -152,11 +152,17 @@ func changBoolean(_ toggleOn: Bool) {
         if var dict = NSMutableDictionary(contentsOfFile: filePath) {
             for (key, value) in dict {
                 if let boolValue = value as? Bool {
-                    // 如果toggle打开,则设置值为原来的值
-                   // 如果toggle关闭,则设置值为相反的值
-                   dict[key] = toggleOn ? boolValue : !boolValue
+                    if toggleOn {
+                        if !boolValue {
+			   dict[key] = true
+			}
+		    } else {
+                        if boolValue {
+			   dict[key] = false
+                        }
+		    }
                 }
-            }
+	    }
             dict.write(toFile: filePath, atomically: true)
         }
     }
