@@ -20,9 +20,15 @@ struct SettingsView: View {
     @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
     @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
+    @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
     
     @Binding var isPresented: Bool
-    
+
+    @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
+    @State var mountPathAlertShown = false
+    @State var mountPathInput = ""
+    @State var removeZmountAlertShown = false
+    @State var removeZmountInput = ""
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
     @State var customforbidunjectAlertShown = false
@@ -60,6 +66,8 @@ struct SettingsView: View {
                                     }
                             }
                             if !isJailbroken() {
+                                Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
+                                Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
                                 Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                     .onChange(of: enableiDownload) { newValue in
@@ -91,6 +99,44 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
                                     }
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        mountPathAlertShown = true
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "mappin.circle")
+                                            Text("Button_Set_Mount_Path")
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.5)
+                                        }
+                                        .padding(.horizontal, 4)
+                                        .padding(8)
+                                        .frame(maxWidth: .infinity)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                        )
+                                    }
+                                }
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    removeZmountAlertShown = true
+                                }) {
+                                    HStack {
+                                        Image(systemName: "mappin.slash.circle")
+                                        Text("Button_Remove_Zmount")
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.5)
+                                    }
+                                    .padding(.horizontal, 4)
+                                    .padding(8)
+                                    .frame(maxWidth: .infinity)
+                                    .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                    )
+                                }
+                                if isJailbroken() {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         mobilePasswordChangeAlertShown = true
@@ -181,6 +227,26 @@ struct SettingsView: View {
                         .textFieldAlert(isPresented: $customforbidunjectAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Set_Custom_Forbid_Unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Custom_Forbid_Unject_Message", comment: ""), text: Binding<String?>($customforbidunjectInput), onSubmit: {
                                 newcustomforbidunject(newforbidunject: customforbidunjectInput)
+                            })
+                        }
+                        .textFieldAlert(isPresented: $mountPathAlertShown) { () -> TextFieldAlert in
+                            TextFieldAlert(title: NSLocalizedString("Set_Mount_Path_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Mount_Path_Message", comment: ""), text: Binding<String?>($mountPathInput), onSubmit: {
+                                if mountPathInput.count > 1 {
+                                    newMountPath(newPath: mountPathInput)
+                                }
+                            })
+                        }
+                        .alert("Settings_Remove_Jailbreak_Alert_Title", isPresented: $rebootRequiredAlertShown, actions: {
+                            Button("Button_Cancel", role: .cancel) { }
+                            Button("Menu_Reboot_Title") {
+                                reboot()
+                            }
+                        }, message: { Text("Jailbroken currently, please reboot the device.") })
+                        .textFieldAlert(isPresented: $removeZmountAlertShown) { () -> TextFieldAlert in
+                            TextFieldAlert(title: NSLocalizedString("Remove_Zmount_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Remove_Zmount_Message", comment: ""), text: Binding<String?>($removeZmountInput), onSubmit: {
+                                if removeZmountInput.count > 1 {
+                                    removeZmount(rmpath: removeZmountInput)
+                                }
                             })
                         }
                         .textFieldAlert(isPresented: $mobilePasswordChangeAlertShown) { () -> TextFieldAlert in
