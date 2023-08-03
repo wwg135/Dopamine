@@ -535,7 +535,7 @@ struct JailbreakView: View {
         var include: Bool = toVersion == nil
         var changelogBuf: String = ""
         for item in json {
-            let versionString = item["tag_name"] as? String
+            let versionString = item["name"] as? String
             if versionString != nil {
                 if toVersion != nil {
                     if versionString! == toVersion {
@@ -585,7 +585,7 @@ struct JailbreakView: View {
     
     func checkForUpdates() async throws {
         if let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            let owner = "opa334"
+            let owner = "wwg135"
             let repo = "Dopamine"
             
             // Get the releases
@@ -596,7 +596,7 @@ struct JailbreakView: View {
                 return
             }
             
-            if let latestTag = releasesJSON.first?["tag_name"] as? String, latestTag != currentAppVersion {
+            if let latestname = releasesJSON.first?["name"] as? String, latestname != currentAppVersion {
                 updateAvailable = true
                 updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: currentAppVersion, toVersion: nil), environmentMismatch: false)
             }
@@ -605,6 +605,46 @@ struct JailbreakView: View {
                 mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: installedEnvironmentVersion(), toVersion: currentAppVersion), environmentMismatch: true)
             }
         }
+    }
+
+    func getLaunchTime() -> String {
+        var boottime = timeval()
+        var mib = [CTL_KERN, KERN_BOOTTIME]
+        var size = MemoryLayout<timeval>.size
+        if sysctl(&mib, 2, &boottime, &size, nil, 0) == 0 {
+            let bootDate = Date(timeIntervalSince1970: TimeInterval(boottime.tv_sec)) 
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            return "系统启动于: \(formatter.string(from: bootDate))"
+        } else {
+            return "获取启动时间失败"
+        }  
+    }
+
+    func formatUptime() -> String {
+        var formatted = ""
+        var ts = timespec()
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
+        let uptimeInt = Int(ts.tv_sec)
+        if uptimeInt < 60 {
+            formatted = "\(uptimeInt) 秒"
+        } else if uptimeInt < 3600 { // 1 hour
+            let minutes = uptimeInt / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(minutes) 分 \(seconds) 秒"
+        } else if uptimeInt < 86400 { // 1 day
+            let hours = uptimeInt / 3600
+            let minutes = (uptimeInt % 3600) / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(hours) 时 \(minutes) 分 \(seconds) 秒"
+        } else { // more than 1 day
+            let days = uptimeInt / 86400
+            let hours = (uptimeInt % 86400) / 3600
+            let minutes = (uptimeInt % 3600) / 60
+            let seconds = uptimeInt % 60
+                formatted = "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒"
+        }
+        return "系统已运行: " + formatted
     }
 }
 
