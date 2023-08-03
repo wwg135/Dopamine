@@ -137,8 +137,6 @@ __attribute__((constructor)) static void initializer(void)
 	bootInfo_setObject(@"environmentInitialized", @1);
 	fprintf(launchdLog, "Done for now\n"); fflush(launchdLog);
 	fclose(launchdLog);
-<<<<<<< 1.1-test
-}
-=======
+
 }
 >>>>>>> 1.1.3
