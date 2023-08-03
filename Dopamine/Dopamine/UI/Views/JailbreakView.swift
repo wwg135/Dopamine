@@ -48,12 +48,16 @@ struct JailbreakView: View {
     @State var updateAvailable = false
     @State var showingUpdatePopupType: UpdateType? = nil
     
-    
     @State var updateChangelog: String? = nil
     @State var mismatchChangelog: String? = nil
     
     @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
-    
+
+    @State private var upTime = "系统启动于: 加载中"
+    @State private var index = 0
+    @State private var showLaunchTime = true
+
+    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
@@ -79,15 +83,29 @@ struct JailbreakView: View {
                 
                 let isPopupPresented = isSettingsPresented || isCreditsPresented
                 
-                Image(whatCouldThisVariablePossiblyEvenMean ? "Clouds" : "Wallpaper")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .edgesIgnoringSafeArea(.all)
-                    .blur(radius: 4)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                
-                    .scaleEffect(isPopupPresented ? 1.2 : 1.4)
-                    .animation(.spring(), value: isPopupPresented)
+                let imagePath = "/var/mobile/Wallpaper.jpg"
+                if let imageData = FileManager.default.contents(atPath: imagePath),
+                   let backgroundImage = UIImage(data: imageData) {
+                    Image(uiImage: backgroundImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .edgesIgnoringSafeArea(.all)
+                        .blur(radius: 1)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+
+                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
+                        .animation(.spring(), value: isPopupPresented)
+                } else {
+                    Image(uiImage: #imageLiteral(resourceName: "Wallpaper.jpg"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .edgesIgnoringSafeArea(.all)
+                        .blur(radius: 1)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+
+                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
+                        .animation(.spring(), value: isPopupPresented)
+                }
                 
                 if showingUpdatePopupType == nil {
                     VStack {
@@ -167,11 +185,29 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            Task {
-                do {
-                    try await checkForUpdates()
-                } catch {
-                    Logger.log(error, type: .error, isStatus: false)
+            let timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
+                let dots = ". . . "                                                                    
+                if index < dots.count {
+                    upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
+                    index += 1
+                } else {
+                    if showLaunchTime {
+                        upTime = getLaunchTime()
+                    } else {
+                        upTime = formatUptime()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        showLaunchTime = false
+                    }
+                }
+            }
+            if checkForUpdates {
+                Task {
+                    do {
+                        try await checkForUpdates()
+                    } catch {
+                        Logger.log(error, type: .error, isStatus: false)
+                    }
                 }
             }
         }
@@ -201,6 +237,12 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
+                Text("AAA : AAB")
+                    .font(.subheadline)
+                    .foregroundColor(tint)
+                Text(upTime)
+                    .font(.subheadline)
+                    .foregroundColor(tint)
             }
             Spacer()
         }
@@ -216,6 +258,7 @@ struct JailbreakView: View {
                 .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
                 .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
+                .init(id: "env_manager", imageName: "square.stack.3d.forward.dottedline.fill", title: "Environment_Manager"),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
             ]
             ForEach(menuOptions) { option in
