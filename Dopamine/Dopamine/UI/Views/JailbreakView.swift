@@ -262,48 +262,61 @@ struct JailbreakView: View {
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
             ]
             ForEach(menuOptions) { option in
-                Button {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    if let action = option.action {
-                        action()
-                    } else {
-                        switch option.id {
-                        case "settings":
-                            isSettingsPresented = true
-                        case "credits":
-                            isCreditsPresented = true
-                        default: break
+                if (option.id != "env_manager" || dopamineDefaults().bool(forKey: "developmentMode")) {
+                    Button {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        if let action = option.action {
+                            action()
+                        } else {
+                            switch option.id {
+                            case "settings":
+                                isSettingsPresented = true
+                            case "credits":
+                                isCreditsPresented = true
+                            default: break
+                            }
                         }
-                    }
-                } label: {
-                    HStack {
-                        Label(title: { Text(option.title) }, icon: { Image(systemName: option.imageName) })
-                            .foregroundColor(Color.white)
-                        
-                        Spacer()
-                        
-                        if option.action == nil {
-                            Image(systemName: Locale.characterDirection(forLanguage: Locale.current.languageCode ?? "") == .rightToLeft ? "chevron.left" : "chevron.right")
-                                .font(.body)
-                                .symbolRenderingMode(.palette)
-                                .foregroundStyle(.white.opacity(0.5))
-                                .onLongPressGesture {
-                                    UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
-                                }
+                    } label: {
+                        HStack {
+                            Label(title: { Text(option.title) }, icon: { Image(systemName: option.imageName) })
+                                .foregroundColor(Color.white)
+
+                            Spacer()
+
+                            if option.action == nil {
+                                Image(systemName: Locale.characterDirection(forLanguage: Locale.current.languageCode ?? "") == .rightToLeft ? "chevron.left" : "chevron.right")
+                                    .font(.body)
+                                    .symbolRenderingMode(.palette)
+                                    .foregroundStyle(.white.opacity(1))
+                                    // .onLongPressGesture {
+                                    //     UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
+                                    // }
+                            }
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(16)
+                        .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
+                        .contextMenu(
+                          option.id == "userspace"
+                          ? ContextMenu {
+                            Button(action: doReboot,
+                                    label: {Label("Menu_Reboot_Title", systemImage: "arrow.clockwise.circle.fill")})
+                            Button(action: doUpdateEnvironment,
+                                    label: {Label("Button_Update_Environment", systemImage: "arrow.counterclockwise.circle.fill")})
+                          }
+                          : nil
+                        )
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
-                }
-                .buttonStyle(.plain)
-                .disabled(!option.showUnjailbroken && !isJailbroken())
-                
-                if menuOptions.last != option {
-                    Divider()
-                        .background(.white)
-                        .opacity(0.5)
-                        .padding(.horizontal)
+                    .buttonStyle(.plain)
+                    .disabled(option.id == "env_manager" ? !dopamineDefaults().bool(forKey: "developmentMode")
+                                                        : (!option.showUnjailbroken && !isJailbroken()))
+
+                    if menuOptions.last != option {
+                        Divider()
+                            .background(.white)
+                            .opacity(0.5)
+                            .padding(.horizontal)
+                    }
                 }
             }
         }
