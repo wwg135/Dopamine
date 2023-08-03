@@ -40,7 +40,7 @@
 
 "Credits_Button_Source_Code" = "源代码";
 
-"Credits_Footer_Dopamine_Version %@\nOS:%@" = "Dopamine 版本 %@ 稳定版\n%@";
+"Credits_Footer_Dopamine_Version %@\nOS:%@" = "Dopamine 版本 %@\n%@";
 
 "Credits_Header_Special_Thanks" = "特别感谢 ：";
 
