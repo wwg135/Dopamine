@@ -139,4 +139,3 @@ __attribute__((constructor)) static void initializer(void)
 	fclose(launchdLog);
 
 }
->>>>>>> 1.1.3
