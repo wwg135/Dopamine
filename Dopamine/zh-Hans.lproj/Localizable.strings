@@ -40,7 +40,7 @@
 
 "Credits_Button_Source_Code" = "源代码";
 
-"Credits_Footer_Dopamine_Version %@\nOS:%@" = "Dopamine 版本 %@ \n%@";
+"Credits_Footer_Dopamine_Version %@\nOS:%@" = "Dopamine 版本 %@ 稳定版\n%@";
 
 "Credits_Header_Special_Thanks" = "特别感谢 ：";
 
@@ -159,6 +159,26 @@
 "Menu_Reboot_Title" = "重启";
 
 "Check_For_Updates" = "检查更新";
+
+"Options_bridgeToXinA" = "桥接心浪";
+
+"Options_Enable_Mount_Path" = "启用挂载";
+
+"Button_Set_Mount_Path" = "  新增挂载";
+
+"Set_Mount_Path_Alert_Shown_Title" = "请输入要新增的挂载目录(原始路径)";
+
+"Set_Mount_Path_Message" = "挂载后在\"/var/jb/原始路径\"里面替换内容";
+
+"Button_Remove_Zmount" = "  解除挂载";
+
+"Remove_Zmount_Alert_Shown_Title" = "请输入要解除的挂载目录(原始路径)";
+
+"Remove_Zmount_Message" = "此举会删除系统挂载的文件\n\n如果在越狱状态,请立即重启用户空间";
+
+"Button_Respring_Finish" = "注销以完成越狱";
+
+"Button_Reboot_Userspace_Finish" = "重启用户空间";
 
 "Jailbroken currently, please reboot the device." = "当前为越狱状态，请重启设备后再清除越狱。确定重启吗？";
 
