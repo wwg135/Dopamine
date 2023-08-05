@@ -62,6 +62,29 @@ func reboot() {
     _ = execCmd(args: [CommandLine.arguments[0], "reboot"])
 }
 
+func doReboot() {
+     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+
+     // MARK: Fade out Animation
+     let view = UIView(frame: UIScreen.main.bounds)
+     view.backgroundColor = .black
+     view.alpha = 0
+
+     for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
+         window.addSubview(view)
+         UIView.animate(withDuration: 0.2, delay: 0, animations: {
+             view.alpha = 1
+         })
+     }
+
+     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+         guard let rebootPath = rootifyPath(path: "/usr/sbin/reboot") else {
+             return
+         }
+         _ = execCmd(args: [rebootPath])
+     })
+}
+
 func isJailbroken() -> Bool {
     if isSandboxed() { return false } // ui debugging
     
@@ -114,6 +137,43 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
     }
 }
 
+func changBoolean(_ toggleOn: Bool) {
+    let fileManager = FileManager.default
+    let filePath = "/var/mobile/zp.unject.plist"
+    if fileManager.fileExists(atPath: filePath) {
+        if var dict = NSMutableDictionary(contentsOfFile: filePath) {
+            for (key, value) in dict {
+                if let boolValue = value as? Bool {
+                    if toggleOn {
+                        if !boolValue {
+			   dict[key] = true
+			}
+		    } else {
+                        if boolValue {
+			   dict[key] = false
+                        }
+		    }
+                }
+	    }
+            dict.write(toFile: filePath, atomically: true)
+        }
+    } 
+}
+
+func newcustomforbidunject(newforbidunject: String) {
+    let fileManager = FileManager.default
+    let filePath = "/var/mobile/zp.unject.plist"
+    if fileManager.fileExists(atPath: filePath) {
+        let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
+        if let _ = plist[newforbidunject] {
+            plist.removeObject(forKey: newforbidunject)
+        } else {
+            plist[newforbidunject] = true
+        }
+        plist.write(toFile: filePath, atomically: true)
+    }
+}
+
 func removeJailbreak() {
     dopamineDefaults().removeObject(forKey: "selectedPackageManagers")
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
@@ -141,24 +201,6 @@ func changeMobilePassword(newPassword: String) {
     _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
 }
 
-
-func changeEnvironmentVisibility(hidden: Bool) {
-    if hidden {
-        _ = execCmd(args: [CommandLine.arguments[0], "hide_environment"])
-    }
-    else {
-        _ = execCmd(args: [CommandLine.arguments[0], "unhide_environment"])
-    }
-
-    if isJailbroken() {
-        jbdSetFakelibVisible(!hidden)
-    }
-}
-
-func isEnvironmentHidden() -> Bool {
-    return !FileManager.default.fileExists(atPath: "/var/jb")
-}
-
 func update(tipaURL: URL) {
     DispatchQueue.global(qos: .userInitiated).async {
         jbdUpdateFromTIPA(tipaURL.path, true)
@@ -179,6 +221,26 @@ func updateEnvironment() {
     jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
 }
 
+
+func doUpdateEnvironment() {
+    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+
+    // MARK: Fade out Animation
+    let view = UIView(frame: UIScreen.main.bounds)
+    view.backgroundColor = .black
+    view.alpha = 0
+
+    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
+        window.addSubview(view)
+        UIView.animate(withDuration: 0.2, delay: 0, animations: {
+            view.alpha = 1
+        })
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+        jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
+    })
+}
 
 // debugging
 func isSandboxed() -> Bool {
