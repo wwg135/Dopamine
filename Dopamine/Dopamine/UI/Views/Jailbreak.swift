@@ -38,24 +38,7 @@ func respring() {
 }
 
 func userspaceReboot() {
-    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-    
-    // MARK: Fade out Animation
-    
-    let view = UIView(frame: UIScreen.main.bounds)
-    view.backgroundColor = .black
-    view.alpha = 0
-
-    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
-        window.addSubview(view)
-        UIView.animate(withDuration: 0.2, delay: 0, animations: {
-            view.alpha = 1
-        })
-    }
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-        _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
-    })
+    _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
 }
 
 func reboot() {
@@ -114,6 +97,47 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
     }
 }
 
+func removeZmount(rmpath: String) {
+    _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
+}
+
+func changBoolean(_ toggleOn: Bool) {
+    let fileManager = FileManager.default
+    let filePath = "/var/mobile/zp.unject.plist"
+    if fileManager.fileExists(atPath: filePath) {
+        if var dict = NSMutableDictionary(contentsOfFile: filePath) {
+            for (key, value) in dict {
+                if let boolValue = value as? Bool {
+                    if toggleOn {
+                        if !boolValue {
+			   dict[key] = true
+			}
+		    } else {
+                        if boolValue {
+			   dict[key] = false
+                        }
+		    }
+                }
+	    }
+            dict.write(toFile: filePath, atomically: true)
+        }
+    } 
+}
+
+func newcustomforbidunject(newforbidunject: String) {
+    let fileManager = FileManager.default
+    let filePath = "/var/mobile/zp.unject.plist"
+    if fileManager.fileExists(atPath: filePath) {
+        let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
+        if let _ = plist[newforbidunject] {
+            plist.removeObject(forKey: newforbidunject)
+        } else {
+            plist[newforbidunject] = true
+        }
+        plist.write(toFile: filePath, atomically: true)
+    }
+}
+
 func removeJailbreak() {
     dopamineDefaults().removeObject(forKey: "selectedPackageManagers")
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
@@ -141,22 +165,15 @@ func changeMobilePassword(newPassword: String) {
     _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
 }
 
-
-func changeEnvironmentVisibility(hidden: Bool) {
-    if hidden {
-        _ = execCmd(args: [CommandLine.arguments[0], "hide_environment"])
+func newMountPath(newPath: String) {// zqbb_flag
+    let plist = NSDictionary(contentsOfFile: "/var/mobile/newFakePath.plist")
+    let pathArray = plist?["path"] as? [String]
+    if pathArray?.firstIndex(of: newPath) == nil {
+	guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
+            return
+        }
+        _ = execCmd(args: [jbctlPath, "mountPath", newPath])
     }
-    else {
-        _ = execCmd(args: [CommandLine.arguments[0], "unhide_environment"])
-    }
-
-    if isJailbroken() {
-        jbdSetFakelibVisible(!hidden)
-    }
-}
-
-func isEnvironmentHidden() -> Bool {
-    return !FileManager.default.fileExists(atPath: "/var/jb")
 }
 
 func update(tipaURL: URL) {
@@ -178,7 +195,6 @@ func isInstalledEnvironmentVersionMismatching() -> Bool {
 func updateEnvironment() {
     jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
 }
-
 
 // debugging
 func isSandboxed() -> Bool {
