@@ -38,51 +38,11 @@ func respring() {
 }
 
 func userspaceReboot() {
-    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-    
-    // MARK: Fade out Animation
-    
-    let view = UIView(frame: UIScreen.main.bounds)
-    view.backgroundColor = .black
-    view.alpha = 0
-
-    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
-        window.addSubview(view)
-        UIView.animate(withDuration: 0.2, delay: 0, animations: {
-            view.alpha = 1
-        })
-    }
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-        _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
-    })
+    _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
 }
 
 func reboot() {
     _ = execCmd(args: [CommandLine.arguments[0], "reboot"])
-}
-
-func doReboot() {
-    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-
-    // MARK: Fade out Animation
-    let view = UIView(frame: UIScreen.main.bounds)
-    view.backgroundColor = .black
-    view.alpha = 0
-
-    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
-        window.addSubview(view)
-        UIView.animate(withDuration: 0.2, delay: 0, animations: {
-            view.alpha = 1
-        })
-    }
-
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-        guard let rebootPath = rootifyPath(path: "/usr/sbin/reboot") else {
-            return
-        }
-        _ = execCmd(args: [rebootPath])
-    })
 }
 
 func isJailbroken() -> Bool {
@@ -226,27 +186,6 @@ func isInstalledEnvironmentVersionMismatching() -> Bool {
 
 func updateEnvironment() {
     jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
-}
-
-func doUpdateEnvironment() {
-    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-
-    // MARK: Fade out Animation
-
-    let view = UIView(frame: UIScreen.main.bounds)
-    view.backgroundColor = .black
-    view.alpha = 0
-
-    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
-        window.addSubview(view)
-        UIView.animate(withDuration: 0.2, delay: 0, animations: {
-            view.alpha = 1
-        })
-    }
-
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-        jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
-    })
 }
 
 // debugging
