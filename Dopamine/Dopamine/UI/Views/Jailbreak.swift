@@ -38,7 +38,7 @@ func respring() {
 }
 
 func userspaceReboot() {
-    _ = execCmd(args: [launchctlPath, "reboot", "userspace"])
+    _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
 }
 
 func reboot() {
