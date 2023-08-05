@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1.3.1_bridge'
+  VERSION: '1.1.3_1_bridge'
  
 jobs:
   build:
