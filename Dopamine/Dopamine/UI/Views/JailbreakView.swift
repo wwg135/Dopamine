@@ -490,9 +490,9 @@ struct JailbreakView: View {
     func uiJailbreak() {
         jailbreakingProgress = .jailbreaking
         let dpDefaults = dopamineDefaults()
-        dpDefaults.set(dpDefaults.integer(forKey: "totalJailbreaks") + 1, forKey: "totalJailbreaks")
-        let retry = 10
-        for i in stride(from: 0, to: retry, by: 1) where !dpDefaults.synchronize() {}
+        dpDefaults.set(dpDefaults.integer(forKey: "total_jailbreaks") + 1, forKey: "total_jailbreaks")
+        dpDefaults.synchronize()
+        
         DispatchQueue(label: "Dopamine").async {
             sleep(1)
             
@@ -501,12 +501,13 @@ struct JailbreakView: View {
                 jailbreakingError = e
                 
                 if e == nil {
-                    dpDefaults.set(dpDefaults.integer(forKey: "successfulJailbreaks") + 1, forKey: "successfulJailbreaks")
+                    dpDefaults.set(dpDefaults.integer(forKey: "successful_jailbreaks") + 1, forKey: "successful_jailbreaks")
+                    dpDefaults.synchronize()
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                     let tweakInjectionEnabled = dpDefaults.bool(forKey: "tweakInjectionEnabled")
-
+                    
                     Logger.log(NSLocalizedString("Restarting Userspace", comment: ""), type: .continuous, isStatus: true)
-
+                    
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         if tweakInjectionEnabled {
                             userspaceReboot()
