@@ -301,7 +301,7 @@ struct JailbreakView: View {
                           ? ContextMenu {
                             Button(action: reboot,
                                     label: {Label("Menu_Reboot_Title", systemImage: "arrow.clockwise.circle.fill")})
-                            Button(action: doUpdateEnvironment,
+                            Button(action: updateEnvironment,
                                     label: {Label("Button_Update_Environment", systemImage: "arrow.counterclockwise.circle.fill")})
                           }
                           : nil
