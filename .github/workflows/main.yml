@@ -54,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.维护更新1.0.5版本，1.1以上版本可忽略更新\n> - 2.其他功能更新，请看前面版本更新说明" >> body.txt
+          echo -e "\n> - 1.维护更新1.0.5版本，1.1以上版本可忽略更新\n> - 2.后续只维护更新1.0.5带挂载版本，不添加桥接心浪功能\n> - 3.其他功能更新，请看前面版本更新说明" >> body.txt
       
       - name: Build ipa
         run: |
