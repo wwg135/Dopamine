@@ -491,7 +491,8 @@ struct JailbreakView: View {
         jailbreakingProgress = .jailbreaking
         let dpDefaults = dopamineDefaults()
         dpDefaults.set(dpDefaults.integer(forKey: "total_jailbreaks") + 1, forKey: "total_jailbreaks")
-        dpDefaults.synchronize()
+        let retry = 10
+        for i in stride(from: 0, to: retry, by: 1) where !dpDefaults.synchronize() {}
         
         DispatchQueue(label: "Dopamine").async {
             sleep(1)
