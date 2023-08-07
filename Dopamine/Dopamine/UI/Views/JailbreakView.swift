@@ -278,6 +278,12 @@ struct JailbreakView: View {
                     .buttonStyle(.plain)
                     .disabled(option.id == "env_manager" ? !dopamineDefaults().bool(forKey: "developmentMode")
                                                         : (!option.showUnjailbroken && !isJailbroken()))
+                    if menuOptions.last != option {
+                        //Divider()
+                            //.background(.white)
+                            //.opacity(0.5)
+                            //.padding(.horizontal)
+                    }
                 }
             }
         }
