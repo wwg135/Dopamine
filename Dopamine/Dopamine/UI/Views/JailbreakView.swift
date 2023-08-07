@@ -67,20 +67,9 @@ struct JailbreakView: View {
     
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     
-//    init() {
-//        menuOptions = [
-//            .init(imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: ""), view: AnyView(SettingsView())),
-//            .init(imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
-//            .init(imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
-//            .init(imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: ""), view: AnyView(AboutView())),
-//        ]
-//    }
-    
-    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                
                 let isPopupPresented = isSettingsPresented || isCreditsPresented
                 
                 let imagePath = "/var/mobile/Wallpaper.jpg"
@@ -163,24 +152,6 @@ struct JailbreakView: View {
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
 
-//
-//                ZStack {
-//                    ForEach(menuOptions) { option in
-//                        option.view?
-//                            .padding(.vertical)
-//                            .background(showingUpdatePopupType != nil ? nil : MaterialView(.systemUltraThinMaterialDark)
-//                                        //                    .opacity(0.8)
-//                                .cornerRadius(16))
-//                            .opacity(option.id == optionPresentedID ? 1 : 0)
-//                            .animation(.spring().speed(1.5), value: optionPresentedID)
-//                    }
-//                    .opacity(showingUpdatePopupType != nil ? 1 : 0)
-//                    .animation(.spring().speed(1.5), value: showingUpdatePopupType)
-//                }
-//                .frame(maxWidth: showingUpdatePopupType != nil ? .infinity : 320)
-//                .scaleEffect(shouldShowBackground ? 1 : 0.9)
-//                .opacity(shouldShowBackground ? 1 : 0)
-//                .animation(.spring().speed(1.5), value: shouldShowBackground)
             }
             .animation(.default, value: showingUpdatePopupType == nil)
         }
@@ -288,9 +259,6 @@ struct JailbreakView: View {
                                     .font(.body)
                                     .symbolRenderingMode(.palette)
                                     .foregroundStyle(.white.opacity(1))
-                                    // .onLongPressGesture {
-                                    //     UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
-                                    // }
                             }
                     }
                     .frame(maxWidth: .infinity)
@@ -424,21 +392,6 @@ struct JailbreakView: View {
     var endButtons: some View {
         switch jailbreakingProgress {
         case .finished:
-            //            Button {
-            //                userspaceReboot()
-            //            } label: {
-            //                Label(title: { Text("Reboot Userspace (Finish)") }, icon: {
-            //                    Image(systemName: "arrow.clockwise")
-            //                })
-            //                .foregroundColor(.white)
-            //                .padding()
-            //                .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? 0 : nil)
-            //                .background(MaterialView(.light)
-            //                    .opacity(0.5)
-            //                    .cornerRadius(8)
-            //                )
-            //                .opacity(jailbreakingError != nil ? 0 : 1)
-            //            }
             if !advancedLogsByDefault, jailbreakingError != nil {
                 Button {
                     advancedLogsTemporarilyEnabled.toggle()
