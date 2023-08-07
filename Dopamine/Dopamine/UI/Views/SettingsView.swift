@@ -34,7 +34,6 @@ struct SettingsView: View {
     @State var mobilePasswordInput = "alpine"
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
-    @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
@@ -67,7 +66,6 @@ struct SettingsView: View {
                                     }
                             }
                             if !isJailbroken() {
-                                Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
                                 Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
                                 Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
