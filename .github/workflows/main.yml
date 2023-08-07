@@ -2,7 +2,7 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.3_bridge
+      - 1.1_bridge
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -69,7 +69,7 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.3_bridge
+          target_commitish: 1.1_bridge
           body_path: body.txt
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
