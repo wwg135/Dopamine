@@ -11,7 +11,7 @@ import Fugu15KernelExploit
 struct SettingsView: View {
     
     @AppStorage("totalJailbreaks", store: dopamineDefaults()) var totalJailbreaks: Int = 0
-    @AppStorage("successfulJailbreaks", store: dopamineDefaults()) var successfulJailbreaks: Int = 0
+    @AppStorage("successful_jailbreaks", store: dopamineDefaults()) var successfulJailbreaks: Int = 0
     
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
@@ -202,9 +202,11 @@ struct SettingsView: View {
                         Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             .font(.footnote)
                             .opacity(1)
-                        Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
-                            .font(.footnote)
-                            .opacity(1)
+                        if isJailbroken() {
+                            Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
+                                .font(.footnote)
+                                .opacity(1)
+                        }
                     }
                     .padding(.top, 2)
                     
