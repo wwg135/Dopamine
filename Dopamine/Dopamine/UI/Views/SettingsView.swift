@@ -60,10 +60,12 @@ struct SettingsView: View {
                                     }
                                 }
                             if isJailbroken() {
-                                Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
-                                    .onChange(of: bottomforbidUnject) { newValue in
-                                        changBoolean(newValue)
-                                    }
+                                if forbidUnject {
+                                    Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
+                                        .onChange(of: bottomforbidUnject) { newValue in
+                                            changBoolean(newValue)
+                                        }
+                                }
                             }
                             if !isJailbroken() {
                                 Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
