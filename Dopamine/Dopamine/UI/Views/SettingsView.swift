@@ -77,7 +77,7 @@ struct SettingsView: View {
                         if isBootstrapped() {
                             VStack {
                                 if isJailbroken() {
-                                    if forbidUnject {
+                                    if bottomforbidUnject {
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                             customforbidunjectAlertShown = true
