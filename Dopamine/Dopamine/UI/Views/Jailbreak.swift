@@ -101,7 +101,7 @@ func removeZmount(rmpath: String) {
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
 }
 
-func changBooleanAndUpdatePlist(\_ toggleOn: Bool, newforbidunject: String) {
+func changBooleanAndUpdatePlist(toggleOn: Bool?, newforbidunject: String?) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) {
@@ -118,12 +118,14 @@ func changBooleanAndUpdatePlist(\_ toggleOn: Bool, newforbidunject: String) {
                                         }    
                                 }    
                         }  
-                }  
-                if let _ = dict[newforbidunject] { 
-                        dict.removeObject(forKey: newforbidunject)    
-                } else {  
-                        dict[newforbidunject] = true   
                 }
+	        if let newforbidunject = key {
+                        if let _ = dict[newforbidunject] { 
+                                dict.removeObject(forKey: newforbidunject)    
+                        } else {  
+                                dict[newforbidunject] = true   
+                        }
+		}
                 dict.write(toFile: filePath, atomically: true)
     }
 }
