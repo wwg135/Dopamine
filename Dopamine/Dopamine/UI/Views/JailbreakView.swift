@@ -284,16 +284,16 @@ struct JailbreakView: View {
                                                         : (!option.showUnjailbroken && !isJailbroken()))
 
                     if menuOptions.last != option {
-                        Divider()
-                            .background(.white)
-                            .opacity(0.5)
-                            .padding(.horizontal)
+                        //Divider()
+                            //.background(.white)
+                            //.opacity(0.5)
+                            //.padding(.horizontal)
                     }
                 }
             }
         }
         .padding()
-        .background(MaterialView(.systemUltraThinMaterialDark))
+        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
         .cornerRadius(16)
         .frame(maxWidth: 320, maxHeight: isJailbreaking ? 0 : nil)
         .opacity(isJailbreaking ? 0 : 1)
@@ -395,7 +395,7 @@ struct JailbreakView: View {
             .cornerRadius(isJailbreaking ? 20 : 8)
             .ignoresSafeArea(.all, edges: isJailbreaking ? .all : .top)
             .offset(y: isJailbreaking ? 16 : 0)
-            .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1)
+            .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1) .opacity(0.25)
         )
         .animation(.spring(), value: isJailbreaking)
     }
