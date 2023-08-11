@@ -101,31 +101,29 @@ func removeZmount(rmpath: String) {
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
 }
 
-func changBooleanAndUpdatePlist(_ toggleOn: Bool, newforbidunject: String?) {
+func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
-    if fileManager.fileExists(atPath: filePath) {
-	if toggleOn {
-            var dict = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
-                for (key, value) in dict {
-                        if let boolValue = value as? Bool {
-                                if toggleOn && !boolValue { 
-                                        dict[key] = true   
-                                } else if !toggleOn && boolValue {
-                                        dict[key] = false        
-                                }    
-                        }  
-		}
-		dict.write(toFile: filePath, atomically: true)
-	}
-	else {
-                let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
-                if let _ = plist[newforbidunject] {
-                        plist.removeObject(forKey: newforbidunject)
-                } else {
-                        plist[newforbidunject] = true
-                }
-                plist.write(toFile: filePath, atomically: true)
+    if fileManager.fileExists(atPath: filePath) { 
+        if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
+                if let newKey = newForbidUnject {
+                        if let _ = dict[newKey] {
+                                dict.removeObject(forKey: newKey)
+                        } else {
+                                dict[newKey] = true
+                        }
+                } else {   
+                        for (key, value) in dict {
+                                if let boolValue = value as? Bool {
+                                        if toggleOn {
+                                                dict[key] = true
+                                        } else {
+                                                dict[key] = false
+                                        }
+                                }
+                        }
+                }  
+                dict.write(toFile: filePath, atomically: true)
         }
     }
 }
