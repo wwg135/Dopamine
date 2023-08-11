@@ -101,11 +101,11 @@ func removeZmount(rmpath: String) {
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
 }
 
-func changBooleanAndUpdatePlist(_ toggleOn: Bool? = nil, newforbidunject: String? = nil) {
+func changBooleanAndUpdatePlist(_ toggleOn: Bool, newforbidunject: String?) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) {
-	if let toggle = _ toggleOn {
+	if _ toggleOn {
             var dict = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
                 for (key, value) in dict {
                         if let boolValue = value as? Bool {
@@ -122,7 +122,7 @@ func changBooleanAndUpdatePlist(_ toggleOn: Bool? = nil, newforbidunject: String
 		}
 		dict.write(toFile: filePath, atomically: true)
 	}
-	if let newforbidunject = newforbidunject {
+	else {
                 let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
                 if let _ = plist[newforbidunject] {
                         plist.removeObject(forKey: newforbidunject)
