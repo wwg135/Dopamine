@@ -101,40 +101,30 @@ func removeZmount(rmpath: String) {
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
 }
 
-func changBoolean(_ toggleOn: Bool) {
+func changBooleanAndUpdatePlist(\_ toggleOn: Bool, newforbidunject: String) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) {
-        if var dict = NSMutableDictionary(contentsOfFile: filePath) {
-            for (key, value) in dict {
-                if let boolValue = value as? Bool {
-                    if toggleOn {
-                        if !boolValue {
-			   dict[key] = true
-			}
-		    } else {
-                        if boolValue {
-			   dict[key] = false
-                        }
-		    }
+        var dict = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
+                for (key, value) in dict {
+                        if let boolValue = value as? Bool {
+                                if toggleOn {
+                                        if !boolValue { 
+                                                dict[key] = true   
+                                        }  
+                                } else {
+                                        if boolValue {
+                                                dict[key] = false     
+                                        }    
+                                }    
+                        }  
+                }  
+                if let _ = dict[newforbidunject] { 
+                        dict.removeObject(forKey: newforbidunject)    
+                } else {  
+                        dict[newforbidunject] = true   
                 }
-	    }
-            dict.write(toFile: filePath, atomically: true)
-        }
-    } 
-}
-
-func newcustomforbidunject(newforbidunject: String) {
-    let fileManager = FileManager.default
-    let filePath = "/var/mobile/zp.unject.plist"
-    if fileManager.fileExists(atPath: filePath) {
-        let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
-        if let _ = plist[newforbidunject] {
-            plist.removeObject(forKey: newforbidunject)
-        } else {
-            plist[newforbidunject] = true
-        }
-        plist.write(toFile: filePath, atomically: true)
+                dict.write(toFile: filePath, atomically: true)
     }
 }
 
