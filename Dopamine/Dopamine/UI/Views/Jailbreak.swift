@@ -105,8 +105,8 @@ func changBooleanAndUpdatePlist(_ toggleOn: Bool?, newforbidunject: String?) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) {
-    var dict = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
-	    if let toggle = _ toggleOn {
+	if let toggle = _ toggleOn {
+            var dict = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
                 for (key, value) in dict {
                         if let boolValue = value as? Bool {
                                 if toggleOn {
@@ -120,15 +120,17 @@ func changBooleanAndUpdatePlist(_ toggleOn: Bool?, newforbidunject: String?) {
                                 }    
                         }  
 		}
-	    }
-	    if let newforbidunject = newforbidunject {
-                if let _ = dict[newforbidunject] { 
-                        dict.removeObject(forKey: newforbidunject)    
-                } else {  
-                        dict[newforbidunject] = true   
+		dict.write(toFile: filePath, atomically: true)
+	}
+	if let newforbidunject = newforbidunject {
+                let plist = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
+                if let _ = plist[newforbidunject] {
+                        plist.removeObject(forKey: newforbidunject)
+                } else {
+                        plist[newforbidunject] = true
                 }
-            }
-            dict.write(toFile: filePath, atomically: true)
+                plist.write(toFile: filePath, atomically: true)
+        }
     }
 }
 
