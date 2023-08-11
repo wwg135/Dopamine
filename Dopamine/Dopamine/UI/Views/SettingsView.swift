@@ -63,7 +63,7 @@ struct SettingsView: View {
                                 if forbidUnject {
                                     Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
                                         .onChange(of: bottomforbidUnject) { newValue in
-                                            changBoolean(newValue)
+                                            updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
                                         }
                                 }
                             }
@@ -226,7 +226,7 @@ struct SettingsView: View {
                     ZStack {}
                         .textFieldAlert(isPresented: $customforbidunjectAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Set_Custom_Forbid_Unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Custom_Forbid_Unject_Message", comment: ""), text: Binding<String?>($customforbidunjectInput), onSubmit: {
-                                newcustomforbidunject(newforbidunject: customforbidunjectInput)
+                                updateForbidUnject(toggleOn: false, newForbidUnject: customforbidunjectInput)
                             })
                         }
                         .textFieldAlert(isPresented: $mountPathAlertShown) { () -> TextFieldAlert in
