@@ -121,7 +121,7 @@ func changBooleanAndUpdatePlist(toggleOn: Bool?, newforbidunject: String?) {
                         }  
 		}
 	    }
-	    if let newforbidunject = key {
+	    if let newforbidunject = newforbidunject {
                 if let _ = dict[newforbidunject] { 
                         dict.removeObject(forKey: newforbidunject)    
                 } else {  
