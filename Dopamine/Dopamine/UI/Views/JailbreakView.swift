@@ -65,17 +65,7 @@ struct JailbreakView: View {
         jailbreakingProgress != .idle
     }
     
-    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-    
-//    init() {
-//        menuOptions = [
-//            .init(imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: ""), view: AnyView(SettingsView())),
-//            .init(imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
-//            .init(imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
-//            .init(imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: ""), view: AnyView(AboutView())),
-//        ]
-//    }
-    
+    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()  
     
     var body: some View {
         GeometryReader { geometry in
@@ -163,24 +153,6 @@ struct JailbreakView: View {
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
 
-//
-//                ZStack {
-//                    ForEach(menuOptions) { option in
-//                        option.view?
-//                            .padding(.vertical)
-//                            .background(showingUpdatePopupType != nil ? nil : MaterialView(.systemUltraThinMaterialDark)
-//                                        //                    .opacity(0.8)
-//                                .cornerRadius(16))
-//                            .opacity(option.id == optionPresentedID ? 1 : 0)
-//                            .animation(.spring().speed(1.5), value: optionPresentedID)
-//                    }
-//                    .opacity(showingUpdatePopupType != nil ? 1 : 0)
-//                    .animation(.spring().speed(1.5), value: showingUpdatePopupType)
-//                }
-//                .frame(maxWidth: showingUpdatePopupType != nil ? .infinity : 320)
-//                .scaleEffect(shouldShowBackground ? 1 : 0.9)
-//                .opacity(shouldShowBackground ? 1 : 0)
-//                .animation(.spring().speed(1.5), value: shouldShowBackground)
             }
             .animation(.default, value: showingUpdatePopupType == nil)
         }
