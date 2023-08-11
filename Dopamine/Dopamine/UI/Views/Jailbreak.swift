@@ -101,7 +101,7 @@ func removeZmount(rmpath: String) {
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
 }
 
-func changBooleanAndUpdatePlist(toggleOn: Bool?, newforbidunject: String?) {
+func changBooleanAndUpdatePlist(_ toggleOn: Bool?, newforbidunject: String?) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) {
