@@ -109,12 +109,10 @@ func changBooleanAndUpdatePlist(_ toggleOn: Bool, newforbidunject: String?) {
             var dict = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
                 for (key, value) in dict {
                         if let boolValue = value as? Bool {
-                                if !boolValue { 
+                                if toggleOn && !boolValue { 
                                         dict[key] = true   
-                                } else {
-                                        if boolValue {
-                                                dict[key] = false     
-                                        }    
+                                } else if !toggleOn && boolValue {
+                                        dict[key] = false        
                                 }    
                         }  
 		}
