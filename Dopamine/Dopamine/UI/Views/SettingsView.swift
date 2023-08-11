@@ -63,7 +63,7 @@ struct SettingsView: View {
                                 if forbidUnject {
                                     Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
                                         .onChange(of: bottomforbidUnject) { newValue in
-                                            changBooleanAndUpdatePlist(true, newforbidunject: nil)
+                                            changBooleanAndUpdatePlist(newValue, newforbidunject: nil)
                                         }
                                 }
                             }
