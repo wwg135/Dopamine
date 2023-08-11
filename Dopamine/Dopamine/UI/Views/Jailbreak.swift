@@ -106,7 +106,7 @@ func changBooleanAndUpdatePlist(_ toggleOn: Bool?, newforbidunject: String?) {
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) {
     var dict = NSMutableDictionary(contentsOfFile: filePath) ?? NSMutableDictionary()
-	    if let toggle = toggleOn {
+	    if let toggle = _ toggleOn {
                 for (key, value) in dict {
                         if let boolValue = value as? Bool {
                                 if toggleOn {
