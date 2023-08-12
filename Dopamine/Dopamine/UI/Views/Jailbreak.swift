@@ -106,24 +106,24 @@ func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) { 
         if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
-                if let newKey = newForbidUnject {
-                        if let _ = dict[newKey] {
-                                dict.removeObject(forKey: newKey)
+            if let newKey = newForbidUnject {
+                if let _ = dict[newKey] {
+                    dict.removeObject(forKey: newKey)
+                } else {
+                    dict[newKey] = true
+                }
+            } else {   
+                for (key, value) in dict {
+                    if let boolValue = value as? Bool {
+                        if toggleOn {
+                            dict[key] = true
                         } else {
-                                dict[newKey] = true
+                            dict[key] = false
                         }
-                } else {   
-                        for (key, value) in dict {
-                                if let boolValue = value as? Bool {
-                                        if toggleOn {
-                                                dict[key] = true
-                                        } else {
-                                                dict[key] = false
-                                        }
-                                }
-                        }
-                }  
-                dict.write(toFile: filePath, atomically: true)
+                    }
+                }
+            }  
+            dict.write(toFile: filePath, atomically: true)
         }
     }
 }
