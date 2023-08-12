@@ -54,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.维护更新1.0.5版本，1.1以上版本可忽略更新\n> - 2.本次重点更新：优化设置显示逻辑，当越狱前不【启用挂载】，越狱后设置里面不再显示【新增挂载】和【解除挂载】功能。同理越狱前不启用【底层屏蔽】，越狱后设置里面也不显示【启用app越狱屏蔽】和【添加/删除自定义app屏蔽】功能，使看起来更舒服\n> - 3.其他功能更新，请看前面版本更新说明" >> body.txt
+          echo -e "\n> - 1.维护更新1.0.5版本，1.1以上版本可忽略更新\n> - 2.添加逻辑：从其他任何版本更新到当前版本1.0.5，将进行一次完整的重启以更新偏移量" >> body.txt
       
       - name: Build ipa
         run: |
