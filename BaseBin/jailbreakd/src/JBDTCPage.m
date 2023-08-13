@@ -49,7 +49,7 @@ void tcPagesChanged(void)
 	self = [super init];
 	if (self) {
 		_mappedInPage = NULL;
-		_kaddr = kaddr;
+		self.kaddr = kaddr;
 		_mapRefCount = 0;
 	}
 	return self;
@@ -68,9 +68,9 @@ void tcPagesChanged(void)
 
 - (BOOL)mapIn
 {
-	if (!_kaddr) return NO;
+	if (!kaddr) return NO;
 	if (_mapRefCount == 0) {
-		_mappedInPageCtx = mapInRange(_kaddr, 1, (uint8_t**)&_mappedInPage);
+		_mappedInPageCtx = mapInRange(kaddr, 1, (uint8_t**)&_mappedInPage);
 		JBLogDebug("mapped in page %p", _mappedInPage);
 	};
 	_mapRefCount++;
@@ -108,21 +108,22 @@ void tcPagesChanged(void)
 
 - (BOOL)allocateInKernel
 {
+        uint64_t kaddr = 0;
 	if (gTCUnusedAllocations.count) {
-		_kaddr = [gTCUnusedAllocations.firstObject unsignedLongLongValue];
+		kaddr = [gTCUnusedAllocations.firstObject unsignedLongLongValue];
 		[gTCUnusedAllocations removeObjectAtIndex:0];
-		JBLogDebug("got existing trust cache page at 0x%llX", _kaddr);
+		JBLogDebug("got existing trust cache page at 0x%llX", self.kaddr);
 	}
 	else {
-		_kaddr = kalloc(0x4000);
-		JBLogDebug("allocated trust cache page at 0x%llX", _kaddr);
+		kaddr = kalloc(0x4000);
+		JBLogDebug("allocated trust cache page at 0x%llX", self.kaddr);
 	}
 
-	if (_kaddr == 0) return NO;
+	if (kaddr == 0) return NO;
 
 	[self ensureMappedInAndPerform:^{
 		_mappedInPage->nextPtr = 0;
-		_mappedInPage->selfPtr = _kaddr + 0x10;
+		_mappedInPage->selfPtr = kaddr + 0x10;
 
 		_mappedInPage->file.version = 1;
 		uuid_generate(_mappedInPage->file.uuid);
@@ -136,21 +137,21 @@ void tcPagesChanged(void)
 
 - (void)linkInKernel
 {
-	trustCacheListAdd(_kaddr);
+	trustCacheListAdd(self.kaddr);
 }
 
 - (void)unlinkInKernel
 {
-	trustCacheListRemove(_kaddr);
+	trustCacheListRemove(self.kaddr);
 }
 
 - (void)freeInKernel
 {
-	if (_kaddr == 0) return;
+	if (self.kaddr == 0) return;
 
-	[gTCUnusedAllocations addObject:@(_kaddr)];
-	JBLogDebug("moved trust cache page at 0x%llX to unused list", _kaddr);
-	_kaddr = 0;
+	[gTCUnusedAllocations addObject:@(self.kaddr)];
+	JBLogDebug("moved trust cache page at 0x%llX to unused list", self.kaddr);
+	self.kaddr = 0;
 
 	[gTCPages removeObject:self];
 	tcPagesChanged();
