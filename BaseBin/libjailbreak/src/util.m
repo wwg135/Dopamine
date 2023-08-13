@@ -5,6 +5,7 @@
 #import "signatures.h"
 #import "log.h"
 #import <libproc.h>
+#import <libproc_private.h>
 #import <IOKit/IOKitLib.h>
 
 #define P_SUGID 0x00000100
@@ -838,7 +839,7 @@ void proc_replace_entitlements(uint64_t proc_ptr, NSDictionary *newEntitlements)
 	//cr_label_replace_entitlements(cr_label_ptr, newEntitlements, vnode_get_csblob(text_vnode));
 }*/
 
-bool proc_set_debugged(pid_t pid)
+int proc_set_debugged(pid_t pid)
 {
 	if (pid > 0) {
 		bool proc_needs_release = false;
@@ -850,22 +851,22 @@ bool proc_set_debugged(pid_t pid)
 
 			pmap_set_wx_allowed(pmap, true);
 
-			// cs_flags, not needed, wx_allowed is enough
-			/*uint32_t csflags = proc_get_csflags(proc);
-			uint32_t new_csflags = ((csflags & ~0x703b10) | 0x10000024);
-			proc_set_csflags(proc, new_csflags);*/
+			// --- cs_flags, not needed, wx_allowed is enough
+			// uint32_t csflags = proc_get_csflags(proc);
+			// uint32_t new_csflags = ((csflags & ~0x703b10) | 0x10000024);
+			// proc_set_csflags(proc, new_csflags);
 
-			// some vm map crap, not needed
-			/*uint32_t f1 = kread32(vm_map + 0x94);
-			uint32_t f2 = kread32(vm_map + 0x98);
-			printf("before f1: %X, f2: %X\n", f1, f2);
-			f1 &= ~0x10u;
-			//f2++;
-			f1 |= 0x8000;
-			//f2++;
-			printf("after f1: %X, f2: %X\n", f1, f2);
-			kwrite32(vm_map + 0x94, f1);
-			kwrite32(vm_map + 0x98, f2);*/
+			// --- some vm map crap, not needed
+			// uint32_t f1 = kread32(vm_map + 0x94);
+			// uint32_t f2 = kread32(vm_map + 0x98);
+			// printf("before f1: %X, f2: %X\n", f1, f2);
+			// f1 &= ~0x10u;
+			// f2++;
+			// f1 |= 0x8000;
+			// f2++;
+			// printf("after f1: %X, f2: %X\n", f1, f2);
+			// kwrite32(vm_map + 0x94, f1);
+			// kwrite32(vm_map + 0x98, f2);
 
 			if (proc_needs_release) proc_rele(proc);
 		}
@@ -879,6 +880,15 @@ NSString *proc_get_path(pid_t pid)
 	int ret = proc_pidpath(pid, pathbuf, sizeof(pathbuf));
 	if (ret <= 0) return nil;
 	return [[[NSString stringWithUTF8String:pathbuf] stringByResolvingSymlinksInPath] stringByStandardizingPath];
+}
+
+pid_t proc_get_ppid(pid_t pid)
+{
+	struct proc_bsdinfo procInfo;
+	if (proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &procInfo, sizeof(procInfo)) <= 0) {
+		return -1;
+	}
+	return procInfo.pbi_ppid;
 }
 
 int64_t proc_fix_setuid(pid_t pid)

@@ -14,11 +14,23 @@
 #import <bsm/libbsm.h>
 #import <libproc.h>
 #import "spawn_wrapper.h"
+#import "server.h"
 #import "fakelib.h"
 #import "update.h"
 #import "forkfix.h"
 
 kern_return_t bootstrap_check_in(mach_port_t bootstrap_port, const char *service, mach_port_t *server_port);
+
+void setJetsamEnabled(bool enabled)
+{
+	pid_t me = getpid();
+	int priorityToSet = -1;
+	if (enabled) {
+		priorityToSet = 10;
+	}
+	int rc = memorystatus_control(MEMORYSTATUS_CMD_SET_JETSAM_HIGH_WATER_MARK, me, -1, NULL, 0);
+	if (rc < 0) { perror ("memorystatus_control"); exit(rc);}
+}
 
 int processBinary(NSString *binaryPath)
 {
@@ -87,6 +99,7 @@ int launchdInitPPLRW(void)
 	xpc_dictionary_set_bool(msg, "jailbreak", true);
 	xpc_dictionary_set_uint64(msg, "id", LAUNCHD_JB_MSG_ID_GET_PPLRW);
 	xpc_object_t reply = launchd_xpc_send_message(msg);
+	if (!reply) return -1;
 
 	int error = xpc_dictionary_get_int64(reply, "error");
 	if (error == 0) {
@@ -96,6 +109,39 @@ int launchdInitPPLRW(void)
 	}
 	else {
 		return error;
+	}
+}
+
+bool boolValueForEntitlement(audit_token_t *token, const char *entitlement)
+{
+	xpc_object_t entitlementValue = xpc_copy_entitlement_for_token(entitlement, token);
+	if (entitlementValue) {
+		if (xpc_get_type(entitlementValue) == XPC_TYPE_BOOL) {
+			return xpc_bool_get_value(entitlementValue);
+		}
+	}
+	return false;
+}
+
+void dumpUserspacePanicLog(const char *message)
+{
+	time_t t = time(NULL);
+	struct tm *tm = localtime(&t);
+	char timestamp[20];
+	strftime(timestamp, sizeof(timestamp), "%Y-%m-%d_%H-%M-%S", tm);
+
+	char panicPath[PATH_MAX];
+	strcpy(panicPath, "/var/mobile/Library/Logs/CrashReporter/userspace-panic-");
+	strcat(panicPath, timestamp);
+	strcat(panicPath, ".ips");
+
+	FILE * f = fopen(panicPath, "w");
+	if (f) {
+		fprintf(f, "%s", message);
+		fprintf(f, "\n\nThis panic was prevented by Dopamine and jailbreakd triggered a userspace reboot instead.");
+		fclose(f);
+		chown(panicPath, 0, 250);
+		chmod(panicPath, 0660);
 	}
 }
 
@@ -127,7 +173,8 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 			BOOL isAllowedSystemWide = msgId == JBD_MSG_PROCESS_BINARY || 
 									msgId == JBD_MSG_DEBUG_ME ||
 									msgId == JBD_MSG_SETUID_FIX ||
-									msgId == JBD_MSG_FORK_FIX;
+									msgId == JBD_MSG_FORK_FIX ||
+									msgId == JBD_MSG_INTERCEPT_USERSPACE_PANIC;
 
 			if (!systemwide || isAllowedSystemWide) {
 				switch (msgId) {
@@ -189,7 +236,9 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 							uint64_t argc = xpc_array_get_count(args);
 							uint64_t argv[argc];
 							for (uint64_t i = 0; i < argc; i++) {
-								argv[i] = xpc_array_get_uint64(args, i);
+								@autoreleasepool {
+									argv[i] = xpc_array_get_uint64(args, i);
+								}
 							}
 							uint64_t ret = kcall(func, argc, argv);
 							xpc_dictionary_set_uint64(reply, "ret", ret);
@@ -211,7 +260,9 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 							uint64_t xXpcCount = xpc_array_get_count(xXpcArr);
 							if (xXpcCount > 29) xXpcCount = 29;
 							for (uint64_t i = 0; i < xXpcCount; i++) {
-								threadState.x[i] = xpc_array_get_uint64(xXpcArr, i);
+								@autoreleasepool {
+									threadState.x[i] = xpc_array_get_uint64(xXpcArr, i);
+								}
 							}
 
 							bool raw = xpc_dictionary_get_bool(message, "raw");
@@ -245,6 +296,15 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 						break;
 					}
 
+                                        case JBD_MSG_MOUNTPATH: {// zqbb_flag
+						if (gPPLRWStatus == kPPLRWStatusInitialized && gKCallStatus == kKcallStatusFinalized) {
+							const char *mountPath = xpc_dictionary_get_string(message, "mountPath");
+							bool new = xpc_dictionary_get_bool(message, "new");
+							initMountPath([NSString stringWithUTF8String:mountPath], new);
+						}
+						break;
+					}
+
 					case JBD_MSG_JBUPDATE: {
 						int64_t result = 0;
 						if (gPPLRWStatus == kPPLRWStatusInitialized && gKCallStatus == kKcallStatusFinalized) {
@@ -268,7 +328,6 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 						xpc_dictionary_set_int64(reply, "result", result);
 						break;
 					}
-
 
 					case JBD_MSG_REBUILD_TRUSTCACHE: {
 						int64_t result = 0;
@@ -314,7 +373,7 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 						int64_t result = 0;
 						if (gPPLRWStatus == kPPLRWStatusInitialized && gKCallStatus == kKcallStatusFinalized) {
 							pid_t pid = xpc_dictionary_get_int64(message, "pid");
-							proc_set_debugged(pid);
+							result = proc_set_debugged(pid);
 						}
 						else {
 							result = JBD_ERR_PRIMITIVE_NOT_INITIALIZED;
@@ -326,7 +385,7 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 					case JBD_MSG_DEBUG_ME: {
 						int64_t result = 0;
 						if (gPPLRWStatus == kPPLRWStatusInitialized && gKCallStatus == kKcallStatusFinalized) {
-							proc_set_debugged(clientPid);
+							result = proc_set_debugged(clientPid);
 						}
 						else {
 							result = JBD_ERR_PRIMITIVE_NOT_INITIALIZED;
@@ -347,6 +406,18 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 						}
 						xpc_dictionary_set_int64(reply, "result", result);
 						break;
+					}
+
+					case JBD_MSG_INTERCEPT_USERSPACE_PANIC: {
+						int64_t result = 0;
+						const char *messageString = xpc_dictionary_get_string(message, "message");
+						if (boolValueForEntitlement(&auditToken, "com.apple.private.iowatchdog.user-access") == true) {
+							if (messageString) {
+								dumpUserspacePanicLog(messageString);
+							}
+							reboot3(RB2_USERREBOOT);
+						}
+						xpc_dictionary_set_int64(reply, "result", result);
 					}
 
 					case JBD_SET_FAKELIB_VISIBLE: {
@@ -381,6 +452,8 @@ int main(int argc, char* argv[])
 	@autoreleasepool {
 		JBLogDebug("Hello from the other side!");
 		gIsJailbreakd = YES;
+
+		setJetsamEnabled(true);
 
 		gTCPages = [NSMutableArray new];
 		gTCUnusedAllocations = [NSMutableArray new];
@@ -421,6 +494,7 @@ int main(int argc, char* argv[])
 			if (bootInfo_getUInt64(@"jbdIconCacheNeedsRefresh")) {
 				spawn(prebootPath(@"usr/bin/uicache"), @[@"-a"]);
 				bootInfo_setObject(@"jbdIconCacheNeedsRefresh", nil);
+                                sleep(1);
 			}
 		});
 
@@ -441,23 +515,4 @@ int main(int argc, char* argv[])
 		dispatch_main();
 		return 0;
 	}
-}
-
-// KILL JETSAM
-// Credits: https://gist.github.com/Lessica/ecfc5816467dcbaac41c50fd9074b8e9
-// There is literally no other way to do it, fucking hell
-static __attribute__ ((constructor(101), visibility("hidden")))
-void BypassJetsam(void) {
-	pid_t me = getpid();
-	int rc; memorystatus_priority_properties_t props = {JETSAM_PRIORITY_CRITICAL, 0};
-	rc = memorystatus_control(MEMORYSTATUS_CMD_SET_PRIORITY_PROPERTIES, me, 0, &props, sizeof(props));
-	if (rc < 0) { perror ("memorystatus_control"); exit(rc);}
-	rc = memorystatus_control(MEMORYSTATUS_CMD_SET_JETSAM_HIGH_WATER_MARK, me, -1, NULL, 0);
-	if (rc < 0) { perror ("memorystatus_control"); exit(rc);}
-	rc = memorystatus_control(MEMORYSTATUS_CMD_SET_PROCESS_IS_MANAGED, me, 0, NULL, 0);
-	if (rc < 0) { perror ("memorystatus_control"); exit(rc);}
-	rc = memorystatus_control(MEMORYSTATUS_CMD_SET_PROCESS_IS_FREEZABLE, me, 0, NULL, 0);
-	if (rc < 0) { perror ("memorystatus_control"); exit(rc); }
-	rc = proc_track_dirty(me, 0);
-	if (rc != 0) { perror("proc_track_dirty"); exit(rc); }
 }

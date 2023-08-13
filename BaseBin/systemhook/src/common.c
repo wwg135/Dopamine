@@ -16,6 +16,7 @@ int posix_spawnattr_getprocesstype_np(const posix_spawnattr_t * __restrict, int 
 #define JBD_MSG_PROCESS_BINARY 22
 #define JBD_MSG_DEBUG_ME 24
 #define JBD_MSG_FORK_FIX 25
+#define JBD_MSG_INTERCEPT_USERSPACE_PANIC 26
 
 #define JETSAM_MULTIPLIER 3
 #define XPC_TIMEOUT 0.1 * NSEC_PER_SEC
@@ -216,6 +217,20 @@ int64_t jbdswForkFix(pid_t childPid, bool mightHaveDirtyPages)
 	return result;
 }
 
+int64_t jbdswInterceptUserspacePanic(const char *messageString)
+{
+	xpc_object_t message = xpc_dictionary_create_empty();
+	xpc_dictionary_set_uint64(message, "id", JBD_MSG_INTERCEPT_USERSPACE_PANIC);
+	xpc_dictionary_set_string(message, "message", messageString);
+	xpc_object_t reply = sendJBDMessageSystemWide(message);
+	int64_t result = -1;
+	if (reply) {
+		result  = xpc_dictionary_get_int64(reply, "result");
+		xpc_release(reply);
+	}
+	return result;
+}
+
 // Derived from posix_spawnp in Apple libc
 int resolvePath(const char *file, const char *searchPath, int (^attemptHandler)(char *path))
 {
@@ -315,6 +330,42 @@ done:
 	return (err);
 }
 
+// zqbb_flag  unject
+extern xpc_object_t xpc_create_from_plist(const void* buf, size_t len);
+bool unject(const char* str) {
+    void* addr = NULL;
+    struct stat s = {};
+    int fd = 0;
+    fd = open("/var/mobile/zp.unject.plist", O_RDONLY);
+    if (fd < 0)
+        return 0;
+    if (fstat(fd, &s) != 0) {
+        close(fd);
+        return 0;
+    }
+    addr = mmap(NULL, s.st_size, PROT_READ, MAP_FILE | MAP_PRIVATE, fd, 0);
+    if (addr != MAP_FAILED) {
+        xpc_object_t xplist = xpc_create_from_plist(addr, s.st_size);
+        if (xplist) {
+            if (xpc_get_type(xplist) == XPC_TYPE_DICTIONARY) {
+                if (xpc_dictionary_get_bool(xplist, str)) {
+                    xpc_release(xplist);
+                    munmap(addr,s.st_size);
+                    close(fd);
+                    return 1;
+                }
+            }
+	    xpc_release(xplist);
+        }
+	munmap(addr,s.st_size);
+    }
+    close(fd);
+    return 0;
+}
+
+// I don't like the idea of blacklisting certain processes
+// But for some it seems neccessary
+
 typedef enum 
 {
 	kBinaryConfigDontInject = 1 << 0,
@@ -355,7 +406,22 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 		if (!strcmp(processBlacklist[i], path)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 	}
 
-	return 0;
+        if (!strncmp(path, "/Dev", 4)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+	
+        if (access("/var/mobile/zp.unject.plist", F_OK) == 0) {
+            if (!strstr(path, "/var/jb") && !strstr(path, "procursus")) {
+                // unject Plugins
+                if (strstr(path, ".appex/") != NULL) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+
+                // unject in the blacklist
+                char *exe_name = strrchr(path, '/');
+                if (exe_name != NULL) {
+                    exe_name++;
+                        if (unject(exe_name)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+                }
+            }
+        }
+        return 0;
 }
 
 // Make sure the about to be spawned binary and all of it's dependencies are trust cached

@@ -38,27 +38,7 @@ func respring() {
 }
 
 func userspaceReboot() {
-    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-    
-    // MARK: Fade out Animation
-    
-    let view = UIView(frame: UIScreen.main.bounds)
-    view.backgroundColor = .black
-    view.alpha = 0
-
-    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
-        window.addSubview(view)
-        UIView.animate(withDuration: 0.2, delay: 0, animations: {
-            view.alpha = 1
-        })
-    }
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-        guard let launchctlPath = rootifyPath(path: "/usr/bin/launchctl") else {
-            return
-        }
-        _ = execCmd(args: [launchctlPath, "reboot", "userspace"])
-    })
+    _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
 }
 
 func reboot() {
@@ -66,7 +46,7 @@ func reboot() {
 }
 
 func isJailbroken() -> Bool {
-    if isSandboxed() { return true } // ui debugging
+    if isSandboxed() { return false } // ui debugging
     
     var jbdPid: pid_t = 0
     jbdGetStatus(nil, nil, &jbdPid)
@@ -74,24 +54,17 @@ func isJailbroken() -> Bool {
 }
 
 func isBootstrapped() -> Bool {
-    if isSandboxed() { return true } // ui debugging
+    if isSandboxed() { return false } // ui debugging
     
     return Bootstrapper.isBootstrapped()
 }
 
 func jailbreak(completion: @escaping (Error?) -> ()) {
     do {
-        if #available(iOS 15.4, *) {
-            // No Wifi fixup needed
+        handleWifiFixBeforeJailbreak {message in 
+            Logger.log(message, isStatus: true)
         }
-        else {
-            if wifiIsEnabled() {
-                setWifiEnabled(false)
-                Logger.log("Disabling Wi-Fi", isStatus: true)
-                sleep(1)
-            }
-        }
-
+        
         Logger.log("Launching kexploitd", isStatus: true)
 
         try Fugu15.launchKernelExploit(oobPCI: Bundle.main.bundleURL.appendingPathComponent("oobPCI")) { msg in
@@ -108,14 +81,6 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
                 Logger.log(toPrint, isStatus: !verbose)
             }
         }
-
-        if #available(iOS 15.4, *) {
-            // No Wifi fixup needed
-        }
-        else {
-            setWifiEnabled(true)
-            Logger.log("Enabling Wi-Fi", isStatus: true)
-        }
         
         try Fugu15.startEnvironment()
         
@@ -128,6 +93,37 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
             Logger.log("\(error.localizedDescription)", type: .error, isStatus: true)
             completion(error)
             NSLog("Fugu15 error: \(error)")
+        }
+    }
+}
+
+func removeZmount(rmpath: String) {
+    _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
+}
+
+func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
+    let fileManager = FileManager.default
+    let filePath = "/var/mobile/zp.unject.plist"
+    if fileManager.fileExists(atPath: filePath) { 
+        if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
+            if let newKey = newForbidUnject {
+                if let _ = dict[newKey] {
+                    dict.removeObject(forKey: newKey)
+                } else {
+                    dict[newKey] = true
+                }
+            } else {   
+                for (key, value) in dict {
+                    if let boolValue = value as? Bool {
+                        if toggleOn {
+                            dict[key] = true
+                        } else {
+                            dict[key] = false
+                        }
+                    }
+                }
+            }  
+            dict.write(toFile: filePath, atomically: true)
         }
     }
 }
@@ -154,32 +150,27 @@ func changeMobilePassword(newPassword: String) {
     _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
 }
 
-
-func changeEnvironmentVisibility(hidden: Bool) {
-    if hidden {
-        _ = execCmd(args: [CommandLine.arguments[0], "hide_environment"])
+func newMountPath(newPath: String) {
+    let plist = NSDictionary(contentsOfFile: "/var/mobile/newFakePath.plist")
+    let pathArray = plist?["path"] as? [String]
+    if pathArray?.firstIndex(of: newPath) == nil {
+	guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
+            return
+        }
+        _ = execCmd(args: [jbctlPath, "mountPath", newPath])
     }
-    else {
-        _ = execCmd(args: [CommandLine.arguments[0], "unhide_environment"])
-    }
-
-    if isJailbroken() {
-        jbdSetFakelibVisible(!hidden)
-    }
-}
-
-func isEnvironmentHidden() -> Bool {
-    return !FileManager.default.fileExists(atPath: "/var/jb")
 }
 
 func update(tipaURL: URL) {
-    DispatchQueue.global(qos: .userInitiated).async {
-        jbdUpdateFromTIPA(tipaURL.path, true)
-    }
+        //jbdUpdateFromTIPA(tipaURL.path, true)
+	guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
+            return
+        }
+        _ = execCmd(args: [jbctlPath, "update", "tipa", tipaURL.path])
 }
 
 func installedEnvironmentVersion() -> String {
-    if isSandboxed() { return "0.9" } // ui debugging
+    if isSandboxed() { return "1.0.3" } // ui debugging
     
     return getBootInfoValue(key: "basebin-version") as? String ?? "1.0"
 }
@@ -191,7 +182,6 @@ func isInstalledEnvironmentVersionMismatching() -> Bool {
 func updateEnvironment() {
     jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
 }
-
 
 // debugging
 func isSandboxed() -> Bool {
