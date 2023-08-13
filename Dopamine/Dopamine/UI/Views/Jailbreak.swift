@@ -110,7 +110,7 @@ func removeZmount(rmpath: String) {
 }
 
 func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
         if fileManager.fileExists(atPath: filePath) { 
