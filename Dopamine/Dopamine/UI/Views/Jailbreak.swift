@@ -34,21 +34,21 @@ func respring() {
     guard let sbreloadPath = rootifyPath(path: "/usr/bin/sbreload") else {
         return
     }
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         _ = execCmd(args: [sbreloadPath])
-	}
+    }
 }
 
 func userspaceReboot() {
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
-	}
+    }
 }
 
 func reboot() {
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         _ = execCmd(args: [CommandLine.arguments[0], "reboot"])
-	}
+    }
 }
 
 func isJailbroken() -> Bool {
@@ -104,9 +104,9 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
 }
 
 func removeZmount(rmpath: String) {
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
-	}
+    }
 }
 
 func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
@@ -135,23 +135,23 @@ func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
                 dict.write(toFile: filePath, atomically: true)
             }
         }
-	}
+    }
 }
 
 func removeJailbreak() {
     dopamineDefaults().removeObject(forKey: "selectedPackageManagers")
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
-	}
+    }
     if isJailbroken() {
         reboot()
     }
 }
 
 func jailbrokenUpdateTweakInjectionPreference() {
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         _ = execCmd(args: [CommandLine.arguments[0], "update_tweak_injection"])
-	}
+    }
 }
 
 func changeMobilePassword(newPassword: String) {
@@ -161,9 +161,9 @@ func changeMobilePassword(newPassword: String) {
     guard let pwPath = rootifyPath(path: "/usr/sbin/pw") else {
         return;
     }
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
-	}
+    }
 }
 
 func newMountPath(newPath: String) {
@@ -173,9 +173,9 @@ func newMountPath(newPath: String) {
 	guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
             return
         }
-		DispatchQueue.global().async {
+	DispatchQueue.global().async {
             _ = execCmd(args: [jbctlPath, "mountPath", newPath])
-		}
+	}
     }
 }
 
@@ -184,9 +184,9 @@ func update(tipaURL: URL) {
     guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
         return
     }
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         _ = execCmd(args: [jbctlPath, "update", "tipa", tipaURL.path])
-	}
+    }
 }
 
 func installedEnvironmentVersion() -> String {
@@ -200,9 +200,9 @@ func isInstalledEnvironmentVersionMismatching() -> Bool {
 }
 
 func updateEnvironment() {
-	DispatchQueue.global().async {
+    DispatchQueue.global().async {
         jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
-	}
+    }
 }
 
 // debugging
