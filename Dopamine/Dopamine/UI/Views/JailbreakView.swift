@@ -503,32 +503,20 @@ struct JailbreakView: View {
         }
     }
     
-    func getDeltaChangelog(json: [[String : Any]], fromVersion: String?, toVersion: String?) -> String? {
-        var include: Bool = toVersion == nil
+    func getDeltaChangelog(json: [[String: Any]]) -> String? {
+        var include: Bool = false
         var changelogBuf: String = ""
         for item in json {
-            let versionString = item["name"] as? String
-            if versionString != nil {
-                if toVersion != nil {
-                    if versionString! == toVersion {
-                        include = true
-                    }
-                }
+            let version = item["name"] as? String
+            if version != "1.0.5" {
+                include = true
                 
-                if fromVersion != nil {
-                    if versionString! == fromVersion {
-                        include = false
+            let changelog = item["body"] as? String
+                if changelog != nil {
+                    if !changelogBuf.isEmpty {
+                        changelogBuf += "\n\n\n"
                     }
-                }
-                
-                if include {
-                    let changelog = item["body"] as? String
-                    if changelog != nil {
-                        if !changelogBuf.isEmpty {
-                            changelogBuf += "\n\n\n"
-                        }
-                        changelogBuf += "**" + versionString! + "**\n\n" + changelog!
-                    }
+                    changelogBuf += "**" + version! + "**\n\n" + changelog!
                 }
             }
         }
@@ -556,7 +544,7 @@ struct JailbreakView: View {
     }
     
     func checkForUpdates() async throws {
-        if let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            let currentAppVersion = "AAC"
             let owner = "wwg135"
             let repo = "Dopamine"
             
@@ -568,15 +556,18 @@ struct JailbreakView: View {
                 return
             }
             
-            if let latestname = releasesJSON.first?["name"] as? String, latestname != currentAppVersion {
-                updateAvailable = true
-                updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: currentAppVersion, toVersion: nil), environmentMismatch: false)
+            if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
+                if let latestName = latest["tag_name"] as? String,
+                    let latestVersion = latest["name"] as? String,
+                    latestName != currentAppVersion && latestVersion != "1.0.5" {
+                        updateAvailable = true
+                        updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+                }
             }
 
             if isInstalledEnvironmentVersionMismatching() {
-                mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: installedEnvironmentVersion(), toVersion: currentAppVersion), environmentMismatch: true)
+                mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
             }
-        }
     }
 
     func getLaunchTime() -> String {
