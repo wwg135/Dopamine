@@ -508,7 +508,7 @@ struct JailbreakView: View {
         var changelogBuf: String = ""
         for item in json {
             let version = item["name"] as? String
-            if version == "1.0.5" {
+            if version != "1.0.5" {
                 include = true
                 
             let changelog = item["body"] as? String
@@ -556,10 +556,10 @@ struct JailbreakView: View {
                 return
             }
             
-            if let latest = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) {
+            if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
                 if let latestName = latest["tag_name"] as? String,
                     let latestVersion = latest["name"] as? String,
-                    latestName != currentAppVersion && latestVersion == "1.0.5" {
+                    latestName != currentAppVersion && latestVersion != "1.0.5" {
                         updateAvailable = true
                         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
                 }
