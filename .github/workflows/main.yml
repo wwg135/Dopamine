@@ -46,6 +46,7 @@ jobs:
         run: |
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
       
@@ -54,7 +55,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.维护更新1.0.5版本，1.1以上版本可忽略更新\n> - 2.改善代码，提高执行效率，不影响重启" >> body.txt
+          echo -e "\n> - 1.维护更新1.0.5版本\n> - 2.修正ota升级逻辑，后续1.0.5版本仅收到1.0.5版本的ota升级\n> - 3.必须到仓库手动下载回来安装当前版本，后续才可以接收OTA升级\n> - 4.改善代码，提高执行效率，不影响重启" >> body.txt
       
       - name: Build ipa
         run: |
