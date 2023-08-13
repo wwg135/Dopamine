@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1.4_2'
+  VERSION: '1.1.4_3'
  
 jobs:
   build:
@@ -55,7 +55,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 优化合并逻辑代码" >> body.txt
+          echo -e "\n> - 1.同步官方最新代码更新\n> - 2.当前后续版本支持桥接及挂载" >> body.txt
       
       - name: Build ipa
         run: |
