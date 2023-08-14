@@ -57,7 +57,7 @@ struct JailbreakView: View {
     @State private var upTime = "系统启动于: 加载中"
     @State private var index = 0
     @State private var showLaunchTime = true
-
+    
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
@@ -154,7 +154,7 @@ struct JailbreakView: View {
                 PopupView(title: {
                     Text("Title_Changelog")
                 }, contents: {
-                    Text(changlog)
+                    Text(updateChangelog)
                         .opacity(1)
                         .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
