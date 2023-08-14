@@ -41,6 +41,7 @@ struct JailbreakView: View {
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
+    @State var isUpdatelogPresented = false
     
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?
