@@ -546,7 +546,7 @@ struct JailbreakView: View {
                 checkForUpdates = true
                 if let latestName = latest["tag_name"] as? String,
                     let latestVersion = latest["name"] as? String,
-                    latestName != currentAppVersion && latestVersion != "1.0.5" {
+                    latestName != currentAppVersion && latestVersion == "1.0.5" {
                         updateAvailable = true
                     }
                     if updateAvailable || checkForUpdates {
