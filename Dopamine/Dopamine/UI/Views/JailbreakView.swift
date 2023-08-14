@@ -241,7 +241,7 @@ struct JailbreakView: View {
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "env_manager", imageName: "square.stack.3d.forward.dottedline.fill", title: "Environment_Manager"),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
-                .init(id: "updatelog", imageName: "info.circle", title: NSLocalizedString("Menu_Update_Log_Title", comment: "")),
+                .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Menu_Update_Log_Title", comment: "")),
             ]
             ForEach(menuOptions) { option in
                 if (option.id != "env_manager" || dopamineDefaults().bool(forKey: "developmentMode")) {
