@@ -157,8 +157,8 @@ struct JailbreakView: View {
                     ScrollView {
                         Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
                             .opacity(0.5)
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical)
+                            .multilineTextAlignment(.center)
+                            .padding(.vertical)
                     }
                     .opacity(1)
                     .frame(maxWidth: 280, maxHeight: 480)
