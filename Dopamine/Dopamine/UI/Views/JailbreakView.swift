@@ -154,9 +154,14 @@ struct JailbreakView: View {
                 PopupView(title: {
                     Text("Title_Changelog")
                 }, contents: {
-                    Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
-                        .opacity(1)
-                        .frame(maxWidth: 280, maxHeight: 480)
+                    ScrollView {
+                        Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                                .opacity(0.5)
+                                .multilineTextAlignment(.center)
+                                .padding(.vertical)
+                    }
+                    .opacity(1)
+                    .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
                 
