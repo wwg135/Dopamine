@@ -41,6 +41,7 @@ struct JailbreakView: View {
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
+    @State var isUpdatelogPresented = false
     
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?
@@ -56,7 +57,7 @@ struct JailbreakView: View {
     @State private var upTime = "系统启动于: 加载中"
     @State private var index = 0
     @State private var showLaunchTime = true
-
+    
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
@@ -69,8 +70,8 @@ struct JailbreakView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                let isPopupPresented = isSettingsPresented || isCreditsPresented
+            ZStack { 
+                let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
                 
                 let imagePath = "/var/mobile/Wallpaper.jpg"
                 if let imageData = FileManager.default.contents(atPath: imagePath),
@@ -148,6 +149,16 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320)
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
+
+
+                PopupView(title: {
+                    Text("Title_Changelog")
+                }, contents: {
+                    Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                        .opacity(1)
+                        .frame(maxWidth: 280, maxHeight: 480)
+                }, isPresented: $isUpdatelogPresented)
+                .zIndex(2)
                 
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
@@ -180,12 +191,6 @@ struct JailbreakView: View {
                         Logger.log(error, type: .error, isStatus: false)
                     }
                 }
-            }
-        }
-        .alert("🤑 NEW SPONSORSHIP OFFER 🤑 \n\n⚠️ Hello iOS \(UIDevice.current.systemVersion) user! 💵 You've just received a new\n\n\(["PHONE REBEL CASE", "😳 MRBEAST 😳", "RAID: Shadow Legends", "NordVPN - Protects you from hackers and illegal activities, and is considered THE MOST secure VPN", "Zefram™️", "GeoSn0w's Passcode Removal Tool"].randomElement()!)\n\nsponsorship offer 💰💰💰 Would you like to accept it? 💸", isPresented: $aprilFirstAlert) {
-            Button("Ignore for now") { }
-            Button("✅ Accept") {
-                UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
             }
         }
     }
@@ -231,6 +236,7 @@ struct JailbreakView: View {
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "env_manager", imageName: "square.stack.3d.forward.dottedline.fill", title: "Environment_Manager"),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
+                .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
             ]
             ForEach(menuOptions) { option in
                 if (option.id != "env_manager" || dopamineDefaults().bool(forKey: "developmentMode")) {
@@ -244,6 +250,8 @@ struct JailbreakView: View {
                                 isSettingsPresented = true
                             case "credits":
                                 isCreditsPresented = true
+                            case "updatelog":
+                                isUpdatelogPresented = true
                             default: break
                             }
                         }
@@ -529,13 +537,16 @@ struct JailbreakView: View {
                 return
             }
             
-            if let latest = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) {
+            if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
+                checkForUpdates = true
                 if let latestName = latest["tag_name"] as? String,
                     let latestVersion = latest["name"] as? String,
-                    latestName != currentAppVersion && latestVersion == "1.0.5" {
+                    latestName != currentAppVersion && latestVersion != "1.0.5" {
                         updateAvailable = true
+                    }
+                    if updateAvailable || checkForUpdates {
                         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
-                }
+                    }
             }
 
             if isInstalledEnvironmentVersionMismatching() {
