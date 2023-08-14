@@ -542,7 +542,7 @@ struct JailbreakView: View {
                 return
             }
             
-            if let latest = releasesJSON.first(where: { ($0["name"] as? String) == "1.0.5" }) {
+            if let latest = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) {
                 checkForUpdates = true
                 if let latestName = latest["tag_name"] as? String,
                     let latestVersion = latest["name"] as? String,
