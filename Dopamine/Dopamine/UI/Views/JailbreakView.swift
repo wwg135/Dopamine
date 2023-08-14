@@ -67,10 +67,16 @@ struct JailbreakView: View {
     }
     
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
+
+    var changelog: String
     
     var body: some View {
+        VStack {
+            Text(changelog) 
+        }
+        
         GeometryReader { geometry in
-            ZStack {
+            ZStack { 
                 let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
                 
                 let imagePath = "/var/mobile/Wallpaper.jpg"
@@ -154,7 +160,7 @@ struct JailbreakView: View {
                 PopupView(title: {
                     Text("Menu_Update_Log_Title")
                 }, contents: {
-                    UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                    UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog)
                         .frame(maxWidth: 320)
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
