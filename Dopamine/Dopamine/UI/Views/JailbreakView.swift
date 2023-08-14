@@ -71,7 +71,7 @@ struct JailbreakView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                let isPopupPresented = isSettingsPresented || isCreditsPresented
+                let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
                 
                 let imagePath = "/var/mobile/Wallpaper.jpg"
                 if let imageData = FileManager.default.contents(atPath: imagePath),
@@ -148,6 +148,15 @@ struct JailbreakView: View {
                     AboutView()
                         .frame(maxWidth: 320)
                 }, isPresented: $isCreditsPresented)
+                .zIndex(2)
+
+
+                PopupView(title: {
+                    Text("Menu_Update_Log_Title")
+                }, contents: {
+                    LogView()
+                        .frame(maxWidth: 320)
+                }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
                 
                 
