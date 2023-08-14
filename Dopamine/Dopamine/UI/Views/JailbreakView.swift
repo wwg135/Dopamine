@@ -155,7 +155,7 @@ struct JailbreakView: View {
                     Text("Title_Changelog")
                 }, contents: {
                     ScrollView {
-                        Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                        Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
                             .opacity(0.5)
                             .multilineTextAlignment(.center)
                             .padding(.vertical)
