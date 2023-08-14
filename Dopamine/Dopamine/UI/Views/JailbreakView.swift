@@ -67,14 +67,8 @@ struct JailbreakView: View {
     }
     
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-
-    var changelog: String
     
     var body: some View {
-        VStack {
-            Text(changelog) 
-        }
-        
         GeometryReader { geometry in
             ZStack { 
                 let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
@@ -158,7 +152,7 @@ struct JailbreakView: View {
 
 
                 PopupView(title: {
-                    Text("Menu_Update_Log_Title")
+                    Text("Title_Changelog")
                 }, contents: {
                     UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog)
                         .frame(maxWidth: 320)
@@ -196,12 +190,6 @@ struct JailbreakView: View {
                         Logger.log(error, type: .error, isStatus: false)
                     }
                 }
-            }
-        }
-        .alert("🤑 NEW SPONSORSHIP OFFER 🤑 \n\n⚠️ Hello iOS \(UIDevice.current.systemVersion) user! 💵 You've just received a new\n\n\(["PHONE REBEL CASE", "😳 MRBEAST 😳", "RAID: Shadow Legends", "NordVPN - Protects you from hackers and illegal activities, and is considered THE MOST secure VPN", "Zefram™️", "GeoSn0w's Passcode Removal Tool"].randomElement()!)\n\nsponsorship offer 💰💰💰 Would you like to accept it? 💸", isPresented: $aprilFirstAlert) {
-            Button("Ignore for now") { }
-            Button("✅ Accept") {
-                UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
             }
         }
     }
@@ -247,7 +235,7 @@ struct JailbreakView: View {
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "env_manager", imageName: "square.stack.3d.forward.dottedline.fill", title: "Environment_Manager"),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
-                .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Menu_Update_Log_Title", comment: "")),
+                .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
             ]
             ForEach(menuOptions) { option in
                 if (option.id != "env_manager" || dopamineDefaults().bool(forKey: "developmentMode")) {
