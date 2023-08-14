@@ -548,10 +548,9 @@ struct JailbreakView: View {
                     latestName != currentAppVersion && latestVersion != "1.0.5" {
                         updateAvailable = true
                     }
-            } else {
-                if checkForUpdates {
-                    updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
-                }
+                    if checkForUpdates {
+                        updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+                    }
             }
 
             if isInstalledEnvironmentVersionMismatching() {
