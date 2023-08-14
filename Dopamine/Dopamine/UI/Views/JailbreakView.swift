@@ -154,9 +154,9 @@ struct JailbreakView: View {
                 PopupView(title: {
                     Text("Title_Changelog")
                 }, contents: {
-                    UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                    Text(changlog)
                         .opacity(1)
-                        .frame(maxWidth: 320, maxHeight: .infinity)
+                        .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
                 
