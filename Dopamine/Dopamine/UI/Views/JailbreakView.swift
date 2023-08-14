@@ -67,8 +67,6 @@ struct JailbreakView: View {
     }
     
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-
-    var changelog: String
     
     var body: some View {
         GeometryReader { geometry in
@@ -156,8 +154,9 @@ struct JailbreakView: View {
                 PopupView(title: {
                     Text("Title_Changelog")
                 }, contents: {
-                    ChangelogView(changelog: $updateChangelog)
-                        .frame(maxWidth: 320)
+                    UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                        .opacity(1)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
                 
