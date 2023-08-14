@@ -551,7 +551,7 @@ struct JailbreakView: View {
             if isInstalledEnvironmentVersionMismatching() {
                 mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
             }
-    }}
+    }
 
     func getLaunchTime() -> String {
         var boottime = timeval()
