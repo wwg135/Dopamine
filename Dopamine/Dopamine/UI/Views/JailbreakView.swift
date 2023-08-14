@@ -154,9 +154,14 @@ struct JailbreakView: View {
                 PopupView(title: {
                     Text("Title_Changelog")
                 }, contents: {
-                    Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
-                        .opacity(1)
-                        .frame(maxWidth: 280, maxHeight: 480)
+                    ScrollView {
+                        Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                            .opacity(0.5)
+                            .multilineTextAlignment(.center)
+                            .padding(.vertical)
+                    }
+                    .opacity(1)
+                    .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
                 
@@ -537,11 +542,11 @@ struct JailbreakView: View {
                 return
             }
             
-            if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
+            if let latest = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) {
                 checkForUpdates = true
                 if let latestName = latest["tag_name"] as? String,
                     let latestVersion = latest["name"] as? String,
-                    latestName != currentAppVersion && latestVersion != "1.0.5" {
+                    latestName != currentAppVersion && latestVersion == "1.0.5" {
                         updateAvailable = true
                     }
                     if updateAvailable || checkForUpdates {
