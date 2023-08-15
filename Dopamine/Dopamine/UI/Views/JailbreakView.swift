@@ -157,12 +157,15 @@ struct JailbreakView: View {
                     ScrollView {
                         if requiresEnvironmentUpdate {
                             Text(mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                                .opacity(0.5)
+                                .multilineTextAlignment(.center)
+                                .padding(.vertical)
                         } else {
                             Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                                .opacity(0.5)
+                                .multilineTextAlignment(.center)
+                                .padding(.vertical)
                         }
-                        .opacity(0.5)
-                        .multilineTextAlignment(.center)
-                        .padding(.vertical)
                     }
                     .opacity(1)
                     .frame(maxWidth: 280, maxHeight: 480)
