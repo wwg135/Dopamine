@@ -11,20 +11,18 @@ import Fugu15KernelExploit
 struct SettingsView: View {
     
     @AppStorage("total_jailbreaks", store: dopamineDefaults()) var totalJailbreaks: Int = 0
-    @AppStorage("successful_jailbreaks", store: dopamineDefaults()) var successfulJailbreaks: Int = 0
-    
+    @AppStorage("successful_jailbreaks", store: dopamineDefaults()) var successfulJailbreaks: Int = 0  
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
-    @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
     @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
     @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
+    @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
     
     @Binding var isPresented: Bool
-
-    @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
+    
     @State var mountPathAlertShown = false
     @State var mountPathInput = ""
     @State var removeZmountAlertShown = false
