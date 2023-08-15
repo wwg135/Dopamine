@@ -517,23 +517,21 @@ struct JailbreakView: View {
     }
     
     func getDeltaChangelog(json: [[String: Any]]) -> String? {
-        var include: Bool = false
-        var changelogBuf: String = ""
+        var changelogBuf = ""
         for item in json {
-            let version = item["name"] as? String
-            if version != "1.0.5" {
-                include = true
-                
-            let changelog = item["body"] as? String
-                if changelog != nil {
-                    if !changelogBuf.isEmpty {
-                        changelogBuf += "\n\n\n"
-                    }
-                    changelogBuf += "**" + version! + "**\n\n" + changelog!
+            guard let version = item["name"] as? String,
+                  let changelog = item["body"] as? String else {
+                continue
+            }
+            
+            if version != nil {    
+                if !changelogBuf.isEmpty {
+                    changelogBuf += "\n\n\n"
                 }
+                changelogBuf += "**" + version + "**\n\n" + changelog
             }
         }
-        return changelogBuf == "" ? nil : changelogBuf
+        return changelogBuf.isEmpty ? nil : changelogBuf 
     }
 
     func createUserOrientedChangelog(deltaChangelog: String?, environmentMismatch: Bool) -> String {
