@@ -48,7 +48,7 @@ struct UpdateDownloadingView: View {
                             .opacity(0.5)
                         ScrollView {
                             Text(try! AttributedString(markdown: type == .environment ? mismatchChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                .opacity(0.5)
+                                .opacity(1)
                                 .multilineTextAlignment(.center)
                                 .padding(.vertical)
                         }
