@@ -270,7 +270,7 @@ struct JailbreakView: View {
 
                         Spacer()
 
-                        if option.action == nil {
+                        if option.action == nil && option.id != "updatelog" {
                             Image(systemName: Locale.characterDirection(forLanguage: Locale.current.languageCode ?? "") == .rightToLeft ? "chevron.left" : "chevron.right")
                                 .font(.body)
                                 .symbolRenderingMode(.palette)
