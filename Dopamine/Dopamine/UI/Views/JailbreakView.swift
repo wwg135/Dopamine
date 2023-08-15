@@ -153,7 +153,7 @@ struct JailbreakView: View {
                     Text("Title_Changelog")
                 }, contents: {
                     ScrollView {
-                        if requiresEnvironmentUpdate {
+                        if isInstalledEnvironmentVersionMismatching() {
                             Text(mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
                                 .opacity(0.5)
                                 .multilineTextAlignment(.center)
