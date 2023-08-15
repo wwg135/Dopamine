@@ -51,8 +51,6 @@ struct JailbreakView: View {
     
     @State var updateChangelog: String? = nil
     @State var mismatchChangelog: String? = nil
-    
-    @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
 
     @State private var upTime = "系统启动于: 加载中"
     @State private var index = 0
