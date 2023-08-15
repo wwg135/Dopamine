@@ -150,7 +150,7 @@ struct JailbreakView: View {
 
 
                 PopupView(title: {
-                    Text("Title_Changelog")
+                    Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                 }, contents: {
                     ScrollView {
                         if isInstalledEnvironmentVersionMismatching() {
