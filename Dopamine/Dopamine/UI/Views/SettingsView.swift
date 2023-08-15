@@ -16,10 +16,10 @@ struct SettingsView: View {
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
-    @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
     @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
     @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
+    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     
     @Binding var isPresented: Bool
 
@@ -32,13 +32,9 @@ struct SettingsView: View {
     @State var removeZmountInput = ""
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
-
-    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
-    
-    @State var easterEgg = false
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -215,13 +211,6 @@ struct SettingsView: View {
                         }
                     }
                     .padding(.top, 2)
-                    
-                    if easterEgg {
-                        Image("fr")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(maxHeight: .infinity)
-                    }
                     
                     ZStack {}
                         .textFieldAlert(isPresented: $customforbidunjectAlertShown) { () -> TextFieldAlert in
