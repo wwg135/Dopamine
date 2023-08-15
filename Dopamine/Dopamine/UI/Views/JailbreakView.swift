@@ -150,17 +150,17 @@ struct JailbreakView: View {
 
 
                 PopupView(title: {
-                    Text("Title_Changelog")
+                    Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                 }, contents: {
                     ScrollView {
                         if isInstalledEnvironmentVersionMismatching() {
-                            Text(mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
-                                .opacity(0.5)
+                            Text(try! AttributedString(markdown: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                .opacity(1)
                                 .multilineTextAlignment(.center)
                                 .padding(.vertical)
                         } else {
-                            Text(updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
-                                .opacity(0.5)
+                            Text(try! AttributedString(markdown: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                .opacity(1)
                                 .multilineTextAlignment(.center)
                                 .padding(.vertical)
                         }
