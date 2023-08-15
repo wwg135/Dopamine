@@ -246,68 +246,64 @@ struct JailbreakView: View {
                 .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
                 .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
-                .init(id: "env_manager", imageName: "square.stack.3d.forward.dottedline.fill", title: "Environment_Manager"),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
                 .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
             ]
             ForEach(menuOptions) { option in
-                if (option.id != "env_manager" || dopamineDefaults().bool(forKey: "developmentMode")) {
-                    Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        if let action = option.action {
-                            action()
-                        } else {
-                            switch option.id {
-                            case "settings":
-                                isSettingsPresented = true
-                            case "credits":
-                                isCreditsPresented = true
-                            case "updatelog":
-                                isUpdatelogPresented = true
-                            default: break
-                            }
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    if let action = option.action {
+                        action()
+                    } else {
+                        switch option.id {
+                        case "settings":
+                            isSettingsPresented = true
+                        case "credits":
+                            isCreditsPresented = true
+                        case "updatelog":
+                            isUpdatelogPresented = true
+                        default: break
                         }
-                    } label: {
-                        HStack {
-                            Label(title: { Text(option.title) }, icon: { Image(systemName: option.imageName) })
-                                .foregroundColor(Color.white)
+                    }
+                } label: {
+                    HStack {
+                        Label(title: { Text(option.title) }, icon: { Image(systemName: option.imageName) })
+                            .foregroundColor(Color.white)
 
-                            Spacer()
+                        Spacer()
 
-                            if option.action == nil {
-                                Image(systemName: Locale.characterDirection(forLanguage: Locale.current.languageCode ?? "") == .rightToLeft ? "chevron.left" : "chevron.right")
-                                    .font(.body)
-                                    .symbolRenderingMode(.palette)
-                                    .foregroundStyle(.white.opacity(1))
-                                    // .onLongPressGesture {
-                                    //     UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
-                                    // }
-                            }
+                        if option.action == nil {
+                            Image(systemName: Locale.characterDirection(forLanguage: Locale.current.languageCode ?? "") == .rightToLeft ? "chevron.left" : "chevron.right")
+                                .font(.body)
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(.white.opacity(1))
+                                // .onLongPressGesture {
+                                //     UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
+                                // }
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(16)
-                        .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
-                        .contextMenu(
-                          option.id == "userspace"
-                          ? ContextMenu {
-                            Button(action: reboot,
-                                    label: {Label("Menu_Reboot_Title", systemImage: "arrow.clockwise.circle.fill")})
-                            Button(action: updateEnvironment,
-                                    label: {Label("Button_Update_Environment", systemImage: "arrow.counterclockwise.circle.fill")})
-                          }
-                          : nil
-                        )
                     }
-                    .buttonStyle(.plain)
-                    .disabled(option.id == "env_manager" ? !dopamineDefaults().bool(forKey: "developmentMode")
-                                                        : (!option.showUnjailbroken && !isJailbroken()))
+                    .frame(maxWidth: .infinity)
+                    .padding(16)
+                    .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
+                    .contextMenu(
+                        option.id == "userspace"
+                        ? ContextMenu {
+                        Button(action: reboot,
+                            label: {Label("Menu_Reboot_Title", systemImage: "arrow.clockwise.circle.fill")})
+                        Button(action: updateEnvironment,
+                            label: {Label("Button_Update_Environment", systemImage: "arrow.counterclockwise.circle.fill")})
+                        }
+                        : nil
+                    )
+                }
+                .buttonStyle(.plain)
+                .disabled(!option.showUnjailbroken && !isJailbroken())
 
-                    if menuOptions.last != option {
-                        //Divider()
-                            //.background(.white)
-                            //.opacity(0.5)
-                            //.padding(.horizontal)
-                    }
+                if menuOptions.last != option {
+                    //Divider()
+                        //.background(.white)
+                        //.opacity(0.5)
+                        //.padding(.horizontal)
                 }
             }
         }
