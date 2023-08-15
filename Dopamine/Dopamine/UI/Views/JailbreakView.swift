@@ -575,7 +575,7 @@ struct JailbreakView: View {
                     }
             }
                 
-            if tweakInjection {
+            if checkForUpdates {
                 updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
             }
 
