@@ -577,6 +577,7 @@ struct JailbreakView: View {
                     latestName != currentAppVersion && latestVersion != "1.0.5" {
                         updateAvailable = true
                     } 
+            }
             
             if changeVersion {
                 updateAvailable = true
