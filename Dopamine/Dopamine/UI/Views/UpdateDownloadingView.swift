@@ -47,13 +47,7 @@ struct UpdateDownloadingView: View {
                             .padding(.horizontal, 32)
                             .opacity(0.5)
                         ScrollView {
-                            let attrText = try! AttributedString(markdown: type == .environment ? mismatchChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace))
-                            let string = attrText.string
-                            let length = string.count
-                            let insertIndex = attrText.length/2
-                            let buttonAttr = AttributedString("update_download")
-                            attrText.insert(buttonAttr, at: insertIndex)
-                            Text(attrText)
+                            Text(try! AttributedString(markdown: type == .environment ? mismatchChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                 .opacity(1)
                                 .multilineTextAlignment(.center)
                                 .padding(.vertical)
