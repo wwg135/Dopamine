@@ -57,6 +57,7 @@ struct JailbreakView: View {
     @State private var showLaunchTime = true
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
+    @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
@@ -573,7 +574,7 @@ struct JailbreakView: View {
             if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
                 if let latestName = latest["tag_name"] as? String,
                     let latestVersion = latest["name"] as? String,
-                    latestName != currentAppVersion && latestVersion != "1.0.5" {
+                    latestName != currentAppVersion && latestVersion != "1.0.5" || if changeVersion {
                         updateAvailable = true
                     }
             }
