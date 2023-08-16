@@ -193,18 +193,13 @@ struct JailbreakView: View {
                     }
                 }
             }
-            if checkForUpdates {
-                Task {
-                    do {
-                        try await checkForUpdates()
-                    } catch {
-                        Logger.log(error, type: .error, isStatus: false)
-                    }
-                }
-            }
             Task {
                 do {
                     try await allUpdatelog()
+
+                    if checkForUpdates {
+                        try await checkForUpdates()
+                    }
                 } catch {
                     Logger.log(error, type: .error, isStatus: false)
                 }
