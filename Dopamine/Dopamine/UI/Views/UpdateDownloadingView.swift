@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftfulLoadingIndicators
+import Fugu15KernelExploit
 
 enum UpdateType {
     case environment, regular
@@ -27,6 +28,8 @@ struct UpdateDownloadingView: View {
     @State var showLogView = false
     var changelog: String
     var mismatchChangelog: String
+
+    @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     
     var body: some View {
         ZStack {
@@ -54,89 +57,93 @@ struct UpdateDownloadingView: View {
                         }
                     }
                     
-                    Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        if type == .regular {
-                            updateState = .downloading
+                    if !changeVersion {
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            if type == .regular {
+                                updateState = .downloading
                             
-                            // 💀 code
-                            Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                                progressDouble = downloadProgress.fractionCompleted
+                                // 💀 code
+                                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                                    progressDouble = downloadProgress.fractionCompleted
                                 
-                                if progressDouble == 1 {
-                                    t.invalidate()
+                                    if progressDouble == 1 {
+                                        t.invalidate()
+                                    }
                                 }
-                            }
                             
-                            Task {
-                                do {
-                                    try await downloadUpdateAndInstall()
-                                    updateState = .updating
-                                } catch {
-                                    showLogView = true
-                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                Task {
+                                    do {
+                                        try await downloadUpdateAndInstall()
+                                        updateState = .updating
+                                    } catch {
+                                        showLogView = true
+                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                    }
+                                }
+                            } else {
+                                updateState = .updating
+                                DispatchQueue.global(qos: .userInitiated).async {
+                                    updateEnvironment()
                                 }
                             }
-                        } else {
-                            updateState = .updating
-                            DispatchQueue.global(qos: .userInitiated).async {
-                                updateEnvironment()
-                            }
-                        }
                         
-                    } label: {
-                        Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: 280)
-                            .background(MaterialView(.light)
-                                .opacity(0.5)
-                                .cornerRadius(8)
-                            )
-                    }
-                    .fixedSize()
-
-                    Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        if type == .regular {
-                            updateState = .downloading
-
-                            // 💀 code
-                            Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                                progressDouble = downloadProgress.fractionCompleted
-
-                                if progressDouble == 1 {
-                                    t.invalidate()
-                                }
-                            }
-
-                            Task {
-                                do {
-                                    try await selectdownloadUpdateAndInstall()
-                                    updateState = .updating
-                                } catch {
-                                    showLogView = true
-                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                }
-                            }
-                        } else {
-                            updateState = .updating
-                            DispatchQueue.global(qos: .userInitiated).async {
-                                updateEnvironment()
-                            }
+                        } label: {
+                            Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                                .background(MaterialView(.light)
+                                    .opacity(0.5)
+                                    .cornerRadius(8)
+                                )
                         }
-
-                    } label: {
-                        Label(title: { Text("Button_Select_Update")  }, icon: { Image(systemName: "arrow.down") })
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: 280)
-                            .background(MaterialView(.light)
-                                .opacity(0.5)
-                                .cornerRadius(8)
-                            )
+                        .fixedSize()
                     }
-                    .fixedSize()
+                    
+                    if changeVersion {
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            if type == .regular {
+                                updateState = .downloading
+                            
+                                // 💀 code
+                                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                                    progressDouble = downloadProgress.fractionCompleted
+                                
+                                    if progressDouble == 1 {
+                                        t.invalidate()
+                                    }
+                                }
+                            
+                                Task {
+                                    do {
+                                        try await selectdownloadUpdateAndInstall()
+                                        updateState = .updating
+                                    } catch {
+                                        showLogView = true
+                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                    }
+                                }
+                            } else {
+                                updateState = .updating
+                                DispatchQueue.global(qos: .userInitiated).async {
+                                    updateEnvironment()
+                                }
+                            }
+                        
+                        } label: {
+                            Label(title: { Text("Button_Select_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                                .background(MaterialView(.light)
+                                    .opacity(0.5)
+                                    .cornerRadius(8)
+                                )
+                        }
+                        .fixedSize()
+                    }
                     
                     Button {
                         type = nil

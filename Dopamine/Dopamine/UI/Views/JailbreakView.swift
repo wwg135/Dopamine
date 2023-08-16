@@ -57,6 +57,7 @@ struct JailbreakView: View {
     @State private var showLaunchTime = true
     
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
+    @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
@@ -550,9 +551,14 @@ struct JailbreakView: View {
                     let latestVersion = latest["name"] as? String,
                     latestName != currentAppVersion && latestVersion == "1.0.5" {
                         updateAvailable = true
-                    }
+                    } 
+            }
+
+            if changeVersion {
+                updateAvailable = true
             }
     }
+
 
     func allUpdatelog() async throws {
             let owner = "wwg135"
