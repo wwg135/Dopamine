@@ -20,6 +20,7 @@ struct SettingsView: View {
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
     @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
+    @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     
     @Binding var isPresented: Bool
 
@@ -48,6 +49,7 @@ struct SettingsView: View {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
                             Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                            Toggle("Change_Version", isOn: $changeVersion)
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
