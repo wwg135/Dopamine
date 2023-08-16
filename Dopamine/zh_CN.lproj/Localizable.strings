@@ -193,3 +193,5 @@
 "Set_Custom_Forbid_Unject_Message" = "1.输入说明：在越狱商店源https://repo.initnil.com/下载插件AppData-Rootless安装，上划要屏蔽越狱检测的app图标→→点击“应用安装目录”进去→→复制XXXXX.app中的“XXXXX”粘贴到这里确定即可。\n2.若要删除已添加的App屏蔽越狱检测，则输入添加时的Bundle进去确定即可。";
 
 "Button_Select_Update" = "安装1.0.5版本";
+
+"Change_Version" = "更换版本";
