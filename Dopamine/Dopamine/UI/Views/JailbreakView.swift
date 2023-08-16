@@ -202,6 +202,13 @@ struct JailbreakView: View {
                     }
                 }
             }
+            Task {
+                do {
+                    try await allUpdatelog()
+                } catch {
+                    Logger.log(error, type: .error, isStatus: false)
+                }
+            }
         }
     }
     
@@ -566,7 +573,8 @@ struct JailbreakView: View {
             guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
                 return
             }
-            
+
+            //updateAvailable is not true
             if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
                 if let latestName = latest["tag_name"] as? String,
                     let latestVersion = latest["name"] as? String,
@@ -574,10 +582,22 @@ struct JailbreakView: View {
                         updateAvailable = true
                     }
             }
-                
-            if checkForUpdates {
-                updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+    }
+
+    func allUpdatelog() async throws {
+            let owner = "wwg135"
+            let repo = "Dopamine"
+            
+            // Get the releases
+            let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
+            let releasesRequest = URLRequest(url: releasesURL)
+            let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
+            guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
+                return
             }
+
+            //get the updateChangelog
+            updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
 
             if isInstalledEnvironmentVersionMismatching() {
                 mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
