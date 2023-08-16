@@ -56,49 +56,51 @@ struct UpdateDownloadingView: View {
                                 .padding(.vertical)
                         }
                     }
-                    
-                    Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        if type == .regular {
-                            updateState = .downloading
-                            
-                            // 💀 code
-                            Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                                progressDouble = downloadProgress.fractionCompleted
-                                
-                                if progressDouble == 1 {
-                                    t.invalidate()
-                                }
-                            }
-                            
-                            Task {
-                                do {
-                                    try await downloadUpdateAndInstall()
-                                    updateState = .updating
-                                } catch {
-                                    showLogView = true
-                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                }
-                            }
-                        } else {
-                            updateState = .updating
-                            DispatchQueue.global(qos: .userInitiated).async {
-                                updateEnvironment()
-                            }
-                        }
-                        
-                    } label: {
-                        Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: 280)
-                            .background(MaterialView(.light)
-                                .opacity(0.5)
-                                .cornerRadius(8)
-                            )
-                    }
-                    .fixedSize()
 
+                    if !changeVersion {
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            if type == .regular {
+                                updateState = .downloading
+                            
+                                // 💀 code
+                                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                                    progressDouble = downloadProgress.fractionCompleted
+                                
+                                    if progressDouble == 1 {
+                                        t.invalidate()
+                                    }
+                                }
+                            
+                                Task {
+                                    do {
+                                        try await downloadUpdateAndInstall()
+                                        updateState = .updating
+                                    } catch {
+                                        showLogView = true
+                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                    }
+                                }
+                            } else {
+                                updateState = .updating
+                                DispatchQueue.global(qos: .userInitiated).async {
+                                    updateEnvironment()
+                                }
+                            }
+                        
+                        } label: {
+                            Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                                .background(MaterialView(.light)
+                                    .opacity(0.5)
+                                    .cornerRadius(8)
+                                )
+                        }
+                        .fixedSize()
+                    }
+                    
                     if changeVersion {
                         Button {
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
