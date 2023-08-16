@@ -193,13 +193,15 @@ struct JailbreakView: View {
                     }
                 }
             }
-            if checkForUpdates {
-                Task {
-                    do {
+            Task {
+                do {
+                    try await allUpdatelog()
+
+                    if checkForUpdates {
                         try await checkForUpdates()
-                    } catch {
-                        Logger.log(error, type: .error, isStatus: false)
                     }
+                } catch {
+                    Logger.log(error, type: .error, isStatus: false)
                 }
             }
         }
@@ -492,23 +494,21 @@ struct JailbreakView: View {
     }
     
     func getDeltaChangelog(json: [[String: Any]]) -> String? {
-        var include: Bool = false
-        var changelogBuf: String = ""
+        var changelogBuf = ""
         for item in json {
-            let version = item["name"] as? String
-            if version == "1.0.5" {
-                include = true
-                
-            let changelog = item["body"] as? String
-                if changelog != nil {
-                    if !changelogBuf.isEmpty {
-                        changelogBuf += "\n\n\n"
-                    }
-                    changelogBuf += "**" + version! + "**\n\n" + changelog!
+            guard let version = item["name"] as? String,
+                  let changelog = item["body"] as? String else {
+                continue
+            }
+            
+            if version != nil {    
+                if !changelogBuf.isEmpty {
+                    changelogBuf += "\n\n\n"
                 }
+                changelogBuf += "**" + version + "**\n\n" + changelog
             }
         }
-        return changelogBuf == "" ? nil : changelogBuf
+        return changelogBuf.isEmpty ? nil : changelogBuf 
     }
 
     func createUserOrientedChangelog(deltaChangelog: String?, environmentMismatch: Bool) -> String {
@@ -543,18 +543,31 @@ struct JailbreakView: View {
             guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
                 return
             }
-            
+
+            //updateAvailable is not true
             if let latest = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) {
-                checkForUpdates = true
                 if let latestName = latest["tag_name"] as? String,
                     let latestVersion = latest["name"] as? String,
                     latestName != currentAppVersion && latestVersion == "1.0.5" {
                         updateAvailable = true
                     }
-                    if updateAvailable || checkForUpdates {
-                        updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
-                    }
             }
+    }
+
+    func allUpdatelog() async throws {
+            let owner = "wwg135"
+            let repo = "Dopamine"
+            
+            // Get the releases
+            let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
+            let releasesRequest = URLRequest(url: releasesURL)
+            let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
+            guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
+                return
+            }
+
+            //get the updateChangelog
+            updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
 
             if isInstalledEnvironmentVersionMismatching() {
                 mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
