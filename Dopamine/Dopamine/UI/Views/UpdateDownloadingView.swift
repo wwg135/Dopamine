@@ -28,6 +28,8 @@ struct UpdateDownloadingView: View {
     @State var showLogView = false
     var changelog: String
     var mismatchChangelog: String
+
+    @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     
     var body: some View {
         ZStack {
@@ -97,8 +99,7 @@ struct UpdateDownloadingView: View {
                     }
                     .fixedSize()
 
-                    let dpDefaults = dopamineDefaults()
-                    if dpDefaults.bool(forKey: "changeVersion") {
+                    if changeVersion {
                         Button {
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             if type == .regular {
