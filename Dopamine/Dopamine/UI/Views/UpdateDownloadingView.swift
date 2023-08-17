@@ -220,6 +220,7 @@ struct UpdateDownloadingView: View {
                 let downloadURLString = asset["browser_download_url"] as? String,
                 let downloadURL = URL(string: downloadURLString) else {
                     throw "Could not find download URL for ipa"
+            }
         }
 
         // Download the asset
