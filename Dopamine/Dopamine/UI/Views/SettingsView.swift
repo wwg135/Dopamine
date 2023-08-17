@@ -51,6 +51,7 @@ struct SettingsView: View {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
                             Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                            Toggle("Change_Version", isOn: $changeVersion)
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
@@ -58,8 +59,7 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            if isJailbroken() {
-                                Toggle("Change_Version", isOn: $changeVersion)
+                            if isJailbroken() {   
                                 if forbidUnject {
                                     Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
                                         .onChange(of: bottomforbidUnject) { newValue in
