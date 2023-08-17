@@ -57,39 +57,48 @@ struct UpdateDownloadingView: View {
                         }
                     }
 
-                    if !changeVersion {
-                        Button {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            if type == .regular {
-                                updateState = .downloading
+                    Button {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        if type == .regular {
+                            updateState = .downloading
                             
-                                // 💀 code
-                                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                                    progressDouble = downloadProgress.fractionCompleted
+                            // 💀 code
+                            Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                                progressDouble = downloadProgress.fractionCompleted
                                 
-                                    if progressDouble == 1 {
-                                        t.invalidate()
-                                    }
-                                }
-                            
-                                Task {
-                                    do {
-                                        try await downloadUpdateAndInstall()
-                                        updateState = .updating
-                                    } catch {
-                                        showLogView = true
-                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                    }
-                                }
-                            } else {
-                                updateState = .updating
-                                DispatchQueue.global(qos: .userInitiated).async {
-                                    updateEnvironment()
+                                if progressDouble == 1 {
+                                    t.invalidate()
                                 }
                             }
+                            
+                            Task {
+                                do {
+                                    try await downloadUpdateAndInstall()
+                                    updateState = .updating
+                                } catch {
+                                    showLogView = true
+                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                }
+                            }
+                        } else {
+                            updateState = .updating
+                            DispatchQueue.global(qos: .userInitiated).async {
+                                updateEnvironment()
+                            }
+                        }
                         
-                        } label: {
-                            Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                    } label: {
+                        if changeVersion {
+                            Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                                .background(MaterialView(.light)
+                                    .opacity(0.5)
+                                    .cornerRadius(8)
+                                )
+                        } else {
+                            Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
                                 .foregroundColor(.white)
                                 .padding()
                                 .frame(maxWidth: 280)
@@ -98,52 +107,8 @@ struct UpdateDownloadingView: View {
                                     .cornerRadius(8)
                                 )
                         }
-                        .fixedSize()
                     }
-                    
-                    if changeVersion {
-                        Button {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            if type == .regular {
-                                updateState = .downloading
-                            
-                                // 💀 code
-                                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                                    progressDouble = downloadProgress.fractionCompleted
-                                
-                                    if progressDouble == 1 {
-                                        t.invalidate()
-                                    }
-                                }
-                            
-                                Task {
-                                    do {
-                                        try await selectdownloadUpdateAndInstall()
-                                        updateState = .updating
-                                    } catch {
-                                        showLogView = true
-                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                    }
-                                }
-                            } else {
-                                updateState = .updating
-                                DispatchQueue.global(qos: .userInitiated).async {
-                                    updateEnvironment()
-                                }
-                            }
-                        
-                        } label: {
-                            Label(title: { Text("Button_Select_Update")  }, icon: { Image(systemName: "arrow.down") })
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(maxWidth: 280)
-                                .background(MaterialView(.light)
-                                    .opacity(0.5)
-                                    .cornerRadius(8)
-                                )
-                        }
-                        .fixedSize()
-                    }
+                    .fixedSize()
                     
                     
                     Button {
@@ -241,7 +206,8 @@ struct UpdateDownloadingView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }),
+        let latest = changeVersion ? releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) : releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })
+        guard let latestRelease = latest,
               let assets = latestRelease["assets"] as? [[String: Any]],
               let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
               let downloadURLString = asset["browser_download_url"] as? String,
@@ -254,7 +220,7 @@ struct UpdateDownloadingView: View {
             downloadProgress.totalUnitCount = 1
             group.addTask {
                 let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
-                if isJailbroken() {
+                if (isJailbroken()) {
                     update(tipaURL: url)
                 } else {
                     guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=\(url.absoluteString)") else {
@@ -262,48 +228,7 @@ struct UpdateDownloadingView: View {
                     }
                     await UIApplication.shared.open(dopamineUpdateURL)
                     exit(0)
-                    return;
-                }
-            }
-            try await group.waitForAll()
-        }
-    }
-
-    func selectdownloadUpdateAndInstall() async throws {
-        let owner = "wwg135"
-        let repo = "Dopamine"
-        
-        // Get the releases
-        let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
-        let releasesRequest = URLRequest(url: releasesURL)
-        let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
-        let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as! [[String: Any]]
-        
-        Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
-
-        // Find the latest release
-        guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }),
-              let assets = latestRelease["assets"] as? [[String: Any]],
-              let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
-              let downloadURLString = asset["browser_download_url"] as? String,
-              let downloadURL = URL(string: downloadURLString) else {
-            throw "Could not find download URL for ipa"
-        }
-
-        // Download the asset
-        try await withThrowingTaskGroup(of: Void.self) { group in
-            downloadProgress.totalUnitCount = 1
-            group.addTask {
-                let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
-                if isJailbroken() {
-                    update(tipaURL: url)
-                } else {
-                    guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=https://github.com/wwg135/Dopamine/releases/latest/download/Dopamine.ipa") else {
-                        return
-                    }
-                    await UIApplication.shared.open(dopamineUpdateURL)
-                    exit(0)
-                    return;
+                    return
                 }
             }
             try await group.waitForAll()
