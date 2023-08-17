@@ -45,8 +45,7 @@ struct JailbreakView: View {
     @State var jailbreakingError: Error?
     
     @State var updateAvailable = false
-    @State var showingUpdatePopupType: UpdateType? = nil
-        
+    @State var showingUpdatePopupType: UpdateType? = nil      
     @State var mismatchAndupdateChangelog: String? = nil
 
     @State private var upTime = "系统启动于: 加载中"
@@ -118,8 +117,7 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320)
                 }, isPresented: $isSettingsPresented)
                 .zIndex(2)
-                
-                
+                            
                 PopupView(title: {
                     VStack(spacing: 4) {
                         Text("Credits_Made_By")
@@ -133,7 +131,6 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320)
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
-
 
                 PopupView(title: {
                     Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
@@ -180,7 +177,6 @@ struct JailbreakView: View {
             }
         }
     }
-    
     
     @ViewBuilder
     var header: some View {
