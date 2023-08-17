@@ -342,7 +342,7 @@ struct UpdateDownloadingView_Previews: PreviewProvider {
 · Improved the app's compatibility with various iOS devices.
 · Fixed bugs related to the installation of certain tweaks and packages.
 · Added new options for customizing the app's interface and settings.
-""", mismatchChangelog:
+""", mismatchAndupdateChangelog:
 """
 · Added support for iOS 15.0 - 15.1.
 · Improved the app's compatibility with various iOS devices.
