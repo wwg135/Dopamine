@@ -27,7 +27,7 @@ struct UpdateDownloadingView: View {
     @State var updateState: UpdateState = .changelog
     @State var showLogView = false
     var changelog: String
-    var mismatchChangelog: String
+    var mismatchAndupdateChangelog: String
 
     @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     
@@ -50,7 +50,7 @@ struct UpdateDownloadingView: View {
                             .padding(.horizontal, 32)
                             .opacity(0.5)
                         ScrollView {
-                            Text(try! AttributedString(markdown: type == .environment ? mismatchChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                            Text(try! AttributedString(markdown: type == .environment ? mismatchAndupdateChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                 .opacity(1)
                                 .multilineTextAlignment(.center)
                                 .padding(.vertical)
@@ -341,7 +341,7 @@ struct UpdateDownloadingView_Previews: PreviewProvider {
 · Improved the app's compatibility with various iOS devices.
 · Fixed bugs related to the installation of certain tweaks and packages.
 · Added new options for customizing the app's interface and settings.
-""", mismatchChangelog:
+""", mismatchAndupdateChangelog:
 """
 · Added support for iOS 15.0 - 15.1.
 · Improved the app's compatibility with various iOS devices.
