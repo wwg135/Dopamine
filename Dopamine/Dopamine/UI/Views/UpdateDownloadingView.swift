@@ -88,7 +88,7 @@ struct UpdateDownloadingView: View {
                         }
                         
                     } label: {
-                        if changeVersion() {
+                        if changeVersion {
                             Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })
                         } else {
                             Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
@@ -198,16 +198,16 @@ struct UpdateDownloadingView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        if changeVersion() {
+        if changeVersion {
             guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }),
         } else {
             guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }),
         }
-        let assets = latestRelease["assets"] as? [[String: Any]],
-        let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
-        let downloadURLString = asset["browser_download_url"] as? String,
-        let downloadURL = URL(string: downloadURLString) else {
-            throw "Could not find download URL for ipa"
+            let assets = latestRelease["assets"] as? [[String: Any]],
+            let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
+            let downloadURLString = asset["browser_download_url"] as? String,
+            let downloadURL = URL(string: downloadURLString) else {
+                throw "Could not find download URL for ipa"
         }
 
         // Download the asset
