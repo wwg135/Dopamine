@@ -205,8 +205,8 @@ struct UpdateDownloadingView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        if changeVersion {
-            guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }),
+        let latest = changeVersion() ? releasesJSON.first(where:{ $0["name"] != "1.0.5" }) : releasesJSON.first(where:{ $0["name"] == "1.0.5" })
+        guard let latestRelease = latest,
                 let assets = latestRelease["assets"] as? [[String: Any]],
                 let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
                 let downloadURLString = asset["browser_download_url"] as? String,
@@ -227,7 +227,7 @@ struct UpdateDownloadingView: View {
             downloadProgress.totalUnitCount = 1
             group.addTask {
                 let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
-                if isJailbroken() {
+                if (isJailbroken()) {
                     update(tipaURL: url)
                 } else {
                     guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=\(url.absoluteString)") else {
@@ -235,7 +235,7 @@ struct UpdateDownloadingView: View {
                     }
                     await UIApplication.shared.open(dopamineUpdateURL)
                     exit(0)
-                    return;
+                    return
                 }
             }
             try await group.waitForAll()
