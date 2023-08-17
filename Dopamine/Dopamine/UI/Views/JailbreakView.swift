@@ -542,17 +542,17 @@ struct JailbreakView: View {
                             updateAvailable = true
                         } 
                 }
+            }
 
-                if changeVersion {
-                    updateAvailable = true
-                }
-            } else {
-                //get the updateChangelog
-                updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+            if changeVersion {
+                updateAvailable = true
+            } 
+        
+            //get the updateChangelog
+            updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
 
-                if isInstalledEnvironmentVersionMismatching() {
-                    mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
-                }
+            if isInstalledEnvironmentVersionMismatching() {
+                mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
             }
     }
 
