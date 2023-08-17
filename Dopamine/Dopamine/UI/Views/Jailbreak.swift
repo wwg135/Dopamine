@@ -34,32 +34,21 @@ func respring() {
     guard let sbreloadPath = rootifyPath(path: "/usr/bin/sbreload") else {
         return
     }
-    _ = execCmd(args: [sbreloadPath])
+    DispatchQueue.global().async {
+        _ = execCmd(args: [sbreloadPath])
+    }
 }
 
 func userspaceReboot() {
-    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-    
-    // MARK: Fade out Animation
-    
-    let view = UIView(frame: UIScreen.main.bounds)
-    view.backgroundColor = .black
-    view.alpha = 0
-
-    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
-        window.addSubview(view)
-        UIView.animate(withDuration: 0.2, delay: 0, animations: {
-            view.alpha = 1
-        })
-    }
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+    DispatchQueue.global().async {
         _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
-    })
+    }
 }
 
 func reboot() {
-    _ = execCmd(args: [CommandLine.arguments[0], "reboot"])
+    DispatchQueue.global().async {
+        _ = execCmd(args: [CommandLine.arguments[0], "reboot"])
+    }
 }
 
 func isJailbroken() -> Bool {
@@ -114,21 +103,62 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
     }
 }
 
+func removeZmount(rmpath: String) {
+    DispatchQueue.global().async {
+        _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
+    }
+}
+
+func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
+    DispatchQueue.global().async {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if fileManager.fileExists(atPath: filePath) { 
+            if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
+                if let newKey = newForbidUnject {
+                    if let _ = dict[newKey] {
+                        dict.removeObject(forKey: newKey)
+                    } else {
+                        dict[newKey] = true
+                    }
+                } else {   
+                    for (key, value) in dict {
+                        if let boolValue = value as? Bool {
+                            if toggleOn {
+                                dict[key] = true
+                            } else {
+                                dict[key] = false
+                            }
+                        }
+                    }
+                }  
+                dict.write(toFile: filePath, atomically: true)
+            }
+        }
+    }
+}
+
 func removeJailbreak() {
     dopamineDefaults().removeObject(forKey: "selectedPackageManagers")
-    _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
+    DispatchQueue.global().async {
+        _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
+    }
     if isJailbroken() {
         reboot()
     }
 }
 
 func jailbrokenUpdateTweakInjectionPreference() {
-    _ = execCmd(args: [CommandLine.arguments[0], "update_tweak_injection"])
+    DispatchQueue.global().async {
+        _ = execCmd(args: [CommandLine.arguments[0], "update_tweak_injection"])
+    }
 }
 
 func jailbrokenUpdateIDownloadEnabled() {
     let iDownloadEnabled = dopamineDefaults().bool(forKey: "iDownloadEnabled")
-    _ = execCmd(args: [rootifyPath(path: "basebin/jbinit")!, iDownloadEnabled ? "start_idownload" : "stop_idownload"])
+    DispatchQueue.global().async {
+        _ = execCmd(args: [rootifyPath(path: "basebin/jbinit")!, iDownloadEnabled ? "start_idownload" : "stop_idownload"])
+    }
 }
 
 func changeMobilePassword(newPassword: String) {
@@ -138,25 +168,22 @@ func changeMobilePassword(newPassword: String) {
     guard let pwPath = rootifyPath(path: "/usr/sbin/pw") else {
         return;
     }
-    _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
-}
-
-
-func changeEnvironmentVisibility(hidden: Bool) {
-    if hidden {
-        _ = execCmd(args: [CommandLine.arguments[0], "hide_environment"])
-    }
-    else {
-        _ = execCmd(args: [CommandLine.arguments[0], "unhide_environment"])
-    }
-
-    if isJailbroken() {
-        jbdSetFakelibVisible(!hidden)
+    DispatchQueue.global().async {
+        _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
     }
 }
 
-func isEnvironmentHidden() -> Bool {
-    return !FileManager.default.fileExists(atPath: "/var/jb")
+func newMountPath(newPath: String) {// zqbb_flag
+    let plist = NSDictionary(contentsOfFile: "/var/mobile/newFakePath.plist")
+    let pathArray = plist?["path"] as? [String]
+    if pathArray?.firstIndex(of: newPath) == nil {
+	guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
+            return
+        }
+        DispatchQueue.global().async {
+            _ = execCmd(args: [jbctlPath, "mountPath", newPath])
+	}
+    }
 }
 
 func update(tipaURL: URL) {
@@ -176,9 +203,10 @@ func isInstalledEnvironmentVersionMismatching() -> Bool {
 }
 
 func updateEnvironment() {
-    jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
+    DispatchQueue.global().async {
+        jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
+    }
 }
-
 
 // debugging
 func isSandboxed() -> Bool {
