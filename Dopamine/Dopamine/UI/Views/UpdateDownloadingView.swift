@@ -90,18 +90,25 @@ struct UpdateDownloadingView: View {
                     } label: {
                         if changeVersion {
                             Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                                .background(MaterialView(.light)
+                                    .opacity(0.5)
+                                    .cornerRadius(8)
+                                )
                         } else {
                             Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                                .background(MaterialView(.light)
+                                    .opacity(0.5)
+                                    .cornerRadius(8)
+                                )
                         }
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: 280)
-                            .background(MaterialView(.light)
-                                .opacity(0.5)
-                                .cornerRadius(8)
-                        )
+                        .fixedSize()
                     }
-                    .fixedSize()
                     
                     Button {
                         type = nil
