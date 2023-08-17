@@ -107,8 +107,8 @@ struct UpdateDownloadingView: View {
                                     .cornerRadius(8)
                                 )
                         }
-                        .fixedSize()
                     }
+                    .fixedSize()
                     
                     Button {
                         type = nil
