@@ -7,15 +7,13 @@
 
 import SwiftUI
 import Fugu15KernelExploit
+import SwiftfulLoadingIndicators
 
 #if os(iOS)
 import UIKit
 #else
 import AppKit
 #endif
-
-import Fugu15KernelExploit
-import SwiftfulLoadingIndicators
 
 struct JailbreakView: View {
     
