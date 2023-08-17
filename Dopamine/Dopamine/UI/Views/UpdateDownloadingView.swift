@@ -93,12 +93,12 @@ struct UpdateDownloadingView: View {
                         } else {
                             Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
                         }
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: 280)
-                        .background(MaterialView(.light)
-                            .opacity(0.5)
-                            .cornerRadius(8)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: 280)
+                            .background(MaterialView(.light)
+                                .opacity(0.5)
+                                .cornerRadius(8)
                         )
                     }
                     .fixedSize()
@@ -203,12 +203,12 @@ struct UpdateDownloadingView: View {
         } else {
             guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }),
         }
-            let assets = latestRelease["assets"] as? [[String: Any]],
-            let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
-            let downloadURLString = asset["browser_download_url"] as? String,
-            let downloadURL = URL(string: downloadURLString) else {
-                throw "Could not find download URL for ipa"
-            }
+        let assets = latestRelease["assets"] as? [[String: Any]],
+        let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
+        let downloadURLString = asset["browser_download_url"] as? String,
+        let downloadURL = URL(string: downloadURLString) else {
+            throw "Could not find download URL for ipa"
+        }
 
         // Download the asset
         try await withThrowingTaskGroup(of: Void.self) { group in
