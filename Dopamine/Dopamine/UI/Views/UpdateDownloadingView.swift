@@ -198,7 +198,11 @@ struct UpdateDownloadingView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        changeVersion() ? (guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }),) : (guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }),)
+        if changeVersion() {
+            guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }),
+        } else {
+            guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }),
+        }
             let assets = latestRelease["assets"] as? [[String: Any]],
             let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
             let downloadURLString = asset["browser_download_url"] as? String,
@@ -214,7 +218,7 @@ struct UpdateDownloadingView: View {
                 if isJailbroken() {
                     update(tipaURL: url)
                 } else {
-                    guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=https://github.com/wwg135/Dopamine/releases/latest/download/Dopamine.ipa") else {
+                    guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=\(url.absoluteString)") else {
                         return
                     }
                     await UIApplication.shared.open(dopamineUpdateURL)
