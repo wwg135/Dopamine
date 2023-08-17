@@ -154,7 +154,7 @@ struct JailbreakView: View {
                     Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                 }, contents: {
                     ScrollView {
-                        Text(try! AttributedString(markdown: isInstalledEnvironmentVersionMismatching() ? mismatchChangelog : updateChangelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                        Text(try! AttributedString(markdown: isInstalledEnvironmentVersionMismatching() ? mismatchChangelog! : updateChangelog!, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                             .opacity(1)
                             .multilineTextAlignment(.center)
                             .padding(.vertical)
