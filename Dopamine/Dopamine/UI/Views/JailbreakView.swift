@@ -49,8 +49,7 @@ struct JailbreakView: View {
     @State var updateAvailable = false
     @State var showingUpdatePopupType: UpdateType? = nil
     
-    @State var updateChangelog: String? = nil
-    @State var mismatchChangelog: String? = nil
+    @State var mismatchAndupdateChangelog: String? = nil
 
     @State private var upTime = "系统启动于: 加载中"
     @State private var index = 0
@@ -154,7 +153,7 @@ struct JailbreakView: View {
                     Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                 }, contents: {
                     ScrollView {
-                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ? mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                        Text(try! AttributedString(markdown: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                             .opacity(1)
                             .multilineTextAlignment(.center)
                             .padding(.vertical)
@@ -162,10 +161,9 @@ struct JailbreakView: View {
                     .opacity(1)
                     .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
-                .zIndex(2)
+                .zIndex(2)            
                 
-                
-                UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
 
             }
             .animation(.default, value: showingUpdatePopupType == nil)
@@ -189,11 +187,7 @@ struct JailbreakView: View {
             }
             Task {
                 do {
-                    try await allUpdatelog()
-
-                    if checkForUpdates {
-                        try await checkForUpdates()
-                    }
+                    try await checkForUpdates()
                 } catch {
                     Logger.log(error, type: .error, isStatus: false)
                 }
@@ -563,40 +557,25 @@ struct JailbreakView: View {
                 return
             }
 
-            //updateAvailable is not true
-            if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
-                if let latestName = latest["tag_name"] as? String,
-                    let latestVersion = latest["name"] as? String,
-                    latestName != currentAppVersion && latestVersion != "1.0.5" {
-                        updateAvailable = true
-                    } 
+            if checkForUpdates {
+                //updateAvailable is not true
+                if let latest = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) {
+                    if let latestName = latest["tag_name"] as? String,
+                        let latestVersion = latest["name"] as? String,
+                        latestName != currentAppVersion && latestVersion == "1.0.5" {
+                            updateAvailable = true
+                        } 
+                }
             }
-            
+
             if changeVersion {
                 updateAvailable = true
-            }
-    }
-
-    func allUpdatelog() async throws {
-            let owner = "wwg135"
-            let repo = "Dopamine"
-            
-            // Get the releases
-            let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
-            let releasesRequest = URLRequest(url: releasesURL)
-            let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
-            guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
-                return
-            }
+            } 
 
             //get the updateChangelog
-            updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
-
-            if isInstalledEnvironmentVersionMismatching() {
-                mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
-            }
+            mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
     }
-
+    
     func getLaunchTime() -> String {
         var boottime = timeval()
         var mib = [CTL_KERN, KERN_BOOTTIME]
