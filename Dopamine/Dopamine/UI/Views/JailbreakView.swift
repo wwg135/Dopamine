@@ -7,15 +7,13 @@
 
 import SwiftUI
 import Fugu15KernelExploit
+import SwiftfulLoadingIndicators
 
 #if os(iOS)
 import UIKit
 #else
 import AppKit
 #endif
-
-import Fugu15KernelExploit
-import SwiftfulLoadingIndicators
 
 struct JailbreakView: View {
     
@@ -48,7 +46,6 @@ struct JailbreakView: View {
     
     @State var updateAvailable = false
     @State var showingUpdatePopupType: UpdateType? = nil
-    
     @State var mismatchAndupdateChangelog: String? = nil
 
     @State private var upTime = "系统启动于: 加载中"
@@ -72,9 +69,8 @@ struct JailbreakView: View {
                 let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
                 
                 let imagePath = "/var/mobile/Wallpaper.jpg"
-                if let imageData = FileManager.default.contents(atPath: imagePath),
-                   let backgroundImage = UIImage(data: imageData) {
-                    Image(uiImage: backgroundImage)
+                let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
+                    Image(uiImage: backgroundImage!)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .edgesIgnoringSafeArea(.all)
@@ -83,17 +79,6 @@ struct JailbreakView: View {
 
                         .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                         .animation(.spring(), value: isPopupPresented)
-                } else {
-                    Image(uiImage: #imageLiteral(resourceName: "Wallpaper.jpg"))
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .edgesIgnoringSafeArea(.all)
-                        .blur(radius: 1)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-
-                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
-                        .animation(.spring(), value: isPopupPresented)
-                }
                 
                 if showingUpdatePopupType == nil {
                     VStack {
