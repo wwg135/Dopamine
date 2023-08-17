@@ -7,15 +7,13 @@
 
 import SwiftUI
 import Fugu15KernelExploit
+import SwiftfulLoadingIndicators
 
 #if os(iOS)
 import UIKit
 #else
 import AppKit
 #endif
-
-import Fugu15KernelExploit
-import SwiftfulLoadingIndicators
 
 struct JailbreakView: View {
     
@@ -47,8 +45,7 @@ struct JailbreakView: View {
     @State var jailbreakingError: Error?
     
     @State var updateAvailable = false
-    @State var showingUpdatePopupType: UpdateType? = nil
-        
+    @State var showingUpdatePopupType: UpdateType? = nil      
     @State var mismatchAndupdateChangelog: String? = nil
 
     @State private var upTime = "系统启动于: 加载中"
@@ -72,9 +69,8 @@ struct JailbreakView: View {
                 let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
                 
                 let imagePath = "/var/mobile/Wallpaper.jpg"
-                if let imageData = FileManager.default.contents(atPath: imagePath),
-                    let backgroundImage = UIImage(data: imageData) {
-                    Image(uiImage: backgroundImage)
+                let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
+                    Image(uiImage: backgroundImage!)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .edgesIgnoringSafeArea(.all)
@@ -83,17 +79,6 @@ struct JailbreakView: View {
 
                         .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                         .animation(.spring(), value: isPopupPresented)
-                } else {
-                    Image(uiImage: #imageLiteral(resourceName: "Wallpaper.jpg"))
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .edgesIgnoringSafeArea(.all)
-                        .blur(radius: 1)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-
-                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
-                        .animation(.spring(), value: isPopupPresented)
-                }
                 
                 if showingUpdatePopupType == nil {
                     VStack {
@@ -132,8 +117,7 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320)
                 }, isPresented: $isSettingsPresented)
                 .zIndex(2)
-                
-                
+                            
                 PopupView(title: {
                     VStack(spacing: 4) {
                         Text("Credits_Made_By")
@@ -147,7 +131,6 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320)
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
-
 
                 PopupView(title: {
                     Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
@@ -194,7 +177,6 @@ struct JailbreakView: View {
             }
         }
     }
-    
     
     @ViewBuilder
     var header: some View {
@@ -532,20 +514,7 @@ struct JailbreakView: View {
                 return
             }
 
-            if checkForUpdates {
-                //updateAvailable is not true
-                if let latest = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) {
-                    if let latestName = latest["tag_name"] as? String,
-                        let latestVersion = latest["name"] as? String,
-                        latestName != currentAppVersion && latestVersion == "1.0.5" {
-                            updateAvailable = true
-                        } 
-                }
-            }
-
-            if changeVersion {
-                updateAvailable = true
-            } 
+            updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String == "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String == "1.0.5" })?["name"] as? String == "1.0.5") : false) : false) || changeVersion
 
             //get the updateChangelog
             mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
