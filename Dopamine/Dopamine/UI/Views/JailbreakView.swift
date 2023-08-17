@@ -17,6 +17,10 @@ import AppKit
 import Fugu15KernelExploit
 import SwiftfulLoadingIndicators
 
+enum UpdateType {
+    case environment
+}
+
 struct JailbreakView: View {
     
     enum JailbreakingProgress: Equatable {
@@ -38,6 +42,8 @@ struct JailbreakView: View {
         
         var action: (() -> ())? = nil
     }
+
+    @Binding var type: UpdateType?
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
@@ -154,23 +160,15 @@ struct JailbreakView: View {
                     Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                 }, contents: {
                     ScrollView {
-                        if isInstalledEnvironmentVersionMismatching() {
-                            Text(try! AttributedString(markdown: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                .opacity(1)
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical)
-                        } else {
-                            Text(try! AttributedString(markdown: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                .opacity(1)
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical)
-                        }
+                        Text(try! AttributedString(markdown: type == .environment ? mismatchChangelog : updateChangelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                            .opacity(1)
+                            .multilineTextAlignment(.center)
+                            .padding(.vertical)
                     }
                     .opacity(1)
                     .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
-                .zIndex(2)
-                
+                .zIndex(2)            
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
 
