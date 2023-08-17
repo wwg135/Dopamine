@@ -154,17 +154,10 @@ struct JailbreakView: View {
                     Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                 }, contents: {
                     ScrollView {
-                        if isInstalledEnvironmentVersionMismatching() {
-                            Text(try! AttributedString(markdown: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                .opacity(1)
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical)
-                        } else {
-                            Text(try! AttributedString(markdown: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                .opacity(1)
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical)
-                        }
+                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ? mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                            .opacity(1)
+                            .multilineTextAlignment(.center)
+                            .padding(.vertical)
                     }
                     .opacity(1)
                     .frame(maxWidth: 280, maxHeight: 480)
