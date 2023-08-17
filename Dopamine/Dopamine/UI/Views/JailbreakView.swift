@@ -71,7 +71,7 @@ struct JailbreakView: View {
                 
                 let imagePath = "/var/mobile/Wallpaper.jpg"
                 let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
-                    Image(uiImage: backgroundImage)
+                    Image(uiImage: backgroundImage!)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .edgesIgnoringSafeArea(.all)
