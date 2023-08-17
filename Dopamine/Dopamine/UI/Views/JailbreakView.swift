@@ -72,8 +72,7 @@ struct JailbreakView: View {
                 let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
                 
                 let imagePath = "/var/mobile/Wallpaper.jpg"
-                if let imageData = FileManager.default.contents(atPath: imagePath),
-                    let backgroundImage = UIImage(data: imageData) {
+                let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
                     Image(uiImage: backgroundImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -83,17 +82,6 @@ struct JailbreakView: View {
 
                         .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                         .animation(.spring(), value: isPopupPresented)
-                } else {
-                    Image(uiImage: #imageLiteral(resourceName: "Wallpaper.jpg"))
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .edgesIgnoringSafeArea(.all)
-                        .blur(radius: 1)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-
-                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
-                        .animation(.spring(), value: isPopupPresented)
-                }
                 
                 if showingUpdatePopupType == nil {
                     VStack {
