@@ -49,8 +49,7 @@ struct JailbreakView: View {
     @State var updateAvailable = false
     @State var showingUpdatePopupType: UpdateType? = nil
         
-    @State var updateChangelog: String? = nil
-    @State var mismatchChangelog: String? = nil
+    @State var mismatchAndupdateChangelog: String? = nil
 
     @State private var upTime = "系统启动于: 加载中"
     @State private var index = 0
