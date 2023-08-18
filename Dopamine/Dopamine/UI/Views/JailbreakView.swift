@@ -23,13 +23,11 @@ struct JailbreakView: View {
         var progress: Double {
             switch self {
             case .idle:
-                return 0.25
+                return 0.2
             case .jailbreaking:
-                return 0.5
+                return 0.7
             case .selectingPackageManager:
-                return 0.75
-            case .finished:
-                return 1.0
+                return 0.9
             }
         }
     }
@@ -50,7 +48,6 @@ struct JailbreakView: View {
     }
 
     @State var progressDouble: Double = 0
-    @State private var isShowing = true
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
@@ -345,7 +342,7 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    progressDouble = jailbreakingProgress.progress
+                    progressDouble += 0.01
                                 
                     if progressDouble >= 1 {
                         t.invalidate()
@@ -359,6 +356,7 @@ struct JailbreakView: View {
                         jailbreakingProgress = .selectingPackageManager
                     } else {
                         uiJailbreak()
+                        progressDouble = 1
                     }
                 }
             } label: {
@@ -430,6 +428,7 @@ struct JailbreakView: View {
             } else if jailbreakingProgress == .selectingPackageManager {
                 PackageManagerSelectionView(shown: .constant(true), onContinue: {
                     uiJailbreak()
+                    progressDouble = 1
                 })
                 .padding(.horizontal)
             }
