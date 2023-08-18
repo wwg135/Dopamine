@@ -324,11 +324,11 @@ struct JailbreakView: View {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 
                 // 💀 code
-                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { (self: JailbreakView) in
+                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
                     self.progress = progress
                                 
                     if self.progress >= 1 {
-                        (self: JailbreakView).invalidate()
+                        t.invalidate()
                     }
                 }
                 
@@ -351,19 +351,19 @@ struct JailbreakView: View {
                                 switch self.jailbreakingProgress {
                                 case .idle:
                                     let progress: Double = 0.25
-                                    self.progress = Double(progress)
+                                    (self as JailbreakView).progress = progress
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
                                     let progress: Double = 0.5
-                                    self.progress = Double(progress)
+                                    (self as JailbreakView).progress = progress
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
                                     let progress: Double = 0.75
-                                    self.progress = Double(progress)
+                                    (self as JailbreakView).progress = progress
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
                                     let progress: Double = 1
-                                    self.progress = Double(progress)
+                                    (self as JailbreakView).progress = progress
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
