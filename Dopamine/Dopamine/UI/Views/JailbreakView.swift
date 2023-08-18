@@ -19,6 +19,15 @@ struct JailbreakView: View {
     
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
+
+        var fractionCompleted: Float {
+            switch self {
+                case .idle: return 0
+                case .jailbreaking: return 0.5 
+                case .selectingPackageManager: return 0.7
+                case .finished: return 1.0
+            }
+        }
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -33,12 +42,10 @@ struct JailbreakView: View {
         var title: String
         var showUnjailbroken: Bool = true
         
-        
         var action: (() -> ())? = nil
     }
 
     @State var progressDouble: Double = 0
-    @State var fractionCompleted: Float = 0
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
