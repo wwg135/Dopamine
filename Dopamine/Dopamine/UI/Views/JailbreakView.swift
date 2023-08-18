@@ -24,7 +24,16 @@ struct JailbreakView: View {
         case finished
 
         var progress: Double {
-            return 0.0
+            switch self {
+            case .idle:
+                return 0.0
+            case .jailbreaking:
+                return 0.5
+            case .selectingPackageManager:
+                return 0.8
+            case .finished:
+                return 1.0
+            }
         }
     }
     
@@ -337,7 +346,7 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    progressDouble = self.progress
+                    progressDouble = JailbreakingProgress
                                 
                     if progressDouble == 1 {
                         t.invalidate()
@@ -362,16 +371,12 @@ struct JailbreakView: View {
                             } else {
                                 switch jailbreakingProgress {
                                 case .idle:
-                                    (self as JailbreakView).progress = 0.25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
-                                    (self as JailbreakView).progress = 0.5
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
-                                    (self as JailbreakView).progress = 0.75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
-                                    (self as JailbreakView).progress = 1
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
