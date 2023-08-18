@@ -322,11 +322,6 @@ struct JailbreakView: View {
         VStack {
             Button {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-
-                let progress25 = Double(0.25)
-                let progress50 = Double(0.5)
-                let progress75 = Double(0.75)
-                let progress100 = Double(1.0)
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
@@ -349,6 +344,10 @@ struct JailbreakView: View {
             } label: {
                 Label(title: {
                     if Fugu15.supportsThisDeviceBool() {
+                        let progress25 = Double(0.25)
+                        let progress50 = Double(0.5)
+                        let progress75 = Double(0.75)
+                        let progress100 = Double(1.0)
                         if !requiresEnvironmentUpdate {
                             if isJailbroken() {
                                 Text("Status_Title_Jailbroken")
