@@ -114,6 +114,7 @@ struct JailbreakView: View {
                     .blur(radius: isPopupPresented ? 4 : 0)
                     .scaleEffect(isPopupPresented ? 0.85 : 1)
                     .animation(.spring(), value: updateAvailable)
+                    .animation(.spring(), value: self.progress)
                     .animation(.spring(), value: isPopupPresented)
                     .transition(.opacity)
                     .zIndex(1)
