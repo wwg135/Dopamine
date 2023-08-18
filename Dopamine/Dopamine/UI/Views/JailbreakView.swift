@@ -126,8 +126,7 @@ struct JailbreakView: View {
                                 .animation(.easeOut, value: progressDouble)
                                 .animation(.linear, value: progressDouble)
                         }
-                        .frame(height: 128)
-                        .animation(.linear, value: progressDouble)
+                        .frame(height: 48)
 
                         if !isJailbreaking {
                             Spacer()
