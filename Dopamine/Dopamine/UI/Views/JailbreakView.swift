@@ -110,7 +110,6 @@ struct JailbreakView: View {
                     .blur(radius: isPopupPresented ? 4 : 0)
                     .scaleEffect(isPopupPresented ? 0.85 : 1)
                     .animation(.spring(), value: updateAvailable)
-                    .animation(.spring(), value: self.progress)
                     .animation(.spring(), value: isPopupPresented)
                     .transition(.opacity)
                     .zIndex(1)
@@ -161,13 +160,13 @@ struct JailbreakView: View {
                                 .font(.title)
                                 .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
                         }
-                        Rectangle()
+                        Circle()
                             .stroke(
                                 Color.white.opacity(0.1),
                                 lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
                             )
                             .animation(.linear, value: progressDouble)
-                        Rectangle()
+                        Circle()
                             .trim(from: 0, to: progressDouble)
                             .stroke(
                                 Color.white,
@@ -287,9 +286,6 @@ struct JailbreakView: View {
                                 .font(.body)
                                 .symbolRenderingMode(.palette)
                                 .foregroundStyle(.white.opacity(1))
-                                // .onLongPressGesture {
-                                //     UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
-                                // }
                         }
                     }
                     .frame(maxWidth: .infinity)
