@@ -324,11 +324,11 @@ struct JailbreakView: View {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 
                 // 💀 code
-                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { (self: JailbreakView) in
+                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
                     self.progress += 0.25
                                 
                     if self.progress >= 1 {
-                        (self: JailbreakView).invalidate()
+                        t.invalidate()
                     }
                 }
                 
@@ -350,16 +350,20 @@ struct JailbreakView: View {
                             } else {
                                 switch self.jailbreakingProgress {
                                 case .idle:
-                                    self.progress = 0.25
+                                    let progress = 0.25
+                                    self.progress = progress
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
-                                    self.progress = 0.5
+                                    let progress = 0.5
+                                    self.progress = progress
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
-                                    self.progress = 0.75
+                                    let progress = 0.75
+                                    self.progress = progress
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
-                                    self.progress = 1
+                                    let progress = 1
+                                    self.progress = progress
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
