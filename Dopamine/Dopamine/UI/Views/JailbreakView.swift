@@ -38,6 +38,7 @@ struct JailbreakView: View {
     }
 
     @State var progressDouble: Double = 0
+    @State var JailbreakingState: JailbreakingProgress
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
@@ -154,24 +155,24 @@ struct JailbreakView: View {
                     ZStack {
                         Text("\(Int(progressDouble * 100))%")
                             .font(.title)
-                            .opacity(updateState == .downloading ? 1 : 0)
+                            .opacity(JailbreakingState == .downloading ? 1 : 0)
                         if type != nil {
                             LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                .opacity(updateState == .updating ? 1 : 0)
+                                .opacity(JailbreakingState == .updating ? 1 : 0)
                         }
                     }
                     Rectangle()
                         .stroke(
                             Color.white.opacity(0.1),
-                            lineWidth: updateState == .downloading ? 8 : 4
+                            lineWidth: JailbreakingState == .downloading ? 8 : 4
                         )
-                        .animation(.spring(), value: updateState)
+                        .animation(.spring(), value: JailbreakingState)
                     Rectangle()
                         .trim(from: 0, to: progressDouble)
                         .stroke(
                             Color.white,
                             style: StrokeStyle(
-                                lineWidth: updateState == .downloading ? 8 : 0,
+                                lineWidth: JailbreakingState == .downloading ? 8 : 0,
                                 lineCap: .round
                             )
                         )
