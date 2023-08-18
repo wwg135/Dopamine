@@ -38,6 +38,7 @@ struct JailbreakView: View {
     }
 
     @State var progressDouble: Double = 0
+    @State var fractionCompleted: Float = 0
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
