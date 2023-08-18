@@ -28,6 +28,7 @@ struct JailbreakView: View {
                 return 0.7
             case .selectingPackageManager:
                 return 0.9
+            case .finished    
             }
         }
     }
@@ -314,7 +315,7 @@ struct JailbreakView: View {
             Circle()
                 .stroke(
                     Color.white.opacity(0.1),
-                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
+                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
                 )
                 .animation(.linear, value: progressDouble)
             Circle()
