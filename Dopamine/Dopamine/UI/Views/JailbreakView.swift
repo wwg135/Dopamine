@@ -36,7 +36,7 @@ struct JailbreakView: View {
         var action: (() -> ())? = nil
     }
 
-    @State var progressDouble: Double = 0
+    @State var progressDouble = 0
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
@@ -330,7 +330,11 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.08, repeats: true) { t in
-                    (isJailbroken() ? progressDouble = 1 : progressDouble += 0.0125)               
+                    if isJailbroken() {
+                        progressDouble = 1
+                    } else {
+                        progressDouble += 0.0125 
+                    }               
                                 
                     if progressDouble >= 1 {
                         t.invalidate()
