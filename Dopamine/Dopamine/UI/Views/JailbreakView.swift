@@ -328,7 +328,7 @@ struct JailbreakView: View {
                     self.progress += 0.25
                                 
                     if self.progress >= 1 {
-                        t.invalidate()
+                        (self: JailbreakView).invalidate()
                     }
                 }
                 
