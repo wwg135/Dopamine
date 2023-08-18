@@ -175,7 +175,7 @@ struct JailbreakView: View {
                         .animation(.easeOut, value: progressDouble)
                         .animation(.spring(), value: isJailbreaking)
                 }
-                .frame(height: 128)
+                .frame(height: 48)
                 .padding(32)
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
