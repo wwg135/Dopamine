@@ -22,19 +22,6 @@ struct JailbreakView: View {
         case jailbreaking
         case selectingPackageManager
         case finished
-
-        var progress: Double {
-            switch jailbreakingProgress {
-                case .idle:
-                    progressDouble = 0.25
-                case .jailbreaking:
-                    progressDouble = 0.25
-                case .selectingPackageManager:
-                    progressDouble = 0.75
-                case .finished:
-                    progressDouble = 1
-            }
-        }
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -346,9 +333,9 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    progressDouble = JailbreakingProgress.progress
+                    self.progressDouble = progress
                                 
-                    if progressDouble == 1 {
+                    if self.progressDouble == 1 {
                         t.invalidate()
                     }
                 }
@@ -369,14 +356,18 @@ struct JailbreakView: View {
                             if isJailbroken() {
                                 Text("Status_Title_Jailbroken")
                             } else {
-                                switch jailbreakingProgress {
+                                switch self.jailbreakingProgress {
                                 case .idle:
+                                    let progress = 0.25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
+                                    let progress = 0.5
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
+                                    let progress = 0.75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
+                                    let progress = 1
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
