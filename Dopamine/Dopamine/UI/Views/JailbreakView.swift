@@ -324,6 +324,15 @@ struct JailbreakView: View {
             Button {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 
+                // 💀 code
+                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                    progressDouble = JailbreakingProgress.fractionCompleted
+                                
+                    if progressDouble == 1 {
+                        t.invalidate()
+                    }
+                }
+                
                 if requiresEnvironmentUpdate {
                     showingUpdatePopupType = .environment
                 } else {
