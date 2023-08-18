@@ -346,7 +346,7 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    progressDouble = JailbreakingProgress
+                    progressDouble = JailbreakingProgress.progress
                                 
                     if progressDouble == 1 {
                         t.invalidate()
