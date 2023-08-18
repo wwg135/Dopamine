@@ -78,8 +78,7 @@ struct JailbreakView: View {
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()  
     
     var body: some View {
-        GeometryReader { geometry in
-                        
+        GeometryReader { geometry in                
             ZStack {
                 let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
                 
@@ -101,33 +100,6 @@ struct JailbreakView: View {
                         header
                         Spacer()
                         menu
-                        if isJailbreaking {
-                            ZStack {
-                                Text("\(Int(progressDouble * 100))%")
-                                    .font(.title)
-                                    .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-                            }
-                            Rectangle()
-                                .stroke(
-                                    Color.white.opacity(0.1),
-                                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
-                                )
-                                .animation(.linear, value: progressDouble)
-                            Rectangle()
-                                .trim(from: 0, to: progressDouble)
-                                .stroke(
-                                    Color.white,
-                                    style: StrokeStyle(
-                                        lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                                        lineCap: .round
-                                    )
-                                )
-                                .rotationEffect(.degrees(-90))
-                                .animation(.easeOut, value: progressDouble)
-                                .animation(.linear, value: progressDouble)
-                        }
-                        .frame(height: 48)
-
                         if !isJailbreaking {
                             Spacer()
                             Spacer()
@@ -138,6 +110,9 @@ struct JailbreakView: View {
                             }
                         }
                         bottomSection
+                        if isJailbreaking {
+                            currentProgress
+                        }
                         updateButton
                         if !isJailbreaking {
                             Spacer()
@@ -325,6 +300,38 @@ struct JailbreakView: View {
         .frame(maxWidth: 320, maxHeight: isJailbreaking ? 0 : nil)
         .opacity(isJailbreaking ? 0 : 1)
         .animation(.spring(), value: isJailbreaking)
+    }
+
+    @ViewBuilder
+    var currentProgress: some View {
+        ZStack {
+            ZStack {
+                Text("\(Int(progressDouble * 100))%")
+                    .font(.title)
+                    .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
+            }
+            Circle()
+                .stroke(
+                    Color.white.opacity(0.1),
+                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
+                )
+                .animation(.linear, value: progressDouble)
+            Circle()
+                .trim(from: 0, to: progressDouble)
+                .stroke(
+                    Color.white,
+                    style: StrokeStyle(
+                        lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
+                        lineCap: .round
+                    )
+                )
+                .rotationEffect(.degrees(-90))
+                .animation(.easeOut, value: progressDouble)
+                .animation(.linear, value: progressDouble)
+            }
+            .frame(height: 128)
+            .animation(.linear, value: progressDouble)
+            .padding(32)
     }
     
     @ViewBuilder
