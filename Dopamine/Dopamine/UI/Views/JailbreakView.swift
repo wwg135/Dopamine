@@ -173,7 +173,7 @@ struct JailbreakView: View {
                                 Color.white,
                                 style: StrokeStyle(
                                     lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                                    .clipped()
+                                    lineCap: .round
                                 )
                             )
                             .rotationEffect(.degrees(0))
