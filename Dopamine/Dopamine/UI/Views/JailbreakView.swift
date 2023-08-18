@@ -305,16 +305,32 @@ struct JailbreakView: View {
     @ViewBuilder
     var currentProgress: some View {
         ZStack {
-            Text("\(Int(progressDouble * 100))%")
-                .font(.title)
-                .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
+            ZStack {
+                Text("\(Int(progressDouble * 100))%")
+                    .font(.title)
+                    .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
             }
-            Rectangle()
-                .fill(Color.white.opacity(0.1))
-            Rectangle()
-                .trim(from: 0, to: progressDouble)
-                .frame(width: progressDouble * (.infinity), height: 28)
+            Circle()
+                .stroke(
+                    Color.white.opacity(0.1),
+                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
+                )
                 .animation(.linear, value: progressDouble)
+            Circle()
+                .trim(from: 0, to: progressDouble)
+                .stroke(
+                    Color.white,
+                    style: StrokeStyle(
+                        lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
+                        lineCap: .round
+                    )
+                )
+                .rotationEffect(.degrees(-90))
+                .animation(.easeOut, value: progressDouble)
+                .animation(.linear, value: progressDouble)
+        }
+        .frame(height: 48)
+        .animation(.linear, value: progressDouble)
     }
     
     @ViewBuilder
