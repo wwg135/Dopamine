@@ -20,7 +20,9 @@ struct JailbreakView: View {
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
 
-        var progress = 0.0
+        var progress: Double {
+            return 0.0
+        }
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -39,6 +41,7 @@ struct JailbreakView: View {
     }
 
     @State var progressDouble: Double = 0
+    @State var progress = 0.0
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
