@@ -158,7 +158,7 @@ struct JailbreakView: View {
                 if isJailbreaking {
                     ZStack {
                         ZStack {
-                            Text("\(Int(JailbreakingProgress * 100))%")
+                            Text("\(Int(Progress * 100))%")
                                 .font(.title)
                                 .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
                         }
@@ -167,9 +167,9 @@ struct JailbreakView: View {
                                 Color.white.opacity(0.1),
                                 lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
                             )
-                            .animation(.linear, value: JailbreakingProgress)
+                            .animation(.linear, value: Progress)
                         Circle()
-                            .trim(from: 0, to: JailbreakingProgress)
+                            .trim(from: 0, to: Progress)
                             .stroke(
                                 Color.white,
                                 style: StrokeStyle(
@@ -178,11 +178,11 @@ struct JailbreakView: View {
                                 )
                             )
                             .rotationEffect(.degrees(-90))
-                            .animation(.easeOut, value: JailbreakingProgress)
-                            .animation(.linear, value: JailbreakingProgress)
+                            .animation(.easeOut, value: Progress)
+                            .animation(.linear, value: Progress)
                     }
                     .frame(height: 128)
-                    .animation(.linear, value: JailbreakingProgress)
+                    .animation(.linear, value: Progress)
                     .padding(32)
                 }
                 
@@ -356,16 +356,16 @@ struct JailbreakView: View {
                             } else {
                                 switch jailbreakingProgress {
                                 case .idle:
-                                    JailbreakingProgress = progress25
+                                    Progress = progress25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
-                                    JailbreakingProgress = progress50
+                                    Progress = progress50
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
-                                    JailbreakingProgress = progress75
+                                    Progress = progress75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
-                                    JailbreakingProgress = progress100
+                                    Progress = progress100
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
