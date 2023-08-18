@@ -311,7 +311,6 @@ struct JailbreakView: View {
             }
             Rectangle()
                 .fill(Color.white.opacity(0.1))
-                .frame(maxWidth: .infinity, height: 28)
             Rectangle()
                 .trim(from: 0, to: progressDouble)
                 .frame(width: progressDouble * (.infinity), height: 28)
