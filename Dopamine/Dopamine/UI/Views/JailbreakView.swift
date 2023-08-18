@@ -161,7 +161,7 @@ struct JailbreakView: View {
                             Color.white.opacity(0.1),
                             lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
                         )
-                        .animation(.spring(), value: jailbreakingProgress)
+                        .animation(.spring(), value: isJailbreaking)
                     Rectangle()
                         .trim(from: 0, to: progressDouble)
                         .stroke(
