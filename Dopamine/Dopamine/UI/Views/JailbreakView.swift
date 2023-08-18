@@ -71,6 +71,7 @@ struct JailbreakView: View {
     
     var body: some View {
         GeometryReader { geometry in
+                        
             ZStack {
                 let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
                 
@@ -157,7 +158,7 @@ struct JailbreakView: View {
                 if isJailbreaking {
                     ZStack {
                         ZStack {
-                            Text("\(Int(self.progress * 100))%")
+                            Text("\(Int(progress * 100))%")
                                 .font(.title)
                                 .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
                         }
@@ -166,9 +167,9 @@ struct JailbreakView: View {
                                 Color.white.opacity(0.1),
                                 lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
                             )
-                            .animation(.linear, value: self.progress)
+                            .animation(.linear, value: progress)
                         Circle()
-                            .trim(from: 0, to: self.progress)
+                            .trim(from: 0, to: progress)
                             .stroke(
                                 Color.white,
                                 style: StrokeStyle(
@@ -177,11 +178,11 @@ struct JailbreakView: View {
                                 )
                             )
                             .rotationEffect(.degrees(-90))
-                            .animation(.easeOut, value: self.progress)
-                            .animation(.linear, value: self.progress)
+                            .animation(.easeOut, value: progress)
+                            .animation(.linear, value: progress)
                     }
                     .frame(height: 128)
-                    .animation(.linear, value: self.progress)
+                    .animation(.linear, value: progress)
                     .padding(32)
                 }
                 
@@ -329,11 +330,11 @@ struct JailbreakView: View {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 
                 // 💀 code
-                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { [self] _ in
-                    self.progress = progress25
+                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                    progress = progress25
                                 
                     if self.progress >= 1 {
-                        self.invalidate()
+                        t.invalidate()
                     }
                 }
                 
@@ -355,16 +356,16 @@ struct JailbreakView: View {
                             } else {
                                 switch self.jailbreakingProgress {
                                 case .idle:
-                                    self.progress = progress25
+                                    progress = progress25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
-                                    self.progress = progress50
+                                    progress = progress50
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
-                                    self.progress = progress75
+                                    progress = progress75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
-                                    self.progress = progress100
+                                    progress = progress100
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
