@@ -163,7 +163,7 @@ struct JailbreakView: View {
                                 Color.white.opacity(0.1),
                                 lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
                             )
-                            .animation(.spring(), value: isJailbreaking)
+                            .animation(.linear, value: progressDouble)
                         Rectangle()
                             .trim(from: 0, to: progressDouble)
                             .stroke(
@@ -175,9 +175,10 @@ struct JailbreakView: View {
                             )
                             .rotationEffect(.degrees(-90))
                             .animation(.easeOut, value: progressDouble)
-                            .animation(.spring(), value: isJailbreaking)
+                            .animation(.linear, value: progressDouble)
                     }
                     .frame(height: 48)
+                    .animation(.linear, value: progressDouble)
                     .padding(32)
                 }
                 
