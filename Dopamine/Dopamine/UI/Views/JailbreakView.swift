@@ -101,6 +101,34 @@ struct JailbreakView: View {
                         header
                         Spacer()
                         menu
+                        if isJailbreaking {
+                            ZStack {
+                                Text("\(Int(progressDouble * 100))%")
+                                    .font(.title)
+                                    .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
+                            }
+                            Rectangle()
+                                .stroke(
+                                    Color.white.opacity(0.1),
+                                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
+                                )
+                                .animation(.linear, value: progressDouble)
+                            Rectangle()
+                                .trim(from: 0, to: progressDouble)
+                                .stroke(
+                                    Color.white,
+                                    style: StrokeStyle(
+                                        lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
+                                        lineCap: .round
+                                    )
+                                )
+                                .rotationEffect(.degrees(-90))
+                                .animation(.easeOut, value: progressDouble)
+                                .animation(.linear, value: progressDouble)
+                        }
+                        .frame(height: 128)
+                        .animation(.linear, value: progressDouble)
+
                         if !isJailbreaking {
                             Spacer()
                             Spacer()
@@ -162,37 +190,6 @@ struct JailbreakView: View {
                     .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
-
-                if isJailbreaking {
-                    ZStack {
-                        ZStack {
-                            Text("\(Int(progressDouble * 100))%")
-                                .font(.title)
-                                .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-                        }
-                        Circle()
-                            .stroke(
-                                Color.white.opacity(0.1),
-                                lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
-                            )
-                            .animation(.linear, value: progressDouble)
-                        Circle()
-                            .trim(from: 0, to: progressDouble)
-                            .stroke(
-                                Color.white,
-                                style: StrokeStyle(
-                                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                                    lineCap: .round
-                                )
-                            )
-                            .rotationEffect(.degrees(-90))
-                            .animation(.easeOut, value: progressDouble)
-                            .animation(.linear, value: progressDouble)
-                    }
-                    .frame(height: 128)
-                    .animation(.linear, value: progressDouble)
-                    .padding(32)
-                }
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
 
