@@ -19,6 +19,19 @@ struct JailbreakView: View {
     
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
+
+        var progressDouble: Double {
+            switch self {
+            case .idle:
+                return 0.0
+            case .jailbreaking:
+                return 0.5
+            case .selectingPackageManager:
+                return 0.8
+            case .finished:
+                return 1.0
+            }
+        }
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -36,12 +49,7 @@ struct JailbreakView: View {
         var action: (() -> ())? = nil
     }
 
-    let progress25: Double = 0.25
-    let progress50: Double = 0.5 
-    let progress75: Double = 0.75
-    let progress100: Double = 1.0
-
-    @State var progress: Double = 0
+    @State var progressDouble: Double = 0
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
@@ -158,7 +166,7 @@ struct JailbreakView: View {
                 if isJailbreaking {
                     ZStack {
                         ZStack {
-                            Text("\(Int(Progress * 100))%")
+                            Text("\(Int(progressDouble * 100))%")
                                 .font(.title)
                                 .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
                         }
@@ -167,9 +175,9 @@ struct JailbreakView: View {
                                 Color.white.opacity(0.1),
                                 lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
                             )
-                            .animation(.linear, value: Progress)
+                            .animation(.linear, value: progressDouble)
                         Circle()
-                            .trim(from: 0, to: Progress)
+                            .trim(from: 0, to: progressDouble)
                             .stroke(
                                 Color.white,
                                 style: StrokeStyle(
@@ -178,11 +186,11 @@ struct JailbreakView: View {
                                 )
                             )
                             .rotationEffect(.degrees(-90))
-                            .animation(.easeOut, value: Progress)
-                            .animation(.linear, value: Progress)
+                            .animation(.easeOut, value: progressDouble)
+                            .animation(.linear, value: progressDouble)
                     }
                     .frame(height: 128)
-                    .animation(.linear, value: Progress)
+                    .animation(.linear, value: progressDouble)
                     .padding(32)
                 }
                 
@@ -331,9 +339,9 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    JailbreakingProgress = progress25
+                    progressDouble = JailbreakingProgress
                                 
-                    if JailbreakingProgress >= 1 {
+                    if progressDouble >= 1 {
                         t.invalidate()
                     }
                 }
@@ -356,16 +364,12 @@ struct JailbreakView: View {
                             } else {
                                 switch jailbreakingProgress {
                                 case .idle:
-                                    Progress = progress25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
-                                    Progress = progress50
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
-                                    Progress = progress75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
-                                    Progress = progress100
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
