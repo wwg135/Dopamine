@@ -147,38 +147,6 @@ struct JailbreakView: View {
                     .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
-
-                ZStack {
-                        ZStack {
-                            Text("\(Int(progressDouble * 100))%")
-                                .font(.title)
-                                .opacity(updateState == .downloading ? 1 : 0)
-                            if type != nil {
-                                LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                    .opacity(updateState == .updating ? 1 : 0)
-                            }
-                        }
-                        Rectangle()
-                            .stroke(
-                                Color.white.opacity(0.1),
-                                lineWidth: updateState == .downloading ? 8 : 4
-                            )
-                            .animation(.spring(), value: updateState)
-                        Rectangle()
-                            .trim(from: 0, to: progressDouble)
-                            .stroke(
-                                Color.white,
-                                style: StrokeStyle(
-                                    lineWidth: updateState == .downloading ? 8 : 0,
-                                    lineCap: .round
-                                )
-                            )
-                            .rotationEffect(.degrees(-90))
-                            .animation(.easeOut, value: progressDouble)
-                            .animation(.spring(), value: isJailbreaking)
-                    }
-                    .frame(height: 128)
-                    .padding(32)
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
 
