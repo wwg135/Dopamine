@@ -361,16 +361,16 @@ struct JailbreakView: View {
                             } else {
                                 switch jailbreakingProgress {
                                 case .idle:
-                                    self.progress = 0.25
+                                    (self as JailbreakView).progress = 0.25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
-                                    self.progress = 0.5
+                                    (self as JailbreakView).progress = 0.5
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
-                                    self.progress = 0.75
+                                    (self as JailbreakView).progress = 0.75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
-                                    self.progress = 1
+                                    (self as JailbreakView).progress = 1
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
