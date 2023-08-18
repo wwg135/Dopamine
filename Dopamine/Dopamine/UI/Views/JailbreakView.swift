@@ -175,7 +175,7 @@ struct JailbreakView: View {
                                     lineCap: .round
                                 )
                             )
-                            .rotationEffect(.degrees(0))
+                            .rotationEffect(.degrees(-90))
                             .animation(.easeOut, value: progressDouble)
                             .animation(.linear, value: progressDouble)
                     }
