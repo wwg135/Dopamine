@@ -343,6 +343,7 @@ struct JailbreakView: View {
             }
         }
     }
+    .opacity(isShowing ? 1 : 0)
     
     @ViewBuilder
     var bottomSection: some View {
