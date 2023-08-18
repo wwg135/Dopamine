@@ -351,7 +351,6 @@ struct JailbreakView: View {
                     if Fugu15.supportsThisDeviceBool() {
                         if !requiresEnvironmentUpdate {
                             if isJailbroken() {
-                                progressDouble = 0.99
                                 Text("Status_Title_Jailbroken")
                             } else {
                                 switch jailbreakingProgress {
