@@ -18,7 +18,10 @@ import AppKit
 struct JailbreakView: View {
     
     enum JailbreakingProgress: Equatable {
-        case idle, jailbreaking, selectingPackageManager, finished
+        case idle
+        case jailbreaking
+        case selectingPackageManager
+        case finished
 
         var progress: Double {
             return 0.0
@@ -63,9 +66,7 @@ struct JailbreakView: View {
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
-    var isJailbreaking: Bool {
-        jailbreakingProgress != .idle
-    }
+    var jailbreakingProgress: JailbreakingProgress = .idle
     
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()  
     
@@ -333,7 +334,7 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    progressDouble = self.JailbreakingProgress.progress
+                    progressDouble = self.progress
                                 
                     if progressDouble == 1 {
                         t.invalidate()
@@ -358,16 +359,16 @@ struct JailbreakView: View {
                             } else {
                                 switch jailbreakingProgress {
                                 case .idle:
-                                    self.jailbreakingProgress.progress = 0.25
+                                    self.progress = 0.25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
-                                    self.jailbreakingProgress.progress = 0.5
+                                    self.progress = 0.5
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
-                                    self.jailbreakingProgress.progress = 0.75
+                                    self.progress = 0.75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
-                                    self.jailbreakingProgress.progress = 1
+                                    self.progress = 1
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
