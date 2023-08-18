@@ -116,7 +116,7 @@ struct JailbreakView: View {
                         Group {
                             currentProgress
                         }
-                        .opacity(isJailbreaking ? 1 : (jailbreakingProgress == .finished ? 0 : 1))
+                        .opacity(isJailbreaking && !isJailbroken() ? 1 : (jailbreakingProgress == .finished ? 0 : 1))
                         updateButton
                         if !isJailbreaking {
                             Spacer()
