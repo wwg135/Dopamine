@@ -98,9 +98,7 @@ struct JailbreakView: View {
                                     .opacity(0.5)
                             }
                         }
-                        if isJailbreaking {
-                            currentProgress
-                        }
+                        currentProgress
                         bottomSection
                         updateButton
                         if !isJailbreaking {
@@ -318,7 +316,7 @@ struct JailbreakView: View {
                 .animation(.easeOut, value: progressDouble)
                 .animation(.linear, value: progressDouble)
         }
-        .frame(height: 68)
+        .frame(height: 88)
         .animation(.linear, value: progressDouble)
     }
     
@@ -329,7 +327,7 @@ struct JailbreakView: View {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 
                 // 💀 code
-                Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                Timer.scheduledTimer(withTimeInterval: 0.048, repeats: true) { t in
                     progressDouble += 0.01              
                                 
                     if progressDouble >= 1 {
