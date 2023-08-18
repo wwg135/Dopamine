@@ -329,8 +329,8 @@ struct JailbreakView: View {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 
                 // 💀 code
-                Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { t in
-                    progressDouble += 0.1              
+                Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                    progressDouble += 0.01              
                                 
                     if progressDouble >= 1 {
                         t.invalidate()
