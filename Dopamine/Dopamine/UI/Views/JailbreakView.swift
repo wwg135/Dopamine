@@ -36,10 +36,10 @@ struct JailbreakView: View {
         var action: (() -> ())? = nil
     }
 
-    let progress25 = Double(0.25)
-    let progress50 = Double(0.5) 
-    let progress75 = Double(0.75)
-    let progress100 = Double(1.0)
+    let progress25: Double = 0.25
+    let progress50: Double = 0.5 
+    let progress75: Double = 0.75
+    let progress100: Double = 1.0
 
     @State var progress: Double = 0
     
@@ -355,16 +355,16 @@ struct JailbreakView: View {
                             } else {
                                 switch self.jailbreakingProgress {
                                 case .idle:
-                                    self.progress = progress25
+                                    (self as JailbreakView).progress = progress25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
-                                    self.progress = progress50
+                                    (self as JailbreakView).progress = progress50
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
-                                    self.progress = progress75
+                                    (self as JailbreakView).progress = progress75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
-                                    self.progress = progress100
+                                    (self as JailbreakView).progress = progress100
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
