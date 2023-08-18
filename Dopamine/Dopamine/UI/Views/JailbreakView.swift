@@ -24,15 +24,15 @@ struct JailbreakView: View {
         case finished
 
         var progress: Double {
-            switch self {
-            case .idle:
-                return 0.0
-            case .jailbreaking:
-                return 0.5
-            case .selectingPackageManager:
-                return 0.8
-            case .finished:
-                return 1.0
+            switch jailbreakingProgress {
+                case .idle:
+                    progressDouble = 0.25
+                case .jailbreaking:
+                    progressDouble = 0.25
+                case .selectingPackageManager:
+                    progressDouble = 0.75
+                case .finished:
+                    progressDouble = 1
             }
         }
     }
