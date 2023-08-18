@@ -21,7 +21,7 @@ struct JailbreakView: View {
         case idle, jailbreaking, selectingPackageManager, finished
 
         var progress: Double {
-            switch jailbreakingProgress {
+            switch self {
             case .idle:
                 return 0.25
             case .jailbreaking:
@@ -339,7 +339,7 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    progressDouble = progress
+                    progressDouble = jailbreakingProgress.progress
                                 
                     if progressDouble >= 1 {
                         t.invalidate()
