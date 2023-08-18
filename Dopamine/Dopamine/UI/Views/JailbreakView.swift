@@ -76,7 +76,9 @@ struct JailbreakView: View {
         jailbreakingProgress != .idle
     }
     
-    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()  
+    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
+
+    
     
     var body: some View {
         GeometryReader { geometry in                
@@ -111,9 +113,10 @@ struct JailbreakView: View {
                             }
                         }
                         bottomSection
-                        if isJailbreaking {
+                        Group {
                             currentProgress
                         }
+                        .opacity(isJailbreaking ? 1 : (isShowing ? 0 : 1))
                         updateButton
                         if !isJailbreaking {
                             Spacer()
@@ -343,7 +346,6 @@ struct JailbreakView: View {
             }
         }
     }
-    .opacity(isShowing ? 1 : 0)
     
     @ViewBuilder
     var bottomSection: some View {
