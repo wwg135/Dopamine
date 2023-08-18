@@ -316,7 +316,7 @@ struct JailbreakView: View {
                 .animation(.easeOut, value: progressDouble)
                 .animation(.linear, value: progressDouble)
         }
-        .frame(height: 88)
+        .frame(height: 75)
         .animation(.linear, value: progressDouble)
     }
     
@@ -327,7 +327,7 @@ struct JailbreakView: View {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 
                 // 💀 code
-                Timer.scheduledTimer(withTimeInterval: 0.048, repeats: true) { t in
+                Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { t in
                     progressDouble += 0.01              
                                 
                     if progressDouble >= 1 {
