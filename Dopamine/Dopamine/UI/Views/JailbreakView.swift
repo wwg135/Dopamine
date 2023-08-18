@@ -36,6 +36,8 @@ struct JailbreakView: View {
         
         var action: (() -> ())? = nil
     }
+
+    @State var progressDouble: Double = 0
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
