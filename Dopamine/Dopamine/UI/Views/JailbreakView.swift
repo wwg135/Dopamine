@@ -116,7 +116,7 @@ struct JailbreakView: View {
                         Group {
                             currentProgress
                         }
-                        .opacity(isJailbreaking ? 1 : (isShowing ? 0 : 1))
+                        .opacity(isJailbreaking ? 1 : (jailbreakingProgress == .finished ? 0 : 1))
                         updateButton
                         if !isJailbreaking {
                             Spacer()
@@ -335,16 +335,6 @@ struct JailbreakView: View {
         }
         .frame(height: 68)
         .animation(.linear, value: progressDouble)
-
-        .onChange(of: progressDouble) { newValue in
-            if newValue == 1 {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    withAnimation {
-                        isShowing = false 
-                    }
-                }
-            }
-        }
     }
     
     @ViewBuilder
