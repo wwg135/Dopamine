@@ -18,10 +18,7 @@ import AppKit
 struct JailbreakView: View {
     
     enum JailbreakingProgress: Equatable {
-        case idle
-        case jailbreaking
-        case selectingPackageManager
-        case finished
+        case idle, jailbreaking, selectingPackageManager, finished
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -39,8 +36,7 @@ struct JailbreakView: View {
         var action: (() -> ())? = nil
     }
 
-    @State var progressDouble: Double = 0
-    @State var progress = 0.0
+    @State var progress: Double = 0
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
@@ -179,7 +175,7 @@ struct JailbreakView: View {
                             .animation(.easeOut, value: progressDouble)
                             .animation(.linear, value: progressDouble)
                     }
-                    .frame(height: 48)
+                    .frame(height: 128)
                     .animation(.linear, value: progressDouble)
                     .padding(32)
                 }
@@ -329,7 +325,7 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    self.progressDouble = progress
+                    self.progressDouble = self.progress
                                 
                     if self.progressDouble == 1 {
                         t.invalidate()
