@@ -36,6 +36,11 @@ struct JailbreakView: View {
         var action: (() -> ())? = nil
     }
 
+    let progress25 = Double(0.25)
+    let progress50 = Double(0.5) 
+    let progress75 = Double(0.75)
+    let progress100 = Double(1.0)
+
     @State var progress: Double = 0
     
     @State var isSettingsPresented = false
@@ -344,10 +349,6 @@ struct JailbreakView: View {
             } label: {
                 Label(title: {
                     if Fugu15.supportsThisDeviceBool() {
-                        let progress25 = Double(0.25)
-                        let progress50 = Double(0.5)
-                        let progress75 = Double(0.75)
-                        let progress100 = Double(1.0)
                         if !requiresEnvironmentUpdate {
                             if isJailbroken() {
                                 Text("Status_Title_Jailbroken")
