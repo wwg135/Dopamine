@@ -158,22 +158,22 @@ struct JailbreakView: View {
                                 .font(.title)
                                 .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
                         }
-                        Circle()
+                        Rectangle()
                             .stroke(
                                 Color.white.opacity(0.1),
                                 lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
                             )
                             .animation(.linear, value: progressDouble)
-                        Circle()
+                        Rectangle()
                             .trim(from: 0, to: progressDouble)
                             .stroke(
                                 Color.white,
                                 style: StrokeStyle(
                                     lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                                    lineCap: .round
+                                    .clipped()
                                 )
                             )
-                            .rotationEffect(.degrees(-90))
+                            .rotationEffect(.degrees(0))
                             .animation(.easeOut, value: progressDouble)
                             .animation(.linear, value: progressDouble)
                     }
