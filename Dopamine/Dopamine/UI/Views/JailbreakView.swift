@@ -50,6 +50,7 @@ struct JailbreakView: View {
     }
 
     @State var progressDouble: Double = 0
+    @State private var isShowing = true
     
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
@@ -329,8 +330,18 @@ struct JailbreakView: View {
                 .animation(.easeOut, value: progressDouble)
                 .animation(.linear, value: progressDouble)
         }
-        .frame(height: 48)
+        .frame(height: 68)
         .animation(.linear, value: progressDouble)
+
+        .onChange(of: progressDouble) { newValue in
+            if newValue == 1 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    withAnimation {
+                        isShowing = false 
+                    }
+                }
+            }
+        }
     }
     
     @ViewBuilder
