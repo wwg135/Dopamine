@@ -151,33 +151,35 @@ struct JailbreakView: View {
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
 
-                ZStack {
+                if isJailbreaking {
                     ZStack {
-                        Text("\(Int(progressDouble * 100))%")
-                            .font(.title)
-                            .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-                    }
-                    Rectangle()
-                        .stroke(
-                            Color.white.opacity(0.1),
-                            lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
-                        )
-                        .animation(.spring(), value: isJailbreaking)
-                    Rectangle()
-                        .trim(from: 0, to: progressDouble)
-                        .stroke(
-                            Color.white,
-                            style: StrokeStyle(
-                                lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                                lineCap: .round
+                        ZStack {
+                            Text("\(Int(progressDouble * 100))%")
+                                .font(.title)
+                                .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
+                        }
+                        Rectangle()
+                            .stroke(
+                                Color.white.opacity(0.1),
+                                lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 4
                             )
-                        )
-                        .rotationEffect(.degrees(-90))
-                        .animation(.easeOut, value: progressDouble)
-                        .animation(.spring(), value: isJailbreaking)
+                            .animation(.spring(), value: isJailbreaking)
+                        Rectangle()
+                            .trim(from: 0, to: progressDouble)
+                            .stroke(
+                                Color.white,
+                                style: StrokeStyle(
+                                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
+                                    lineCap: .round
+                                )
+                            )
+                            .rotationEffect(.degrees(-90))
+                            .animation(.easeOut, value: progressDouble)
+                            .animation(.spring(), value: isJailbreaking)
+                    }
+                    .frame(height: 48)
+                    .padding(32)
                 }
-                .frame(height: 48)
-                .padding(32)
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
 
