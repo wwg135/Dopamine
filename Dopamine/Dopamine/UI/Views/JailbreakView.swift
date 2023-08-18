@@ -353,23 +353,23 @@ struct JailbreakView: View {
                             if isJailbroken() {
                                 Text("Status_Title_Jailbroken")
                             } else {
-                                switch self.jailbreakingProgress { (self: JailbreakView) in
-                                    case .idle:
-                                        self.progress = progress25
-                                        Text("Button_Jailbreak_Title")
-                                    case .jailbreaking:
-                                        self.progress = progress50
-                                        Text("Status_Title_Jailbreaking")
-                                    case .selectingPackageManager:
-                                        self.progress = progress75
-                                        Text("Status_Title_Select_Package_Managers")
-                                    case .finished:
-                                        self.progress = progress100
-                                        if jailbreakingError == nil {
-                                            Text("Status_Title_Jailbroken")
-                                        } else {
-                                            Text("Status_Title_Unsuccessful")
-                                        }
+                                switch self.jailbreakingProgress {
+                                case .idle:
+                                    self.progress = progress25
+                                    Text("Button_Jailbreak_Title")
+                                case .jailbreaking:
+                                    self.progress = progress50
+                                    Text("Status_Title_Jailbreaking")
+                                case .selectingPackageManager:
+                                    self.progress = progress75
+                                    Text("Status_Title_Select_Package_Managers")
+                                case .finished:
+                                    self.progress = progress100
+                                    if jailbreakingError == nil {
+                                        Text("Status_Title_Jailbroken")
+                                    } else {
+                                        Text("Status_Title_Unsuccessful")
+                                    }
                                 }
                             }
                         } else {
