@@ -322,6 +322,11 @@ struct JailbreakView: View {
         VStack {
             Button {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+
+                let progress25 = Double(0.25)
+                let progress50 = Double(0.5)
+                let progress75 = Double(0.75)
+                let progress100 = Double(1.0)
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
@@ -350,20 +355,16 @@ struct JailbreakView: View {
                             } else {
                                 switch self.jailbreakingProgress {
                                 case .idle:
-                                    let progress: Double = Double(0.25)
-                                    (self as JailbreakView).progress = progress
+                                    self.progress = progress25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
-                                    let progress: Double = Double(0.5)
-                                    (self as JailbreakView).progress = progress
+                                    self.progress = progress50
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
-                                    let progress: Double = Double(0.75)
-                                    (self as JailbreakView).progress = progress
+                                    self.progress = progress75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
-                                    let progress: Double = Double(1)
-                                    (self as JailbreakView).progress = progress
+                                    self.progress = progress100
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
