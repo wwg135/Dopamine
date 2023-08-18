@@ -330,8 +330,8 @@ struct JailbreakView: View {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 
                 // 💀 code
-                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    progressDouble += 0.1
+                Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { t in
+                    progressDouble += 0.01
                                 
                     if progressDouble >= 1 {
                         t.invalidate()
@@ -345,7 +345,6 @@ struct JailbreakView: View {
                         jailbreakingProgress = .selectingPackageManager
                     } else {
                         uiJailbreak()
-                        progressDouble = 1
                     }
                 }
             } label: {
@@ -353,6 +352,7 @@ struct JailbreakView: View {
                     if Fugu15.supportsThisDeviceBool() {
                         if !requiresEnvironmentUpdate {
                             if isJailbroken() {
+                                progressDouble = 0.99
                                 Text("Status_Title_Jailbroken")
                             } else {
                                 switch jailbreakingProgress {
@@ -417,7 +417,6 @@ struct JailbreakView: View {
             } else if jailbreakingProgress == .selectingPackageManager {
                 PackageManagerSelectionView(shown: .constant(true), onContinue: {
                     uiJailbreak()
-                    progressDouble = 1
                 })
                 .padding(.horizontal)
             }
@@ -438,21 +437,21 @@ struct JailbreakView: View {
     var endButtons: some View {
         switch jailbreakingProgress {
         case .finished:
-                       Button {
-                           userspaceReboot()
-                       } label: {
-                           Label(title: { Text("Reboot_Userspace_Finish") }, icon: {
-                               Image(systemName: "arrow.clockwise")
-                           })
-                           .foregroundColor(.white)
-                           .padding()
-                           .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? 0 : nil)
-                           .background(MaterialView(.light)
-                               .opacity(0.5)
-                               .cornerRadius(8)
-                           )
-                           .opacity(jailbreakingError != nil ? 0 : 1)
-                       }
+            Button {
+                userspaceReboot()
+            } label: {
+                Label(title: { Text("Reboot_Userspace_Finish") }, icon: {
+                    Image(systemName: "arrow.clockwise")
+                })
+                .foregroundColor(.white)
+                .padding()
+                .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? 0 : nil)
+                .background(MaterialView(.light)
+                    .opacity(0.5)
+                    .cornerRadius(8)
+                )
+                .opacity(jailbreakingError != nil ? 0 : 1)
+            }
             if !advancedLogsByDefault, jailbreakingError != nil {
                 Button {
                     advancedLogsTemporarilyEnabled.toggle()
