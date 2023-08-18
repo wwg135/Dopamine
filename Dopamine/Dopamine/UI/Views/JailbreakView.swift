@@ -20,14 +20,7 @@ struct JailbreakView: View {
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
 
-        var fractionCompleted: Float {
-            switch self {
-                case .idle: return 0
-                case .jailbreaking: return 0.5 
-                case .selectingPackageManager: return 0.7
-                case .finished: return 1.0
-            }
-        }
+        var progress = 0.0
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -336,7 +329,7 @@ struct JailbreakView: View {
                 
                 // 💀 code
                 Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    progressDouble = JailbreakingProgress.fractionCompleted
+                    progressDouble = JailbreakingProgress.progress
                                 
                     if progressDouble == 1 {
                         t.invalidate()
@@ -361,12 +354,16 @@ struct JailbreakView: View {
                             } else {
                                 switch jailbreakingProgress {
                                 case .idle:
+                                    jailbreakingProgress.progress = 0.25
                                     Text("Button_Jailbreak_Title")
                                 case .jailbreaking:
+                                    jailbreakingProgress.progress = 0.5
                                     Text("Status_Title_Jailbreaking")
                                 case .selectingPackageManager:
+                                    jailbreakingProgress.progress = 0.75
                                     Text("Status_Title_Select_Package_Managers")
                                 case .finished:
+                                    jailbreakingProgress.progress = 1
                                     if jailbreakingError == nil {
                                         Text("Status_Title_Jailbroken")
                                     } else {
