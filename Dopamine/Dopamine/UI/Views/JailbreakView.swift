@@ -291,33 +291,45 @@ struct JailbreakView: View {
 
     @ViewBuilder
     var currentProgress: some View {
-        ZStack {
+        VStack {
             ZStack {
-                Text("\(Int(progressDouble * 100))%")
-                    .font(.title)
-                    .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-            }
-            Circle()
-                .stroke(
-                    Color.white.opacity(0.1),
-                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
-                )
-                .animation(.linear, value: progressDouble)
-            Circle()
-                .trim(from: 0, to: progressDouble)
-                .stroke(
-                    Color.white,
-                    style: StrokeStyle(
-                        lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                        lineCap: .round
+                Text("Status_Title_Jailbreaking")
+                    .font(.system(size: 24))
+                    .multilineTextAlignment(.center)
+
+                Divider()
+                    .background(.white)
+                    .padding(.horizontal, 32)
+                    .opacity(0.8)
+            
+                ZStack {
+                    Text("\(Int(progressDouble * 100))%")
+                        .font(.system(size: 16))
+                        .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
+                }
+                Circle()
+                    .stroke(
+                        Color.white.opacity(0.1),
+                        lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
                     )
-                )
-                .rotationEffect(.degrees(-90))
-                .animation(.easeOut, value: progressDouble)
-                .animation(.linear, value: progressDouble)
+                    .animation(.linear, value: progressDouble)
+                Circle()
+                    .trim(from: 0, to: progressDouble)
+                    .stroke(
+                        Color.white,
+                        style: StrokeStyle(
+                            lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
+                            lineCap: .round
+                        )
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeOut, value: progressDouble)
+                    .animation(.linear, value: progressDouble)
+            }
+            .frame(height: 75)
+            .animation(.linear, value: progressDouble)
         }
-        .frame(height: 75)
-        .animation(.linear, value: progressDouble)
+        .frame(maxHeight: jailbreakingError != nil ? 0 : nil)
     }
     
     @ViewBuilder
