@@ -293,18 +293,18 @@ struct JailbreakView: View {
     var currentProgress: some View {
         VStack {
             ZStack {
-                if isJailbreaking {
-                    Text("Status_Title_Jailbreaking")
-                        .font(.system(size: 24))
-                        .multilineTextAlignment(.center)
-
-                    Divider()
-                        .background(.white)
-                        .padding(.horizontal, 32)
-                        .opacity(0.8)
-                }
-            
                 ZStack {
+                    if isJailbreaking {
+                        Text("Status_Title_Jailbreaking")
+                            .font(.system(size: 24))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+
+                        Divider()
+                            .background(.white)
+                            .padding(.horizontal, 25)
+                            .opacity(0.8)
+                    }
                     Text("\(Int(progressDouble * 100))%")
                         .font(.system(size: 16))
                         .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
@@ -508,7 +508,7 @@ struct JailbreakView: View {
         dpDefaults.synchronize()
 
         // 💀 code
-        Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { t in
+        Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
             progressDouble += 0.01              
                                 
             if progressDouble >= 1 {
