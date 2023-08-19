@@ -417,6 +417,7 @@ struct JailbreakView: View {
                 }
                 .frame(height: 128)
                 .animation(.linear, value: progressDouble)
+                .opacity(progressDouble < 1 ? 1 : 0)
             }
         }
     }
