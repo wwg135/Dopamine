@@ -399,8 +399,10 @@ struct JailbreakView: View {
                             .animation(.linear, value: progressDouble)
                         Circle()
                             .trim(from: 0, to: progressDouble)
-                            Color.white;
-                                style: StrokeStyle(lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0, lineCap: .round) 
+                            .stroke(
+                                Color.white,
+                                style: StrokeStyle(lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0, lineCap: .round)
+                            )
                             .animation(.linear) {
                                 Text("\(Int(progressDouble * 100))%")
                                     .position(x: geo.size.width/2, y: geo.size.height/2) 
