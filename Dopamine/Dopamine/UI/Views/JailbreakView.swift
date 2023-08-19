@@ -296,7 +296,7 @@ struct JailbreakView: View {
             ZStack {
                 ZStack {
                     Text("\(Int(progressDouble * 100))%")
-                        .font(.system(size: 20))
+                        .font(.title)
                         .foregroundColor(.white)
                         .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
                 }
@@ -499,7 +499,7 @@ struct JailbreakView: View {
         dpDefaults.synchronize()
 
         // 💀 code
-        Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+        Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
             progressDouble += 0.01              
                                 
             if progressDouble >= 1 {
