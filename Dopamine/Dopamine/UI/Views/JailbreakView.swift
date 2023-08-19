@@ -292,45 +292,35 @@ struct JailbreakView: View {
     @ViewBuilder
     var currentProgress: some View {
         VStack {
-            VStack {
-                Text(jailbreakingProgress == .jailbreaking ? "Status_Title_Jailbreaking" : "Jailbreak_Done")
-                    .font(.system(size: 24))
+            ZStack {
+                Text("\(Int(progressDouble * 100))%")
+                    .font(.system(size: 20))
                     .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
                     .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
             }
-
-            VStack {
-                ZStack {
-                    Text("\(Int(progressDouble * 100))%")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                        .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-                }
-                Circle()
-                    .stroke(
-                        Color.white.opacity(0.1),
-                        lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
+            Circle()
+                .stroke(
+                    Color.white.opacity(0.1),
+                    lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
+                )
+                .animation(.linear, value: progressDouble)
+            Circle()
+                .trim(from: 0, to: progressDouble)
+                .stroke(
+                    Color.white,
+                    style: StrokeStyle(
+                        lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
+                        lineCap: .round
                     )
-                    .animation(.linear, value: progressDouble)
-                Circle()
-                    .trim(from: 0, to: progressDouble)
-                    .stroke(
-                        Color.white,
-                        style: StrokeStyle(
-                            lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                            lineCap: .round
-                        )
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .animation(.easeOut, value: progressDouble)
-                    .animation(.linear, value: progressDouble)
-            }
-            .frame(height: 100)
-            .animation(.linear, value: progressDouble)
+                )
+                .rotationEffect(.degrees(-90))
+                .animation(.easeOut, value: progressDouble)
+                .animation(.linear, value: progressDouble)
         }
-        .frame(height: 28)
+        .frame(height: 128)
+        .animation(.linear, value: progressDouble)
     }
+    .frame(height: 28)
     
     @ViewBuilder
     var bottomSection: some View {
