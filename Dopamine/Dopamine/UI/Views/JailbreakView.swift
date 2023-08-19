@@ -415,7 +415,7 @@ struct JailbreakView: View {
                         .animation(.easeOut, value: progressDouble)
                         .animation(.linear, value: progressDouble)
                 }
-                .frame(maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.15 : nil)
+                .frame(maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.1 : nil)
                 .animation(.linear, value: progressDouble)
                 .opacity(progressDouble < 1 ? 1 : 0)
             }
@@ -496,7 +496,7 @@ struct JailbreakView: View {
         dpDefaults.synchronize()
 
         // 💀 code
-        Timer.scheduledTimer(withTimeInterval: 0.035, repeats: true) { t in
+        Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
             progressDouble += 0.01              
                                 
             if progressDouble >= 1 {
