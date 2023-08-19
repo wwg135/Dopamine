@@ -98,8 +98,6 @@ struct JailbreakView: View {
                                     .opacity(0.5)
                             }
                         }
-                        currentProgress
-                            .frame(height: 28)
                         bottomSection
                         updateButton
                         if !isJailbreaking {
@@ -289,10 +287,107 @@ struct JailbreakView: View {
         .opacity(isJailbreaking ? 0 : 1)
         .animation(.spring(), value: isJailbreaking)
     }
-
+    
     @ViewBuilder
-    var currentProgress: some View {
+    var bottomSection: some View {
         VStack {
+            VStack {
+                Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                
+                    if requiresEnvironmentUpdate {
+                        showingUpdatePopupType = .environment
+                    } else {
+                        if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
+                            jailbreakingProgress = .selectingPackageManager
+                        } else {
+                            uiJailbreak()
+                        }
+                    }
+                } label: {
+                    Label(title: {
+                        if Fugu15.supportsThisDeviceBool() {
+                            if !requiresEnvironmentUpdate {
+                                if isJailbroken() {
+                                    Text("Status_Title_Jailbroken")
+                                } else {
+                                    switch jailbreakingProgress {
+                                    case .idle:
+                                        Text("Button_Jailbreak_Title")
+                                    case .jailbreaking:
+                                        Text("Status_Title_Jailbreaking")
+                                    case .selectingPackageManager:
+                                        Text("Status_Title_Select_Package_Managers")
+                                    case .finished:
+                                        if jailbreakingError == nil {
+                                            Text("Status_Title_Jailbroken")
+                                        } else {
+                                            Text("Status_Title_Unsuccessful")
+                                        }
+                                    }
+                                }
+                            } else {
+                                Text("Button_Update_Environment")
+                            }
+                        } else {
+                            Text("Unsupported")
+                        }
+                    
+                    }, icon: {
+                        if Fugu15.supportsThisDeviceBool() {
+                            if !requiresEnvironmentUpdate {
+                                ZStack {
+                                    switch jailbreakingProgress {
+                                    case .jailbreaking:
+                                        LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
+                                    case .selectingPackageManager:
+                                        Image(systemName: "shippingbox")
+                                    case .finished:
+                                        if jailbreakingError == nil {
+                                            Image(systemName: "lock.open")
+                                        } else {
+                                            Image(systemName: "lock.slash")
+                                        }
+                                    case .idle:
+                                        Image(systemName: "lock.open")
+                                    }
+                                }
+                            } else {
+                                Image(systemName: "doc.badge.arrow.up")
+                            }
+                        } else {
+                            Image(systemName: "lock.slash")
+                        }
+                    })
+                    .foregroundColor(whatCouldThisVariablePossiblyEvenMean ? .black : .white)
+                    .padding()
+                    .frame(maxWidth: isJailbreaking ? .infinity : 280)
+                }
+                .disabled((isJailbroken() || isJailbreaking || !Fugu15.supportsThisDeviceBool()) && !requiresEnvironmentUpdate)
+                .drawingGroup()
+            
+                if jailbreakingProgress == .finished || jailbreakingProgress == .jailbreaking {
+                    Spacer()
+                    LogView(advancedLogsTemporarilyEnabled: $advancedLogsTemporarilyEnabled, advancedLogsByDefault: $advancedLogsByDefault)
+                    endButtons
+                } else if jailbreakingProgress == .selectingPackageManager {
+                    PackageManagerSelectionView(shown: .constant(true), onContinue: {
+                        uiJailbreak()
+                    })
+                    .padding(.horizontal)
+                }
+            }
+            .frame(maxWidth: isJailbreaking ? .infinity : 280, maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.65 : nil)
+            .padding(.horizontal, isJailbreaking ? 0 : 20)
+            .padding(.top, isJailbreaking ? 16 : 0)
+            .background(MaterialView(.systemUltraThinMaterialDark)
+                .cornerRadius(isJailbreaking ? 20 : 8)
+                .ignoresSafeArea(.all, edges: isJailbreaking ? .all : .top)
+                .offset(y: isJailbreaking ? 16 : 0)
+                .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1) .opacity(0.25)
+            )
+            .animation(.spring(), value: isJailbreaking)
+
             ZStack {
                 ZStack {
                     Text("\(Int(progressDouble * 100))%")
@@ -322,109 +417,8 @@ struct JailbreakView: View {
             .frame(height: 128)
             .animation(.linear, value: progressDouble)
         }
-        .frame(height: 48)
     }
-    
-    @ViewBuilder
-    var bottomSection: some View {
-        VStack {
-            Button {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                
-                if requiresEnvironmentUpdate {
-                    showingUpdatePopupType = .environment
-                } else {
-                    if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
-                        jailbreakingProgress = .selectingPackageManager
-                    } else {
-                        uiJailbreak()
-                    }
-                }
-            } label: {
-                Label(title: {
-                    if Fugu15.supportsThisDeviceBool() {
-                        if !requiresEnvironmentUpdate {
-                            if isJailbroken() {
-                                Text("Status_Title_Jailbroken")
-                            } else {
-                                switch jailbreakingProgress {
-                                case .idle:
-                                    Text("Button_Jailbreak_Title")
-                                case .jailbreaking:
-                                    Text("Status_Title_Jailbreaking")
-                                case .selectingPackageManager:
-                                    Text("Status_Title_Select_Package_Managers")
-                                case .finished:
-                                    if jailbreakingError == nil {
-                                        Text("Status_Title_Jailbroken")
-                                    } else {
-                                        Text("Status_Title_Unsuccessful")
-                                    }
-                                }
-                            }
-                        } else {
-                            Text("Button_Update_Environment")
-                        }
-                    } else {
-                        Text("Unsupported")
-                    }
-                    
-                }, icon: {
-                    if Fugu15.supportsThisDeviceBool() {
-                        if !requiresEnvironmentUpdate {
-                            ZStack {
-                                switch jailbreakingProgress {
-                                case .jailbreaking:
-                                    LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                                case .selectingPackageManager:
-                                    Image(systemName: "shippingbox")
-                                case .finished:
-                                    if jailbreakingError == nil {
-                                        Image(systemName: "lock.open")
-                                    } else {
-                                        Image(systemName: "lock.slash")
-                                    }
-                                case .idle:
-                                    Image(systemName: "lock.open")
-                                }
-                            }
-                        } else {
-                            Image(systemName: "doc.badge.arrow.up")
-                        }
-                    } else {
-                        Image(systemName: "lock.slash")
-                    }
-                })
-                .foregroundColor(whatCouldThisVariablePossiblyEvenMean ? .black : .white)
-                .padding()
-                .frame(maxWidth: isJailbreaking ? .infinity : 280)
-            }
-            .disabled((isJailbroken() || isJailbreaking || !Fugu15.supportsThisDeviceBool()) && !requiresEnvironmentUpdate)
-            .drawingGroup()
-            
-            if jailbreakingProgress == .finished || jailbreakingProgress == .jailbreaking {
-                Spacer()
-                LogView(advancedLogsTemporarilyEnabled: $advancedLogsTemporarilyEnabled, advancedLogsByDefault: $advancedLogsByDefault)
-                endButtons
-            } else if jailbreakingProgress == .selectingPackageManager {
-                PackageManagerSelectionView(shown: .constant(true), onContinue: {
-                    uiJailbreak()
-                })
-                .padding(.horizontal)
-            }
-        }
-        .frame(maxWidth: isJailbreaking ? .infinity : 280, maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.65 : nil)
-        .padding(.horizontal, isJailbreaking ? 0 : 20)
-        .padding(.top, isJailbreaking ? 16 : 0)
-        .background(MaterialView(.systemUltraThinMaterialDark)
-            .cornerRadius(isJailbreaking ? 20 : 8)
-            .ignoresSafeArea(.all, edges: isJailbreaking ? .all : .top)
-            .offset(y: isJailbreaking ? 16 : 0)
-            .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1) .opacity(0.25)
-        )
-        .animation(.spring(), value: isJailbreaking)
-    }
-    
+
     @ViewBuilder
     var endButtons: some View {
         switch jailbreakingProgress {
