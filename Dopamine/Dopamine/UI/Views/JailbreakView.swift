@@ -293,20 +293,20 @@ struct JailbreakView: View {
     var currentProgress: some View {
         VStack {
             ZStack {
-                ZStack {
-                    if isJailbreaking {
-                        Text("Status_Title_Jailbreaking")
-                            .font(.system(size: 24))
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
+                Text(isJailbreaking () ? "Status_Title_Jailbreaking" : "Jailbreak_Done")
+                    .font(.system(size: 24))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
 
-                        Divider()
-                            .background(.white)
-                            .padding(.horizontal, 25)
-                            .opacity(0.8)
-                    }
+                Divider()
+                    .background(.white)
+                    .opacity(0.8)
+                    .padding(.horizontal)  
+                
+                VStack {
                     Text("\(Int(progressDouble * 100))%")
-                        .font(.system(size: 16))
+                        .font(.system(size: 20))
+                        .foregroundColor(.white)
                         .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
                 }
                 Circle()
@@ -328,10 +328,10 @@ struct JailbreakView: View {
                     .animation(.easeOut, value: progressDouble)
                     .animation(.linear, value: progressDouble)
             }
-            .frame(height: 75)
+            .frame(height: 100)
             .animation(.linear, value: progressDouble)
         }
-        .frame(maxHeight: jailbreakingError != nil ? 0 : nil)
+        .frame(height: 28)
     }
     
     @ViewBuilder
