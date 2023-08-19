@@ -298,11 +298,6 @@ struct JailbreakView: View {
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-
-                Divider()
-                    .background(.white)
-                    .opacity(0.8)
-                    .padding(.horizontal)  
                 
                 VStack {
                     Text("\(Int(progressDouble * 100))%")
