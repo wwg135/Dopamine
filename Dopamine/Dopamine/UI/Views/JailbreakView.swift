@@ -415,7 +415,7 @@ struct JailbreakView: View {
                         .animation(.easeOut, value: progressDouble)
                         .animation(.linear, value: progressDouble)
                 }
-                .frame(height: 128)
+                .frame(maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.15 : nil)
                 .animation(.linear, value: progressDouble)
                 .opacity(progressDouble < 1 ? 1 : 0)
             }
