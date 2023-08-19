@@ -390,23 +390,25 @@ struct JailbreakView: View {
 
             if (jailbreakingProgress == .jailbreaking) {
                 ZStack {
-                    Circle()
-                        .stroke(
-                            Color.white.opacity(0.1),
-                            lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
-                        )
-                        .animation(.linear, value: progressDouble)
-                    Circle()
-                        .trim(from: 0, to: progress)
-                        .stroke(Color.white) 
-                        .animation(.linear) {
-                            Text("\(Int(progressDouble * 100))%")
-                                .position(x: geo.size.width/2, y: geo.size.height/2) 
-                                .animation(.linear, value: progressDouble)
-                        }
-                        .rotationEffect(.degrees(-90))
-                        .animation(.easeOut, value: progressDouble)
-                        .animation(.linear, value: progressDouble)
+                    GeometryReader { geo in
+                        Circle()
+                            .stroke(
+                                Color.white.opacity(0.1),
+                                lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
+                            )
+                            .animation(.linear, value: progressDouble)
+                        Circle()
+                            .trim(from: 0, to: progressDouble)
+                            .stroke(Color.white) 
+                            .animation(.linear) {
+                                Text("\(Int(progressDouble * 100))%")
+                                    .position(x: geo.size.width/2, y: geo.size.height/2) 
+                                    .animation(.linear, value: progressDouble)
+                            }
+                            .rotationEffect(.degrees(-90))
+                            .animation(.easeOut, value: progressDouble)
+                            .animation(.linear, value: progressDouble)
+                    }
                 }
                 .frame(maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.15 : nil)
                 .animation(.linear, value: progressDouble)
