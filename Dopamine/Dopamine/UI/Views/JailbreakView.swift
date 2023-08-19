@@ -292,14 +292,16 @@ struct JailbreakView: View {
     @ViewBuilder
     var currentProgress: some View {
         VStack {
-            ZStack {
+            VStack {
                 Text(jailbreakingProgress == .jailbreaking ? "Status_Title_Jailbreaking" : "Jailbreak_Done")
                     .font(.system(size: 24))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-                
-                VStack {
+            }
+
+            VStack {
+                ZStack {
                     Text("\(Int(progressDouble * 100))%")
                         .font(.system(size: 20))
                         .foregroundColor(.white)
