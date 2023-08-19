@@ -99,6 +99,7 @@ struct JailbreakView: View {
                             }
                         }
                         currentProgress
+                            .frame(height: 28)
                         bottomSection
                         updateButton
                         if !isJailbreaking {
@@ -320,7 +321,6 @@ struct JailbreakView: View {
         .frame(height: 128)
         .animation(.linear, value: progressDouble)
     }
-    .frame(height: 28)
     
     @ViewBuilder
     var bottomSection: some View {
