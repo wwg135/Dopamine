@@ -293,14 +293,16 @@ struct JailbreakView: View {
     var currentProgress: some View {
         VStack {
             ZStack {
-                Text("Status_Title_Jailbreaking")
-                    .font(.system(size: 24))
-                    .multilineTextAlignment(.center)
+                if isJailbreaking {
+                    Text("Status_Title_Jailbreaking")
+                        .font(.system(size: 24))
+                        .multilineTextAlignment(.center)
 
-                Divider()
-                    .background(.white)
-                    .padding(.horizontal, 32)
-                    .opacity(0.8)
+                    Divider()
+                        .background(.white)
+                        .padding(.horizontal, 32)
+                        .opacity(0.8)
+                }
             
                 ZStack {
                     Text("\(Int(progressDouble * 100))%")
@@ -337,15 +339,6 @@ struct JailbreakView: View {
         VStack {
             Button {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                
-                // 💀 code
-                Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { t in
-                    progressDouble += 0.01              
-                                
-                    if progressDouble >= 1 {
-                        t.invalidate()
-                    }
-                }
                 
                 if requiresEnvironmentUpdate {
                     showingUpdatePopupType = .environment
@@ -513,6 +506,15 @@ struct JailbreakView: View {
         let dpDefaults = dopamineDefaults()
         dpDefaults.set(dpDefaults.integer(forKey: "total_jailbreaks") + 1, forKey: "total_jailbreaks")
         dpDefaults.synchronize()
+
+        // 💀 code
+        Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { t in
+            progressDouble += 0.01              
+                                
+            if progressDouble >= 1 {
+                t.invalidate()
+            }
+        }
         
         DispatchQueue(label: "Dopamine").async {
             sleep(1)
