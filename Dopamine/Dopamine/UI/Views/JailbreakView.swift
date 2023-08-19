@@ -390,12 +390,6 @@ struct JailbreakView: View {
 
             if (jailbreakingProgress == .jailbreaking) {
                 ZStack {
-                    ZStack {
-                        Text("\(Int(progressDouble * 100))%")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-                    }
                     Circle()
                         .stroke(
                             Color.white.opacity(0.1),
@@ -403,14 +397,13 @@ struct JailbreakView: View {
                         )
                         .animation(.linear, value: progressDouble)
                     Circle()
-                        .trim(from: 0, to: progressDouble)
-                        .stroke(
-                            Color.white,
-                            style: StrokeStyle(
-                                lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                                lineCap: .round
-                            )
-                        )
+                        .trim(from: 0, to: progress)
+                        .stroke(Color.white) 
+                        .animation(.linear) {
+                            Text("\(Int(progressDouble * 100))%")
+                                .position(x: geo.size.width/2, y: geo.size.height/2) 
+                                .animation(.linear, value: progressDouble)
+                        }
                         .rotationEffect(.degrees(-90))
                         .animation(.easeOut, value: progressDouble)
                         .animation(.linear, value: progressDouble)
