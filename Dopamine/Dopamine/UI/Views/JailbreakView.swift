@@ -171,16 +171,17 @@ struct JailbreakView: View {
                     }
                 }
             }
-            Task {
-                do {
-                    try await checkForUpdates()
-                } catch {
-                    Logger.log(error, type: .error, isStatus: false)
+            DispatchQueue.global().async {
+                Task {
+                    do {
+                        try await checkForUpdates()
+                    } catch {
+                        Logger.log(error, type: .error, isStatus: false)
+                    }
                 }
             }
         }
     }
-    
     
     @ViewBuilder
     var header: some View {
@@ -576,17 +577,27 @@ struct JailbreakView: View {
             let repo = "Dopamine"
             
             // Get the releases
-            let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
-            let releasesRequest = URLRequest(url: releasesURL)
-            let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
+            let releasesData = DispatchQueue.global(qos: .userInitiated).sync {
+                let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
+                let releasesRequest = URLRequest(url: releasesURL)
+                let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
+                return releasesData
+            }
             guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
                 return
             }
 
-            updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
-
+            updateAvailable = DispatchQueue.global(qos: .userInitiated).sync {
+                (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
+                return updateAvailable
+            }
+        
             //get the updateChangelog
-            mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+            
+            mismatchAndupdateChangelog = DispatchQueue.global(qos: .userInitiated).sync {
+                isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+                return mismatchAndupdateChangelog
+            }
     }
     
     func getLaunchTime() -> String {
