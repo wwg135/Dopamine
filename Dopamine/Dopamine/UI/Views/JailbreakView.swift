@@ -63,8 +63,6 @@ struct JailbreakView: View {
     }
     
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-
-    
     
     var body: some View {
         GeometryReader { geometry in                
