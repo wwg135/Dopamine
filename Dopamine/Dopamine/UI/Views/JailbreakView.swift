@@ -587,15 +587,8 @@ struct JailbreakView: View {
                 return
             }
 
-            updateAvailable = DispatchQueue.global(qos: .userInitiated).sync {
-                let result = { (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
-                    return true/false
-                }
-                return result
-            }
-        
-            //get the updateChangelog
-            
+            updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
+      
             mismatchAndupdateChangelog = DispatchQueue.global(qos: .userInitiated).sync {
                 isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
                 return mismatchAndupdateChangelog
