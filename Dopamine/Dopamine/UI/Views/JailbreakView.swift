@@ -180,7 +180,7 @@ struct JailbreakView: View {
     
     @ViewBuilder
     var header: some View {
-        let tint = !isJailbroken() ? Color.black : .white
+        let tint = Color.white
         HStack {
             VStack(alignment: .leading) {
                 Image(!isJailbroken() ? "DopamineLogo2" : "DopamineLogo")
