@@ -572,23 +572,21 @@ struct JailbreakView: View {
     }
     
     func checkForUpdates() async throws {
-        DispatchQueue.global(qos: .userInitiated).async {
-            let currentAppVersion = "AAC"
-            let owner = "wwg135"
-            let repo = "Dopamine"
+        let currentAppVersion = "AAC"
+        let owner = "wwg135"
+        let repo = "Dopamine"
             
-            // Get the releases
-            let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
-            let releasesRequest = URLRequest(url: releasesURL)
-            let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
-            guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
-                return
-            }
-
-            updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
-            
-            mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+        // Get the releases
+        let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
+        let releasesRequest = URLRequest(url: releasesURL)
+        let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
+        guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
+            return
         }
+
+        updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
+            
+        mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
     }
     
     func getLaunchTime() -> String {
@@ -607,11 +605,13 @@ struct JailbreakView: View {
 
     func formatUptime() -> String {
         var formatted = ""
-        let uptime = Int(clock_gettime(CLOCK_MONOTONIC_RAW))
-        let days = uptime / 86400
-        let hours = uptime % 86400 / 3600
-        let minutes = uptime % 3600 / 60
-        let seconds = uptime % 60 
+        var ts = timespec()
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
+        let uptimeInt = Int(ts.tv_sec)
+        let days = uptimeInt / 86400
+        let hours = uptimeInt % 86400 / 3600
+        let minutes = uptimeInt % 3600 / 60
+        let seconds = uptimeInt % 60 
         if days > 0 {
             formatted += "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒" 
         } else if hours > 0 {
