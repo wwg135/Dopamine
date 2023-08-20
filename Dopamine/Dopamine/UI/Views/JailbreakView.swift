@@ -621,7 +621,7 @@ struct JailbreakView: View {
         } else {
             formatted += "\(seconds) 秒" 
         }
-        return "系统已运行:" + formatted
+        return "系统已运行: " + formatted
     }
 }
 
