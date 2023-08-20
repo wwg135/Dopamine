@@ -572,27 +572,27 @@ struct JailbreakView: View {
     }
     
     func checkForUpdates() async throws {
+        DispatchQueue.global(qos: .userInitiated).async {
             let currentAppVersion = "AAC"
             let owner = "wwg135"
             let repo = "Dopamine"
-            
-            // Get the releases
-            let releasesData = await DispatchQueue.global(qos: .userInitiated).sync {
+
+            DispatchQueue.global().async {
+                // Get the releases
                 let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
                 let releasesRequest = URLRequest(url: releasesURL)
                 let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
-                return releasesData
-            }
-            guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
-                return
+                guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
+                    return
+                }
             }
 
-            updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
-      
-            mismatchAndupdateChangelog = DispatchQueue.global(qos: .userInitiated).sync {
-                isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
-                return mismatchAndupdateChangelog
+            DispatchQueue.global().async {
+                updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
+                
+                mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
             }
+        }
     }
     
     func getLaunchTime() -> String {
