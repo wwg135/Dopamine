@@ -326,7 +326,6 @@ struct JailbreakView: View {
                         } else {
                             Text("Unsupported")
                         }
-                    
                     }, icon: {
                         if Fugu15.supportsThisDeviceBool() {
                             if !requiresEnvironmentUpdate {
@@ -548,7 +547,6 @@ struct JailbreakView: View {
 
     func createUserOrientedChangelog(deltaChangelog: String?, environmentMismatch: Bool) -> String {
         var userOrientedChangelog : String = ""
-
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
 
         // Prefix
