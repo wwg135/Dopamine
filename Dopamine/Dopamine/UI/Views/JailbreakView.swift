@@ -238,7 +238,7 @@ struct JailbreakView: View {
                 } label: {
                     HStack {
                         Label(title: { Text(option.title) }, icon: { Image(systemName: option.imageName) })
-                            .foregroundColor(Color.white)
+                            .foregroundColor(!isJailbroken() ? Color.black : .white)
 
                         Spacer()
 
@@ -246,7 +246,7 @@ struct JailbreakView: View {
                             Image(systemName: Locale.characterDirection(forLanguage: Locale.current.languageCode ?? "") == .rightToLeft ? "chevron.left" : "chevron.right")
                                 .font(.body)
                                 .symbolRenderingMode(.palette)
-                                .foregroundStyle(.white.opacity(1))
+                                .foregroundStyle(!isJailbroken() ? Color.black : .white .opacity(1))
                         }
                     }
                     .frame(maxWidth: .infinity)
