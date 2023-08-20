@@ -15,29 +15,24 @@ import UIKit
 import AppKit
 #endif
 
-struct JailbreakView: View {
-    
+struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
     }
     
     struct MenuOption: Identifiable, Equatable {
-        
         static func == (lhs: JailbreakView.MenuOption, rhs: JailbreakView.MenuOption) -> Bool {
             lhs.id == rhs.id
         }
         
-        var id: String
-        
+        var id: String  
         var imageName: String
         var title: String
-        var showUnjailbroken: Bool = true
-        
+        var showUnjailbroken: Bool = true   
         var action: (() -> ())? = nil
     }
 
-    @State var progressDouble: Double = 0
-    
+    @State var progressDouble: Double = 0  
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
     @State var isUpdatelogPresented = false
