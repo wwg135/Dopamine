@@ -180,7 +180,7 @@ struct JailbreakView: View {
     
     @ViewBuilder
     var header: some View {
-        let tint = !isJailbroken() ? Color.black : .white
+        let tint = .white
         HStack {
             VStack(alignment: .leading) {
                 Image(!isJailbroken() ? "DopamineLogo2" : "DopamineLogo")
@@ -352,7 +352,7 @@ struct JailbreakView: View {
                             Image(systemName: "lock.slash")
                         }
                     })
-                    .foregroundColor(!isJailbroken() ? .black : .white)
+                    .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: isJailbreaking ? .infinity : 280)
                 }
@@ -474,7 +474,7 @@ struct JailbreakView: View {
                     }
                 }
             })
-            .foregroundColor(!isJailbroken() ? .black : .white)
+            .foregroundColor(.white)
             .padding()
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
