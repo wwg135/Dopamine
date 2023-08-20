@@ -577,7 +577,7 @@ struct JailbreakView: View {
             let repo = "Dopamine"
             
             // Get the releases
-            let releasesData = DispatchQueue.global(qos: .userInitiated).sync {
+            let releasesData = await DispatchQueue.global(qos: .userInitiated).sync {
                 let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
                 let releasesRequest = URLRequest(url: releasesURL)
                 let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
@@ -588,8 +588,8 @@ struct JailbreakView: View {
             }
 
             updateAvailable = DispatchQueue.global(qos: .userInitiated).sync {
-                (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
-                return updateAvailable
+                let result: Bool = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
+                return result
             }
         
             //get the updateChangelog
