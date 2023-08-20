@@ -615,7 +615,7 @@ struct JailbreakView: View {
         if days > 0 {
             formatted += "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒" 
         } else if hours > 0 {
-            formatted += "\(hours) 时 \(minutes) 分"
+            formatted += "\(hours) 时 \(minutes) 分 \(seconds) 秒"
         } else if minutes > 0 {
             formatted += "\(minutes) 分 \(seconds) 秒"
         } else {
