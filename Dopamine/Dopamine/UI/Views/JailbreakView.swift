@@ -431,6 +431,8 @@ struct JailbreakView: View {
                 )
                 .opacity(jailbreakingError != nil ? 0 : 1)
             }
+            .opacity(jailbreakingError != nil ? 0 : 1) .animation(Animation .easeInOut(duration: 1.0) .repeatForever())
+            
             if !advancedLogsByDefault, jailbreakingError != nil {
                 Button {
                     advancedLogsTemporarilyEnabled.toggle()
