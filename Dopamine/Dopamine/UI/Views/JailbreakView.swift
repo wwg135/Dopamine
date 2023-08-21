@@ -91,6 +91,7 @@ struct JailbreakView: View {
                                     .opacity(0.5)
                             }
                         }
+                        checkForUpdatesButton
                         bottomSection
                         updateButton
                         if !isJailbreaking {
@@ -217,7 +218,6 @@ struct JailbreakView: View {
                 .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
-                .init(id: "checkForUpdates", imageName: "arrow.down.circle", title: NSLocalizedString("Check_For_Updates", comment: ""), showUnjailbroken: false, action: checkForUpdates),
                 .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
             ]
             ForEach(menuOptions) { option in
@@ -281,6 +281,25 @@ struct JailbreakView: View {
         .frame(maxWidth: 320, maxHeight: isJailbreaking ? 0 : nil)
         .opacity(isJailbreaking ? 0 : 1)
         .animation(.spring(), value: isJailbreaking)
+    }
+
+    @ViewBuilder
+    var checkForUpdatesButton: some View {
+        Button {
+            checkForUpdates()
+        } label: {
+            Label(title: { Text("Check_For_Updates") }, icon: {
+                Image(systemName: "arrow.down.circle")
+            })
+            .foregroundColor(.white)
+            .padding()
+            .frame(maxWidth: 280, maxHeight: 48)
+            .background(MaterialView(.light)
+                .opacity(0.5)
+                .cornerRadius(8)
+            )
+            .opacity(1)
+        }
     }
     
     @ViewBuilder
