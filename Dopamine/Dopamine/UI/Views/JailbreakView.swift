@@ -477,8 +477,8 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .animation(Animation.easeInOut(duration: 0.8) .repeatForever(autoreverses: true), value: updateAvailable)
-        .animation(Animation.easeInOut(duration: 0.8) .repeatForever(autoreverses: true), value: isPopupPresented)
+        .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: updateAvailable)
+        .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: isPopupPresented)
     }
     
     func uiJailbreak() {
