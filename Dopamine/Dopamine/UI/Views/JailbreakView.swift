@@ -33,8 +33,6 @@ struct JailbreakView: View {
     }
 
     @State var progressDouble: Double = 0
-    @State var animValue: CGFloat = 1
-    
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
     @State var isUpdatelogPresented = false
@@ -238,8 +236,6 @@ struct JailbreakView: View {
                     HStack {
                         Label(title: { Text(option.title) }, icon: { Image(systemName: option.imageName) })
                             .foregroundColor(Color.white)
-                            .scaleEffect(CGSize(width: animValue, height: 1)) 
-                            .animation(.easeInOut.repeatForever(autoreverses: true))
 
                         Spacer()
 
