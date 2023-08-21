@@ -286,7 +286,7 @@ struct JailbreakView: View {
     @ViewBuilder
     var checkForUpdatesButton: some View {
         Button {
-            checkForUpdates()
+            try await checkForUpdates()
         } label: {
             Label(title: { Text("Check_For_Updates") }, icon: {
                 Image(systemName: "arrow.down.circle")
@@ -584,7 +584,7 @@ struct JailbreakView: View {
         return userOrientedChangelog
     }
     
-    func checkForUpdates() {
+    func checkForUpdates() async throws {
         let currentAppVersion = "AAC"
         let owner = "wwg135"
         let repo = "Dopamine"
