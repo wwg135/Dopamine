@@ -286,7 +286,9 @@ struct JailbreakView: View {
     @ViewBuilder
     var checkForUpdatesButton: some View {
         Button {
-            try await checkForUpdates()
+            Task {
+                try await checkForUpdates() 
+            }
         } label: {
             Label(title: { Text("Check_For_Updates") }, icon: {
                 Image(systemName: "arrow.down.circle")
