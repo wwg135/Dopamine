@@ -100,7 +100,7 @@ struct JailbreakView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .blur(radius: isPopupPresented ? 4 : 0)
                     .scaleEffect(isPopupPresented ? 0.85 : 1)
-                    .animation(animation.easeInOut(duration: 0.5) .repeatForever(autoreverses: true), value: updateAvailable)
+                    .animation(Animation.easeInOut(duration: 0.5) .repeatForever(autoreverses: true), value: updateAvailable)
                     .animation(.spring(), value: isPopupPresented)
                     .transition(.opacity)
                     .zIndex(1)
