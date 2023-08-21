@@ -9,7 +9,6 @@ import UIKit
 import Fugu15KernelExploit
 import CBindings
 
-var updateAvailable = false
 var fakeRootPath: String? = nil
 public func rootifyPath(path: String) -> String? {
     if fakeRootPath == nil {
