@@ -34,9 +34,6 @@ struct JailbreakView: View {
 
     @State var progressDouble: Double = 0
     @State var isPopupPresented = false
-    @State var isSettingsPresented = false
-    @State var isCreditsPresented = false
-    @State var isUpdatelogPresented = false
     
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?
@@ -62,9 +59,7 @@ struct JailbreakView: View {
     
     var body: some View {
         GeometryReader { geometry in                
-            ZStack {
-                let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
-                
+            ZStack {    
                 let imagePath = "/var/mobile/Wallpaper.jpg"
                 let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
                     Image(uiImage: backgroundImage!)
