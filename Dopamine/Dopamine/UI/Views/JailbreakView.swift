@@ -33,7 +33,9 @@ struct JailbreakView: View {
     }
 
     @State var progressDouble: Double = 0
-    @State var isPopupPresented = false
+    @State var isSettingsPresented = false
+    @State var isCreditsPresented = false
+    @State var isUpdatelogPresented = false
     
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?
@@ -59,7 +61,9 @@ struct JailbreakView: View {
     
     var body: some View {
         GeometryReader { geometry in                
-            ZStack {    
+            ZStack {
+                let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
+                
                 let imagePath = "/var/mobile/Wallpaper.jpg"
                 let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
                     Image(uiImage: backgroundImage!)
@@ -105,9 +109,9 @@ struct JailbreakView: View {
                 PopupView(title: {
                     Text("Menu_Settings_Title")
                 }, contents: {
-                    SettingsView(isPresented: $isPopupPresented)
+                    SettingsView(isPresented: $isSettingsPresented)
                         .frame(maxWidth: 320)
-                }, isPresented: $isPopupPresented)
+                }, isPresented: $isSettingsPresented)
                 .zIndex(2)          
                 
                 PopupView(title: {
@@ -121,7 +125,7 @@ struct JailbreakView: View {
                 }, contents: {
                     AboutView()
                         .frame(maxWidth: 320)
-                }, isPresented: $isPopupPresented)
+                }, isPresented: $isCreditsPresented)
                 .zIndex(2)
 
                 PopupView(title: {
@@ -135,7 +139,7 @@ struct JailbreakView: View {
                     }
                     .opacity(1)
                     .frame(maxWidth: 280, maxHeight: 480)
-                }, isPresented: $isPopupPresented)
+                }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
@@ -220,11 +224,11 @@ struct JailbreakView: View {
                     } else {
                         switch option.id {
                         case "settings":
-                            isPopupPresented = true
+                            isSettingsPresented = true
                         case "credits":
-                            isPopupPresented = true
+                            isCreditsPresented = true
                         case "updatelog":
-                            isPopupPresented = true
+                            isUpdatelogPresented = true
                         default: break
                         }
                     }
@@ -472,7 +476,7 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .animation(Animation.easeInOut(duration: 1.0), value: updateAvailable)
+        .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: updateAvailable)
     }
     
     func uiJailbreak() {
