@@ -13,12 +13,10 @@ enum UpdateType {
     case environment, regular
 }
 
-struct UpdateDownloadingView: View {
-    
+struct UpdateDownloadingView: View {   
     enum UpdateState {
         case changelog, downloading, updating
     }
-    
     
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
@@ -85,8 +83,7 @@ struct UpdateDownloadingView: View {
                             DispatchQueue.global(qos: .userInitiated).async {
                                 updateEnvironment()
                             }
-                        }
-                        
+                        }  
                     } label: {
                         if changeVersion {
                             Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })
