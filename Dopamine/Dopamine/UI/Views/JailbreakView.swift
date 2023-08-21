@@ -111,8 +111,7 @@ struct JailbreakView: View {
                     SettingsView(isPresented: $isSettingsPresented)
                         .frame(maxWidth: 320)
                 }, isPresented: $isSettingsPresented)
-                .zIndex(2)
-                
+                .zIndex(2)          
                 
                 PopupView(title: {
                     VStack(spacing: 4) {
@@ -127,7 +126,6 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320)
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
-
 
                 PopupView(title: {
                     Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
@@ -144,7 +142,6 @@ struct JailbreakView: View {
                 .zIndex(2)
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
-
             }
             .animation(.default, value: showingUpdatePopupType == nil)
         }
@@ -553,8 +550,7 @@ struct JailbreakView: View {
             userOrientedChangelog += String(format:NSLocalizedString("Mismatching_Environment_Version_Update_Body", comment: ""), installedEnvironmentVersion(), appVersion!)
             userOrientedChangelog += "\n\n\n" + NSLocalizedString("Title_Changelog", comment: "") + ":\n\n"
         }
-        else {
-            
+        else {        
         }
 
         // Changelog
@@ -576,8 +572,7 @@ struct JailbreakView: View {
             return
         }
 
-        updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion 
-            
+        updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion      
         mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
     }
     
