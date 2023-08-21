@@ -32,7 +32,8 @@ struct JailbreakView: View {
         var action: (() -> ())? = nil
     }
 
-    @State var progressDouble: Double = 0  
+    @State var progressDouble: Double = 0
+    @State var isPopupPresented = false
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
     @State var isUpdatelogPresented = false
@@ -459,8 +460,6 @@ struct JailbreakView: View {
     
     @ViewBuilder
     var updateButton: some View {
-        @State var isPopupPresented = false
-        
         Button {
             showingUpdatePopupType = .regular
         } label: {
