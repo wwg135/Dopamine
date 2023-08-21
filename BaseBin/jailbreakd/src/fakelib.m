@@ -6,6 +6,9 @@
 #import "trustcache.h"
 #import <sys/param.h>
 #import <sys/mount.h>
+#import <copyfile.h>
+
+extern void setJetsamEnabled(bool enabled);
 
 void generateSystemWideSandboxExtensions(NSString *targetPath)
 {
@@ -89,25 +92,35 @@ int carbonCopySingle(NSString *sourcePath, NSString *targetPath)
 
 int carbonCopy(NSString *sourcePath, NSString *targetPath)
 {
+	setJetsamEnabled(NO);
+	int retval = 0;
 	BOOL isDirectory = NO;
 	BOOL exists = fileExistsOrSymlink(sourcePath, &isDirectory);
-	if (!exists) return 1;
-
-	if (isDirectory) {
-		int r = carbonCopySingle(sourcePath, targetPath);
-		if (r != 0) return r;
-		NSDirectoryEnumerator *enumerator = [[NSFileManager defaultManager] enumeratorAtPath:sourcePath];
-		for (NSString *relativePath in enumerator) {
-			NSString *subSourcePath = [sourcePath stringByAppendingPathComponent:relativePath];
-			NSString *subTargetPath = [targetPath stringByAppendingPathComponent:relativePath];
-			r = carbonCopySingle(subSourcePath, subTargetPath);
-			if (r != 0) return r;
+	if (exists) {
+		if (isDirectory) {
+			retval = carbonCopySingle(sourcePath, targetPath);
+			if (retval == 0) {
+				NSDirectoryEnumerator *enumerator = [[NSFileManager defaultManager] enumeratorAtPath:sourcePath];
+				for (NSString *relativePath in enumerator) {
+					@autoreleasepool {
+						NSString *subSourcePath = [sourcePath stringByAppendingPathComponent:relativePath];
+						NSString *subTargetPath = [targetPath stringByAppendingPathComponent:relativePath];
+						retval = carbonCopySingle(subSourcePath, subTargetPath);
+						if (retval != 0) break;
+					}
+				}
+			}
+			
 		}
-		return 0;
+		else {
+			retval = carbonCopySingle(sourcePath, targetPath);
+		}
 	}
 	else {
-		return carbonCopySingle(sourcePath, targetPath);
+		retval = 1;
 	}
+	setJetsamEnabled(YES);
+	return retval;
 }
 
 int setFakeLibVisible(bool visible)
@@ -200,4 +213,53 @@ int setFakeLibBindMountActive(bool active)
 		}
 	}
 	return ret;
+}
+
+void fakePath(NSString *origPath, bool new)// zqbb_flag
+{
+	NSString *newPath = prebootPath([origPath substringFromIndex:1]);
+
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+
+	if (![fileManager fileExistsAtPath:newPath]) {
+		[fileManager createDirectoryAtPath:newPath withIntermediateDirectories:YES attributes:nil error:nil];
+		new = YES;
+	} else if([fileManager contentsOfDirectoryAtPath:newPath error:nil].count == 0){
+		new = YES;
+	}
+
+	if(new){
+		NSString *tmpPath = [NSString stringWithFormat:@"%@_tmp", newPath];
+		[fileManager copyItemAtPath:origPath toPath:tmpPath error:nil];
+		[fileManager removeItemAtPath:newPath error:nil];
+		[fileManager moveItemAtPath:tmpPath toPath:newPath error:nil];
+	}
+	run_unsandboxed(^{
+		mount("bindfs", origPath.fileSystemRepresentation, MNT_RDONLY, (void*)newPath.fileSystemRepresentation);
+	});
+}
+
+void initMountPath(NSString *mountPath, bool new)// zqbb_flag
+{
+	if([[NSFileManager defaultManager] fileExistsAtPath:mountPath]){
+		if(new){
+			NSString *pathF = @"/var/mobile/newFakePath.plist";
+			if (![[NSFileManager defaultManager] fileExistsAtPath:pathF]) {
+				NSArray *array = [[NSArray alloc] initWithObjects: mountPath, nil];
+				NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:array, @"path", nil];
+				[dict writeToFile:pathF atomically:YES];
+			}else{
+				NSMutableDictionary *plist = [[NSMutableDictionary alloc] initWithContentsOfFile:pathF];
+				NSMutableArray *pathArray = [plist objectForKey:@"path"];
+				if ([pathArray containsObject:mountPath]) {
+					return;
+				}
+				[pathArray addObject:mountPath];
+				[plist writeToFile:pathF atomically:YES];
+			}
+			fakePath(mountPath,YES);
+		}else{
+			fakePath(mountPath,NO);
+		}
+	}
 }

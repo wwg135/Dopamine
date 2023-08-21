@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftfulLoadingIndicators
+import Fugu15KernelExploit
 
 enum UpdateType {
     case environment, regular
@@ -26,7 +27,9 @@ struct UpdateDownloadingView: View {
     @State var updateState: UpdateState = .changelog
     @State var showLogView = false
     var changelog: String
-    var mismatchChangelog: String
+    var mismatchAndupdateChangelog: String
+
+    @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     
     var body: some View {
         ZStack {
@@ -47,8 +50,8 @@ struct UpdateDownloadingView: View {
                             .padding(.horizontal, 32)
                             .opacity(0.5)
                         ScrollView {
-                            Text(try! AttributedString(markdown: type == .environment ? mismatchChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                .opacity(0.5)
+                            Text(try! AttributedString(markdown: type == .environment ? mismatchAndupdateChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                .opacity(1)
                                 .multilineTextAlignment(.center)
                                 .padding(.vertical)
                         }
@@ -85,17 +88,27 @@ struct UpdateDownloadingView: View {
                         }
                         
                     } label: {
-                        Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: 280)
-                            .background(MaterialView(.light)
-                                .opacity(0.5)
-                                .cornerRadius(8)
-                            )
+                        if changeVersion {
+                            Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                                .background(MaterialView(.light)
+                                    .opacity(0.5)
+                                    .cornerRadius(8)
+                                )
+                        } else {
+                            Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                                .background(MaterialView(.light)
+                                    .opacity(0.5)
+                                    .cornerRadius(8)
+                                )
+                        }
                     }
                     .fixedSize()
-                    
                     
                     Button {
                         type = nil
@@ -180,7 +193,7 @@ struct UpdateDownloadingView: View {
     }
     
     func downloadUpdateAndInstall() async throws {
-        let owner = "opa334"
+        let owner = "wwg135"
         let repo = "Dopamine"
         
         // Get the releases
@@ -190,22 +203,32 @@ struct UpdateDownloadingView: View {
         let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as! [[String: Any]]
         
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
-        
+
         // Find the latest release
-        guard let latestRelease = releasesJSON.first,
+        let latest = changeVersion ? releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) : releasesJSON.first(where: { $0["name"] as? String == "1.0.5" })
+        guard let latestRelease = latest,
               let assets = latestRelease["assets"] as? [[String: Any]],
-              let asset = assets.first(where: { ($0["name"] as! String).contains(".tipa") }),
+              let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
               let downloadURLString = asset["browser_download_url"] as? String,
               let downloadURL = URL(string: downloadURLString) else {
             throw "Could not find download URL for ipa"
         }
-        
+
         // Download the asset
         try await withThrowingTaskGroup(of: Void.self) { group in
             downloadProgress.totalUnitCount = 1
             group.addTask {
                 let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
-                update(tipaURL: url)
+                if (isJailbroken()) {
+                    update(tipaURL: url)
+                } else {
+                    guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=\(url.absoluteString)") else {
+                        return
+                    }
+                    await UIApplication.shared.open(dopamineUpdateURL)
+                    exit(0)
+                    return
+                }
             }
             try await group.waitForAll()
         }
@@ -243,7 +266,7 @@ struct UpdateDownloadingView_Previews: PreviewProvider {
 · Improved the app's compatibility with various iOS devices.
 · Fixed bugs related to the installation of certain tweaks and packages.
 · Added new options for customizing the app's interface and settings.
-""", mismatchChangelog:
+""", mismatchAndupdateChangelog:
 """
 · Added support for iOS 15.0 - 15.1.
 · Improved the app's compatibility with various iOS devices.

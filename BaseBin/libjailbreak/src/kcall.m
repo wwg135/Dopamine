@@ -143,7 +143,7 @@ uint64_t Fugu14Kcall_withThreadState(Fugu14KcallThread *callThread, KcallThreadS
 	// Sync all changes
 	// (Probably not required)
 	MEMORY_BARRIER
-	
+
 	// Copy return value
 	return callThread->scratchMemoryMapped[0];
 }

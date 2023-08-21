@@ -298,24 +298,27 @@ bool shouldEnableTweaks(void)
 		}
 	}
 
-	bool tweaksEnabled = true;
+	const char *tweaksDisabledPathSuffixes[] = {
+		// System binaries
+		"/usr/libexec/xpcproxy",
 
-	if (gExecutablePath) {
-		if (!strcmp(gExecutablePath, "/usr/libexec/xpcproxy")) {
-			tweaksEnabled = false;
-		}
-		else if (stringEndsWith(gExecutablePath, "/usr/bin/dash")) {
-			tweaksEnabled = false;
-		}
-		else if (stringEndsWith(gExecutablePath, "/usr/bin/apt-config")) {
-			tweaksEnabled = false;
-		}
-		else if (stringEndsWith(gExecutablePath, "/usr/bin/apt-get")) {
-			tweaksEnabled = false;
-		}
+		// Bootstrap binaries
+		"/usr/sbin/sshd",
+		"/usr/bin/dash",
+		"/usr/bin/zsh",
+		"/usr/bin/apt-config",
+		"/usr/bin/apt-get",
+		"/usr/bin/dpkg-deb",
+
+		// Dopamine app itself (jailbreak detection bypass tweaks can break it)
+		"Dopamine.app/Dopamine",
+	};
+	for (size_t i = 0; i < sizeof(tweaksDisabledPathSuffixes) / sizeof(const char*); i++)
+	{
+		if (stringEndsWith(gExecutablePath, tweaksDisabledPathSuffixes[i])) return false;
 	}
 
-	return tweaksEnabled;
+	return true;
 }
 
 void applyKbdFix(void)
@@ -342,11 +345,14 @@ __attribute__((constructor)) static void initializer(void)
 		if (strcmp(gExecutablePath, "/System/Library/CoreServices/SpringBoard.app/SpringBoard") == 0) {
 			applyKbdFix();
 		}
-		if (strcmp(gExecutablePath, "/usr/sbin/cfprefsd") == 0) {
+		else if (strcmp(gExecutablePath, "/usr/sbin/cfprefsd") == 0) {
 			int64_t debugErr = jbdswDebugMe();
 			if (debugErr == 0) {
 				dlopen_hook("/var/jb/basebin/rootlesshooks.dylib", RTLD_NOW);
 			}
+		}
+		else if (strcmp(gExecutablePath, "/usr/libexec/watchdogd") == 0) {
+			dlopen_hook("/var/jb/basebin/watchdoghook.dylib", RTLD_NOW);
 		}
 	}
 
@@ -364,14 +370,6 @@ __attribute__((constructor)) static void initializer(void)
 	}
 	freeExecutablePath();
 }
-
-/*void _os_crash(void);
-void _os_crash_hook(void)
-{
-	// Normally this function is used to trigger a userspace panic
-	// We overwrite it to do a userspace reboot instead, so that the jailbreak environment stays alive
-	reboot3(RB2_USERREBOOT);
-}*/
 
 DYLD_INTERPOSE(posix_spawn_hook, posix_spawn)
 DYLD_INTERPOSE(posix_spawnp_hook, posix_spawnp)

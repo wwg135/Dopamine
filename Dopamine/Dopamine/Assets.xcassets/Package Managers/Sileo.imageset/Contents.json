@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "Clouds.png",
+      "filename" : "Sileo.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Clouds@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Clouds@3x.jpg",
       "idiom" : "universal",
       "scale" : "3x"
     }

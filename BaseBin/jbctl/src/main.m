@@ -11,7 +11,8 @@ void print_usage(void)
 Available commands:\n\
 	proc_set_debugged <pid>\t\tMarks the process with the given pid as being debugged, allowing invalid code pages inside of it\n\
 	rebuild_trustcache\t\tRebuilds the TrustCache, clearing any previously trustcached files that no longer exists from it (automatically ran daily at midnight)\n\
-	update <tipa/basebin> <path>\tInitiates a jailbreak update either based on a TIPA or based on a basebin.tar file, TIPA installation depends on TrollStore, afterwards it triggers a userspace reboot\n");
+	update <tipa/basebin> <path>\tInitiates a jailbreak update either based on a TIPA or based on a basebin.tar file, TIPA installation depends on TrollStore, afterwards it triggers a userspace reboot\n\
+	mountPath <path>\tEnter the real path of the mounted directory. Used to modify system files. Works in (/var/jb/real path)");
 }
 
 int main(int argc, char* argv[])
@@ -29,7 +30,7 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 		int pid = atoi(argv[2]);
-		int64_t result = jbdProcSetDebugged(getpid());
+		int64_t result = jbdProcSetDebugged(pid);
 		if (result == 0) {
 			printf("Successfully marked proc of pid %d as debugged\n", pid);
 		}
@@ -39,6 +40,8 @@ int main(int argc, char* argv[])
 	}
 	else if (!strcmp(cmd, "rebuild_trustcache")) {
 		jbdRebuildTrustCache();
+        } else if (!strcmp(cmd, "reboot_userspace")) {
+		return reboot3(RB2_USERREBOOT);
 	} else if (!strcmp(cmd, "update")) {
 		if (argc < 4) {
 			print_usage();
@@ -60,6 +63,14 @@ int main(int argc, char* argv[])
 			printf("Update failed with error code %lld\n", result);
 			return result;
 		}
+	} else if (!strcmp(cmd, "userspace_reboot")) {
+		execve(prebootPath(@"usr/bin/launchctl").fileSystemRepresentation,
+			(char *const[]){
+				(char *const)prebootPath(@"usr/bin/launchctl").fileSystemRepresentation, "reboot", "userspace", NULL
+			}, environ);
+        } else if (!strcmp(cmd, "mountPath")) {
+		if (argc != 3) return 1;
+		jbdMountPath([NSString stringWithUTF8String:argv[2]], true);
 	}
 
 	return 0;
