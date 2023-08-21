@@ -91,7 +91,6 @@ struct JailbreakView: View {
                                     .opacity(0.5)
                             }
                         }
-                        checkForUpdatesButton
                         bottomSection
                         updateButton
                         if !isJailbreaking {
@@ -281,27 +280,6 @@ struct JailbreakView: View {
         .frame(maxWidth: 320, maxHeight: isJailbreaking ? 0 : nil)
         .opacity(isJailbreaking ? 0 : 1)
         .animation(.spring(), value: isJailbreaking)
-    }
-
-    @ViewBuilder
-    var checkForUpdatesButton: some View {
-        Button {
-            Task {
-                try await checkForUpdates() 
-            }
-        } label: {
-            Label(title: { Text("Check_For_Updates") }, icon: {
-                Image(systemName: "arrow.down.circle")
-            })
-            .foregroundColor(.white)
-            .padding()
-            .frame(maxWidth: 280, maxHeight: 48)
-            .background(MaterialView(.light)
-                .opacity(0.5)
-                .cornerRadius(8)
-            )
-            .opacity(1)
-        }
     }
     
     @ViewBuilder
