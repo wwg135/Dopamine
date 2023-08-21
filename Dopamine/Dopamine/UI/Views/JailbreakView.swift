@@ -214,7 +214,7 @@ struct JailbreakView: View {
                 .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
-                .init(id: "checkAndUpdates", imageName: "arrow.down.circle", title: NSLocalizedString("Check_For_Updates", comment: ""), action: checkAndUpdates),
+                .init(id: "checkForUpdates", imageName: "arrow.down.circle", title: NSLocalizedString("Check_For_Updates", comment: ""), action: try await checkForUpdates()),
                 .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
             ]
             ForEach(menuOptions) { option in
@@ -576,28 +576,6 @@ struct JailbreakView: View {
 
         updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion      
         mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
-    }
-
-    func checkAndUpdates() {
-        let currentAppVersion = "AAC"
-        let owner = "wwg135"
-        let repo = "Dopamine"
-            
-        // Get the releases
-        let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
-        let releasesRequest = URLRequest(url: releasesURL)
-        let (releasesData, _) = URLSession.shared.data(for: releasesRequest)
-        guard let releasesJSON = JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
-            return
-        }
-
-	    if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
-            if let latestName = latest["tag_name"] as? String,
-                let latestVersion = latest["name"] as? String,
-                latestName != currentAppVersion && latestVersion != "1.0.5" {
-                    updateAvailable = true
-	            }
-	    }
     }
     
     func getLaunchTime() -> String {
