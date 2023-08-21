@@ -132,13 +132,13 @@ struct AboutView: View {
                 if !easterEgg {
                     Text("Credits_Footer_Dopamine_Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")\nOS:\(ProcessInfo.processInfo.operatingSystemVersionString)")
                 } else {
-                    Text(verbatim: "Wait, it's all Evyrest?\nAlways has been.")
+                    Text(verbatim: "不要为了越狱放弃升级的乐趣！！！")
                 }
             }
             .fixedSize()
             .font(.footnote)
             .opacity(0.6)
-            .onTapGesture(count: 5) {
+            .onTapGesture(count: 1) {
                 easterEgg.toggle()
             }
         }
