@@ -459,6 +459,8 @@ struct JailbreakView: View {
     
     @ViewBuilder
     var updateButton: some View {
+        @State var isPopupPresented = false
+        
         Button {
             showingUpdatePopupType = .regular
         } label: {
