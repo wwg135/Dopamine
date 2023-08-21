@@ -584,7 +584,7 @@ struct JailbreakView: View {
         return userOrientedChangelog
     }
     
-    func checkForUpdates() async throws {
+    func checkForUpdates() {
         let currentAppVersion = "AAC"
         let owner = "wwg135"
         let repo = "Dopamine"
