@@ -105,9 +105,9 @@ struct JailbreakView: View {
                 PopupView(title: {
                     Text("Menu_Settings_Title")
                 }, contents: {
-                    SettingsView(isPresented: $isSettingsPresented)
+                    SettingsView(isPresented: $isPopupPresented)
                         .frame(maxWidth: 320)
-                }, isPresented: $isSettingsPresented)
+                }, isPresented: $isPopupPresented)
                 .zIndex(2)          
                 
                 PopupView(title: {
@@ -121,7 +121,7 @@ struct JailbreakView: View {
                 }, contents: {
                     AboutView()
                         .frame(maxWidth: 320)
-                }, isPresented: $isCreditsPresented)
+                }, isPresented: $isPopupPresented)
                 .zIndex(2)
 
                 PopupView(title: {
@@ -135,7 +135,7 @@ struct JailbreakView: View {
                     }
                     .opacity(1)
                     .frame(maxWidth: 280, maxHeight: 480)
-                }, isPresented: $isUpdatelogPresented)
+                }, isPresented: $isPopupPresented)
                 .zIndex(2)
                 
                 UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
@@ -220,11 +220,11 @@ struct JailbreakView: View {
                     } else {
                         switch option.id {
                         case "settings":
-                            isSettingsPresented = true
+                            isPopupPresented = true
                         case "credits":
-                            isCreditsPresented = true
+                            isPopupPresented = true
                         case "updatelog":
-                            isUpdatelogPresented = true
+                            isPopupPresented = true
                         default: break
                         }
                     }
@@ -472,8 +472,7 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: updateAvailable)
-        .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: isPopupPresented)
+        .animation(Animation.easeInOut(duration: 1.0), value: updateAvailable)
     }
     
     func uiJailbreak() {
