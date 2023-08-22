@@ -47,8 +47,6 @@ jobs:
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
-          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/BBB/${{ env.VERSION }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Fugu15.swift
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
       
       - name: Pre body
@@ -56,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.同步官方1.1.5正式版更新\n> - 2.优化部分代码，提高执行效率" >> body.txt
+          echo -e "\n> - 同步官方1.1.5正式版更新" >> body.txt
       
       - name: Build ipa
         run: |
@@ -65,7 +63,7 @@ jobs:
           gmake -j$(sysctl -n hw.physicalcpu)
           mv Dopamine/Dopamine.tipa Dopamine.ipa
 
-      - name: Release
+      - name: Release ipa
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ env.VERSION }}
