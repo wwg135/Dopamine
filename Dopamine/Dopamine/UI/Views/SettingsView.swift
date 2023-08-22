@@ -65,10 +65,12 @@ struct SettingsView: View {
                                 }
                             if isJailbroken() {   
                                 if forbidUnject {
-                                    Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
-                                        .onChange(of: bottomforbidUnject) { newValue in
-                                            updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
-                                        }
+                                    Toggle(isOn: $bottomforbidUnject) {
+                                        Text(bottomforbidUnject ? "Options_Enble_Bottom_Forbid_Unject" : "Options_Disenble_Bottom_Forbid_Unject")
+                                            .onChange(of: bottomforbidUnject) { newValue in
+                                                updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
+                                            }
+                                    }
                                 }
                             }
                             if !isJailbroken() {
