@@ -495,7 +495,7 @@ struct JailbreakView: View {
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         if tweakInjectionEnabled {
-                            // userspaceReboot()
+                            userspaceReboot()
                         } else {
                             respring()
                             exit(0)
