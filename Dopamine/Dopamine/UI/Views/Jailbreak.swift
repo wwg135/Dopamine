@@ -103,12 +103,6 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
     }
 }
 
-func removeZmount(rmpath: String) {
-    DispatchQueue.global().async {
-        _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
-    }
-}
-
 func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
     DispatchQueue.global().async {
         let fileManager = FileManager.default
@@ -170,19 +164,6 @@ func changeMobilePassword(newPassword: String) {
     }
     DispatchQueue.global().async {
         _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
-    }
-}
-
-func newMountPath(newPath: String) {// zqbb_flag
-    let plist = NSDictionary(contentsOfFile: "/var/mobile/newFakePath.plist")
-    let pathArray = plist?["path"] as? [String]
-    if pathArray?.firstIndex(of: newPath) == nil {
-	guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
-            return
-        }
-        DispatchQueue.global().async {
-            _ = execCmd(args: [jbctlPath, "mountPath", newPath])
-	}
     }
 }
 
