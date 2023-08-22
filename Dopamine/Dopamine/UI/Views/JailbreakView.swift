@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Fugu15KernelExploit
-import SwiftfulLoadingIndicators
 
 #if os(iOS)
 import UIKit
@@ -42,7 +41,8 @@ struct JailbreakView: View {
     
     @State var updateAvailable = false
     @State var showingUpdatePopupType: UpdateType? = nil
-    @State var mismatchAndupdateChangelog: String? = nil
+    @State var updateChangelog: String? = nil
+    @State var mismatchChangelog: String? = nil
 
     @State private var upTime = "系统启动于: 加载中"
     @State private var index = 0
@@ -131,7 +131,7 @@ struct JailbreakView: View {
                     Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                 }, contents: {
                     ScrollView {
-                        Text(try! AttributedString(markdown: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                        Text(try! AttributedString(markdown: isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog, NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                             .opacity(1)
                             .multilineTextAlignment(.center)
                             .padding(.vertical)
@@ -141,7 +141,7 @@ struct JailbreakView: View {
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
                 
-                UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
             }
             .animation(.default, value: showingUpdatePopupType == nil)
         }
@@ -564,8 +564,12 @@ struct JailbreakView: View {
                     updateAvailable = true
                 }
         }
-        
-        mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+
+        updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+
+        if isInstalledEnvironmentVersionMismatching() {
+            mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
+        }
     }
     
     func getLaunchTime() -> String {
