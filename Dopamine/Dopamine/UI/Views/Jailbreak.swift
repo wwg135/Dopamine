@@ -34,21 +34,15 @@ func respring() {
     guard let sbreloadPath = rootifyPath(path: "/usr/bin/sbreload") else {
         return
     }
-    DispatchQueue.global().async {
-        _ = execCmd(args: [sbreloadPath])
-    }
+    _ = execCmd(args: [sbreloadPath])
 }
 
 func userspaceReboot() {
-    DispatchQueue.global().async {
-        _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
-    }
+    _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
 }
 
 func reboot() {
-    DispatchQueue.global().async {
-        _ = execCmd(args: [CommandLine.arguments[0], "reboot"])
-    }
+    _ = execCmd(args: [CommandLine.arguments[0], "reboot"])
 }
 
 func isJailbroken() -> Bool {
@@ -104,55 +98,47 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
 }
 
 func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
-    DispatchQueue.global().async {
-        let fileManager = FileManager.default
-        let filePath = "/var/mobile/zp.unject.plist"
-        if fileManager.fileExists(atPath: filePath) { 
-            if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
-                if let newKey = newForbidUnject {
-                    if let _ = dict[newKey] {
-                        dict.removeObject(forKey: newKey)
-                    } else {
-                        dict[newKey] = true
-                    }
-                } else {   
-                    for (key, value) in dict {
-                        if let boolValue = value as? Bool {
-                            if toggleOn {
-                                dict[key] = true
-                            } else {
-                                dict[key] = false
-                            }
+    let fileManager = FileManager.default
+    let filePath = "/var/mobile/zp.unject.plist"
+    if fileManager.fileExists(atPath: filePath) { 
+        if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
+            if let newKey = newForbidUnject {
+                if let _ = dict[newKey] {
+                    dict.removeObject(forKey: newKey)
+                } else {
+                    dict[newKey] = true
+                }
+            } else {   
+                for (key, value) in dict {
+                    if let boolValue = value as? Bool {
+                        if toggleOn {
+                            dict[key] = true
+                        } else {
+                            dict[key] = false
                         }
                     }
-                }  
-                dict.write(toFile: filePath, atomically: true)
-            }
+                }
+            }  
+            dict.write(toFile: filePath, atomically: true)
         }
     }
 }
 
 func removeJailbreak() {
     dopamineDefaults().removeObject(forKey: "selectedPackageManagers")
-    DispatchQueue.global().async {
-        _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
-    }
+    _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
     if isJailbroken() {
         reboot()
     }
 }
 
 func jailbrokenUpdateTweakInjectionPreference() {
-    DispatchQueue.global().async {
-        _ = execCmd(args: [CommandLine.arguments[0], "update_tweak_injection"])
-    }
+    _ = execCmd(args: [CommandLine.arguments[0], "update_tweak_injection"])
 }
 
 func jailbrokenUpdateIDownloadEnabled() {
     let iDownloadEnabled = dopamineDefaults().bool(forKey: "iDownloadEnabled")
-    DispatchQueue.global().async {
-        _ = execCmd(args: [rootifyPath(path: "basebin/jbinit")!, iDownloadEnabled ? "start_idownload" : "stop_idownload"])
-    }
+    _ = execCmd(args: [rootifyPath(path: "basebin/jbinit")!, iDownloadEnabled ? "start_idownload" : "stop_idownload"])
 }
 
 func changeMobilePassword(newPassword: String) {
@@ -162,15 +148,11 @@ func changeMobilePassword(newPassword: String) {
     guard let pwPath = rootifyPath(path: "/usr/sbin/pw") else {
         return;
     }
-    DispatchQueue.global().async {
-        _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
-    }
+    _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
 }
 
 func update(tipaURL: URL) {
-    DispatchQueue.global(qos: .userInitiated).async {
-        jbdUpdateFromTIPA(tipaURL.path, true)
-    }
+    jbdUpdateFromTIPA(tipaURL.path, true)
 }
 
 func installedEnvironmentVersion() -> String {
@@ -184,9 +166,7 @@ func isInstalledEnvironmentVersionMismatching() -> Bool {
 }
 
 func updateEnvironment() {
-    DispatchQueue.global().async {
-        jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
-    }
+    jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
 }
 
 // debugging
