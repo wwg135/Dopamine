@@ -32,7 +32,6 @@ struct JailbreakView: View {
         var action: (() -> ())? = nil
     }
 
-    @State var progressDouble: Double = 0
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
     @State var isUpdatelogPresented = false
@@ -165,12 +164,10 @@ struct JailbreakView: View {
             }
             DispatchQueue.global().async {
                 Task {
-                    if checkForUpdates {
-                        do {
-                            try await checkForUpdates()
-                        } catch {
-                            Logger.log(error, type: .error, isStatus: false)
-                        }
+                    do {
+                        try await checkForUpdates()
+                    } catch {
+                        Logger.log(error, type: .error, isStatus: false)
                     }
                 }
             }
@@ -379,38 +376,6 @@ struct JailbreakView: View {
                 .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1) .opacity(0.25)
             )
             .animation(.spring(), value: isJailbreaking)
-
-            if (jailbreakingProgress == .jailbreaking) {
-                ZStack {
-                    ZStack {
-                        Text("\(Int(progressDouble * 100))%")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-                    }
-                    Circle()
-                        .stroke(
-                            Color.white.opacity(0.1),
-                            lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
-                        )
-                        .animation(.linear, value: progressDouble)
-                    Circle()
-                        .trim(from: 0, to: progressDouble)
-                        .stroke(
-                            Color.white,
-                            style: StrokeStyle(
-                                lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                                lineCap: .round
-                            )
-                        )
-                        .rotationEffect(.degrees(-90))
-                        .animation(.easeOut, value: progressDouble)
-                        .animation(.linear, value: progressDouble)
-                }
-                .frame(maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.1 : nil)
-                .animation(.linear, value: progressDouble)
-                .opacity(progressDouble < 1 ? 1 : 0)
-            }
         }
     }
 
@@ -471,15 +436,6 @@ struct JailbreakView: View {
         let dpDefaults = dopamineDefaults()
         dpDefaults.set(dpDefaults.integer(forKey: "total_jailbreaks") + 1, forKey: "total_jailbreaks")
         dpDefaults.synchronize()
-
-        // 💀 code
-        Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { t in
-            progressDouble += 0.01              
-                                
-            if progressDouble >= 1 {
-                t.invalidate()
-            }
-        }
         
         DispatchQueue(label: "Dopamine").async {
             sleep(1)
@@ -564,7 +520,9 @@ struct JailbreakView: View {
             if let latestName = latest["tag_name"] as? String,
                 let latestVersion = latest["name"] as? String,
                 latestName != currentAppVersion && latestVersion != "1.0.5" {
-                    updateAvailable = true
+                    if checkForUpdates {
+                        updateAvailable = true
+                    }
                 }
         }
 
