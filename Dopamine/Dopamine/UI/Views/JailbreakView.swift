@@ -414,24 +414,7 @@ struct JailbreakView: View {
     @ViewBuilder
     var endButtons: some View {
         switch jailbreakingProgress {
-        case .finished:
-            Button {
-                userspaceReboot()
-            } label: {
-                Label(title: { Text("Reboot_Userspace_Finish") }, icon: {
-                    Image(systemName: "arrow.clockwise")
-                })
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? 0 : nil)
-                .background(MaterialView(.light)
-                    .opacity(0.5)
-                    .cornerRadius(8)
-                )
-                .opacity(jailbreakingError != nil ? 0 : 1)
-            }
-            .opacity(jailbreakingError != nil ? 0 : 1) .animation(Animation .easeInOut(duration: 1.0) .repeatForever())
-            
+        case .finished: 
             if !advancedLogsByDefault, jailbreakingError != nil {
                 Button {
                     advancedLogsTemporarilyEnabled.toggle()
@@ -574,7 +557,14 @@ struct JailbreakView: View {
             return
         }
 
-        updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion      
+        if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
+            if let latestName = latest["tag_name"] as? String,
+                let latestVersion = latest["name"] as? String,
+                latestName != currentAppVersion && latestVersion != "1.0.5" {
+                    updateAvailable = true
+                }
+        }
+        
         mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
     }
     
