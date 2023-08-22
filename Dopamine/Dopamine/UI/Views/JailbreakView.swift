@@ -480,7 +480,7 @@ struct JailbreakView: View {
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
         .scaleEffect(CGSize(width: animValue, height: 1))
-        .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: updateAvailable)
+        .animation(Animation.easeInOut.repeatForever(autoreverses: true), value: updateAvailable)
     }
     
     func uiJailbreak() {
