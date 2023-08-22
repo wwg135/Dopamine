@@ -53,7 +53,8 @@ struct SettingsView: View {
                             Toggle(isOn: $checkForUpdates) {
                                 Text(checkForUpdates ? "Check_For_Updates" : "Block_Update")
                             }
-                            Toggle("Change_Version", isOn: $changeVersion)
+                            Toggle(isOn: $changeVersion) {
+                                Text(changeVersion ? "Change_Version" : "Keep_Version")
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
