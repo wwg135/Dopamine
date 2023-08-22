@@ -33,6 +33,7 @@ struct JailbreakView: View {
     }
 
     @State var progressDouble: Double = 0
+    @State var animValue: CGFloat = 1
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
     @State var isUpdatelogPresented = false
@@ -478,6 +479,7 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
+        .scaleEffect(CGSize(width: animValue, height: 1))
         .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: updateAvailable)
     }
     
