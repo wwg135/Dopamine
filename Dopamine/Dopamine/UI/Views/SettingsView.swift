@@ -50,7 +50,9 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                            Toggle(isOn: $checkForUpdates) {
+                                Text(checkForUpdates ? "Check_For_Updates" : "Block_Update")
+                            }
                             Toggle("Change_Version", isOn: $changeVersion)
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
