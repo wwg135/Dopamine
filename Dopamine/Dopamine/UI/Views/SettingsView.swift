@@ -37,8 +37,6 @@ struct SettingsView: View {
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
     
-    @State var easterEgg = false
-    
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
         self._isPresented = isPresented ?? .constant(true)
@@ -221,13 +219,6 @@ struct SettingsView: View {
                         }
                     }
                     .padding(.top, 2)
-                    
-                    if easterEgg {
-                        Image("fr")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(maxHeight: .infinity)
-                    }
                     
                     ZStack {}
                         .textFieldAlert(isPresented: $customforbidunjectAlertShown) { () -> TextFieldAlert in
