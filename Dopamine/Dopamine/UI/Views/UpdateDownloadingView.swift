@@ -85,25 +85,14 @@ struct UpdateDownloadingView: View {
                             }
                         }  
                     } label: {
-                        if changeVersion {
-                            Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(maxWidth: 280)
-                                .background(MaterialView(.light)
-                                    .opacity(0.5)
-                                    .cornerRadius(8)
-                                )
-                        } else {
-                            Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(maxWidth: 280)
-                                .background(MaterialView(.light)
-                                    .opacity(0.5)
-                                    .cornerRadius(8)
-                                )
-                        }
+                        Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: 280)
+                            .background(MaterialView(.light)
+                                .opacity(0.5)
+                                .cornerRadius(8)
+                            )
                     }
                     .fixedSize()
                     
@@ -203,8 +192,7 @@ struct UpdateDownloadingView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        let latest = changeVersion ? releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) : releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })
-        guard let latestRelease = latest,
+        guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }),
               let assets = latestRelease["assets"] as? [[String: Any]],
               let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
               let downloadURLString = asset["browser_download_url"] as? String,
