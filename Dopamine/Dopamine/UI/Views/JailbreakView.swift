@@ -165,10 +165,12 @@ struct JailbreakView: View {
             }
             DispatchQueue.global().async {
                 Task {
-                    do {
-                        try await checkForUpdates()
-                    } catch {
-                        Logger.log(error, type: .error, isStatus: false)
+                    if checkForUpdates {
+                        do {
+                            try await checkForUpdates()
+                        } catch {
+                            Logger.log(error, type: .error, isStatus: false)
+                        }
                     }
                 }
             }
