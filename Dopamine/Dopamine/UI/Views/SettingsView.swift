@@ -50,9 +50,8 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            Toggle(isOn: $changeVersion) {
-                                Text(changeVersion ? "Change_Version" : "Keep_Version")
-                            }
+                            Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                            Toggle("Change_Version", isOn: $changeVersion)
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
@@ -62,12 +61,10 @@ struct SettingsView: View {
                                 }
                             if isJailbroken() {   
                                 if forbidUnject {
-                                    Toggle(isOn: $bottomforbidUnject) {
-                                        Text(bottomforbidUnject ? "Options_Enble_Bottom_Forbid_Unject" : "Options_Disenble_Bottom_Forbid_Unject")
-                                            .onChange(of: bottomforbidUnject) { newValue in
-                                                updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
-                                            }
-                                    }
+                                    Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
+                                        .onChange(of: bottomforbidUnject) { newValue in
+                                            updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
+                                        }
                                 }
                             }
                             if !isJailbroken() {
@@ -85,24 +82,6 @@ struct SettingsView: View {
                         }
                         if isBootstrapped() {
                             VStack {
-                                Button(action: {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    checkForUpdates.toggle()
-                                }) {
-                                    HStack {
-                                        Image(systemName: checkForUpdates ? "checkmark" : "lock")
-                                        Text(checkForUpdates ? "Check_For_Updates" : "Block_Update")
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.5)
-                                    }
-                                    .padding(.horizontal, 4)
-                                    .padding(8)
-                                    .frame(maxWidth: .infinity)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                    )
-                                }
                                 if isJailbroken() {
                                     if bottomforbidUnject {
                                         Button(action: {
