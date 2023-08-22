@@ -160,29 +160,11 @@
 
 "Check_For_Updates" = "检查更新";
 
-"Options_bridgeToXinA" = "桥接心浪";
-
-"Options_Enable_Mount_Path" = "启用挂载";
-
-"Button_Set_Mount_Path" = "  新增挂载";
-
-"Set_Mount_Path_Alert_Shown_Title" = "请输入要新增的挂载目录(原始路径)";
-
-"Set_Mount_Path_Message" = "挂载后在\"/var/jb/原始路径\"里面替换内容";
-
-"Button_Remove_Zmount" = "  解除挂载";
-
-"Remove_Zmount_Alert_Shown_Title" = "请输入要解除的挂载目录(原始路径)";
-
-"Remove_Zmount_Message" = "此举会删除系统挂载的文件\n\n如果在越狱状态,请立即重启用户空间";
-
-"Button_Respring_Finish" = "注销以完成越狱";
-
 "Button_Reboot_Userspace_Finish" = "重启用户空间";
 
 "Jailbroken currently, please reboot the device." = "当前为越狱状态，请重启设备后再清除越狱。确定重启吗？";
 
-"Options_Forbid_Unject" = "底层屏蔽";
+"Options_Forbid_Unject" = "App底层屏蔽";
 
 "Options_Enble_Bottom_Forbid_Unject" = "启用App越狱屏蔽";
 
@@ -191,7 +173,3 @@
 "Set_Custom_Forbid_Unject_Alert_Shown_Title" = "请输入要屏蔽越狱检测的App名称Bundle";
 
 "Set_Custom_Forbid_Unject_Message" = "1.输入说明：在越狱商店源https://repo.initnil.com/下载插件AppData-Rootless安装，上划要屏蔽越狱检测的app图标→→点击“应用安装目录”进去→→复制XXXXX.app中的“XXXXX”粘贴到这里确定即可。\n2.若要删除已添加的App屏蔽越狱检测，则输入添加时的Bundle进去确定即可。";
-
-"Button_Select_Update" = "安装1.0.5版本";
-
-"Change_Version" = "更换版本";
