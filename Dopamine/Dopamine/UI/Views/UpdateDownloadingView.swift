@@ -12,12 +12,10 @@ enum UpdateType {
     case environment, regular
 }
 
-struct UpdateDownloadingView: View {
-    
+struct UpdateDownloadingView: View {   
     enum UpdateState {
         case changelog, downloading, updating
     }
-    
     
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
@@ -48,12 +46,12 @@ struct UpdateDownloadingView: View {
                             .opacity(0.5)
                         ScrollView {
                             Text(try! AttributedString(markdown: type == .environment ? mismatchChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                .opacity(0.5)
+                                .opacity(1)
                                 .multilineTextAlignment(.center)
                                 .padding(.vertical)
                         }
                     }
-                    
+
                     Button {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         if type == .regular {
@@ -82,10 +80,9 @@ struct UpdateDownloadingView: View {
                             DispatchQueue.global(qos: .userInitiated).async {
                                 updateEnvironment()
                             }
-                        }
-                        
+                        }  
                     } label: {
-                        Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                        Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
                             .foregroundColor(.white)
                             .padding()
                             .frame(maxWidth: 280)
@@ -180,7 +177,7 @@ struct UpdateDownloadingView: View {
     }
     
     func downloadUpdateAndInstall() async throws {
-        let owner = "opa334"
+        let owner = "wwg135"
         let repo = "Dopamine"
         
         // Get the releases
@@ -190,16 +187,16 @@ struct UpdateDownloadingView: View {
         let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as! [[String: Any]]
         
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
-        
+
         // Find the latest release
-        guard let latestRelease = releasesJSON.first,
+        guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }),
               let assets = latestRelease["assets"] as? [[String: Any]],
-              let asset = assets.first(where: { ($0["name"] as! String).contains(".tipa") }),
+              let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
               let downloadURLString = asset["browser_download_url"] as? String,
               let downloadURL = URL(string: downloadURLString) else {
             throw "Could not find download URL for ipa"
         }
-        
+
         // Download the asset
         try await withThrowingTaskGroup(of: Void.self) { group in
             downloadProgress.totalUnitCount = 1
