@@ -50,9 +50,6 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            Toggle(isOn: $checkForUpdates) {
-                                Text(checkForUpdates ? "Check_For_Updates" : "Block_Update")
-                            }
                             Toggle(isOn: $changeVersion) {
                                 Text(changeVersion ? "Change_Version" : "Keep_Version")
                             }
@@ -88,6 +85,24 @@ struct SettingsView: View {
                         }
                         if isBootstrapped() {
                             VStack {
+                                Button(action: {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    checkForUpdates.toggle()
+                                }) {
+                                    HStack {
+                                        Image(systemName: checkForUpdates ? "checkmark" : "lock")
+                                        Text(checkForUpdates ? "Check_For_Updates" : "Block_Update")
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.5)
+                                    }
+                                    .padding(.horizontal, 4)
+                                    .padding(8)
+                                    .frame(maxWidth: .infinity)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                    )
+                                }
                                 if isJailbroken() {
                                     if bottomforbidUnject {
                                         Button(action: {
