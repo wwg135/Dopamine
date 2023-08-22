@@ -152,7 +152,9 @@ func changeMobilePassword(newPassword: String) {
 }
 
 func update(tipaURL: URL) {
-    jbdUpdateFromTIPA(tipaURL.path, true)
+    DispatchQueue.global(qos: .userInitiated).async {
+        jbdUpdateFromTIPA(tipaURL.path, true)
+    }
 }
 
 func installedEnvironmentVersion() -> String {
