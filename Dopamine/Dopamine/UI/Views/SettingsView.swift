@@ -37,7 +37,7 @@ struct SettingsView: View {
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
     
-    @State var nationalDay = false
+    @State var easterEgg = false
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -222,8 +222,8 @@ struct SettingsView: View {
                     }
                     .padding(.top, 2)
                     
-                    if nationalDay {
-                        Image("nd")
+                    if easterEgg {
+                        Image("fr")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(maxHeight: .infinity)
