@@ -157,7 +157,7 @@ struct JailbreakView: View {
                     } else {
                         upTime = formatUptime()
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                         showLaunchTime = false
                     }
                 }
