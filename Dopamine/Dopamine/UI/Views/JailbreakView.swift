@@ -452,7 +452,7 @@ struct JailbreakView: View {
                     
                     Logger.log(NSLocalizedString("Restarting Userspace", comment: ""), type: .continuous, isStatus: true)
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    DispatchQueue.global().async {
                         if tweakInjectionEnabled {
                             userspaceReboot()
                         } else {
