@@ -17,6 +17,7 @@ struct SettingsView: View {
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
+    @State private var hiddenFunction = UserDefaults.standard.bool(forKey: "hiddenFunction")
     
     @Binding var isPresented: Bool
     
@@ -40,7 +41,10 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                            if hiddenFunction {
+                                Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                            } else {
+                            }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
@@ -49,7 +53,10 @@ struct SettingsView: View {
                                     }
                                 }
                             if !isJailbroken() {
-                                Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
+                                if hiddenFunction {
+                                    Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
+                                } else {
+                                }
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                     .onChange(of: enableiDownload) { newValue in
                                         if isJailbroken() {
@@ -63,23 +70,25 @@ struct SettingsView: View {
                             VStack {
                                 if isJailbroken() {
                                     if forbidUnject {
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            customforbidunjectAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "eye")
-                                                Text("Options_Custom_Forbid_Unject")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
+                                        if hiddenFunction {
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                customforbidunjectAlertShown = true
+                                            }) {
+                                                HStack {
+                                                    Image(systemName: "eye")
+                                                    Text("Options_Custom_Forbid_Unject")
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.5)
+                                                }
+                                                .padding(.horizontal, 4)
+                                                .padding(8)
+                                                .frame(maxWidth: .infinity)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                                )
                                             }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
                                         }
                                     }
                                 }
@@ -152,13 +161,15 @@ struct SettingsView: View {
                     .padding(.horizontal, 32)
                     
                     VStack(spacing: 6) {
-                        Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
-                            .font(.footnote)
-                            .opacity(1)
-                        if isJailbroken() {
+                        Group {
+                            Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
-                                .font(.footnote)
-                                .opacity(1)
+                        }
+                        .font(.footnote)
+                        .opacity(1)
+                        .onTapGesture(count: 1) {
+                            hiddenFunction.toggle()
+                            UserDefaults.standard.set(hiddenFunction, forKey: "hiddenFunction")
                         }
                     }
                     .padding(.top, 2)
