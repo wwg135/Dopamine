@@ -221,54 +221,11 @@ struct UpdateDownloadingView: View {
 struct UpdateDownloadingView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
-//            Image("Wallpaper")
-//                .resizable()
-//                .aspectRatio(contentMode: .fill)
-//                .edgesIgnoringSafeArea(.all)
-//                .blur(radius: 4)
-//                .frame(maxWidth: .infinity, maxHeight: .infinity)
             Color.black
                 .opacity(1)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
-            UpdateDownloadingView(type: .constant(.regular), changelog:
-"""
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-""", mismatchChangelog:
-"""
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-"""
-            )
+            UpdateDownloadingView(type: .constant(.regular), changelog: "", mismatchChangelog: "")
         }
     }
 }
