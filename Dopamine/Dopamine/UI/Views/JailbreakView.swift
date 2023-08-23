@@ -51,8 +51,7 @@ struct JailbreakView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
-
-    @State private var showTexts = true
+    @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -212,6 +211,7 @@ struct JailbreakView: View {
                 }
                 .onTapGesture(count: 1) {
                     showTexts.toggle()
+                    UserDefaults.standard.set(showTexts, forKey: "showTexts")
                 }
             }
             Spacer()
