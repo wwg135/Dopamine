@@ -50,6 +50,7 @@ struct JailbreakView: View {
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -191,12 +192,19 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
-                Text("AAA : AAB")
-                    .font(.subheadline)
-                    .foregroundColor(tint)
-                Text(upTime)
-                    .font(.subheadline)
-                    .foregroundColor(tint)
+                if showTexts {
+                    Text("AAA : AAB")
+                    Text(upTime)
+                } else {
+                    Text("")
+                    Text("") 
+                }
+                .font(.subheadline)
+                .foregroundColor(.tint)
+                .onTapGesture {
+                    showTexts.toggle()
+                    UserDefaults.standard.set(showTexts, forKey: "showTexts")
+                }
             }
             Spacer()
         }
