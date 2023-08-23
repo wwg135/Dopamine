@@ -97,28 +97,18 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
     }
 }
 
-func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {
+func ForbidUnject(newForbidUnject: String?) {
     let fileManager = FileManager.default
     let filePath = "/var/mobile/zp.unject.plist"
     if fileManager.fileExists(atPath: filePath) { 
         if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
-            if let newKey = newForbidUnject {
-                if let _ = dict[newKey] {
-                    dict.removeObject(forKey: newKey)
+            if let Key = newForbidUnject {
+                if let _ = dict[Key] {
+                    dict.removeObject(forKey: Key)
                 } else {
-                    dict[newKey] = true
+                    dict[Key] = true
                 }
-            } else {   
-                for (key, value) in dict {
-                    if let boolValue = value as? Bool {
-                        if toggleOn {
-                            dict[key] = true
-                        } else {
-                            dict[key] = false
-                        }
-                    }
-                }
-            }  
+            } 
             dict.write(toFile: filePath, atomically: true)
         }
     }
