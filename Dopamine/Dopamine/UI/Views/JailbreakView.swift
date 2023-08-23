@@ -202,7 +202,7 @@ struct JailbreakView: View {
                     }
                 }
                 .font(.subheadline)
-                .foregroundColor(.tint)
+                .foregroundColor(tint)
                 .onTapGesture(count: 1) {
                     showTexts.toggle()
                     UserDefaults.standard.set(showTexts, forKey: "showTexts")
