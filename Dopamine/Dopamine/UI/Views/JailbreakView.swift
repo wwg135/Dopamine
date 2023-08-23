@@ -50,7 +50,7 @@ struct JailbreakView: View {
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
+    @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts") ?? true
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -205,7 +205,9 @@ struct JailbreakView: View {
                 .foregroundColor(tint)
                 .onTapGesture(count: 1) {
                     showTexts.toggle()
-                    UserDefaults.standard.set(showTexts, forKey: "showTexts")
+                    if !showTexts {
+                        UserDefaults.standard.set(false, forKey: "showTexts")
+                    }
                 }
             }
             Spacer()
