@@ -17,7 +17,6 @@ struct SettingsView: View {
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
-    @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
     
     @Binding var isPresented: Bool
     
@@ -49,14 +48,6 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            if isJailbroken() {   
-                                if forbidUnject {
-                                    Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
-                                        .onChange(of: bottomforbidUnject) { newValue in
-                                            updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
-                                        }
-                                }
-                            }
                             if !isJailbroken() {
                                 Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
@@ -71,7 +62,7 @@ struct SettingsView: View {
                         if isBootstrapped() {
                             VStack {
                                 if isJailbroken() {
-                                    if bottomforbidUnject {
+                                    if forbidUnject {
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                             customforbidunjectAlertShown = true
@@ -175,7 +166,7 @@ struct SettingsView: View {
                     ZStack {}
                         .textFieldAlert(isPresented: $customforbidunjectAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Set_Custom_Forbid_Unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Custom_Forbid_Unject_Message", comment: ""), text: Binding<String?>($customforbidunjectInput), onSubmit: {
-                                updateForbidUnject(toggleOn: false, newForbidUnject: customforbidunjectInput)
+                                ForbidUnject(newForbidUnject: customforbidunjectInput)
                             })
                         }
                         .textFieldAlert(isPresented: $mobilePasswordChangeAlertShown) { () -> TextFieldAlert in
