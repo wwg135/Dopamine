@@ -32,6 +32,18 @@ struct JailbreakView: View {
         var action: (() -> ())? = nil
     }
 
+    struct ToggleText: View {
+        @Binding var show: Bool
+        var body: some View {
+            if show {
+                Text("AAA : AAB"))
+                Text(upTime) 
+            } else {
+                Text("") 
+                Text("")
+            }
+    }
+
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
     @State var isUpdatelogPresented = false
@@ -50,7 +62,7 @@ struct JailbreakView: View {
 
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
+    @State private var showTexts = true
     @State var advancedLogsTemporarilyEnabled: Bool = false
     
     var isJailbreaking: Bool {
@@ -193,20 +205,16 @@ struct JailbreakView: View {
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
                 Group {
-                    if showTexts {
-                        Text("AAA : AAB")      
-                        Text(upTime)
-                    } else {
-                        Text("")
-                        Text("") 
-                    }
+                    ToggleText(show: $showTexts)
+                        .font(.subheadline)
+                        .foregroundColor(tint)
                 }
-                .font(.subheadline)
-                .foregroundColor(tint)
-                .onTapGesture(count: 1) {
-                    showTexts.toggle()
-                    if !UserDefaults.standard.bool(forKey: "showTexts") {
-                        showTexts = true
+                .onTapGesture {
+                    self.showTexts.toggle()
+                    if !self.showTexts {
+                        UserDefaults.standard.set(false, forKey: "showTexts") 
+                    } else {
+                        UserDefaults.standard.removeObject(forKey: "showTexts")
                     }
                 }
             }
