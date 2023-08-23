@@ -166,7 +166,7 @@
 
 "Options_Forbid_Unject" = "App底层屏蔽";
 
-"Options_Custom_Forbid_Unject" = "添加/删除自定义App屏蔽";
+"Options_Custom_Forbid_Unject" = "添加/删除App屏蔽";
 
 "Set_Custom_Forbid_Unject_Alert_Shown_Title" = "请输入要屏蔽越狱检测的App名称Bundle";
 
