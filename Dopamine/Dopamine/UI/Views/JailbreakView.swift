@@ -177,6 +177,10 @@ struct JailbreakView: View {
     
     @ViewBuilder
     var header: some View {
+        if UserDefaults.standard.object(forKey: "showTexts") == nil {
+            showTexts = true
+        }
+        
         let tint = Color.white
         HStack {
             VStack(alignment: .leading) {
@@ -192,9 +196,6 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
-                if UserDefaults.standard.object(forKey: "showTexts") == nil {
-                    showTexts = true
-                }
                 Group {
                     if showTexts {
                         Text("AAA : AAB")      
