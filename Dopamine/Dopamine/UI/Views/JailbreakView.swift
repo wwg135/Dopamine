@@ -147,6 +147,11 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
+            DispatchQueue.global().async {
+                if UserDefaults.standard.object(forKey: "showTexts") == nil {
+                    showTexts = true
+                }
+            }
             let timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
                 let dots = ". . . "                                                                    
                 if index < dots.count {
@@ -177,10 +182,6 @@ struct JailbreakView: View {
     
     @ViewBuilder
     var header: some View {
-        if UserDefaults.standard.object(forKey: "showTexts") == nil {
-            showTexts = true
-        }
-        
         let tint = Color.white
         HStack {
             VStack(alignment: .leading) {
