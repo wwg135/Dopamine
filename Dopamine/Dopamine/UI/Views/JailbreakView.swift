@@ -147,11 +147,6 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            DispatchQueue.global().async {
-                if UserDefaults.standard.object(forKey: "showTexts") == nil {
-                    showTexts = true
-                }
-            }
             let timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
                 let dots = ". . . "                                                                    
                 if index < dots.count {
@@ -210,8 +205,8 @@ struct JailbreakView: View {
                 .foregroundColor(tint)
                 .onTapGesture(count: 1) {
                     showTexts.toggle()
-                    if !showTexts {
-                        UserDefaults.standard.set(false, forKey: "showTexts")
+                    if !UserDefaults.standard.bool(forKey: "showTexts") {
+                        showTexts = true
                     }
                 }
             }
