@@ -185,34 +185,28 @@ struct JailbreakView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(maxWidth: 200)
                     .padding(.top)
-                
-                Text("Title_Supported_iOS_Versions")
-                    .font(.subheadline)
-                    .foregroundColor(tint)
-                Text("Title_Made_By")
-                    .font(.subheadline)
-                    .foregroundColor(tint.opacity(0.5))
+
                 Group {
-                    if showTexts {
-                        Text("AAA : AAB")
-                            .font(.subheadline)
-                            .foregroundColor(tint)
-                        Text(upTime)
-                            .font(.subheadline)
-                            .foregroundColor(tint)
-                    } else {
-                        Text("AAA : AAB")
-                            .font(.subheadline)
-                            .foregroundColor(.clear)
-                        Text(upTime)
-                            .font(.subheadline)
-                            .foregroundColor(.clear)
-                    }
+                    Text("Title_Supported_iOS_Versions")
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                    Text("Title_Made_By")
+                        .font(.subheadline)
+                        .foregroundColor(tint.opacity(0.5))
                 }
                 .onTapGesture(count: 1) {
                     showTexts.toggle()
                     UserDefaults.standard.set(showTexts, forKey: "showTexts")
                 }
+                if showTexts {
+                    Text("AAA : AAB")
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                    Text(upTime)
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                } else {
+                } 
             }
             Spacer()
         }
