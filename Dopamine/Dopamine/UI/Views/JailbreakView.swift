@@ -192,16 +192,18 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
-                if showTexts {
-                    Text("AAA : AAB")
-                    Text(upTime)
-                } else {
-                    Text("")
-                    Text("") 
+                Group {
+                    if showTexts {
+                        Text("AAA : AAB")      
+                        Text(upTime)
+                    } else {
+                        Text("")
+                        Text("") 
+                    }
                 }
                 .font(.subheadline)
                 .foregroundColor(.tint)
-                .onTapGesture {
+                .onTapGesture(count: 1) {
                     showTexts.toggle()
                     UserDefaults.standard.set(showTexts, forKey: "showTexts")
                 }
