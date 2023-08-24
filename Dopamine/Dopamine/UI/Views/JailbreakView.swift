@@ -225,7 +225,7 @@ struct JailbreakView: View {
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
             ]
             if showTexts {
-                menuOptions.append(.init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),)
+                menuOptions.append(.init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")))
             } else {
             }
             ForEach(menuOptions) { option in
