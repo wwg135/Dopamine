@@ -210,16 +210,19 @@ struct JailbreakView: View {
     @ViewBuilder
     var menu: some View {
         VStack {
-            var menuOptions = [MenuOption]()
+            let extraOptions = [
+                .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")) 
+            ]
             
-            // 加入其他选项
-            menuOptions.append(.init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")))
-            menuOptions.append(.init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring))
-            menuOptions.append(.init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot))
-            menuOptions.append(.init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")))
+            var menuOptions: [MenuOption] = [
+                .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
+                .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
+                .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
+                .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
+            ]
             
-            // 加入要单独追加的选项
-            menuOptions.append(.init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")))
+            // 组合所有选项
+            menuOptions += extraOptions
             ForEach(menuOptions) { option in
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
