@@ -39,7 +39,7 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            {hiddenFunction ? Toggle("Check_For_Updates", isOn: $checkForUpdates) : nil}
+                            (hiddenFunction ? Toggle("Check_For_Updates", isOn: $checkForUpdates) : nil)
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
