@@ -48,7 +48,7 @@ struct SettingsView: View {
                                     }
                                 }
                             if !isJailbroken() {
-                                {hiddenFunction ? Toggle("Options_Forbid_Unject", isOn: $forbidUnject) : nil}
+                                (hiddenFunction ? Toggle("Options_Forbid_Unject", isOn: $forbidUnject) : nil)
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                     .onChange(of: enableiDownload) { newValue in
                                         if isJailbroken() {
