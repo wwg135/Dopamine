@@ -202,7 +202,7 @@ struct UpdateDownloadingView: View {
             downloadProgress.totalUnitCount = 1
             group.addTask {
                 let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
-                if (isJailbroken()) {
+                if isJailbroken() {
                     update(tipaURL: url)
                 } else {
                     guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=\(url.absoluteString)") else {
