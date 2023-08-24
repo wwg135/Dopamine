@@ -559,7 +559,7 @@ struct JailbreakView: View {
         let hours = uptimeInt % 86400 / 3600
         let minutes = uptimeInt % 3600 / 60
         let seconds = uptimeInt % 60 
-        let formatted = days > 0 ? "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒" :
+        formatted = days > 0 ? "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒" :
                         hours > 0 ? "\(hours) 时 \(minutes) 分 \(seconds) 秒" :
                         minutes > 0 ? "\(minutes) 分 \(seconds) 秒" :
                         "\(seconds) 秒"
