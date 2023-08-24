@@ -218,12 +218,7 @@ struct JailbreakView: View {
     @ViewBuilder
     var menu: some View {
         VStack {
-            let menuOptions: [MenuOption] = [
-                .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
-                .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
-                .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
-                .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
-            ]
+            let menuOptions = getMenuOptions()
             ForEach(menuOptions) { option in
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -270,11 +265,6 @@ struct JailbreakView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(!option.showUnjailbroken && !isJailbroken())
-
-                if showTexts {
-                    menuOptions.append(.init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")))
-                } else {
-                }
                                   
                 if menuOptions.last != option {
                     //Divider()
@@ -479,6 +469,19 @@ struct JailbreakView: View {
                 }
             }
         }
+    }
+
+    func getMenuOptions() {
+         [MenuOption] = [
+              .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
+              .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
+              .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
+              .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
+         ]
+         if showTexts {
+              menuOptions.append(.init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")))
+         } else {
+         }
     }
     
     func getDeltaChangelog(json: [[String: Any]]) -> String? {
