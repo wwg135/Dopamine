@@ -153,7 +153,7 @@ struct JailbreakView: View {
                     upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
                     index += 1
                 } else {
-                    (showLaunchTime ? upTime = getLaunchTime() : upTime = formatUptime())
+                    (showLaunchTime ? (upTime = getLaunchTime()) : （upTime = formatUptime()))
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         showLaunchTime = false
                     }
