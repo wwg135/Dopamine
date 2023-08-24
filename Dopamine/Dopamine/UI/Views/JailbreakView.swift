@@ -154,11 +154,7 @@ struct JailbreakView: View {
                     upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
                     index += 1
                 } else {
-                    if showLaunchTime {
-                        upTime = getLaunchTime()
-                    } else {
-                        upTime = formatUptime()
-                    }
+                    upTime = showLaunchTime ? getLaunchTime() : formatUptime()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         showLaunchTime = false
                     }
@@ -199,15 +195,12 @@ struct JailbreakView: View {
                     showTexts.toggle()
                     UserDefaults.standard.set(showTexts, forKey: "showTexts")
                 }
-                if showTexts {
-                    Text("AAA : AAB")
-                        .font(.subheadline)
-                        .foregroundColor(tint)
-                    Text(upTime)
-                        .font(.subheadline)
-                        .foregroundColor(tint)
-                } else {
-                } 
+                Text(showTexts ? "AAA : AAB" : "")
+                    .font(.subheadline)
+                    .foregroundColor(tint)
+                Text(showTexts ? upTime : "")
+                    .font(.subheadline)
+                    .foregroundColor(tint)
             }
             Spacer()
         }
