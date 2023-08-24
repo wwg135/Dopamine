@@ -441,7 +441,7 @@ struct JailbreakView: View {
                 )
                 .opacity(jailbreakingError != nil ? 0 : 1)
             }
-            .opacity(jailbreakingError != nil ? 0 : 1) .animation(Animation .easeInOut(duration: 1.0) .repeatForever())
+            .opacity(jailbreakingError != nil ? 0 : 1)
             
             if !advancedLogsByDefault, jailbreakingError != nil {
                 Button {
