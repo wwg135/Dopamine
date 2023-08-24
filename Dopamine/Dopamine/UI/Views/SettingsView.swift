@@ -266,12 +266,6 @@ struct SettingsView: View {
                                 changeMobilePassword(newPassword: mobilePasswordInput)
                             })
                         }
-                        .alert("Settings_Remove_Jailbreak_Alert_Title", isPresented: $rebootRequiredAlertShown, actions: {
-                            Button("Button_Cancel", role: .cancel) { }
-                            Button("Menu_Reboot_Title") {
-                                reboot()
-                            }
-                        }, message: { Text("Jailbroken currently, please reboot the device.") })
                         .alert("Settings_Remove_Jailbreak_Alert_Title", isPresented: $removeJailbreakAlertShown, actions: {
                             Button("Button_Cancel", role: .cancel) { }
                             Button("Alert_Button_Uninstall", role: .destructive) {
