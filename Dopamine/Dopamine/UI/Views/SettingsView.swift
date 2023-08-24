@@ -61,15 +61,15 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            if isJailbroken() {   
-                                if forbidUnject {
-                                    if hiddenFunction {
+                            if isJailbroken() {
+                                if hiddenFunction {
+                                    if forbidUnject {    
                                         Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
                                             .onChange(of: bottomforbidUnject) { newValue in
                                                 updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
                                             }
-                                    } else {
                                     }
+                                } else {
                                 }
                             }
                             if !isJailbroken() {
@@ -91,63 +91,66 @@ struct SettingsView: View {
                         if isBootstrapped() {
                             VStack {
                                 if isJailbroken() {
-                                    if bottomforbidUnject {
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            customforbidunjectAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "eye")
-                                                Text("Options_Custom_Forbid_Unject")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
+                                    if hiddenFunction {
+                                        if bottomforbidUnject {
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                customforbidunjectAlertShown = true
+                                            }) {
+                                                HStack {
+                                                    Image(systemName: "eye")
+                                                    Text("Options_Custom_Forbid_Unject")
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.5)
+                                                }
+                                                .padding(.horizontal, 4)
+                                                .padding(8)
+                                                .frame(maxWidth: .infinity)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                                )
                                             }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
                                         }
-                                    }
-                                    if enableMount {
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            mountPathAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "mappin.circle")
-                                                Text("Button_Set_Mount_Path")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
+                                        if enableMount {
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                mountPathAlertShown = true
+                                            }) {
+                                                HStack {
+                                                    Image(systemName: "mappin.circle")
+                                                    Text("Button_Set_Mount_Path")
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.5)
+                                                }
+                                                .padding(.horizontal, 4)
+                                                .padding(8)
+                                                .frame(maxWidth: .infinity)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                                )
                                             }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
-                                        }
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                removeZmountAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "mappin.slash.circle")
-                                                Text("Button_Remove_Zmount")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                    removeZmountAlertShown = true
+                                            }) {
+                                                HStack {
+                                                    Image(systemName: "mappin.slash.circle")
+                                                    Text("Button_Remove_Zmount")
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.5)
+                                                }
+                                                .padding(.horizontal, 4)
+                                                .padding(8)
+                                                .frame(maxWidth: .infinity)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                                )
                                             }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
                                         }
+                                    } else {
                                     }
                                 }
                                 if isJailbroken() {
