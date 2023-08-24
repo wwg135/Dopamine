@@ -21,6 +21,7 @@ struct SettingsView: View {
     @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
     @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
     @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
+    @State private var hiddenFunction = UserDefaults.standard.bool(forKey: "hiddenFunction")
     
     @Binding var isPresented: Bool
     
@@ -48,8 +49,11 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            Toggle("Check_For_Updates", isOn: $checkForUpdates)
-                            Toggle("Change_Version", isOn: $changeVersion)
+                            if hiddenFunction {
+                                Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                                Toggle("Change_Version", isOn: $changeVersion)
+                            } else {
+                            }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
@@ -59,16 +63,22 @@ struct SettingsView: View {
                                 }
                             if isJailbroken() {   
                                 if forbidUnject {
-                                    Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
-                                        .onChange(of: bottomforbidUnject) { newValue in
-                                            updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
-                                        }
+                                    if hiddenFunction {
+                                        Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
+                                            .onChange(of: bottomforbidUnject) { newValue in
+                                                updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
+                                            }
+                                    } else {
+                                    }
                                 }
                             }
                             if !isJailbroken() {
-                                Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
-                                Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
-                                Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
+                                if hiddenFunction {
+                                    Toggle("Options_bridgeToXinA", isOn: $bridgeToXinA)
+                                    Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
+                                    Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
+                                } else {
+                                }
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                     .onChange(of: enableiDownload) { newValue in
                                         if isJailbroken() {
@@ -209,13 +219,15 @@ struct SettingsView: View {
                     .padding(.horizontal, 32)
                     
                     VStack(spacing: 6) {
-                        Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
-                            .font(.footnote)
-                            .opacity(1)
-                        if isJailbroken() {
+                        Group {
+                            Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
-                                .font(.footnote)
-                                .opacity(1)
+                        }
+                        .font(.footnote)
+                        .opacity(1)
+                        .onTapGesture(count: 1) {
+                            hiddenFunction.toggle()
+                            UserDefaults.standard.set(hiddenFunction, forKey: "hiddenFunction")
                         }
                     }
                     .padding(.top, 2)
