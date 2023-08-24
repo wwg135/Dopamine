@@ -605,15 +605,10 @@ struct JailbreakView: View {
         let hours = uptimeInt % 86400 / 3600
         let minutes = uptimeInt % 3600 / 60
         let seconds = uptimeInt % 60 
-        if days > 0 {
-            formatted += "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒" 
-        } else if hours > 0 {
-            formatted += "\(hours) 时 \(minutes) 分 \(seconds) 秒"
-        } else if minutes > 0 {
-            formatted += "\(minutes) 分 \(seconds) 秒"
-        } else {
-            formatted += "\(seconds) 秒" 
-        }
+        formatted = days > 0 ? "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒" :
+                    hours > 0 ? "\(hours) 时 \(minutes) 分 \(seconds) 秒" :
+                    minutes > 0 ? "\(minutes) 分 \(seconds) 秒" :
+                    "\(seconds) 秒"
         return "系统已运行: " + formatted
     }
 }
