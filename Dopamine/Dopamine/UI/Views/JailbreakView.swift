@@ -224,10 +224,6 @@ struct JailbreakView: View {
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
             ]
-            if showTexts {
-                menuOptions.append(.init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")))
-            } else {
-            }
             ForEach(menuOptions) { option in
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -275,6 +271,11 @@ struct JailbreakView: View {
                 .buttonStyle(.plain)
                 .disabled(!option.showUnjailbroken && !isJailbroken())
 
+                if showTexts {
+                    menuOptions.append(.init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")))
+                } else {
+                }
+                                  
                 if menuOptions.last != option {
                     //Divider()
                         //.background(.white)
