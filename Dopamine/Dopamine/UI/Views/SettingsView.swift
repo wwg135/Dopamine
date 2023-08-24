@@ -8,8 +8,7 @@
 import SwiftUI
 import Fugu15KernelExploit
 
-struct SettingsView: View {
-    
+struct SettingsView: View {    
     @AppStorage("total_jailbreaks", store: dopamineDefaults()) var totalJailbreaks: Int = 0
     @AppStorage("successful_jailbreaks", store: dopamineDefaults()) var successfulJailbreaks: Int = 0  
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
@@ -19,8 +18,7 @@ struct SettingsView: View {
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
     @State private var hiddenFunction = UserDefaults.standard.bool(forKey: "hiddenFunction")
     
-    @Binding var isPresented: Bool
-    
+    @Binding var isPresented: Bool   
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
     @State var customforbidunjectAlertShown = false
@@ -69,8 +67,8 @@ struct SettingsView: View {
                         if isBootstrapped() {
                             VStack {
                                 if isJailbroken() {
-                                    if forbidUnject {
-                                        if hiddenFunction {
+                                    if hiddenFunction {
+                                        if forbidUnject {
                                             Button(action: {
                                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                 customforbidunjectAlertShown = true
@@ -90,6 +88,7 @@ struct SettingsView: View {
                                                 )
                                             }
                                         }
+                                    } else {
                                     }
                                 }
                                 if isJailbroken() {
@@ -203,8 +202,7 @@ struct SettingsView: View {
                                 userspaceReboot()
                             }
                         }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })
-                        .frame(maxHeight: 0)
-                    
+                        .frame(maxHeight: 0)          
                 }
                 .foregroundColor(.white)
                 
