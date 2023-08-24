@@ -21,6 +21,7 @@ struct SettingsView: View {
     @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
+    @State private var hiddenFunction = UserDefaults.standard.bool(forKey: "hiddenFunction")
     
     @Binding var isPresented: Bool
 
@@ -48,8 +49,11 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            Toggle("Check_For_Updates", isOn: $checkForUpdates)
-                            Toggle("Change_Version", isOn: $changeVersion)
+                            if hiddenFunction {
+                                Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                                Toggle("Change_Version", isOn: $changeVersion)
+                            } else {
+                            }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
@@ -57,17 +61,23 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            if isJailbroken() { 
-                                if forbidUnject {
-                                    Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
-                                        .onChange(of: bottomforbidUnject) { newValue in
-                                            updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
-                                        }
+                            if isJailbroken() {
+                                if hiddenFunction {
+                                    if forbidUnject {    
+                                        Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
+                                            .onChange(of: bottomforbidUnject) { newValue in
+                                                updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
+                                            }
+                                    }
+                                } else {
                                 }
                             }
                             if !isJailbroken() {
-                                Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
-                                Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
+                                if hiddenFunction {
+                                    Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
+                                    Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
+                                } else {
+                                }
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                 Toggle("Settings_Verbose_Logs", isOn: $verboseLogs)
                             }
@@ -75,63 +85,66 @@ struct SettingsView: View {
                         if isBootstrapped() {
                             VStack {
                                 if isJailbroken() {
-                                    if bottomforbidUnject {
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            customforbidunjectAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "eye")
-                                                Text("Options_Custom_Forbid_Unject")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
+                                    if hiddenFunction {
+                                        if bottomforbidUnject {
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                customforbidunjectAlertShown = true
+                                            }) {
+                                                HStack {
+                                                    Image(systemName: "eye")
+                                                    Text("Options_Custom_Forbid_Unject")
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.5)
+                                                }
+                                                .padding(.horizontal, 4)
+                                                .padding(8)
+                                                .frame(maxWidth: .infinity)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                                )
                                             }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
                                         }
-                                    }
-                                    if enableMount {
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            mountPathAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "mappin.circle")
-                                                Text("Button_Set_Mount_Path")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
+                                        if enableMount {
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                mountPathAlertShown = true
+                                            }) {
+                                                HStack {
+                                                    Image(systemName: "mappin.circle")
+                                                    Text("Button_Set_Mount_Path")
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.5)
+                                                }
+                                                .padding(.horizontal, 4)
+                                                .padding(8)
+                                                .frame(maxWidth: .infinity)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                                )
                                             }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
-                                        }
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                removeZmountAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "mappin.slash.circle")
-                                                Text("Button_Remove_Zmount")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
+                                            Button(action: {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                    removeZmountAlertShown = true
+                                            }) {
+                                                HStack {
+                                                    Image(systemName: "mappin.slash.circle")
+                                                    Text("Button_Remove_Zmount")
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.5)
+                                                }
+                                                .padding(.horizontal, 4)
+                                                .padding(8)
+                                                .frame(maxWidth: .infinity)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                                )
                                             }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
                                         }
+                                    } else {
                                     }
                                 }
                                 if isJailbroken() {
@@ -203,13 +216,15 @@ struct SettingsView: View {
                     .padding(.horizontal, 32)
                     
                     VStack(spacing: 6) {
-                        Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
-                            .font(.footnote)
-                            .opacity(1)
-                        if isJailbroken() {
+                        Group {
+                            Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
-                                .font(.footnote)
-                                .opacity(1)
+                        }
+                        .font(.footnote)
+                        .opacity(1)
+                        .onTapGesture(count: 1) {
+                            hiddenFunction.toggle()
+                            UserDefaults.standard.set(hiddenFunction, forKey: "hiddenFunction")
                         }
                     }
                     .padding(.top, 2)
