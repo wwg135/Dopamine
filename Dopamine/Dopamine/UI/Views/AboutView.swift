@@ -137,14 +137,13 @@ struct AboutView: View {
             }
             .fixedSize()
             .font(.footnote)
-            .opacity(0.6)
+            .opacity(1)
             .onTapGesture(count: 1) {
                 easterEgg.toggle()
             }
         }
         .foregroundColor(.white)
         .multilineTextAlignment(.center)
-//        .frame(maxHeight: 600)
     }
 }
 
