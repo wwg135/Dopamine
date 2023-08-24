@@ -39,10 +39,7 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            if hiddenFunction {
-                                Toggle("Check_For_Updates", isOn: $checkForUpdates)
-                            } else {
-                            }
+                            {hiddenFunction ? Toggle("Check_For_Updates", isOn: $checkForUpdates) : nil}
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
@@ -51,10 +48,7 @@ struct SettingsView: View {
                                     }
                                 }
                             if !isJailbroken() {
-                                if hiddenFunction {
-                                    Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
-                                } else {
-                                }
+                                {hiddenFunction ? Toggle("Options_Forbid_Unject", isOn: $forbidUnject) : nil}
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                     .onChange(of: enableiDownload) { newValue in
                                         if isJailbroken() {
@@ -131,11 +125,7 @@ struct SettingsView: View {
                                 VStack {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        if isJailbroken() {
-                                            rebootRequiredAlertShown = true
-                                        } else {
-                                            removeJailbreakAlertShown = true
-                                        }
+                                        isJailbroken() ? (rebootRequiredAlertShown = true) : (removeJailbreakAlertShown = true)
                                     }) {
                                         HStack {
                                             Image(systemName: "trash")
