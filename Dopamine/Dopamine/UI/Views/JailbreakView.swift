@@ -52,6 +52,7 @@ struct JailbreakView: View {
     @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
+    @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -154,12 +155,8 @@ struct JailbreakView: View {
                     upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
                     index += 1
                 } else {
-                    if showLaunchTime {
-                        upTime = getLaunchTime()
-                    } else {
-                        upTime = formatUptime()
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    upTime = showLaunchTime ? getLaunchTime() : formatUptime()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                         showLaunchTime = false
                     }
                 }
@@ -187,16 +184,22 @@ struct JailbreakView: View {
                     .frame(maxWidth: 200)
                     .padding(.top)
                 
-                Text("Title_Supported_iOS_Versions")
+                Group {
+                    Text("Title_Supported_iOS_Versions")
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                    Text("Title_Made_By")
+                        .font(.subheadline)
+                        .foregroundColor(tint.opacity(0.5))
+                }
+                .onTapGesture(count: 1) {
+                    showTexts.toggle()
+                    UserDefaults.standard.set(showTexts, forKey: "showTexts")
+                }
+                Text(showTexts ? "AAA : AAB" : "")
                     .font(.subheadline)
                     .foregroundColor(tint)
-                Text("Title_Made_By")
-                    .font(.subheadline)
-                    .foregroundColor(tint.opacity(0.5))
-                Text("AAA : AAB")
-                    .font(.subheadline)
-                    .foregroundColor(tint)
-                Text(upTime)
+                Text(showTexts ? upTime : "")
                     .font(.subheadline)
                     .foregroundColor(tint)
             }
@@ -210,13 +213,20 @@ struct JailbreakView: View {
     @ViewBuilder
     var menu: some View {
         VStack {
-            let menuOptions: [MenuOption] = [
+            let menuOptionsWithUpdate: [MenuOption] = [
                 .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
                 .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
                 .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
             ]
+            let menuOptionsWithoutUpdate: [MenuOption] = [
+                .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
+                .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
+                .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
+                .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
+            ]
+            let menuOptions = showTexts ? menuOptionsWithUpdate : menuOptionsWithoutUpdate
             ForEach(menuOptions) { option in
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -454,7 +464,7 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .animation(.spring(), value: updateAvailable)
+        .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: updateAvailable)
     }
     
     func uiJailbreak() {
@@ -581,15 +591,10 @@ struct JailbreakView: View {
         let hours = uptimeInt % 86400 / 3600
         let minutes = uptimeInt % 3600 / 60
         let seconds = uptimeInt % 60 
-        if days > 0 {
-            formatted += "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒" 
-        } else if hours > 0 {
-            formatted += "\(hours) 时 \(minutes) 分 \(seconds) 秒"
-        } else if minutes > 0 {
-            formatted += "\(minutes) 分 \(seconds) 秒"
-        } else {
-            formatted += "\(seconds) 秒" 
-        }
+        formatted = days > 0 ? "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒" :
+                    hours > 0 ? "\(hours) 时 \(minutes) 分 \(seconds) 秒" :
+                    minutes > 0 ? "\(minutes) 分 \(seconds) 秒" :
+                    "\(seconds) 秒"
         return "系统已运行: " + formatted
     }
 }
