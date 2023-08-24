@@ -47,7 +47,6 @@ struct JailbreakView: View {
     @State private var upTime = "系统启动于: 加载中"
     @State private var index = 0
     @State private var showLaunchTime = true
-
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
@@ -492,7 +491,6 @@ struct JailbreakView: View {
         var userOrientedChangelog : String = ""
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
 
-        // Prefix
         if environmentMismatch {
             userOrientedChangelog += String(format:NSLocalizedString("Mismatching_Environment_Version_Update_Body", comment: ""), installedEnvironmentVersion(), appVersion!)
             userOrientedChangelog += "\n\n\n" + NSLocalizedString("Title_Changelog", comment: "") + ":\n\n"
