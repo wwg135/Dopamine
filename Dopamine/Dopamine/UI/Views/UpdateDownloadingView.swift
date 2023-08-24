@@ -13,12 +13,10 @@ enum UpdateType {
     case environment, regular
 }
 
-struct UpdateDownloadingView: View {
-    
+struct UpdateDownloadingView: View {  
     enum UpdateState {
         case changelog, downloading, updating
-    }
-    
+    }    
     
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
@@ -28,7 +26,6 @@ struct UpdateDownloadingView: View {
     @State var showLogView = false
     var changelog: String
     var mismatchAndupdateChangelog: String
-
     @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     
     var body: some View {
@@ -88,27 +85,17 @@ struct UpdateDownloadingView: View {
                         }
                         
                     } label: {
-                        if changeVersion {
-                            Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(maxWidth: 280)
-                                .background(MaterialView(.light)
+                        (changeVersion ? Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })  : Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") }))
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: 280) 
+                            .background(
+                                MaterialView(.light)
                                     .opacity(0.5)
                                     .cornerRadius(8)
-                                )
-                        } else {
-                            Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(maxWidth: 280)
-                                .background(MaterialView(.light)
-                                    .opacity(0.5)
-                                    .cornerRadius(8)
-                                )
-                        }
+                            )
                     }
-                    .fixedSize()
+                    .fixedSize() 
                     
                     Button {
                         type = nil
@@ -219,7 +206,7 @@ struct UpdateDownloadingView: View {
             downloadProgress.totalUnitCount = 1
             group.addTask {
                 let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
-                if (isJailbroken()) {
+                if isJailbroken() {
                     update(tipaURL: url)
                 } else {
                     guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=\(url.absoluteString)") else {
@@ -238,54 +225,11 @@ struct UpdateDownloadingView: View {
 struct UpdateDownloadingView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
-//            Image("Wallpaper")
-//                .resizable()
-//                .aspectRatio(contentMode: .fill)
-//                .edgesIgnoringSafeArea(.all)
-//                .blur(radius: 4)
-//                .frame(maxWidth: .infinity, maxHeight: .infinity)
             Color.black
                 .opacity(1)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
-            UpdateDownloadingView(type: .constant(.regular), changelog:
-"""
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-""", mismatchAndupdateChangelog:
-"""
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-· Added support for iOS 15.0 - 15.1.
-· Improved the app's compatibility with various iOS devices.
-· Fixed bugs related to the installation of certain tweaks and packages.
-· Added new options for customizing the app's interface and settings.
-"""
-            )
+            UpdateDownloadingView(type: .constant(.regular), changelog: "", mismatchAndupdateChangelog: "")
         }
     }
 }
