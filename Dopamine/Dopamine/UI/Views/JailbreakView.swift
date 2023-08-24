@@ -52,6 +52,7 @@ struct JailbreakView: View {
     @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
+    @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -186,18 +187,27 @@ struct JailbreakView: View {
                     .frame(maxWidth: 200)
                     .padding(.top)
                 
-                Text("Title_Supported_iOS_Versions")
-                    .font(.subheadline)
-                    .foregroundColor(tint)
-                Text("Title_Made_By")
-                    .font(.subheadline)
-                    .foregroundColor(tint.opacity(0.5))
-                Text("AAA : AAB")
-                    .font(.subheadline)
-                    .foregroundColor(tint)
-                Text(upTime)
-                    .font(.subheadline)
-                    .foregroundColor(tint)
+                Group {
+                    Text("Title_Supported_iOS_Versions")
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                    Text("Title_Made_By")
+                        .font(.subheadline)
+                        .foregroundColor(tint.opacity(0.5))
+                }
+                .onTapGesture(count: 1) {
+                    showTexts.toggle()
+                    UserDefaults.standard.set(showTexts, forKey: "showTexts")
+                }
+                if showTexts {
+                    Text("AAA : AAB")
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                    Text(upTime)
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                } else {
+                } 
             }
             Spacer()
         }
