@@ -34,16 +34,13 @@ struct JailbreakView: View {
 
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
-    @State var isUpdatelogPresented = false
-    
+    @State var isUpdatelogPresented = false    
     @State var jailbreakingProgress: JailbreakingProgress = .idle
-    @State var jailbreakingError: Error?
-    
+    @State var jailbreakingError: Error?    
     @State var updateAvailable = false
     @State var showingUpdatePopupType: UpdateType? = nil
     @State var updateChangelog: String? = nil
     @State var mismatchChangelog: String? = nil
-
     @State var upTime = "系统启动于: 加载中"
     @State var index = 0
     @State var showLaunchTime = true
@@ -61,8 +58,7 @@ struct JailbreakView: View {
     var body: some View {
         GeometryReader { geometry in                
             ZStack {
-                let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
-                
+                let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented             
                 let imagePath = "/var/mobile/Wallpaper.jpg"
                 let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
                     Image(uiImage: backgroundImage!)
@@ -71,7 +67,6 @@ struct JailbreakView: View {
                         .edgesIgnoringSafeArea(.all)
                         .blur(radius: 1)
                         .frame(width: geometry.size.width, height: geometry.size.height)
-
                         .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                         .animation(.spring(), value: isPopupPresented)
                 
@@ -268,10 +263,6 @@ struct JailbreakView: View {
                 .disabled(!option.showUnjailbroken && !isJailbroken())
                                   
                 if menuOptions.last != option {
-                    //Divider()
-                        //.background(.white)
-                        //.opacity(0.5)
-                        //.padding(.horizontal)
                 }
             }
         }
@@ -288,8 +279,7 @@ struct JailbreakView: View {
         VStack {
             VStack {
                 Button {
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()       
                     if requiresEnvironmentUpdate {
                         showingUpdatePopupType = .environment
                     } else {
@@ -440,8 +430,7 @@ struct JailbreakView: View {
         jailbreakingProgress = .jailbreaking
         let dpDefaults = dopamineDefaults()
         dpDefaults.set(dpDefaults.integer(forKey: "total_jailbreaks") + 1, forKey: "total_jailbreaks")
-        dpDefaults.synchronize()
-        
+        dpDefaults.synchronize() 
         DispatchQueue(label: "Dopamine").async {
             sleep(1)
             
@@ -500,9 +489,7 @@ struct JailbreakView: View {
         else {        
         }
 
-        // Changelog
         userOrientedChangelog += deltaChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: "")
-
         return userOrientedChangelog
     }
     
@@ -529,7 +516,6 @@ struct JailbreakView: View {
         }
 
         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
-
         if isInstalledEnvironmentVersionMismatching() {
             mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
         }
