@@ -34,13 +34,16 @@ struct JailbreakView: View {
 
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
-    @State var isUpdatelogPresented = false    
+    @State var isUpdatelogPresented = false
+    
     @State var jailbreakingProgress: JailbreakingProgress = .idle
-    @State var jailbreakingError: Error?    
+    @State var jailbreakingError: Error?
+    
     @State var updateAvailable = false
     @State var showingUpdatePopupType: UpdateType? = nil
     @State var updateChangelog: String? = nil
     @State var mismatchChangelog: String? = nil
+    
     @State var upTime = "系统启动于: 加载中"
     @State var index = 0
     @State var showLaunchTime = true
