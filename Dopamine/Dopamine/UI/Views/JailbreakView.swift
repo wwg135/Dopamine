@@ -44,13 +44,13 @@ struct JailbreakView: View {
     @State var updateChangelog: String? = nil
     @State var mismatchChangelog: String? = nil
 
-    @State private var upTime = "系统启动于: 加载中"
-    @State private var index = 0
-    @State private var showLaunchTime = true
+    @State var upTime = "系统启动于: 加载中"
+    @State var index = 0
+    @State var showLaunchTime = true
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
-    @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
+    @State var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
