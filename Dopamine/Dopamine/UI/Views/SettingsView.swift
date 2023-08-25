@@ -16,8 +16,7 @@ struct SettingsView: View {
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
-    @State var hiddenFunction = UserDefaults.standard.bool(forKey: "hiddenFunction")
-    
+    @State var hiddenFunction = UserDefaults.standard.bool(forKey: "hiddenFunction") 
     @Binding var isPresented: Bool   
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
@@ -194,8 +193,7 @@ struct SettingsView: View {
                         }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })
                         .frame(maxHeight: 0)          
                 }
-                .foregroundColor(.white)
-                
+                .foregroundColor(.white)              
             } else {
                 PackageManagerSelectionView(shown: $isSelectingPackageManagers, reinstall: true) {
                     isSelectingPackageManagers = false
@@ -232,8 +230,7 @@ extension View {
     func placeholder<Content: View>(
         when shouldShow: Bool,
         alignment: Alignment = .leading,
-        @ViewBuilder placeholder: () -> Content) -> some View {
-            
+        @ViewBuilder placeholder: () -> Content) -> some View {            
             ZStack(alignment: alignment) {
                 placeholder().opacity(shouldShow ? 1 : 0)
                 self
