@@ -19,7 +19,8 @@ struct UpdateDownloadingView: View {
     
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
-    
+
+    @State var showButton = true
     @Binding var type: UpdateType?
     @State var updateState: UpdateState = .downloading
     
@@ -32,61 +33,64 @@ struct UpdateDownloadingView: View {
                     .transition(.opacity.animation(.spring()))
                 
                 VStack(spacing: 16) {
-                    Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        if type == .regular {
-                            updateState = .downloading
+                    if showButton {
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            showButton = false
+                            if type == .regular {
+                                updateState = .downloading
                             
-                            // 💀 code
-                            Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                                progressDouble = downloadProgress.fractionCompleted
+                                // 💀 code
+                                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                                    progressDouble = downloadProgress.fractionCompleted
                                 
-                                if progressDouble == 1 {
-                                    t.invalidate()
+                                    if progressDouble == 1 {
+                                        t.invalidate()
+                                    }
                                 }
-                            }
                             
-                            Task {
-                                do {
-                                    try await downloadUpdateAndInstall()
-                                    updateState = .updating
-                                } catch {
-                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                Task {
+                                    do {
+                                        try await downloadUpdateAndInstall()
+                                        updateState = .updating
+                                    } catch {
+                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                    }
                                 }
-                            }
-                        } else {
-                            updateState = .updating
-                            DispatchQueue.global(qos: .userInitiated).async {
-                                updateEnvironment()
-                            }
-                        }  
-                    } label: {
-                        Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: 280)
-                            .background(MaterialView(.light)
-                                .opacity(0.5)
-                                .cornerRadius(8)
-                            )
-                    }
-                    .fixedSize()
+                            } else {
+                                updateState = .updating
+                                DispatchQueue.global(qos: .userInitiated).async {
+                                    updateEnvironment()
+                                }
+                            }  
+                        } label: {
+                            Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                                .background(MaterialView(.light)
+                                    .opacity(0.5)
+                                    .cornerRadius(8)
+                                )
+                        }
+                        .fixedSize()
                     
                     
-                    Button {
-                        type = nil
-                    } label: {
-                        Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: 280)
+                        Button {
+                            type = nil
+                        } label: {
+                            Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: 280)
+                        }
+                        .fixedSize()
                     }
-                    .fixedSize()
+                    .opacity(updateState == .downloading ? 1 : 0)
+                    .animation(.spring(), value: updateState)
+                    .padding(.vertical, 64)
+                    .frame(maxWidth: 280)
                 }
-                .opacity(updateState == .downloading ? 1 : 0)
-                .animation(.spring(), value: updateState)
-                .padding(.vertical, 64)
-                .frame(maxWidth: 280)
                 
                 ZStack {
                     VStack(spacing: 150) {
