@@ -82,6 +82,8 @@ struct UpdateDownloadingView: View {
                             .frame(height: 225)
                             .padding(32)
                         }
+                        .animation(.spring(), value: updateState)
+                        .frame(maxHeight: .infinity, alignment: .center)
                     }
 
                     if showButton {
