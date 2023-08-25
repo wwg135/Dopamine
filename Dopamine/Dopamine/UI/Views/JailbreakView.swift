@@ -506,12 +506,13 @@ struct JailbreakView: View {
             return
         }
 
-        let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }),
-        let latestName = latest["tag_name"] as? String,
-        let latestVersion = latest["name"] as? String {
-            if latestName != currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
-                updateAvailable = true
-            }
+        if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
+           let latestName = latest["tag_name"] as? String,
+           let latestVersion = latest["name"] as? String {
+               if latestName != currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
+                   updateAvailable = true
+               }
+           }
         }
 
         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
