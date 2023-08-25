@@ -141,7 +141,7 @@ struct JailbreakView: View {
             .animation(.default, value: showingUpdatePopupType == nil)
         }
         .onAppear {
-            let timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
                 let dots = ". . . "                                                                    
                 if index < dots.count {
                     upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
@@ -463,12 +463,12 @@ struct JailbreakView: View {
     func getDeltaChangelog(json: [[String: Any]]) -> String? {
         var changelogBuf = ""
         for item in json {
-            guard let version = item["name"] as? String,
+            guard let version = item["name"] as? String?,
                   let changelog = item["body"] as? String else {
                 continue
             }
             
-            if version != nil {    
+            if let version = version, !version.isEmpty {    
                 if !changelogBuf.isEmpty {
                     changelogBuf += "\n\n\n"
                 }
