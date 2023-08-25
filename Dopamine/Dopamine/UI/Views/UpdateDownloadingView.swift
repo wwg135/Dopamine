@@ -132,10 +132,6 @@ struct UpdateDownloadingView: View {
                         }
                         .fixedSize()
                     }
-                    .opacity(updateState == .downloading ? 1 : 0)
-                    .animation(.spring(), value: updateState)
-                    .padding(.vertical, 64)
-                    .frame(maxWidth: 280)
                 }
             }
         }
