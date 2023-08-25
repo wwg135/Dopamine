@@ -34,16 +34,13 @@ struct JailbreakView: View {
 
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
-    @State var isUpdatelogPresented = false
-    
+    @State var isUpdatelogPresented = false 
     @State var jailbreakingProgress: JailbreakingProgress = .idle
-    @State var jailbreakingError: Error?
-    
+    @State var jailbreakingError: Error?  
     @State var updateAvailable = false
     @State var showingUpdatePopupType: UpdateType? = nil
     @State var updateChangelog: String? = nil
-    @State var mismatchChangelog: String? = nil
-    
+    @State var mismatchChangelog: String? = nil 
     @State var upTime = "系统启动于: 加载中"
     @State var index = 0
     @State var showLaunchTime = true
@@ -266,10 +263,6 @@ struct JailbreakView: View {
                 .disabled(!option.showUnjailbroken && !isJailbroken())
                                   
                 if menuOptions.last != option {
-                    //Divider()
-                        //.background(.white)
-                        //.opacity(0.5)
-                        //.padding(.horizontal)
                 }
             }
         }
@@ -496,7 +489,6 @@ struct JailbreakView: View {
         else {        
         }
 
-        // Changelog
         userOrientedChangelog += deltaChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: "")
         
         return userOrientedChangelog
@@ -521,11 +513,10 @@ struct JailbreakView: View {
                 if latestName != currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
                     updateAvailable = true
                 }
-            }
         }
 
         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
-    
+        
         if isInstalledEnvironmentVersionMismatching() {
             mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
         }
