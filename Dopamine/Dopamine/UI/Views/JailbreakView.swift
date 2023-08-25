@@ -219,7 +219,7 @@ struct JailbreakView: View {
             let menuOptionsWithUpdate: [MenuOption] = [
                 .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
             ]
-            let menuOptions = !showTexts ? menuOptionsWithoutUpdate : (menuOptionsWithUpdate + menuOptionsWithoutUpdate) 
+            let menuOptions = !showTexts ? menuOptionsWithoutUpdate : (menuOptionsWithoutUpdate + menuOptionsWithUpdate) 
             ForEach(menuOptions) { option in
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
