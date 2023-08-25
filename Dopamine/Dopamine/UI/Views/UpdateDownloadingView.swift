@@ -48,7 +48,6 @@ struct UpdateDownloadingView: View {
                                         .padding(.bottom, 32)
                                 }
                                 .animation(.spring(), value: updateState)
-                                .frame(maxHeight: .infinity, alignment: .center)
                             }
                             ZStack {
                                 ZStack {
