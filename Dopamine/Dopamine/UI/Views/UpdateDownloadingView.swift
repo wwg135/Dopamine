@@ -32,7 +32,7 @@ struct UpdateDownloadingView: View {
                     .opacity(0.6)
                     .transition(.opacity.animation(.spring()))
 
-                VStack(spacing: 16) {
+                VStack {
                     if !showButton {
                         VStack(spacing: 150) {
                             VStack(spacing: 10) {
