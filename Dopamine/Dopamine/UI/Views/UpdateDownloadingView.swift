@@ -21,7 +21,7 @@ struct UpdateDownloadingView: View {
     var downloadProgress = Progress()
     
     @Binding var type: UpdateType?
-    @State var updateState: UpdateState = .changelog
+    @State var updateState: UpdateState = .downloading
     
     var body: some View {
         ZStack {
