@@ -447,8 +447,7 @@ struct JailbreakView: View {
             
             jailbreak { e in
                 jailbreakingProgress = .finished
-                jailbreakingError = e
-                
+                jailbreakingError = e             
                 if e == nil {
                     dpDefaults.set(dpDefaults.integer(forKey: "successful_jailbreaks") + 1, forKey: "successful_jailbreaks")
                     dpDefaults.synchronize()
@@ -521,13 +520,12 @@ struct JailbreakView: View {
         }
 
         if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
-            if let latestName = latest["tag_name"] as? String,
-                let latestVersion = latest["name"] as? String,
-                latestName != currentAppVersion && latestVersion != "1.0.5" {
-                    if checkForUpdates {
-                        updateAvailable = true
-                    }
+           let latestName = latest["tag_name"] as? String,
+           let latestVersion = latest["name"] as? String,
+                if latestName != currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
+                    updateAvailable = true
                 }
+            }
         }
 
         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
