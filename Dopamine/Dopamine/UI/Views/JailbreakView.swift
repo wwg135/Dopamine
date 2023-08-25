@@ -44,16 +44,15 @@ struct JailbreakView: View {
     @State var upTime = "系统启动于: 加载中"
     @State var index = 0
     @State var showLaunchTime = true
-    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
-    @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     @State var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
+    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
+    @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
     }
-    
-    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     
     var body: some View {
         GeometryReader { geometry in                
@@ -509,14 +508,14 @@ struct JailbreakView: View {
 
         if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
             if let latestName = latest["tag_name"] as? String,
-               let latestVersion = latest["name"] as? String,
+               let latestVersion = latest["name"] as? String {
                    if latestName != currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
                         updateAvailable = true
                     }
+               }
         }
 
-        updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
-        
+        updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)   
         if isInstalledEnvironmentVersionMismatching() {
             mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
         }
