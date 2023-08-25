@@ -78,7 +78,7 @@ struct UpdateDownloadingView: View {
                                 .animation(.easeOut, value: progressDouble)
                                 .animation(.spring(), value: updateState)
                         }
-                        .frame(maxHeight: .infinity, alignment: .center)
+                        .frame(height: 225)
                         .padding(32)
                     }
 
@@ -135,6 +135,8 @@ struct UpdateDownloadingView: View {
                         .fixedSize()
                     }
                 }
+                .frame(maxHeight: .infinity, alignment: .center)
+                .animation(.spring(), value: updateState)
             }
         }
         .foregroundColor(.white)
