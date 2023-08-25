@@ -135,7 +135,7 @@ struct JailbreakView: View {
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
                 
-                UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
+                UpdateDownloadingView(type: $showingUpdatePopupType)
             }
             .animation(.default, value: showingUpdatePopupType == nil)
         }
