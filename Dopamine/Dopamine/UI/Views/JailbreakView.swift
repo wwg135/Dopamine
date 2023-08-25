@@ -263,6 +263,10 @@ struct JailbreakView: View {
                 .disabled(!option.showUnjailbroken && !isJailbroken())
                                   
                 if menuOptions.last != option {
+                    //Divider()
+                        //.background(.white)
+                        //.opacity(0.5)
+                        //.padding(.horizontal)
                 }
             }
         }
@@ -489,7 +493,9 @@ struct JailbreakView: View {
         else {        
         }
 
+        // Changelog
         userOrientedChangelog += deltaChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: "")
+        
         return userOrientedChangelog
     }
     
@@ -516,6 +522,7 @@ struct JailbreakView: View {
         }
 
         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+    
         if isInstalledEnvironmentVersionMismatching() {
             mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
         }
