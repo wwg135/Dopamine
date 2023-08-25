@@ -14,7 +14,7 @@ enum UpdateType {
 
 struct UpdateDownloadingView: View {   
     enum UpdateState {
-        case changelog, downloading, updating
+        case downloading, updating
     }
     
     @State var progressDouble: Double = 0
@@ -22,9 +22,6 @@ struct UpdateDownloadingView: View {
     
     @Binding var type: UpdateType?
     @State var updateState: UpdateState = .changelog
-    @State var showLogView = false
-    var changelog: String
-    var mismatchChangelog: String
     
     var body: some View {
         ZStack {
@@ -35,23 +32,6 @@ struct UpdateDownloadingView: View {
                     .transition(.opacity.animation(.spring()))
                 
                 VStack(spacing: 16) {
-                    VStack(spacing: 10) {
-                        Text(type == .environment ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
-                            .font(.title2)
-                            .multilineTextAlignment(.center)
-                        
-                        Divider()
-                            .background(.white)
-                            .padding(.horizontal, 32)
-                            .opacity(0.5)
-                        ScrollView {
-                            Text(try! AttributedString(markdown: type == .environment ? mismatchChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                .opacity(1)
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical)
-                        }
-                    }
-
                     Button {
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         if type == .regular {
@@ -123,17 +103,6 @@ struct UpdateDownloadingView: View {
                                 .padding(.bottom, 32)
                         }
                         .animation(.spring(), value: updateState)
-                        .frame(height: 225)
-                        
-                        VStack {
-                            if showLogView {
-                                LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
-                                Text("Update_Log_Hint_Scrollable")
-                                    .foregroundColor(.white.opacity(0.5))
-                                    .padding()
-                            }
-                        }
-                        .opacity(showLogView ? 1 : 0)
                         .frame(height: 225)
                     }
                     ZStack {
@@ -225,7 +194,7 @@ struct UpdateDownloadingView_Previews: PreviewProvider {
                 .opacity(1)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
-            UpdateDownloadingView(type: .constant(.regular), changelog: "", mismatchChangelog: "")
+            UpdateDownloadingView(type: .constant(.regular))
         }
     }
 }
