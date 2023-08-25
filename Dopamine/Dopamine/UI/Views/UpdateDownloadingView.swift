@@ -83,7 +83,7 @@ struct UpdateDownloadingView: View {
                     }
                     .fixedSize()
                 }
-                .opacity(updateState == .changelog ? 1 : 0)
+                .opacity(updateState == .downloading ? 1 : 0)
                 .animation(.spring(), value: updateState)
                 .padding(.vertical, 64)
                 .frame(maxWidth: 280)
@@ -136,7 +136,7 @@ struct UpdateDownloadingView: View {
                     .frame(height: 128)
                     .padding(32)
                 }
-                .opacity(updateState != .changelog ? 1 : 0)
+                .opacity(updateState != .downloading ? 1 : 0)
                 .animation(.spring(), value: updateState)
                 .frame(maxWidth: 280)
             }
