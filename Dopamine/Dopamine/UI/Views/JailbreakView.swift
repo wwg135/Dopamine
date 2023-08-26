@@ -438,10 +438,10 @@ struct JailbreakView: View {
                 })
                 .foregroundColor(Color.white)
                 .padding()
-            }
-            .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
-            .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
+            }     
         }
+        .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
+        .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
     }
     
     func uiJailbreak() {
