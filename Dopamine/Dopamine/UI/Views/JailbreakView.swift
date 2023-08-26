@@ -434,7 +434,7 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .alert("Settings_Download_Update_Install_Alert_Title", isPresented: $showConfirmationAlert, actions: {
+        .alert("Button_Update", isPresented: $showConfirmationAlert, actions: {
             Button("Button_Cancel", role: .cancel) { }
             Button("Button_Set") {
                 Task {
@@ -451,7 +451,7 @@ struct JailbreakView: View {
                     }
                 }
             }
-        }, message: { Text("Button_Update") })
+        })
     }
     
     func uiJailbreak() {
