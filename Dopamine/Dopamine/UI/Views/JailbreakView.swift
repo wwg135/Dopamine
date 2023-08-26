@@ -135,29 +135,29 @@ struct JailbreakView: View {
                                         }
                                         Circle()
                                             .stroke(
-                                                  Color.white.opacity(0.1),
-                                                   lineWidth: updateState == .downloading ? 8 : 4
+                                                Color.white.opacity(0.1),
+                                                lineWidth: updateState == .downloading ? 8 : 4
+                                            )
+                                            .animation(.spring(), value: updateState)
+                                        Circle()
+                                            .trim(from: 0, to: progressDouble)
+                                            .stroke(
+                                                Color.white,
+                                                style: StrokeStyle(
+                                                    lineWidth: updateState == .downloading ? 8 : 0,
+                                                    lineCap: .round
                                                 )
-                                                .animation(.spring(), value: updateState)
-                                            Circle()
-                                                .trim(from: 0, to: progressDouble)
-                                                .stroke(
-                                                    Color.white,
-                                                    style: StrokeStyle(
-                                                        lineWidth: updateState == .downloading ? 8 : 0,
-                                                        lineCap: .round
-                                                    )
-                                                )
-                                                .rotationEffect(.degrees(-90))
-                                                .animation(.easeOut, value: progressDouble)
-                                                .animation(.spring(), value: updateState)
-                                        }
-                                        .frame(height: 128)
-                                        .padding(32)
+                                            )
+                                            .rotationEffect(.degrees(-90))
+                                            .animation(.easeOut, value: progressDouble)
+                                            .animation(.spring(), value: updateState)
                                     }
-                                    .opacity(updateState != .changelog ? 1 : 0)
-                                    .animation(.spring(), value: updateState)
-                                    .frame(maxWidth: 280)
+                                    .frame(height: 128)
+                                    .padding(32)
+                                }
+                                .opacity(updateState != .changelog ? 1 : 0)
+                                .animation(.spring(), value: updateState)
+                                .frame(maxWidth: 280)
                             }
                         }
                         updateButton
@@ -500,32 +500,30 @@ struct JailbreakView: View {
             Button("Button_Set") {
                 showDownloadPage = true
                 DispatchQueue.global().async {
-                    if type == .regular {
-                        updateState = .downloading
+                    updateState = .downloading
                             
-                        // 💀 code
-                        Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                            progressDouble = downloadProgress.fractionCompleted
+                    // 💀 code
+                    Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                        progressDouble = downloadProgress.fractionCompleted
                                 
-                            if progressDouble == 1 {
-                                t.invalidate()
-                            }
+                        if progressDouble == 1 {
+                            t.invalidate()
                         }
+                    }
                             
-                        Task {
-                            do {
-                                try await downloadUpdateAndInstall()
-                                updateState = .updating
-                            } catch {
-                                Logger.log("Error: \(error.localizedDescription)", type: .error)
-                            }
+                    Task {
+                        do {
+                            try await downloadUpdateAndInstall()
+                            updateState = .updating
+                        } catch {
+                            Logger.log("Error: \(error.localizedDescription)", type: .error)
                         }
-                    } else {
-                        updateState = .updating
-                        DispatchQueue.global(qos: .userInitiated).async {
-                            updateEnvironment()
-                        }
-                    } 
+                    }
+                } else {
+                    updateState = .updating
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        updateEnvironment()
+                    }
                 }
             }
         })
