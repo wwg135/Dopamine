@@ -21,7 +21,6 @@ struct UpdateDownloadingView: View {
     var downloadProgress = Progress()
 
     @State var showButton = true
-    @Binding var type: UpdateType?
     @State var updateState: UpdateState = .downloading
     
     var body: some View {
