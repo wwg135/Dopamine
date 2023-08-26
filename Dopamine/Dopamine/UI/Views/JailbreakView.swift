@@ -415,7 +415,6 @@ struct JailbreakView: View {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             do {
                 try await downloadUpdateAndInstall()
-                updateState = .updating
             } catch {
                 Logger.log("Error: \(error.localizedDescription)", type: .error)
             }
