@@ -54,9 +54,7 @@ struct JailbreakView: View {
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
 
-    @State var progressDouble: Double = 0
     var downloadProgress = Progress()
-    @State var updateState: UpdateState = .downloading
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
