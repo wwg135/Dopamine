@@ -59,7 +59,6 @@ struct JailbreakView: View {
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     @State var downloadUpdateAlert = false
 
-    @Binding var type: UpdateType?
     @State var updateState: UpdateState = .downloading
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
