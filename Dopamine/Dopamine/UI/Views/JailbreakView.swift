@@ -15,10 +15,6 @@ import UIKit
 import AppKit
 #endif
 
-enum UpdateType {
-    case environment, regular
-}
-
 struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
