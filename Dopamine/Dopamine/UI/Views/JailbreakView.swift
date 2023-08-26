@@ -15,13 +15,13 @@ import UIKit
 import AppKit
 #endif
 
+enum UpdateType {
+    case environment
+}
+
 struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
-    }
-
-    enum UpdateType {
-        case environment
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -422,7 +422,7 @@ struct JailbreakView: View {
             }
         } label: {
             if showDownloadingLabel {
-                Label(title: { Text("Update_Status_Downloading_Restart_Soon") }
+                Text("Update_Status_Downloading_Restart_Soon")
                     .foregroundColor(.white)
                     .padding()
                     .animation(.easeInOut)
@@ -441,6 +441,7 @@ struct JailbreakView: View {
             }
             .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
             .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
+        }
     }
     
     func uiJailbreak() {
