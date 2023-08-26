@@ -415,10 +415,12 @@ struct JailbreakView: View {
     var updateButton: some View {
         Button {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            do {
-                try await downloadUpdateAndInstall()
-            } catch {
-                Logger.log("Error: \(error.localizedDescription)", type: .error)
+            Task {
+                do {
+                    try await downloadUpdateAndInstall()
+                } catch {
+                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                }
             }
         } label: {
             Label(title: { Text("Button_Update_Available") }, icon: {
