@@ -146,6 +146,8 @@ struct JailbreakView: View {
                     .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
+
+                UpdateDownloadingView(type: $showingUpdatePopupType)
             }
             .animation(.default, value: showingUpdatePopupType == nil)
         }
