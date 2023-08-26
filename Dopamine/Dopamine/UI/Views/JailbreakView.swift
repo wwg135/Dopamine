@@ -499,29 +499,31 @@ struct JailbreakView: View {
             Button("Button_Set") {
                 showDownloadPage = true
                 DispatchQueue.global().async {
-                    updateState = .downloading
+                    if .regular {
+                        updateState = .downloading
                             
-                    // 💀 code
-                    Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                        progressDouble = downloadProgress.fractionCompleted
+                        // 💀 code
+                        Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                            progressDouble = downloadProgress.fractionCompleted
                                 
-                        if progressDouble == 1 {
-                            t.invalidate()
+                            if progressDouble == 1 {
+                                t.invalidate()
+                            }
                         }
-                    }
                             
-                    Task {
-                        do {
-                            try await downloadUpdateAndInstall()
-                            updateState = .updating
-                        } catch {
-                            Logger.log("Error: \(error.localizedDescription)", type: .error)
+                        Task {
+                            do {
+                                try await downloadUpdateAndInstall()
+                                updateState = .updating
+                            } catch {
+                                Logger.log("Error: \(error.localizedDescription)", type: .error)
+                            }
                         }
-                    }
-                } else {
-                    updateState = .updating
-                    DispatchQueue.global(qos: .userInitiated).async {
-                        updateEnvironment()
+                    } else {
+                        updateState = .updating
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            updateEnvironment()
+                        }
                     }
                 }
             }
