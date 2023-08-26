@@ -63,6 +63,7 @@ struct JailbreakView: View {
     @State var updateState: UpdateState = .downloading
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
+    @State var showDownloadPage = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -703,6 +704,6 @@ struct JailbreakView: View {
 
 struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
-        JailbreakView()
+        JailbreakView(type: .constant(.regular))
     }
 }
