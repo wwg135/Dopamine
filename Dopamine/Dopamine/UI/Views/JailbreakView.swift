@@ -15,17 +15,13 @@ import UIKit
 import AppKit
 #endif
 
-enum UpdateType {
-    case environment
-}
-
 struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
     }
 
-    enum UpdateState {
-        case downloading, updating
+    enum UpdateType {
+        case environment
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -59,6 +55,7 @@ struct JailbreakView: View {
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
 
     var downloadProgress = Progress()
+    @State private var showDownloadingLabel = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -418,26 +415,32 @@ struct JailbreakView: View {
             Task {
                 do {
                     try await downloadUpdateAndInstall()
+                    showDownloadingLabel = true
                 } catch {
                     Logger.log("Error: \(error.localizedDescription)", type: .error)
                 }
             }
         } label: {
-            Label(title: { Text("Button_Update_Available") }, icon: {
-                ZStack {
-                    if jailbreakingProgress == .jailbreaking {
-                        LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                    } else {
-                        Image(systemName: "arrow.down.circle")
+            if showDownloadingLabel {
+                Label(title: { Text("Update_Status_Downloading_Restart_Soon") }
+                    .foregroundColor(.white)
+                    .padding()
+                    .animation(.easeInOut)
+            } else {
+                Label(title: { Text("Button_Update_Available") }, icon: {
+                    ZStack {
+                        if jailbreakingProgress == .jailbreaking {
+                            LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
+                        } else {
+                            Image(systemName: "arrow.down.circle")
+                        }
                     }
-                }
-            })
-            .foregroundColor(Color.white)
-            .padding()
-        }
-        .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
-        .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: updateAvailable)
+                })
+                .foregroundColor(Color.white)
+                .padding()
+            }
+            .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
+            .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
     }
     
     func uiJailbreak() {
