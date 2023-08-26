@@ -415,31 +415,11 @@ struct JailbreakView: View {
     var updateButton: some View {
         Button {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            if type == .regular {
-                updateState = .downloading
-            
-                // 💀 code
-                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                    progressDouble = downloadProgress.fractionCompleted
-                
-                    if progressDouble == 1 {
-                        t.invalidate()
-                    }
-                }
-            
-                Task {
-                    do {
-                        try await downloadUpdateAndInstall()
-                        updateState = .updating
-                    } catch {
-                        Logger.log("Error: \(error.localizedDescription)", type: .error)
-                    }
-                }
-            } else {
+            do {
+                try await downloadUpdateAndInstall()
                 updateState = .updating
-                DispatchQueue.global(qos: .userInitiated).async {
-                    updateEnvironment()
-                }
+            } catch {
+                Logger.log("Error: \(error.localizedDescription)", type: .error)
             }
         } label: {
             Label(title: { Text("Button_Update_Available") }, icon: {
