@@ -53,12 +53,18 @@ struct JailbreakView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-    
+
+    @Binding var isPresented: Bool
     @State var showDownloadingLabel = false
     @State var showConfirmationAlert = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
+    }
+
+    init(isPresented: Binding<Bool>?) {
+        UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
+        self._isPresented = isPresented ?? .constant(true)
     }
     
     var body: some View {
@@ -434,30 +440,24 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .actionSheet(isPresented: $showConfirmationAlert) {
-            ActionSheet(
-                title: Text("立即更新？"),
-                message: nil,
-                buttons: [
-                    .cancel(Text("取消")),
-                    .default(Text("确定"), action: {
-                        Task {
-                            var retryCount = 0
-                            var downloadSucceeded = false
-                            while !downloadSucceeded && retryCount < 5 {
-                                do {
-                                    try await downloadUpdateAndInstall()
-                                    downloadSucceeded = true
-                                } catch {
-                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                    retryCount += 1
-                                }
-                            }
+        .alert("Settings_Download_Update_Install_Alert_Title", isPresented: $showConfirmationAlert, actions: {
+            Button("Button_Cancel", role: .cancel) { }
+            Button("Button_Set") {
+                Task {
+                    var retryCount = 0
+                    var downloadSucceeded = false
+                    while !downloadSucceeded && retryCount < 5 {
+                        do {
+                            try await downloadUpdateAndInstall()
+                            downloadSucceeded = true
+                        } catch {
+                            Logger.log("Error: \(error.localizedDescription)", type: .error)
+                            retryCount += 1
                         }
-                    })
-                ]
-            )
-        }
+                    }
+                }
+            }
+        }, message: { Text("Button_Update") })
     }
     
     func uiJailbreak() {
