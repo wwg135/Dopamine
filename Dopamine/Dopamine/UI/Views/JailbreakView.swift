@@ -16,12 +16,16 @@ import AppKit
 #endif
 
 enum UpdateType {
-    case environment
+    case environment, regular
 }
 
 struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
+    }
+
+    enum UpdateState {
+        case downloading, updating
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -54,6 +58,11 @@ struct JailbreakView: View {
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     @State var downloadUpdateAlert = false
+
+    @Binding var type: UpdateType?
+    @State var updateState: UpdateState = .downloading
+    @State var progressDouble: Double = 0
+    var downloadProgress = Progress()
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -90,6 +99,69 @@ struct JailbreakView: View {
                             }
                         }
                         bottomSection
+                        if showDownloadPage {
+                            ZStack {
+                                if type != nil {
+                                    Color.black
+                                        .ignoresSafeArea()
+                                        .opacity(0.6)
+                                        .transition(.opacity.animation(.spring()))
+                
+                                    ZStack {
+                                        VStack(spacing: 150) {
+                                            VStack(spacing: 10) {
+                                                Spacer()
+                                                Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
+                                                    .font(.title2)
+                                                    .multilineTextAlignment(.center)
+                                                    .drawingGroup()
+                                                Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
+                                                    .opacity(0.5)
+                                                    .multilineTextAlignment(.center)
+                                                    .padding(.bottom, 32)
+                                            }
+                                            .animation(.spring(), value: updateState)
+                                            .frame(height: 225)
+                                        }
+                                        ZStack {
+                                            ZStack {
+                                                Text("\(Int(progressDouble * 100))%")
+                                                    .font(.title)
+                                                    .opacity(updateState == .downloading ? 1 : 0)
+                                                if type != nil {
+                                                    LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
+                                                        .opacity(updateState == .updating ? 1 : 0)
+                                                }
+                                            }
+                                            Circle()
+                                                .stroke(
+                                                    Color.white.opacity(0.1),
+                                                    lineWidth: updateState == .downloading ? 8 : 4
+                                                )
+                                                .animation(.spring(), value: updateState)
+                                            Circle()
+                                                .trim(from: 0, to: progressDouble)
+                                                .stroke(
+                                                    Color.white,
+                                                    style: StrokeStyle(
+                                                        lineWidth: updateState == .downloading ? 8 : 0,
+                                                        lineCap: .round
+                                                    )
+                                                )
+                                                .rotationEffect(.degrees(-90))
+                                                .animation(.easeOut, value: progressDouble)
+                                                .animation(.spring(), value: updateState)
+                                        }
+                                        .frame(height: 128)
+                                        .padding(32)
+                                    }
+                                    .opacity(updateState != .changelog ? 1 : 0)
+                                    .animation(.spring(), value: updateState)
+                                    .frame(maxWidth: 280)
+                                }
+                                .foregroundColor(.white)
+                            }
+                        }
                         updateButton
                         if !isJailbreaking {
                             Spacer()
@@ -428,20 +500,34 @@ struct JailbreakView: View {
         .alert("Button_Update", isPresented: $downloadUpdateAlert, actions: {
             Button("Button_Cancel", role: .cancel) { }
             Button("Button_Set") {
+                showDownloadPage = true
                 DispatchQueue.global().async {
-                    Task {
-                        var retryCount = 0
-                        var downloadSucceeded = false
-                         while !downloadSucceeded && retryCount < 5 {
-                            do {
-                                try await downloadUpdateAndInstall()
-                                downloadSucceeded = true
-                            } catch {
-                                Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                retryCount += 1
+                    if type == .regular {
+                        updateState = .downloading
+                            
+                        // 💀 code
+                        Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                            progressDouble = downloadProgress.fractionCompleted
+                                
+                            if progressDouble == 1 {
+                                t.invalidate()
                             }
                         }
-                    }
+                            
+                        Task {
+                            do {
+                                try await downloadUpdateAndInstall()
+                                updateState = .updating
+                            } catch {
+                                Logger.log("Error: \(error.localizedDescription)", type: .error)
+                            }
+                        }
+                    } else {
+                        updateState = .updating
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            updateEnvironment()
+                        }
+                    } 
                 }
             }
         })
@@ -566,8 +652,9 @@ struct JailbreakView: View {
 
         // Download the asset
         try await withThrowingTaskGroup(of: Void.self) { group in
+            downloadProgress.totalUnitCount = 1
             group.addTask {
-                let (url, _) = try await URLSession.shared.download(from: downloadURL)
+                let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
                 if isJailbroken() {
                     update(tipaURL: url)
                 } else {
