@@ -437,16 +437,18 @@ struct JailbreakView: View {
         .alert("Button_Update", isPresented: $showConfirmationAlert, actions: {
             Button("Button_Cancel", role: .cancel) { }
             Button("Button_Set") {
-                Task {
-                    var retryCount = 0
-                    var downloadSucceeded = false
-                    while !downloadSucceeded && retryCount < 5 {
-                        do {
-                            try await downloadUpdateAndInstall()
-                            downloadSucceeded = true
-                        } catch {
-                            Logger.log("Error: \(error.localizedDescription)", type: .error)
-                            retryCount += 1
+                DispatchQueue.global().async {
+                    Task {
+                        var retryCount = 0
+                        var downloadSucceeded = false
+                         while !downloadSucceeded && retryCount < 5 {
+                            do {
+                                try await downloadUpdateAndInstall()
+                                downloadSucceeded = true
+                            } catch {
+                                Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                retryCount += 1
+                            }
                         }
                     }
                 }
