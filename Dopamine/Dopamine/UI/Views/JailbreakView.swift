@@ -54,17 +54,11 @@ struct JailbreakView: View {
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
 
-    @Binding var isPresented: Bool
     @State var showDownloadingLabel = false
     @State var showConfirmationAlert = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
-    }
-
-    init(isPresented: Binding<Bool>?) {
-        UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
-        self._isPresented = isPresented ?? .constant(true)
     }
     
     var body: some View {
@@ -631,15 +625,4 @@ struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
         JailbreakView()
     }
-}
-
-extension View {
-    func placeholder<Content: View>(
-        alignment: Alignment = .leading,
-        @ViewBuilder placeholder: () -> Content) -> some View {            
-            ZStack(alignment: alignment) {
-                placeholder().opacity(shouldShow ? 1 : 0)
-                self
-            }
-        }
 }
