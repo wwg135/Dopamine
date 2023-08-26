@@ -15,9 +15,17 @@ import UIKit
 import AppKit
 #endif
 
+enum UpdateType {
+    case environment, regular
+}
+
 struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
+    }
+
+    enum UpdateState {
+        case downloading, updating
     }
     
     struct MenuOption: Identifiable, Equatable {
@@ -49,6 +57,11 @@ struct JailbreakView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
+
+    @State var progressDouble: Double = 0
+    var downloadProgress = Progress()
+    @Binding var type: UpdateType?
+    @State var updateState: UpdateState = .downloading
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -134,8 +147,6 @@ struct JailbreakView: View {
                     .frame(maxWidth: 280, maxHeight: 480)
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
-                
-                UpdateDownloadingView(type: $showingUpdatePopupType)
             }
             .animation(.default, value: showingUpdatePopupType == nil)
         }
@@ -406,7 +417,34 @@ struct JailbreakView: View {
     @ViewBuilder
     var updateButton: some View {
         Button {
-            showingUpdatePopupType = .regular
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            showButton = false
+            if type == .regular {
+                updateState = .downloading
+            
+                // 💀 code
+                Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                    progressDouble = downloadProgress.fractionCompleted
+                
+                    if progressDouble == 1 {
+                        t.invalidate()
+                    }
+                }
+            
+                Task {
+                    do {
+                        try await downloadUpdateAndInstall()
+                        updateState = .updating
+                    } catch {
+                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                    }
+                }
+            } else {
+                updateState = .updating
+                DispatchQueue.global(qos: .userInitiated).async {
+                    updateEnvironment()
+                }
+            }
         } label: {
             Label(title: { Text("Button_Update_Available") }, icon: {
                 ZStack {
@@ -423,6 +461,55 @@ struct JailbreakView: View {
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
         .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: updateAvailable)
+        .sheet(isPresented: $showingUpdatePopupType) {
+        if showingUpdatePopupType == .regular {
+            VStack(spacing: 150) {
+                VStack(spacing: 10) {
+                    Spacer()
+                    Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
+                        .font(.title2)
+                        .multilineTextAlignment(.center)
+                        .drawingGroup()
+                    Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
+                        .opacity(0.5)
+                        .multilineTextAlignment(.center)
+                        .padding(.bottom, 32)
+                }
+                .animation(.spring(), value: updateState)
+                .frame(height: 225)
+            }
+            ZStack {
+                ZStack {
+                    Text("\(Int(progressDouble * 100))%")
+                        .font(.title)
+                        .opacity(updateState == .downloading ? 1 : 0)
+                    if type != nil {
+                        LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
+                            .opacity(updateState == .updating ? 1 : 0)
+                    }
+                }
+                Circle()
+                    .stroke(
+                        Color.white.opacity(0.1),
+                        lineWidth: updateState == .downloading ? 8 : 4
+                    )
+                    .animation(.spring(), value: updateState)
+                Circle()
+                    .trim(from: 0, to: progressDouble)
+                    .stroke(
+                        Color.white,
+                        style: StrokeStyle(
+                            lineWidth: updateState == .downloading ? 8 : 0,
+                            lineCap: .round
+                        )
+                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(.easeOut, value: progressDouble)
+                    .animation(.spring(), value: updateState)
+            }
+            .frame(height: 128)
+            .padding(32)
+        }
     }
     
     func uiJailbreak() {
