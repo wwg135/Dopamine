@@ -53,8 +53,6 @@ struct JailbreakView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-
-    var downloadProgress = Progress()
     @State var showDownloadingLabel = false
     
     var isJailbreaking: Bool {
@@ -569,9 +567,8 @@ struct JailbreakView: View {
 
         // Download the asset
         try await withThrowingTaskGroup(of: Void.self) { group in
-            downloadProgress.totalUnitCount = 1
             group.addTask {
-                let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
+                let (url, _) = try await URLSession.shared.download(from: downloadURL)
                 if isJailbroken() {
                     update(tipaURL: url)
                 } else {
