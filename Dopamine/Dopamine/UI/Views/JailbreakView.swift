@@ -60,7 +60,6 @@ struct JailbreakView: View {
 
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
-    @Binding var type: UpdateType?
     @State var updateState: UpdateState = .downloading
     
     var isJailbreaking: Bool {
@@ -418,7 +417,6 @@ struct JailbreakView: View {
     var updateButton: some View {
         Button {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            showButton = false
             if type == .regular {
                 updateState = .downloading
             
