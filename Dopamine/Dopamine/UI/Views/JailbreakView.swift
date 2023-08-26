@@ -53,9 +53,7 @@ struct JailbreakView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-
-    @State var showDownloadingLabel = false
-    @State var showConfirmationAlert = false
+    @State var downloadUpdateAlert = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -411,30 +409,23 @@ struct JailbreakView: View {
     @ViewBuilder
     var updateButton: some View {
         Button {
-            showConfirmationAlert = true
+            downloadUpdateAlert = true
         } label: {
-            if showDownloadingLabel {
-                Text("Update_Status_Downloading_Restart_Soon")
-                    .foregroundColor(.white)
-                    .padding()
-                    .animation(.easeInOut)
-            } else {
-                Label(title: { Text("Button_Update_Available") }, icon: {
-                    ZStack {
-                        if jailbreakingProgress == .jailbreaking {
-                            LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                        } else {
-                            Image(systemName: "arrow.down.circle")
-                        }
+            Label(title: { Text("Button_Update_Available") }, icon: {
+                ZStack {
+                    if jailbreakingProgress == .jailbreaking {
+                        LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
+                    } else {
+                        Image(systemName: "arrow.down.circle")
                     }
-                })
-                .foregroundColor(Color.white)
-                .padding()
-            }
+                }
+            })
+            .foregroundColor(Color.white)
+            .padding()
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .alert("Button_Update", isPresented: $showConfirmationAlert, actions: {
+        .alert("Button_Update", isPresented: $downloadUpdateAlert, actions: {
             Button("Button_Cancel", role: .cancel) { }
             Button("Button_Set") {
                 DispatchQueue.global().async {
