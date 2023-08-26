@@ -412,13 +412,13 @@ struct JailbreakView: View {
     var updateButton: some View {
         Button {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            showDownloadingLabel = true
             Task {
                 var retryCount = 0
                 var downloadSucceeded = false
                 while !downloadSucceeded && retryCount < 5 {
                     do {
                         try await downloadUpdateAndInstall()
-                        showDownloadingLabel = true
                         downloadSucceeded = true
                     } catch {
                         Logger.log("Error: \(error.localizedDescription)", type: .error)
