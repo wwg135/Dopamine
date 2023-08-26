@@ -86,6 +86,7 @@ struct UpdateDownloadingView: View {
         }
         .foregroundColor(.white)
     }
+}
 
 struct UpdateDownloadingView_Previews: PreviewProvider {
     static var previews: some View {
