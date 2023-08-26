@@ -55,7 +55,7 @@ struct JailbreakView: View {
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
 
     var downloadProgress = Progress()
-    @State private var showDownloadingLabel = false
+    @State var showDownloadingLabel = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -413,11 +413,17 @@ struct JailbreakView: View {
         Button {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             Task {
-                do {
-                    try await downloadUpdateAndInstall()
-                    showDownloadingLabel = true
-                } catch {
-                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                var retryCount = 0
+                var downloadSucceeded = false
+                while !downloadSucceeded && retryCount < 5 {
+                    do {
+                        try await downloadUpdateAndInstall()
+                        showDownloadingLabel = true
+                        downloadSucceeded = true
+                    } catch {
+                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                        retryCount += 1
+                    }
                 }
             }
         } label: {
