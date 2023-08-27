@@ -604,7 +604,7 @@ struct JailbreakView: View {
         if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
             if let latestName = latest["tag_name"] as? String, let latestVersion = latest["name"] as? String {
                 if latestName.count == 10 && currentAppVersion.count == 10 {
-                    if latestName > currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
+                    if latestName = currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
                         updateAvailable = true
                     }
                 }
