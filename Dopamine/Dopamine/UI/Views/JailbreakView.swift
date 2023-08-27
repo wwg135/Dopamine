@@ -153,6 +153,7 @@ struct JailbreakView: View {
                         .padding(.top, 20)
                         .padding(.bottom, 10)
                     }
+                    .background(MaterialView(.systemUltraThinMaterialDark) .opacity(1))
                     .foregroundColor(.white)
                     .cornerRadius(16)
                     .frame(maxWidth: 280, maxHeight: 280)
