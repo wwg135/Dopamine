@@ -150,6 +150,7 @@ struct JailbreakView: View {
                                 .animation(.spring(), value: updateState)
                         }
                         .frame(height: 128)
+                        .padding(.top, 20)
                         .padding(.bottom, 10)
                     }
                     .foregroundColor(.white)
