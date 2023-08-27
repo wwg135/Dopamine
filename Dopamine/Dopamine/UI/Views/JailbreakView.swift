@@ -127,6 +127,9 @@ struct JailbreakView: View {
                                 .animation(.spring(), value: updateState)
                                 .frame(height: 225)
                             }
+
+                            Spacer()
+                            
                             ZStack {   
                                 ZStack {
                                     Text("\(Int(progressDouble * 100))%")
@@ -159,9 +162,8 @@ struct JailbreakView: View {
                             .frame(height: 128)
                             .padding(.bottom, 32)
                         }
-                        .tint(.accentColor)
-                        .zIndex(3)
                     }
+                    .zIndex(3)
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 320)
