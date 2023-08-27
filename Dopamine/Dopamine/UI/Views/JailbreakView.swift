@@ -157,10 +157,10 @@ struct JailbreakView: View {
 
                         VStack {
                             Spacer()
-                            Button(action: {
+                            Button{
                                 downloadTask?.cancel()
                                 showDownloadPage = false
-                            }) label: {
+                            } label: {
                                 Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
                                     .foregroundColor(.white)
                                     .padding()
@@ -668,8 +668,12 @@ struct JailbreakView: View {
                     return
                 }
             }
-            downloadTask = group.next()
-            try await group.waitForAll()
+            downloadTask = URLSession.shared.downloadTask(with: downloadURL)
+            try await withTaskCancellationHandler {
+                downloadTask?.cancel()
+            } perform: {
+                try await group.waitForAll()
+            }
         }
     }
     
