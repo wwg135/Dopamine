@@ -127,6 +127,17 @@ struct JailbreakView: View {
                                 }
                                 .animation(.spring(), value: updateState)
                                 .frame(height: 225)
+
+                                if updateState == .downloading {
+                                    // 💀 code
+                                    Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                                        progressDouble = downloadProgress.fractionCompleted
+                                
+                                        if progressDouble == 1 {
+                                            t.invalidate()
+                                        }
+                                    }
+                                }
                             }
                             ZStack {
                                 ZStack {
@@ -160,10 +171,12 @@ struct JailbreakView: View {
                             .frame(height: 128)
                             .padding(32)
                         }
-                        .opacity(jailbreakingProgress != .jailbreaking ? 1 : 0)
+                        .opacity(updateState == .downloading ? || updateState == .updating ? 1 : 0)
                         .animation(.spring(), value: updateState)
                         .frame(maxWidth: 280)
                     }
+                    .opacity(updateState == .downloading ? || updateState == .updating ? 1 : 0)
+                    .frame(maxWidth: 280, maxHeight: 480)
                     .zIndex(1)
                 }
                 
@@ -494,17 +507,7 @@ struct JailbreakView: View {
                 showDownloadPage = true
                 DispatchQueue.global().async {
                     if !requiresEnvironmentUpdate {
-                        updateState = .downloading
-                            
-                        // 💀 code
-                        Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                            progressDouble = downloadProgress.fractionCompleted
-                                
-                            if progressDouble == 1 {
-                                t.invalidate()
-                            }
-                        }
-                            
+                        updateState = .downloading  
                         Task {
                             do {
                                 try await downloadUpdateAndInstall()
