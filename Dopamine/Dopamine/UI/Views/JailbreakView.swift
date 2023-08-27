@@ -127,18 +127,6 @@ struct JailbreakView: View {
                                 }
                                 .animation(.spring(), value: updateState)
                                 .frame(height: 225)
-                                Group {
-                                    if updateState == .downloading {
-                                        // 💀 code
-                                        Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                                            progressDouble = downloadProgress.fractionCompleted
-                                
-                                            if progressDouble == 1 {
-                                                t.invalidate()
-                                            }
-                                        }
-                                    }
-                                }
                             }
                             ZStack {
                                 ZStack {
@@ -179,6 +167,17 @@ struct JailbreakView: View {
                     .opacity((updateState == .downloading || updateState == .updating) ? 1 : 0)
                     .frame(maxWidth: 280, maxHeight: 480)
                     .zIndex(1)
+                    .onAppear {
+                        if updateState == .downloading {
+                            Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                                progressDouble = downloadProgress.fractionCompleted
+                                
+                                if progressDouble == 1 {
+                                    t.invalidate()
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 PopupView(title: {
