@@ -155,7 +155,7 @@ struct JailbreakView: View {
                     }
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(1))
                     .cornerRadius(16)
-                    .frame(maxWidth: 320, maxHeight: 400)
+                    .frame(maxWidth: 320, maxHeight: 320)
                     .zIndex(2)
                     .onAppear {
                         if updateState == .downloading {
