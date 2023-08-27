@@ -15,10 +15,6 @@ import UIKit
 import AppKit
 #endif
 
-enum UpdateType {
-    case environment, regular
-}
-
 struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
@@ -154,7 +150,7 @@ struct JailbreakView: View {
                                     .frame(height: 128)
                                     .padding(32)
                                 }
-                                .opacity(updateState != .changelog ? 1 : 0)
+                                .opacity(updateState != jailbreaking ? 1 : 0)
                                 .animation(.spring(), value: updateState)
                                 .frame(maxWidth: 280)
                             }
@@ -499,7 +495,7 @@ struct JailbreakView: View {
             Button("Button_Set") {
                 showDownloadPage = true
                 DispatchQueue.global().async {
-                    if .regular {
+                    if !isInstalledEnvironmentVersionMismatching() {
                         updateState = .downloading
                             
                         // 💀 code
