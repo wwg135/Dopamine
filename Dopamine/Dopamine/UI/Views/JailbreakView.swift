@@ -112,9 +112,8 @@ struct JailbreakView: View {
                         .transition(.opacity.animation(.spring()))
                         
                         ZStack {
-                            VStack(spacing: 10) {
+                            VStack(spacing: 20) {
                                 VStack(spacing: 10) {
-                                    Spacer()
                                     Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
                                         .font(.title2)
                                         .opacity(1)
@@ -126,7 +125,7 @@ struct JailbreakView: View {
                                         .padding(.bottom, 32)
                                 }
                                 .animation(.spring(), value: updateState)
-                                .frame(height: 225)
+                                .frame(height: 68)
                             }
                             ZStack {   
                                 ZStack {
@@ -158,9 +157,9 @@ struct JailbreakView: View {
                                     .animation(.spring(), value: updateState)
                             }
                             .frame(height: 128)
-                            .padding(.bottom, 32)
+                            .padding(.bottom, 10)
                         }
-                        .opacity(1)
+                        .opacity(0.1)
                         .animation(.spring(), value: updateState)
                     }
                     .zIndex(3)
