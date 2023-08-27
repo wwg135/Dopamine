@@ -57,7 +57,6 @@ struct JailbreakView: View {
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
     @State var showDownloadPage = false
-    var downloadTask: URLSessionDownloadTask?
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -154,21 +153,6 @@ struct JailbreakView: View {
                         }
                         .frame(height: 128)
                         .padding(32)
-
-                        VStack {
-                            Spacer()
-                            Button{
-                                downloadTask?.cancel()
-                                showDownloadPage = false
-                            } label: {
-                                Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .frame(maxWidth: 280)
-                            }
-                            .fixedSize()
-                        }
-                        .padding(.bottom, 10)
                     }
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(1))
                     .cornerRadius(16)
@@ -668,12 +652,7 @@ struct JailbreakView: View {
                     return
                 }
             }
-            downloadTask = URLSession.shared.downloadTask(with: downloadURL)
-            try await withTaskCancellationHandler {
-                downloadTask?.cancel()
-            } perform: {
-                try await group.waitForAll()
-            }
+            try await group.waitForAll()
         }
     }
     
