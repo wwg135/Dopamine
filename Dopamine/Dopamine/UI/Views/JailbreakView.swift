@@ -152,19 +152,19 @@ struct JailbreakView: View {
                             .animation(.spring(), value: updateState)
                             .frame(maxWidth: 280)
                         }
-                        updateButton
-                        if !isJailbreaking {
-                            Spacer()
-                        }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .blur(radius: isPopupPresented ? 4 : 0)
-                    .scaleEffect(isPopupPresented ? 0.85 : 1)
-                    .animation(.spring(), value: updateAvailable)
-                    .animation(.spring(), value: isPopupPresented)
-                    .transition(.opacity)
-                    .zIndex(1)
+                    updateButton
+                    if !isJailbreaking {
+                        Spacer()
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .blur(radius: isPopupPresented ? 4 : 0)
+                .scaleEffect(isPopupPresented ? 0.85 : 1)
+                .animation(.spring(), value: updateAvailable)
+                .animation(.spring(), value: isPopupPresented)
+                .transition(.opacity)
+                .zIndex(1)
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
