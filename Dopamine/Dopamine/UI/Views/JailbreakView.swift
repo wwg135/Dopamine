@@ -108,7 +108,7 @@ struct JailbreakView: View {
                 if showDownloadPage {
                     ZStack {
                         Color.black
-                        .opacity(0.8)
+                        .opacity(0.25)
                         .transition(.opacity.animation(.spring()))
                         
                         ZStack {
@@ -125,35 +125,37 @@ struct JailbreakView: View {
                             }
                             .animation(.spring(), value: updateState)
                             .frame(height: 225)
-                        
-                            ZStack {   
-                                ZStack {
-                                    Text("\(Int(progressDouble * 100))%")
-                                        .font(.title)
-                                        .opacity(updateState == .downloading ? 1 : 0) 
-                                    if updateState == .downloading || updateState == .updating {
-                                        LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                            .opacity(updateState == .updating ? 1 : 0)
+
+                            VStack {
+                                ZStack {   
+                                    ZStack {
+                                        Text("\(Int(progressDouble * 100))%")
+                                            .font(.title)
+                                            .opacity(updateState == .downloading ? 1 : 0) 
+                                        if updateState == .downloading || updateState == .updating {
+                                            LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
+                                                .opacity(updateState == .updating ? 1 : 0)
+                                        }
                                     }
-                                }
-                                Circle()
-                                    .stroke(
-                                        Color.white.opacity(0.1),
-                                        lineWidth: updateState == .downloading ? 8 : 4
-                                    )
-                                    .animation(.spring(), value: updateState)
-                                Circle()
-                                    .trim(from: 0, to: progressDouble)
-                                    .stroke(
-                                        Color.white,
-                                        style: StrokeStyle(
-                                            lineWidth: updateState == .downloading ? 8 : 0,
-                                            lineCap: .round
+                                    Circle()
+                                        .stroke(
+                                            Color.white.opacity(0.1),
+                                            lineWidth: updateState == .downloading ? 8 : 4
                                         )
-                                    )
-                                    .rotationEffect(.degrees(-90))
-                                    .animation(.easeOut, value: progressDouble)
-                                    .animation(.spring(), value: updateState)
+                                        .animation(.spring(), value: updateState)
+                                    Circle()
+                                        .trim(from: 0, to: progressDouble)
+                                        .stroke(
+                                            Color.white,
+                                            style: StrokeStyle(
+                                                lineWidth: updateState == .downloading ? 8 : 0,
+                                                lineCap: .round
+                                            )
+                                        )
+                                        .rotationEffect(.degrees(-90))
+                                        .animation(.easeOut, value: progressDouble)
+                                        .animation(.spring(), value: updateState)
+                                }
                             }
                             .frame(height: 128)
                             .padding(.bottom, 10)
@@ -163,7 +165,7 @@ struct JailbreakView: View {
                     }
                     .cornerRadius(16)
                     .foregroundColor(.white)
-                    .frame(maxWidth: 280, maxHeight: 450)
+                    .frame(maxWidth: 280, maxHeight: 400)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
