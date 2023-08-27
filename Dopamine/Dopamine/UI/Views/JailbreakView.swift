@@ -107,7 +107,7 @@ struct JailbreakView: View {
           
                 if showDownloadPage {
                     ZStack {
-                        VStack(spacing: 10) {
+                        VStack {
                             Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
                                 .font(.title2)
                                 .multilineTextAlignment(.center)
@@ -133,7 +133,7 @@ struct JailbreakView: View {
                             Circle()
                                 .stroke(
                                     Color.white.opacity(0.1),
-                                    lineWidth: updateState == .downloading ? 16 : 8
+                                    lineWidth: updateState == .downloading ? 8 : 4
                                 )
                                 .animation(.spring(), value: updateState)
                             Circle()
@@ -141,7 +141,7 @@ struct JailbreakView: View {
                                 .stroke(
                                     Color.white,
                                     style: StrokeStyle(
-                                        lineWidth: updateState == .downloading ? 16 : 0,
+                                        lineWidth: updateState == .downloading ? 8 : 0,
                                         lineCap: .round
                                     )
                                 )
@@ -149,7 +149,7 @@ struct JailbreakView: View {
                                 .animation(.easeOut, value: progressDouble)
                                 .animation(.spring(), value: updateState)
                         }
-                        .frame(height: 128)
+                        .frame(height: 160)
                         .padding(.bottom, 10)
                     }
                     .cornerRadius(16)
