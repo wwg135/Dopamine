@@ -15,13 +15,13 @@ import UIKit
 import AppKit
 #endif
 
+enum UpdateState {
+    case downloading, updating
+}
+
 struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
-    }
-
-    enum UpdateState {
-        case downloading, updating
     }
     
     struct MenuOption: Identifiable, Equatable {
