@@ -166,7 +166,7 @@ struct JailbreakView: View {
                     }
                     .opacity((updateState == .downloading || updateState == .updating) ? 1 : 0)
                     .frame(maxWidth: 280, maxHeight: 480)
-                    .zIndex(1)
+                    .zIndex(2)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
