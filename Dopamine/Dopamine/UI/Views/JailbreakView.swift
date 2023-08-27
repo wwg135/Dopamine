@@ -127,14 +127,15 @@ struct JailbreakView: View {
                                 }
                                 .animation(.spring(), value: updateState)
                                 .frame(height: 225)
-
-                                if updateState == .downloading {
-                                    // 💀 code
-                                    Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
-                                        progressDouble = downloadProgress.fractionCompleted
+                                Group {
+                                    if updateState == .downloading {
+                                        // 💀 code
+                                        Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                                            progressDouble = downloadProgress.fractionCompleted
                                 
-                                        if progressDouble == 1 {
-                                            t.invalidate()
+                                            if progressDouble == 1 {
+                                                t.invalidate()
+                                            }
                                         }
                                     }
                                 }
