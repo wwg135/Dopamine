@@ -124,7 +124,7 @@ struct JailbreakView: View {
                                     .padding(.bottom, 32)
                             }
                             .animation(.spring(), value: updateState)
-                            .frame(height: 128)
+                            .frame(height: 88)
                            
                             VStack {   
                                 ZStack {
@@ -155,7 +155,7 @@ struct JailbreakView: View {
                                     .animation(.easeOut, value: progressDouble)
                                     .animation(.spring(), value: updateState)
                             }
-                            .frame(height: 128)
+                            .frame(height: 225)
                             .padding(.bottom, 10)
                         }
                         .tint(.accentColor)
@@ -608,13 +608,12 @@ struct JailbreakView: View {
         }
 
         if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
-            if let latestName = latest["tag_name"] as? String, let latestVersion = latest["name"] as? String {
-                if latestName.count == 10 && currentAppVersion.count == 10 {
-                    if latestName > currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
+            if let latestName = latest["tag_name"] as? String, 
+                let latestVersion = latest["name"] as? String {
+                    if latestName != currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
                         updateAvailable = true
                     }
-                }
-            }
+               }
         }
 
         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false) 
