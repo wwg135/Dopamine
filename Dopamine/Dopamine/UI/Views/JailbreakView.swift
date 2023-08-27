@@ -118,7 +118,7 @@ struct JailbreakView: View {
                                 .padding(.bottom, 10)
                         }
                         .animation(.spring(), value: updateState)
-                        .frame(height: 225)
+                        .frame(height: 100)
                         
                         VStack {   
                             ZStack {
@@ -155,7 +155,7 @@ struct JailbreakView: View {
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(1))
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: 280, maxHeight: .infinity)
                     .zIndex(2)
                     .onAppear {
                         if updateState == .downloading {
