@@ -171,11 +171,11 @@ struct JailbreakView: View {
                             .frame(height: 128)
                             .padding(32)
                         }
-                        .opacity(updateState == .downloading ? || updateState == .updating ? 1 : 0)
+                        .opacity((updateState == .downloading || updateState == .updating) ? 1 : 0)
                         .animation(.spring(), value: updateState)
                         .frame(maxWidth: 280)
                     }
-                    .opacity(updateState == .downloading ? || updateState == .updating ? 1 : 0)
+                    .opacity((updateState == .downloading || updateState == .updating) ? 1 : 0)
                     .frame(maxWidth: 280, maxHeight: 480)
                     .zIndex(1)
                 }
