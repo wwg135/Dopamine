@@ -52,9 +52,8 @@ struct JailbreakView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-    @State var downloadUpdateAlert = false
-
     @State var updateState: UpdateState = .downloading
+    @State var downloadUpdateAlert = false
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
     @State var showDownloadPage = false
@@ -565,7 +564,7 @@ struct JailbreakView: View {
                 continue
             }
             
-            if let version = version, !version.isEmpty {    
+            if !version.isEmpty {    
                 if !changelogBuf.isEmpty {
                     changelogBuf += "\n\n\n"
                 }
