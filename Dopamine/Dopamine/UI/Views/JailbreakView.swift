@@ -119,7 +119,7 @@ struct JailbreakView: View {
                                     .padding(.bottom, 32)
                             }
                             .animation(.spring(), value: updateState)
-                            .frame(height: 128)
+                            .frame(height: 225)
                         
                             ZStack {   
                                 ZStack {
@@ -154,7 +154,7 @@ struct JailbreakView: View {
                             .padding(.top, 150)
                             .padding(.bottom, 10)
                         }
-                        .background(MaterialView(.systemUltraThinMaterialDark))
+                        .tint(.accentColor)
                         .frame(maxWidth: 280, maxHeight: 280)
                         .zIndex(3)
                     }
