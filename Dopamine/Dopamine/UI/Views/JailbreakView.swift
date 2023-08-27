@@ -109,12 +109,11 @@ struct JailbreakView: View {
                     ZStack {
                         VStack(spacing: 10) {
                             Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
-                                .font(.title)
-                                .foregroundColor(Color.white)
+                                .font(.title2)
                                 .multilineTextAlignment(.center)
                                 .drawingGroup()
                             Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
-                                .foregroundColor(Color.white)
+                                .opacity(1)
                                 .multilineTextAlignment(.center)
                                 .padding(.bottom, 10)
                         }
@@ -152,6 +151,7 @@ struct JailbreakView: View {
                         }
                         .frame(height: 128)
                         .padding(.top, 240)
+                        .padding(.bottom, 10)
                     }
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(1))
                     .cornerRadius(16)
