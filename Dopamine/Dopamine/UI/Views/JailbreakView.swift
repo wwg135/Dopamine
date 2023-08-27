@@ -120,9 +120,8 @@ struct JailbreakView: View {
                         }
                         .animation(.spring(), value: updateState)
                         .frame(height: 225)
-                        .padding(.top, 10)
                             
-                        VStack {
+                        ZStack {
                             ZStack {
                                 Text("\(Int(progressDouble * 100))%")
                                     .font(.title)
@@ -152,11 +151,11 @@ struct JailbreakView: View {
                                 .animation(.spring(), value: updateState)
                         }
                         .frame(height: 128)
-                        .padding(32)
+                        .padding(.top, 280)
                     }
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(1))
                     .cornerRadius(16)
-                    .frame(maxWidth: 280, maxHeight: 320)
+                    .frame(maxWidth: 280, maxHeight: 480)
                     .zIndex(2)
                     .onAppear {
                         if updateState == .downloading {
