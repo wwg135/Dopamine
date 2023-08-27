@@ -42,7 +42,6 @@ struct JailbreakView: View {
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?  
     @State var updateAvailable = false
-    @State var showingUpdatePopupType: UpdateType? = nil
     @State var updateChangelog: String? = nil
     @State var mismatchChangelog: String? = nil 
     @State var upTime = "系统启动于: 加载中"
@@ -79,81 +78,79 @@ struct JailbreakView: View {
                         .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                         .animation(.spring(), value: isPopupPresented)
                 
-                if showingUpdatePopupType == nil {
-                    VStack {
+                VStack {
+                    Spacer()
+                    header
+                    Spacer()
+                    menu
+                    if !isJailbreaking {
                         Spacer()
-                        header
                         Spacer()
-                        menu
-                        if !isJailbreaking {
-                            Spacer()
-                            Spacer()
-                            if isSandboxed() {
-                                Text("(Demo version - Sandboxed)")
-                                    .foregroundColor(.white)
-                                    .opacity(0.5)
-                            }
+                        if isSandboxed() {
+                            Text("(Demo version - Sandboxed)")
+                                .foregroundColor(.white)
+                                .opacity(0.5)
                         }
-                        bottomSection
-                        if showDownloadPage {
-                            ZStack {
-                                Color.black
-                                    .ignoresSafeArea()
-                                    .opacity(0.6)
-                                    .transition(.opacity.animation(.spring()))
+                    }
+                    bottomSection
+                    if showDownloadPage {
+                        ZStack {
+                            Color.black
+                                .ignoresSafeArea()
+                                .opacity(0.6)
+                                .transition(.opacity.animation(.spring()))
                 
-                                ZStack {
-                                    VStack(spacing: 150) {
-                                        VStack(spacing: 10) {
-                                            Spacer()
-                                            Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
-                                                .font(.title2)
-                                                .multilineTextAlignment(.center)
-                                                .drawingGroup()
-                                            Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
-                                                .opacity(0.5)
-                                                .multilineTextAlignment(.center)
-                                                .padding(.bottom, 32)
-                                        }
-                                        .animation(.spring(), value: updateState)
-                                        .frame(height: 225)
+                            ZStack {
+                                VStack(spacing: 150) {
+                                    VStack(spacing: 10) {
+                                        Spacer()
+                                        Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
+                                            .font(.title2)
+                                            .multilineTextAlignment(.center)
+                                            .drawingGroup()
+                                        Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
+                                            .opacity(0.5)
+                                            .multilineTextAlignment(.center)
+                                            .padding(.bottom, 32)
                                     }
-                                    ZStack {
-                                        ZStack {
-                                            Text("\(Int(progressDouble * 100))%")
-                                                .font(.title)
-                                                .opacity(updateState == .downloading ? 1 : 0) 
-                                            if type != nil {
-                                                    LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                                        .opacity(updateState == .updating ? 1 : 0)
-                                            }
-                                        }
-                                        Circle()
-                                            .stroke(
-                                                Color.white.opacity(0.1),
-                                                lineWidth: updateState == .downloading ? 8 : 4
-                                            )
-                                            .animation(.spring(), value: updateState)
-                                        Circle()
-                                            .trim(from: 0, to: progressDouble)
-                                            .stroke(
-                                                Color.white,
-                                                style: StrokeStyle(
-                                                    lineWidth: updateState == .downloading ? 8 : 0,
-                                                    lineCap: .round
-                                                )
-                                            )
-                                            .rotationEffect(.degrees(-90))
-                                            .animation(.easeOut, value: progressDouble)
-                                            .animation(.spring(), value: updateState)
-                                    }
-                                    .frame(height: 128)
-                                    .padding(32)
+                                    .animation(.spring(), value: updateState)
+                                    .frame(height: 225)
                                 }
-                                .opacity(updateState != jailbreaking ? 1 : 0)
-                                .animation(.spring(), value: updateState)
-                                .frame(maxWidth: 280)
+                                ZStack {
+                                    ZStack {
+                                        Text("\(Int(progressDouble * 100))%")
+                                            .font(.title)
+                                            .opacity(updateState == .downloading ? 1 : 0) 
+                                        if UpdateState == .downloading  || UpdateState == .updating {
+                                                LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
+                                                    .opacity(updateState == .updating ? 1 : 0)
+                                        }
+                                    }
+                                    Circle()
+                                        .stroke(
+                                            Color.white.opacity(0.1),
+                                            lineWidth: updateState == .downloading ? 8 : 4
+                                        )
+                                        .animation(.spring(), value: updateState)
+                                    Circle()
+                                        .trim(from: 0, to: progressDouble)
+                                        .stroke(
+                                            Color.white,
+                                            style: StrokeStyle(
+                                                lineWidth: updateState == .downloading ? 8 : 0,
+                                                lineCap: .round
+                                            )
+                                        )
+                                        .rotationEffect(.degrees(-90))
+                                        .animation(.easeOut, value: progressDouble)
+                                        .animation(.spring(), value: updateState)
+                                }
+                                .frame(height: 128)
+                                .padding(32)
                             }
+                            .opacity(updateState != jailbreaking ? 1 : 0)
+                            .animation(.spring(), value: updateState)
+                            .frame(maxWidth: 280)
                         }
                         updateButton
                         if !isJailbreaking {
@@ -205,7 +202,7 @@ struct JailbreakView: View {
                 }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
             }
-            .animation(.default, value: showingUpdatePopupType == nil)
+            .animation(.default)
         }
         .onAppear {
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
@@ -348,7 +345,7 @@ struct JailbreakView: View {
                 Button {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()       
                     if requiresEnvironmentUpdate {
-                        showingUpdatePopupType = .environment
+                        updateAvailable = true
                     } else {
                         if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
                             jailbreakingProgress = .selectingPackageManager
@@ -476,12 +473,12 @@ struct JailbreakView: View {
         Button {
             downloadUpdateAlert = true
         } label: {
-            Label(title: { Text("Button_Update_Available") }, icon: {
+            Label(title: { Text(requiresEnvironmentUpdate ? "Button_Update_Environment" : "Button_Update_Available") }, icon: {
                 ZStack {
                     if jailbreakingProgress == .jailbreaking {
                         LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
                     } else {
-                        Image(systemName: "arrow.down.circle")
+                        Image(systemName: requiresEnvironmentUpdate ? "arrow.clockwise.circle" : "arrow.down.circle")
                     }
                 }
             })
@@ -495,7 +492,7 @@ struct JailbreakView: View {
             Button("Button_Set") {
                 showDownloadPage = true
                 DispatchQueue.global().async {
-                    if !isInstalledEnvironmentVersionMismatching() {
+                    if !requiresEnvironmentUpdate {
                         updateState = .downloading
                             
                         // 💀 code
