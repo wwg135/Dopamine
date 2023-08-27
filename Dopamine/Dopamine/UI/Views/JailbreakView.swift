@@ -150,12 +150,11 @@ struct JailbreakView: View {
                                 .animation(.spring(), value: updateState)
                         }
                         .frame(height: 128)
-                        .padding(.top, 240)
                         .padding(.bottom, 10)
                     }
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(1))
                     .cornerRadius(16)
-                    .frame(maxWidth: 280, maxHeight: 380)
+                    .frame(maxWidth: 280, maxHeight: 280)
                     .zIndex(2)
                     .onAppear {
                         if updateState == .downloading {
