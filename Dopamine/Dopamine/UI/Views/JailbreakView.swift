@@ -108,7 +108,6 @@ struct JailbreakView: View {
                 if showDownloadPage {
                     ZStack {
                         Color.black
-                        .ignoresSafeArea()
                         .opacity(0.6)
                         .transition(.opacity.animation(.spring()))
                         
@@ -116,6 +115,7 @@ struct JailbreakView: View {
                             VStack {
                                 Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
                                     .font(.title2)
+                                    .opacity(1)
                                     .multilineTextAlignment(.center)
                                     .drawingGroup()
                                 Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
@@ -160,11 +160,11 @@ struct JailbreakView: View {
                             .padding(.bottom, 10)
                         }
                         .tint(.accentColor)
-                        .frame(maxWidth: 280, maxHeight: 320)
                         .zIndex(3)
                     }
                     .cornerRadius(16)
                     .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 320)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
