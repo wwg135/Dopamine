@@ -108,7 +108,7 @@ struct JailbreakView: View {
                 if showDownloadPage {
                     ZStack {
                         Color.black
-                        .opacity(0.6)
+                        .opacity(0.8)
                         .transition(.opacity.animation(.spring()))
                         
                         ZStack {
@@ -156,7 +156,6 @@ struct JailbreakView: View {
                                     .animation(.spring(), value: updateState)
                             }
                             .frame(height: 128)
-                            .padding(.top, 32)
                             .padding(.bottom, 10)
                         }
                         .tint(.accentColor)
@@ -164,7 +163,7 @@ struct JailbreakView: View {
                     }
                     .cornerRadius(16)
                     .foregroundColor(.white)
-                    .frame(maxWidth: 280, maxHeight: 320)
+                    .frame(maxWidth: 280, maxHeight: 450)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
