@@ -108,7 +108,7 @@ struct JailbreakView: View {
                 if showDownloadPage {
                     ZStack {
                         Color.black
-                        .opacity(0.6)
+                        .opacity(0.5)
                         .transition(.opacity.animation(.spring()))
                         
                         ZStack {
@@ -127,15 +127,6 @@ struct JailbreakView: View {
                             .frame(height: 88)
                            
                             VStack {   
-                                ZStack {
-                                    Text("\(Int(progressDouble * 100))%")
-                                        .font(.title)
-                                        .opacity(updateState == .downloading ? 1 : 0) 
-                                    if updateState == .downloading || updateState == .updating {
-                                        LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                            .opacity(updateState == .updating ? 1 : 0)
-                                    }
-                                }
                                 Circle()
                                     .stroke(
                                         Color.white.opacity(0.1),
@@ -154,12 +145,21 @@ struct JailbreakView: View {
                                     .rotationEffect(.degrees(-90))
                                     .animation(.easeOut, value: progressDouble)
                                     .animation(.spring(), value: updateState)
+                                ZStack {
+                                    Text("\(Int(progressDouble * 100))%")
+                                        .font(.title)
+                                        .opacity(updateState == .downloading ? 1 : 0) 
+                                    if updateState == .downloading || updateState == .updating {
+                                        LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
+                                            .opacity(updateState == .updating ? 1 : 0)
+                                    }
+                                }
                             }
                             .frame(height: 225)
                             .padding(.bottom, 10)
                         }
                         .tint(.accentColor)
-                        .opacity(0.8)
+                        .opacity(0.5)
                         .animation(.spring(), value: updateState)
                     }
                     .zIndex(3)
