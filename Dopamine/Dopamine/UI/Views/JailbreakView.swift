@@ -134,7 +134,7 @@ struct JailbreakView: View {
                             Circle()
                                 .stroke(
                                     Color.white.opacity(0.1),
-                                    lineWidth: updateState == .downloading ? 8 : 4
+                                    lineWidth: updateState == .downloading ? 16 : 8
                                 )
                                 .animation(.spring(), value: updateState)
                             Circle()
@@ -142,7 +142,7 @@ struct JailbreakView: View {
                                 .stroke(
                                     Color.white,
                                     style: StrokeStyle(
-                                        lineWidth: updateState == .downloading ? 8 : 0,
+                                        lineWidth: updateState == .downloading ? 16 : 0,
                                         lineCap: .round
                                     )
                                 )
