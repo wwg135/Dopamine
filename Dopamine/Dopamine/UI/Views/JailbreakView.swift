@@ -109,12 +109,11 @@ struct JailbreakView: View {
                     ZStack {
                         VStack {
                             Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
-                                .font(.title2)
+                                .font(.title)
                                 .foregroundColor(Color.white)
                                 .multilineTextAlignment(.center)
                                 .drawingGroup()
                             Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
-                                .font(.title2)
                                 .foregroundColor(Color.white)
                                 .multilineTextAlignment(.center)
                                 .padding(.bottom, 32)
@@ -122,9 +121,8 @@ struct JailbreakView: View {
                         .animation(.spring(), value: updateState)
                         .frame(height: 225)
                         .padding(.top, 10)
-                        .padding(.bottom, 32)
                             
-                        ZStack {
+                        VStack {
                             ZStack {
                                 Text("\(Int(progressDouble * 100))%")
                                     .font(.title)
