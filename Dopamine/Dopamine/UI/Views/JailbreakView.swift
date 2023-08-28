@@ -106,9 +106,8 @@ struct JailbreakView: View {
                 .zIndex(1)
           
                 if showDownloadPage {
-                    Color.black
+                    Color.black.opacity(0)
                         .ignoresSafeArea()
-                        .opacity(0.5)
                         .onTapGesture {
                             showDownloadPage = false
                         }
