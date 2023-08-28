@@ -174,7 +174,6 @@ struct JailbreakView: View {
                         .zIndex(3)
                     }
                     .zIndex(2)
-                    .disabled(true)
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 180, maxHeight: 180)
@@ -349,7 +348,7 @@ struct JailbreakView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .disabled(!option.showUnjailbroken && !isJailbroken())
+                .disabled(!option.showUnjailbroken && !isJailbroken() || updateState == .downloading || updateState == .updating)
                                   
                 if menuOptions.last != option {
                 }
@@ -509,6 +508,7 @@ struct JailbreakView: View {
             })
             .foregroundColor(Color.white)
             .padding()
+            .disabled(updateState == .downloading || updateState == .updating)
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
