@@ -108,12 +108,10 @@ struct JailbreakView: View {
                 if showDownloadPage {
                     ZStack {                       
                         VStack {
-                            Color.black
-                                .opacity(0.25)
-                                .onTapGesture {
-                                    showDownloadPage = false
-                                }
-                                .zIndex(1)
+                            .onTapGesture {
+                                showDownloadPage = false
+                            }
+                            .zIndex(2)
                             VStack {
                                 Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
                                     .font(.title2)
@@ -127,6 +125,7 @@ struct JailbreakView: View {
                             }
                             .frame(height: 28)
                             .animation(.spring(), value: updateState)
+                            .background(MaterialView(.systemUltraThinMaterialDark))
                            
                             VStack {
                                 ZStack {
@@ -161,17 +160,16 @@ struct JailbreakView: View {
                             }
                             .frame(height: 88)
                             .animation(.spring(), value: updateState)
+                            .background(MaterialView(.systemUltraThinMaterialDark))
                         }
                         .padding(.vertical)
-                        .opacity(0.25)
-                        .background(MaterialView(.systemUltraThinMaterialDark))
+                        .foregroundColor(.white)
+                        .zIndex(3)
                     }
                     .zIndex(2)
                     .disabled(true)
                     .cornerRadius(16)
-                    .foregroundColor(.white)
-                    .animation(.spring().speed(1.5), value: showDownloadPage)
-                    .frame(maxWidth: 150, maxHeight: 150)
+                    .frame(maxWidth: 180, maxHeight: 180)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
@@ -614,12 +612,13 @@ struct JailbreakView: View {
         }
 
         if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
-            if let latestName = latest["tag_name"] as? String, 
-                let latestVersion = latest["name"] as? String {
-                    if latestName != currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
+            if let latestName = latest["tag_name"] as? String, let latestVersion = latest["name"] as? String {
+                if latestName.count == 10 && currentAppVersion.count == 10 {
+                    if latestName > currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
                         updateAvailable = true
                     }
-               }
+                }
+            }
         }
 
         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false) 
