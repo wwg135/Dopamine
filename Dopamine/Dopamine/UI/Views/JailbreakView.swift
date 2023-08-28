@@ -112,16 +112,17 @@ struct JailbreakView: View {
                                 Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
                                     .font(.title2)
                                     .opacity(1)
+                                    .foregroundColor(Color.white)
                                     .multilineTextAlignment(.center)
                                     .drawingGroup()
                                 Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
                                     .opacity(1)
+                                    .foregroundColor(Color.white)
                                     .multilineTextAlignment(.center)
                                     .padding(.bottom, 10)
                             }
-                            .frame(height: 28)
+                            .frame(height: 48)
                             .animation(.spring(), value: updateState)
-                            .background(MaterialView(.systemUltraThinMaterialDark))
                            
                             VStack {
                                 ZStack {
@@ -156,15 +157,15 @@ struct JailbreakView: View {
                             }
                             .frame(height: 88)
                             .animation(.spring(), value: updateState)
-                            .background(MaterialView(.systemUltraThinMaterialDark))
                         }
                         .padding(.vertical)
-                        .foregroundColor(.white)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
                         .zIndex(3)
                     }
                     .zIndex(2)
                     .disabled(true)
                     .cornerRadius(16)
+                    .foregroundColor(.white)
                     .frame(maxWidth: 180, maxHeight: 180)
                     .onAppear {
                         if updateState == .downloading {
