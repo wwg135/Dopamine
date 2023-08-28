@@ -110,7 +110,7 @@ struct JailbreakView: View {
                         Color.clear
                             .ignoresSafeArea()
                             .opacity(0.01)
-                            .onTapGesture {
+                            .onTapGesture(count: 1) {
                                 showDownloadPage = false
                             }
                         ZStack {
@@ -497,7 +497,7 @@ struct JailbreakView: View {
         Button {
             downloadUpdateAlert = true
         } label: {
-            Label(title: { Text(requiresEnvironmentUpdate ? "Button_Update_Environment" : "Button_Update_Available") }, icon: {
+            Label(title: {Text(showDownloadPage ? "Update_Status_Downloading" : (requiresEnvironmentUpdate ? "Button_Update_Environment" : "Button_Update_Available"))}, icon: {
                 ZStack {
                     if jailbreakingProgress == .jailbreaking {
                         LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
