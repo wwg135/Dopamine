@@ -73,6 +73,12 @@ int main(int argc, char* argv[])
         } else if (!strcmp(cmd, "mountPath")) {
 		if (argc != 3) return 1;
 		jbdMountPath([NSString stringWithUTF8String:argv[2]], true);
+        } else if (!strcmp(cmd, "unmountPath")) {
+		if (argc != 3) return 1;
+		jbdInitPPLRW();
+		run_unsandboxed(^{
+				unmount(argv[2], MNT_FORCE);
+		});
 	}
 
 	return 0;
