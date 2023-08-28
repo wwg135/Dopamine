@@ -107,6 +107,12 @@ struct JailbreakView: View {
           
                 if showDownloadPage {
                     ZStack {
+                        Color.clear
+                            .ignoresSafeArea()
+                            .opacity(0.01)
+                            .onTapGesture {
+                                showDownloadPage = false
+                            }
                         VStack {
                             VStack {
                                 Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
