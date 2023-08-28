@@ -123,7 +123,7 @@ struct JailbreakView: View {
                                     .multilineTextAlignment(.center)
                                     .padding(.bottom, 10)
                             }
-                            .frame(height: 48)
+                            .frame(height: 50)
                             .animation(.spring(), value: updateState)
                            
                             VStack {
@@ -157,7 +157,7 @@ struct JailbreakView: View {
                                         .animation(.spring(), value: updateState) 
                                 }
                             }
-                            .frame(height: 88)
+                            .frame(height: 90)
                             .animation(.spring(), value: updateState)
                         }
                         .padding(.vertical)
