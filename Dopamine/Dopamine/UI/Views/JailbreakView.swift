@@ -119,8 +119,9 @@ struct JailbreakView: View {
                                     .multilineTextAlignment(.center)
                                     .padding(.bottom, 32)
                             }
+                            .padding(.top, 20)
                             .animation(.spring(), value: updateState)
-                            .frame(height: 80)
+                            .frame(height: 68)
                            
                             VStack {
                                 ZStack {
@@ -153,8 +154,8 @@ struct JailbreakView: View {
                                         .animation(.spring(), value: updateState) 
                                 }
                             }
-                            .frame(height: 160)
-                            .padding(.bottom, 10)
+                            .frame(height: 125)
+                            .padding(.bottom, 20)
                         }
                         .tint(.accentColor)
                         .opacity(1)
@@ -163,7 +164,7 @@ struct JailbreakView: View {
                     .zIndex(2)
                     .cornerRadius(16)
                     .foregroundColor(.white)
-                    .frame(maxWidth: 280, maxHeight: 280)
+                    .frame(maxWidth: 240, maxHeight: 240)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
