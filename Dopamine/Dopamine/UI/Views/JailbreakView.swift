@@ -109,11 +109,11 @@ struct JailbreakView: View {
                     ZStack {                       
                         VStack {
                             Color.black
-                                .opacity(0.6)
+                                .opacity(0.25)
                                 .onTapGesture {
                                     showDownloadPage = false
                                 }
-                                .zIndex(2)
+                                .zIndex(1)
                             VStack {
                                 Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
                                     .font(.title2)
@@ -123,9 +123,9 @@ struct JailbreakView: View {
                                 Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
                                     .opacity(1)
                                     .multilineTextAlignment(.center)
-                                    .padding(.bottom, 15)
+                                    .padding(.bottom, 10)
                             }
-                            .frame(height: 50)
+                            .frame(height: 28)
                             .animation(.spring(), value: updateState)
                            
                             VStack {
@@ -159,7 +159,7 @@ struct JailbreakView: View {
                                         .animation(.spring(), value: updateState) 
                                 }
                             }
-                            .frame(height: 100)
+                            .frame(height: 88)
                             .animation(.spring(), value: updateState)
                         }
                         .padding(.vertical)
@@ -167,10 +167,11 @@ struct JailbreakView: View {
                         .background(MaterialView(.systemUltraThinMaterialDark))
                     }
                     .zIndex(2)
+                    .disabled(true)
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .animation(.spring().speed(1.5), value: showDownloadPage)
-                    .frame(maxWidth: 180, maxHeight: 180)
+                    .frame(maxWidth: 150, maxHeight: 150)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
