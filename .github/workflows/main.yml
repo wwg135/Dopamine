@@ -2,7 +2,7 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.5-test-2
+      - 1.1.5-self
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -54,7 +54,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 当前为测试版本，谨慎安装！！！！！" >> body.txt
+          echo -e "\n> - 当前为自用测试版本，谨慎安装！！！！！" >> body.txt
       
       - name: Build ipa
         run: |
