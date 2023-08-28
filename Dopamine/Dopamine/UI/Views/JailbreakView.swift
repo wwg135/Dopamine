@@ -108,7 +108,10 @@ struct JailbreakView: View {
                 if showDownloadPage {
                     ZStack {
                         Color.clear
-                        
+                            .onTapGesture {
+                                showDownloadPage = false
+                            }
+                            .zIndex(2)
                         VStack {
                             VStack {
                                 Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
@@ -163,14 +166,13 @@ struct JailbreakView: View {
                             .animation(.spring(), value: updateState)
                         }
                         .padding(.vertical)
+                        .cornerRadius(16)
+                        .frame(maxWidth: 180, maxHeight: 180)
                         .background(MaterialView(.systemUltraThinMaterialDark))
                         .zIndex(3)
                     }
                     .zIndex(2)
-                    .disabled(true)
-                    .cornerRadius(16)
                     .foregroundColor(.white)
-                    .frame(maxWidth: 180, maxHeight: 180)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
@@ -510,7 +512,12 @@ struct JailbreakView: View {
             Button("Button_Set") {
                 showDownloadPage = true
                 DispatchQueue.global().async {
-                    if !requiresEnvironmentUpdate {
+                    if requiresEnvironmentUpdate {
+                        updateState = .updating
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            updateEnvironment()
+                        }    
+                    } else {
                         updateState = .downloading  
                         Task {
                             do {
@@ -519,11 +526,6 @@ struct JailbreakView: View {
                             } catch {
                                 Logger.log("Error: \(error.localizedDescription)", type: .error)
                             }
-                        }
-                    } else {
-                        updateState = .updating
-                        DispatchQueue.global(qos: .userInitiated).async {
-                            updateEnvironment()
                         }
                     }
                 }
