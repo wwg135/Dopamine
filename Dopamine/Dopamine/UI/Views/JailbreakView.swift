@@ -165,8 +165,8 @@ struct JailbreakView: View {
                         .padding(.vertical)
                         .opacity(0.25)
                         .background(MaterialView(.systemUltraThinMaterialDark))
-                        .zIndex(3)
                     }
+                    .zIndex(2)
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .animation(.spring().speed(1.5), value: showDownloadPage)
