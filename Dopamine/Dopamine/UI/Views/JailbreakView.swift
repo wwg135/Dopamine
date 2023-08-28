@@ -123,9 +123,9 @@ struct JailbreakView: View {
                                 Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
                                     .opacity(1)
                                     .multilineTextAlignment(.center)
-                                    .padding(.bottom, 20)
+                                    .padding(.bottom, 15)
                             }
-                            .frame(height: 68)
+                            .frame(height: 50)
                             .animation(.spring(), value: updateState)
                            
                             VStack {
@@ -133,10 +133,10 @@ struct JailbreakView: View {
                                     ZStack {
                                         Text("\(Int(progressDouble * 100))%")
                                             .font(.title)
-                                            .opacity(updateState == .downloading ? 1 : 0) 
+                                            .opacity(1)
                                         if updateState == .downloading || updateState == .updating {
                                             LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                                .opacity(updateState == .updating ? 1 : 0)
+                                                .opacity(1)
                                         }
                                     }
                                     Circle()
@@ -159,18 +159,18 @@ struct JailbreakView: View {
                                         .animation(.spring(), value: updateState) 
                                 }
                             }
-                            .frame(height: 125)
+                            .frame(height: 100)
                             .animation(.spring(), value: updateState)
                         }
                         .padding(.vertical)
-                        .transition(.opacity.combined(with: .scale(scale: 0.9)).combined(with: .opacity))
+                        .opacity(0.25)
                         .background(MaterialView(.systemUltraThinMaterialDark))
                         .zIndex(3)
                     }
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .animation(.spring().speed(1.5), value: showDownloadPage)
-                    .frame(maxWidth: 250, maxHeight: 250)
+                    .frame(maxWidth: 180, maxHeight: 180)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
