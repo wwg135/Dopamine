@@ -163,14 +163,14 @@ struct JailbreakView: View {
                             .animation(.spring(), value: updateState)
                         }
                         .padding(.vertical)
-                        .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                        .transition(.opacity.combined(with: .scale(scale: 0.9)).combined(with: .opacity))
                         .background(MaterialView(.systemUltraThinMaterialDark))
                         .zIndex(3)
                     }
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .animation(.spring().speed(1.5), value: showDownloadPage)
-                    .frame(maxWidth: 220, maxHeight: 220)
+                    .frame(maxWidth: 250, maxHeight: 250)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
