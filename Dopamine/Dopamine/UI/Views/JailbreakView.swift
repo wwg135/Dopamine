@@ -348,7 +348,7 @@ struct JailbreakView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .disabled(!option.showUnjailbroken && !isJailbroken() || updateState == .downloading || updateState == .updating)
+                .disabled(!option.showUnjailbroken && !isJailbroken())
                                   
                 if menuOptions.last != option {
                 }
