@@ -124,6 +124,15 @@ struct JailbreakView: View {
                            
                             VStack {
                                 ZStack {
+                                    ZStack {
+                                        Text("\(Int(progressDouble * 100))%")
+                                            .font(.title)
+                                            .opacity(updateState == .downloading ? 1 : 0) 
+                                        if updateState == .downloading || updateState == .updating {
+                                            LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
+                                                .opacity(updateState == .updating ? 1 : 0)
+                                        }
+                                    }
                                     Circle()
                                         .stroke(
                                             Color.white.opacity(0.1),
@@ -141,16 +150,7 @@ struct JailbreakView: View {
                                         )
                                         .rotationEffect(.degrees(-90))
                                         .animation(.easeOut, value: progressDouble)
-                                        .animation(.spring(), value: updateState)
-                                }
-                                ZStack {
-                                    Text("\(Int(progressDouble * 100))%")
-                                        .font(.title)
-                                        .opacity(updateState == .downloading ? 1 : 0) 
-                                    if updateState == .downloading || updateState == .updating {
-                                        LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                            .opacity(updateState == .updating ? 1 : 0)
-                                    }
+                                        .animation(.spring(), value: updateState) 
                                 }
                             }
                             .frame(height: 160)
