@@ -108,7 +108,7 @@
 
 "Success_Rate %@%% (%lld/%lld)" = "成功率：%@%% ( %lld / %lld )";
 
-"Title_Changelog" = "更新日志";
+"Title_Changelog" = " 更新日志 ";
 
 "Title_Made_By" = "开发: opa334、évelyne  \nUI: sourceloc \nDopamine 越狱基于 Fugu 15";
 
@@ -150,15 +150,11 @@
 
 "Options_Tweak_Injection" = "插件注入";
 
-"Reboot_Userspace_Finish" = "重启用户空间";
-
 "Restarting Userspace" = "正在重启用户空间";
 
 "Menu_Reboot_Title" = "重启";
 
 "Check_For_Updates" = "检查更新";
-
-"Button_Reboot_Userspace_Finish" = "重启用户空间";
 
 "Jailbroken currently, please reboot the device." = "当前为越狱状态，请重启设备后再清除越狱。确定重启吗？";
 
