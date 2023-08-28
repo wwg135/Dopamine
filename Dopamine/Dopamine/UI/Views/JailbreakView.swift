@@ -106,11 +106,7 @@ struct JailbreakView: View {
                 .zIndex(1)
           
                 if showDownloadPage {
-                    ZStack {
-                        Color.black
-                        .opacity(0.5)
-                        .transition(.opacity.animation(.spring()))
-                        
+                    ZStack {                       
                         ZStack {
                             VStack {
                                 Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
@@ -124,27 +120,29 @@ struct JailbreakView: View {
                                     .padding(.bottom, 32)
                             }
                             .animation(.spring(), value: updateState)
-                            .frame(height: 88)
+                            .frame(height: 80)
                            
-                            VStack {   
-                                Circle()
-                                    .stroke(
-                                        Color.white.opacity(0.1),
-                                        lineWidth: updateState == .downloading ? 8 : 4
-                                    )
-                                    .animation(.spring(), value: updateState)
-                                Circle()
-                                    .trim(from: 0, to: progressDouble)
-                                    .stroke(
-                                        Color.white,
-                                        style: StrokeStyle(
-                                            lineWidth: updateState == .downloading ? 8 : 0,
-                                            lineCap: .round
+                            VStack {
+                                ZStack {
+                                    Circle()
+                                        .stroke(
+                                            Color.white.opacity(0.1),
+                                            lineWidth: updateState == .downloading ? 8 : 4
                                         )
-                                    )
-                                    .rotationEffect(.degrees(-90))
-                                    .animation(.easeOut, value: progressDouble)
-                                    .animation(.spring(), value: updateState)
+                                        .animation(.spring(), value: updateState)
+                                    Circle()
+                                        .trim(from: 0, to: progressDouble)
+                                        .stroke(
+                                            Color.white,
+                                            style: StrokeStyle(
+                                                lineWidth: updateState == .downloading ? 8 : 0,
+                                                lineCap: .round
+                                            )
+                                        )
+                                        .rotationEffect(.degrees(-90))
+                                        .animation(.easeOut, value: progressDouble)
+                                        .animation(.spring(), value: updateState)
+                                }
                                 ZStack {
                                     Text("\(Int(progressDouble * 100))%")
                                         .font(.title)
@@ -155,17 +153,17 @@ struct JailbreakView: View {
                                     }
                                 }
                             }
-                            .frame(height: 225)
+                            .frame(height: 160)
                             .padding(.bottom, 10)
                         }
                         .tint(.accentColor)
-                        .opacity(0.5)
+                        .opacity(1)
                         .animation(.spring(), value: updateState)
                     }
-                    .zIndex(3)
+                    .zIndex(2)
                     .cornerRadius(16)
                     .foregroundColor(.white)
-                    .frame(maxWidth: 280, maxHeight: 320)
+                    .frame(maxWidth: 280, maxHeight: 280)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
