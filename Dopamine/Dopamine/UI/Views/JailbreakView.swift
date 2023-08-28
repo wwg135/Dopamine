@@ -107,7 +107,7 @@ struct JailbreakView: View {
           
                 if showDownloadPage {
                     ZStack {                       
-                        ZStack {
+                        VStack {
                             VStack {
                                 Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
                                     .font(.title2)
