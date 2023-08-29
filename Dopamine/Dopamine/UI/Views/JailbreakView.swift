@@ -181,17 +181,19 @@ struct JailbreakView: View {
                                 }
                                 .fixedSize()
                             }
+                            .padding(.vertical)
                             .padding(.horizontal)
+                            .cornerRadius(16)
                         }
                         .padding(.vertical)
-                        .background(Color.black.opacity(0.6))
+                        .background(Color.black.opacity(0.5))
                         .animation(.spring(), value: updateState)
                         .background(MaterialView(.systemUltraThinMaterialDark))
                     }
                     .zIndex(2)
                     .cornerRadius(16)
                     .foregroundColor(.white)
-                    .frame(maxWidth: 280, maxHeight: 450)
+                    .frame(maxWidth: 280, maxHeight: 420)
                 }
                             
                 if showDownloadPage {
@@ -261,7 +263,7 @@ struct JailbreakView: View {
                             .animation(.spring(), value: updateState)
                         }
                         .padding(.vertical)
-                        .background(Color.black.opacity(0.6))
+                        .background(Color.black.opacity(0.5))
                         .background(MaterialView(.systemUltraThinMaterialDark))
                         .zIndex(3)
                     }
