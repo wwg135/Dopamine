@@ -544,9 +544,9 @@ struct JailbreakView: View {
                         .multilineTextAlignment(.center)
                         .padding(.vertical)
                 }
+                .frame(width: 250, height: 350)
             }
-        )
-        .frame(width: 250, height: 350)   
+        )   
     }
     
     func uiJailbreak() {
