@@ -516,7 +516,7 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .alert(title: Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"), isPresented: $downloadUpdateAlert,actions: {
+        .alert((isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"), isPresented: $downloadUpdateAlert,actions: {
             Button("Button_Cancel", role: .cancel) { }
             Button("Button_Set") {
                 showDownloadPage = true
