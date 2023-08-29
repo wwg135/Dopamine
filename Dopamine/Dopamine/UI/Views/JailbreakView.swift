@@ -196,17 +196,6 @@ struct JailbreakView: View {
                     .zIndex(2)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 400)
-                    .onAppear {
-                        if updateState == .downloading {
-                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
-                                progressDouble = downloadProgress.fractionCompleted
-                                
-                                if progressDouble == 1 {
-                                    t.invalidate()
-                                }
-                            }
-                        }
-                    }
                 }
                             
                 if showDownloadPage {
@@ -283,6 +272,17 @@ struct JailbreakView: View {
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 180, maxHeight: 180)
+                    .onAppear {
+                        if updateState == .downloading {
+                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                                progressDouble = downloadProgress.fractionCompleted
+                                
+                                if progressDouble == 1 {
+                                    t.invalidate()
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 PopupView(title: {
