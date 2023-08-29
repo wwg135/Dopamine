@@ -118,16 +118,15 @@ struct JailbreakView: View {
                             VStack{
                                 Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                                     .font(.title2)
-                                    .padding(.top, 15)
                                     .minimumScaleFactor(0.5)
                                     .multilineTextAlignment(.center)
                         
                                 Divider()
                                     .background(.white)
-                                    .padding(.horizontal, 15)
+                                    .padding(.horizontal, 25)
                                 ScrollView {
                                     Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                        .font(.system(size: 15))
+                                        .font(.system(size: 16))
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)
                                 }
@@ -182,7 +181,6 @@ struct JailbreakView: View {
                                 }
                                 .fixedSize()
                             }
-                            .padding(.bottom, 20)
                             .padding(.horizontal)
                         }
                         .padding(.vertical)
@@ -193,7 +191,7 @@ struct JailbreakView: View {
                     .zIndex(2)
                     .cornerRadius(16)
                     .foregroundColor(.white)
-                    .frame(maxWidth: 320, maxHeight: 480)
+                    .frame(maxWidth: 280, maxHeight: 450)
                 }
                             
                 if showDownloadPage {
