@@ -178,9 +178,6 @@ struct JailbreakView: View {
                                         .background(MaterialView(.light)
                                             .opacity(1)
                                             .cornerRadius(8)
-                                            .alignmentGuide(HorizontalAlignment.center) { dimensions in
-                                                dimensions.width
-                                            }
                                         )
                                 }
                                 .fixedSize()
