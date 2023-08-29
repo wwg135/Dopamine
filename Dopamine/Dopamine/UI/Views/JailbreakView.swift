@@ -523,7 +523,7 @@ struct JailbreakView: View {
                             .padding(.vertical)
                     }
                     .opacity(1)
-                    .frame(Width: 250, Height: 360)}, isPresented: $downloadUpdateAlert, actions: {
+                    .frame(width: 250, height: 360)}, isPresented: $downloadUpdateAlert, actions: {
             Button("Button_Cancel", role: .cancel) { }
             Button("Button_Update") {
                 showDownloadPage = true
