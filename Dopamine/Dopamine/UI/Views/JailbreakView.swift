@@ -135,19 +135,17 @@ struct JailbreakView: View {
                             }
 
                             HStack {
-                                Spacer()
                                 Button {
                                     showUpdatelog = false
                                 } label: {
                                     Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
                                         .foregroundColor(.white)
-                                        .font(.system(size: 20))
+                                        .font(.system(size: 18))
                                         .opacity(1)
                                         .padding()
-                                        .frame(maxHeight: 50)
+                                        .frame(maxHeight: 40)
                                 }
                                 .fixedSize()
-                                Spacer()
                                 Button {
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     showDownloadPage = true
@@ -172,17 +170,16 @@ struct JailbreakView: View {
                                     }
                                 } label: {
                                     Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
-                                        .font(.system(size: 20))
+                                        .font(.system(size: 18))
                                         .foregroundColor(.white)
                                         .padding()
-                                        .frame(maxHeight: 50)
+                                        .frame(maxHeight: 40)
                                         .background(MaterialView(.light)
                                             .opacity(1)
                                             .cornerRadius(8)
                                         )
                                 }
                                 .fixedSize()
-                                Spacer()
                             }
                             .padding(.bottom, 20)
                             .padding(.horizontal)
@@ -195,7 +192,7 @@ struct JailbreakView: View {
                     }
                     .zIndex(2)
                     .foregroundColor(.white)
-                    .frame(maxWidth: 280, maxHeight: 400)
+                    .frame(maxWidth: 320, maxHeight: 480)
                 }
                             
                 if showDownloadPage {
