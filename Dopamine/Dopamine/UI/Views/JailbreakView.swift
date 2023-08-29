@@ -133,62 +133,68 @@ struct JailbreakView: View {
                                 .frame(maxWidth: 200, maxHeight: 300)
                             }
 
-                            Button {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                showDownloadPage = true
-                                showUpdatelog = false
-                                DispatchQueue.global(qos: .userInitiated).async {
-                                    if requiresEnvironmentUpdate {
-                                        updateState = .updating
-                                        DispatchQueue.global(qos: .userInitiated).async {
-                                            updateEnvironment()
-                                        }
-
-                                        // 💀 code
-                                        Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
-                                            progressDouble = downloadProgress.fractionCompleted
-                                
-                                            if progressDouble == 1 {
-                                                t.invalidate()
+                            HStack {
+                                Spacer()
+                                Button {
+                                    showUpdatelog = false
+                                } label: {
+                                    Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
+                                        .foregroundColor(.white)
+                                        .minimumScaleFactor(0.5)
+                                        .opacity(1)
+                                        .padding()
+                                        .frame(maxWidth: 80， maxHight: 30)
+                                }
+                                .fixedSize()
+                                Spacer()
+                                Button {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    showDownloadPage = true
+                                    showUpdatelog = false
+                                    DispatchQueue.global(qos: .userInitiated).async {
+                                        if requiresEnvironmentUpdate {
+                                            updateState = .updating
+                                            DispatchQueue.global(qos: .userInitiated).async {
+                                                updateEnvironment()
                                             }
-                                        }
-                                    } else {
-                                        updateState = .downloading
-                                        Task {
-                                            do {
-                                                try await downloadUpdateAndInstall()
-                                                updateState = .updating
-                                            } catch {
-                                                Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                                                progressDouble = downloadProgress.fractionCompleted
+                                
+                                                if progressDouble == 1 {
+                                                    t.invalidate()
+                                                }
+                                            }
+                                        } else {
+                                            updateState = .downloading
+                                            Task {
+                                                do {
+                                                    try await downloadUpdateAndInstall()
+                                                    updateState = .updating
+                                                } catch {
+                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                }
                                             }
                                         }
                                     }
+                                } label: {
+                                    Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                        .minimumScaleFactor(0.5)
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .frame(maxWidth: 80， maxHight: 30)
+                                        .background(MaterialView(.light)
+                                            .opacity(1)
+                                            .cornerRadius(8)
+                                        )
                                 }
-                            } label: {
-                                Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .frame(maxWidth: 50)
-                                    .background(MaterialView(.light)
-                                        .opacity(1)
-                                        .cornerRadius(8)
-                                    )
+                                .fixedSize()
+                                Spacer()
                             }
-                            .fixedSize()
-                    
-                            Button {
-                                showUpdatelog = false
-                            } label: {
-                                Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
-                                    .foregroundColor(.white)
-                                    .opacity(1)
-                                    .padding()
-                                    .frame(maxWidth: 50)
-                            }
-                            .fixedSize()
+                            .padding(.horizontal)
                         }
                         .background(Color.black.opacity(0.6))
                         .animation(.spring(), value: updateState)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
                         .padding(.vertical)
                     }
                     .zIndex(2)
@@ -263,6 +269,7 @@ struct JailbreakView: View {
                             .animation(.spring(), value: updateState)
                         }
                         .padding(.vertical)
+                        .background(Color.black.opacity(0.6))
                         .background(MaterialView(.systemUltraThinMaterialDark))
                         .zIndex(3)
                     }
