@@ -117,6 +117,7 @@ struct JailbreakView: View {
                             VStack{
                                 Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                                     .font(.title2)
+                                    .padding(.top, 15)
                                     .minimumScaleFactor(0.5)
                                     .multilineTextAlignment(.center)
                         
@@ -125,7 +126,7 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 15)
                                 ScrollView {
                                     Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                        .font(.system(size: 10))
+                                        .font(.system(size: 15))
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)
                                 }
@@ -140,7 +141,7 @@ struct JailbreakView: View {
                                 } label: {
                                     Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
                                         .foregroundColor(.white)
-                                        .minimumScaleFactor(0.5)
+                                        .font(.system(size: 20))
                                         .opacity(1)
                                         .padding()
                                         .frame(maxHeight: 50)
@@ -171,7 +172,7 @@ struct JailbreakView: View {
                                     }
                                 } label: {
                                     Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
-                                        .minimumScaleFactor(0.5)
+                                        .font(.system(size: 20))
                                         .foregroundColor(.white)
                                         .padding()
                                         .frame(maxHeight: 50)
