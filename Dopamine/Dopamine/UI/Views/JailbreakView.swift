@@ -130,7 +130,7 @@ struct JailbreakView: View {
                                         .padding(.vertical)
                                 }
                                 .opacity(1)
-                                .frame(maxWidth: 200, maxHeight: 50)
+                                .frame(maxWidth: 200, maxHeight: 300)
                             }
 
                             Button {
@@ -183,7 +183,7 @@ struct JailbreakView: View {
                                     .foregroundColor(.white)
                                     .opacity(1)
                                     .padding()
-                                    .frame(maxWidth: 100)
+                                    .frame(maxWidth: 50)
                             }
                             .fixedSize()
                         }
