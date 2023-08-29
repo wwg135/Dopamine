@@ -38,7 +38,6 @@ struct JailbreakView: View {
 
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
-    @State var isUpdatelogPresented = false 
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?  
     @State var updateAvailable = false
@@ -53,11 +52,11 @@ struct JailbreakView: View {
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     @State var updateState: UpdateState = .downloading
-    @State var downloadUpdateAlert = false
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
     @State var showDownloadPage = false
     @State var showDownloading = false
+    @State var showUpdatelog = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -66,7 +65,7 @@ struct JailbreakView: View {
     var body: some View {
         GeometryReader { geometry in                
             ZStack {
-                let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented             
+                let isPopupPresented = isSettingsPresented || isCreditsPresented            
                 let imagePath = "/var/mobile/Wallpaper.jpg"
                 let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
                     Image(uiImage: backgroundImage!)
@@ -105,10 +104,101 @@ struct JailbreakView: View {
                 .animation(.spring(), value: isPopupPresented)
                 .transition(.opacity)
                 .zIndex(1)
-          
+
+                if showUpdatelog {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        VStack {
+                            VStack{
+                                Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
+                                    .font(.title2)
+                                    .minimumScaleFactor(0.5)
+                                    .multilineTextAlignment(.center)
+                                Divider()
+                                    .background(.white)
+                                    .padding(.horizontal, 25)
+                                ScrollView {
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                        .font(.system(size: 16))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical)
+                                }
+                                .opacity(1)
+                                .frame(maxWidth: 250, maxHeight: 300)
+                            }
+
+                            HStack {
+                                Button {
+                                    showUpdatelog = false
+                                } label: {
+                                    Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 18))
+                                        .opacity(1)
+                                        .padding()
+                                        .frame(maxHeight: 45)
+                                }
+                                .fixedSize()
+                                Button {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    showDownloadPage = true
+                                    showUpdatelog = false
+                                    DispatchQueue.global(qos: .userInitiated).async {
+                                        if requiresEnvironmentUpdate {
+                                            updateState = .updating
+                                            DispatchQueue.global(qos: .userInitiated).async {
+                                                updateEnvironment()
+                                            }
+                                        } else {
+                                            updateState = .downloading
+                                            Task {
+                                                do {
+                                                    try await downloadUpdateAndInstall()
+                                                    updateState = .updating
+                                                } catch {
+                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                }
+                                            }
+                                        }
+                                    }
+                                } label: {
+                                    Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .frame(maxHeight: 45)
+                                        .background(MaterialView(.light)
+                                            .opacity(1)
+                                            .cornerRadius(8)
+                                        )
+                                }
+                                .fixedSize()
+                            }
+                            .padding(.vertical)
+                            .padding(.horizontal)
+                            .cornerRadius(16)
+                        }
+                        .padding(.vertical)
+                        .background(Color.black.opacity(0.5))
+                        .animation(.spring(), value: updateState)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 420)
+                }
+                            
                 if showDownloadPage {
                     GeometryReader { geometry in
                         Color.clear
+                            .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
                             .onTapGesture {
@@ -172,6 +262,7 @@ struct JailbreakView: View {
                             .animation(.spring(), value: updateState)
                         }
                         .padding(.vertical)
+                        .background(Color.black.opacity(0.5))
                         .background(MaterialView(.systemUltraThinMaterialDark))
                         .zIndex(3)
                     }
@@ -212,20 +303,6 @@ struct JailbreakView: View {
                     AboutView()
                         .frame(maxWidth: 320)
                 }, isPresented: $isCreditsPresented)
-                .zIndex(2)
-
-                PopupView(title: {
-                    Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
-                }, contents: {
-                    ScrollView {
-                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                            .opacity(1)
-                            .multilineTextAlignment(.center)
-                            .padding(.vertical)
-                    }
-                    .opacity(1)
-                    .frame(maxWidth: 280, maxHeight: 480)
-                }, isPresented: $isUpdatelogPresented)
                 .zIndex(2)
             }
             .animation(.default)
@@ -295,16 +372,12 @@ struct JailbreakView: View {
     @ViewBuilder
     var menu: some View {
         VStack {
-            let menuOptionsWithoutUpdate: [MenuOption] = [
+            let menuOptions: [MenuOption] = [
                 .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
                 .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
             ]
-            let menuOptionsWithUpdate: [MenuOption] = [
-                .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
-            ]
-            let menuOptions = !showTexts ? menuOptionsWithoutUpdate : (menuOptionsWithoutUpdate + menuOptionsWithUpdate) 
             ForEach(menuOptions) { option in
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -316,8 +389,6 @@ struct JailbreakView: View {
                             isSettingsPresented = true
                         case "credits":
                             isCreditsPresented = true
-                        case "updatelog":
-                            isUpdatelogPresented = true
                         default: break
                         }
                     }
@@ -497,7 +568,7 @@ struct JailbreakView: View {
     @ViewBuilder
     var updateButton: some View {
         Button {
-            downloadUpdateAlert = true
+            showUpdatelog = true
         } label: {
             Label(title: {Text((showDownloadPage || showDownloading) ? "Update_Status_Downloading" :  (requiresEnvironmentUpdate ? "Button_Update_Environment" : "Button_Update_Available"))}, icon: {
                 ZStack {
@@ -516,30 +587,6 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .alert("Button_Update", isPresented: $downloadUpdateAlert, actions: {
-            Button("Button_Cancel", role: .cancel) { }
-            Button("Button_Set") {
-                showDownloadPage = true
-                DispatchQueue.global().async {
-                    if requiresEnvironmentUpdate {
-                        updateState = .updating
-                        DispatchQueue.global(qos: .userInitiated).async {
-                            updateEnvironment()
-                        }    
-                    } else {
-                        updateState = .downloading  
-                        Task {
-                            do {
-                                try await downloadUpdateAndInstall()
-                                updateState = .updating
-                            } catch {
-                                Logger.log("Error: \(error.localizedDescription)", type: .error)
-                            }
-                        }
-                    }
-                }
-            }
-        })
     }
     
     func uiJailbreak() {
