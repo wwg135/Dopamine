@@ -517,7 +517,7 @@ struct JailbreakView: View {
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
         .alert(title: Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"), isPresented: $downloadUpdateAlert,
-            contents: {
+            message: {
                 ScrollView {
                     Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ? mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                         .multilineTextAlignment(.center)
