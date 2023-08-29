@@ -320,7 +320,7 @@ struct JailbreakView: View {
                     }
                 }
             }
-            DispatchQueue.global().async {
+            DispatchQueue.global(qos: .userInitiated).async {
                 Task {
                     do {
                         try await checkForUpdates()
