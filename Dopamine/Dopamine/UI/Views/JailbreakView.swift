@@ -503,6 +503,8 @@ struct JailbreakView: View {
                 ZStack {
                     if jailbreakingProgress == .jailbreaking {
                         LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
+                    } else if showDownloadPage || showDownloading {
+                        Image(systemName: "arrow.down.circle")
                     } else {
                         Image(systemName: requiresEnvironmentUpdate ? "arrow.clockwise.circle" : "arrow.down.circle")
                     }
