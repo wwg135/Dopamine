@@ -157,13 +157,6 @@ struct JailbreakView: View {
                                             DispatchQueue.global(qos: .userInitiated).async {
                                                 updateEnvironment()
                                             }
-                                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
-                                                progressDouble = downloadProgress.fractionCompleted
-                                
-                                                if progressDouble == 1 {
-                                                    t.invalidate()
-                                                }
-                                            }
                                         } else {
                                             updateState = .downloading
                                             Task {
@@ -202,6 +195,17 @@ struct JailbreakView: View {
                     .zIndex(2)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 400)
+                    .onAppear {
+                        if updateState == .downloading {
+                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                                progressDouble = downloadProgress.fractionCompleted
+                                
+                                if progressDouble == 1 {
+                                    t.invalidate()
+                                }
+                            }
+                        }
+                    }
                 }
                             
                 if showDownloadPage {
