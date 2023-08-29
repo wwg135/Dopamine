@@ -516,19 +516,16 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .alert(isPresented: $downloadUpdateAlert) {
-            Alert(title: Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"),
-                message: {
-                    ScrollView {
-                        VStack {
-                            Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ? mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical)
-                        }
-                    }
-                }, 
-                primaryButton: .cancel(Text("Button_Cancel")),
-                secondaryButton: .default(Text("Button_Update"), action: {
+        .alert(title: Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"), isPresented: $downloadUpdateAlert,
+            contents: {
+                ScrollView {
+                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ? mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                        .multilineTextAlignment(.center)
+                        .padding(.vertical)
+                }
+            }, actions: {
+                Button("Button_Cancel", role: .cancel) { }
+                Button("Button_Set") {
                     showDownloadPage = true
                     DispatchQueue.global().async {
                         if requiresEnvironmentUpdate {
@@ -548,9 +545,9 @@ struct JailbreakView: View {
                             }
                         }
                     }
-                })
-            )
-        }
+                }
+            }
+        )
         .frame(width: 250, height: 350)   
     }
     
