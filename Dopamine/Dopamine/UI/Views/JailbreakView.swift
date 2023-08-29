@@ -177,6 +177,9 @@ struct JailbreakView: View {
                                         .background(MaterialView(.light)
                                             .opacity(1)
                                             .cornerRadius(8)
+                                            .alignmentGuide(HorizontalAlignment.center) { dimensions in
+                                                dimensions.width
+                                            }
                                         )
                                 }
                                 .fixedSize()
@@ -184,6 +187,7 @@ struct JailbreakView: View {
                             .padding(.bottom, 20)
                             .padding(.horizontal)
                         }
+                        .padding()
                         .cornerRadius(16)
                         .background(Color.black.opacity(0.6))
                         .animation(.spring(), value: updateState)
