@@ -516,9 +516,9 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .alert("Button_Update", isPresented: $downloadUpdateAlert, actions: {
+        .alert((isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"), isPresented: $downloadUpdateAlert, actions: {
             Button("Button_Cancel", role: .cancel) { }
-            Button("Button_Set") {
+            Button("Button_Update") {
                 showDownloadPage = true
                 DispatchQueue.global().async {
                     if requiresEnvironmentUpdate {
@@ -539,7 +539,15 @@ struct JailbreakView: View {
                     }
                 }
             }
-        }, message: { Text("Settings_Remove_Jailbreak_Alert_Body") })
+        }, message: ScrollView {
+                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                            .opacity(1)
+                            .multilineTextAlignment(.center)
+                            .padding(.vertical)
+                    }
+                    .opacity(1)
+                    .frame(maxWidth: 250, maxHeight: 360)
+        )
     }
     
     func uiJailbreak() {
