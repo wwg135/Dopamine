@@ -113,8 +113,8 @@ struct JailbreakView: View {
                     }
                     .ignoresSafeArea()
                     ZStack {
-                        VStack {
-                            VStack(spacing: 10) {
+                        VStack(spacing: 20)  {
+                            VStack{
                                 Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                                     .font(.title2)
                                     .minimumScaleFactor(0.5)
@@ -123,11 +123,9 @@ struct JailbreakView: View {
                                 Divider()
                                     .background(.white)
                                     .padding(.horizontal, 15)
-                                    .opacity(1)
                                 ScrollView {
                                     Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                        .opacity(1)
-                                        .minimumScaleFactor(0.5)
+                                        .font(.system(size: 10))
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)
                                 }
@@ -192,15 +190,16 @@ struct JailbreakView: View {
                                 .fixedSize()
                                 Spacer()
                             }
+                            .padding(.bottom, 20)
                             .padding(.horizontal)
                         }
+                        .cornerRadius(16)
                         .background(Color.black.opacity(0.6))
                         .animation(.spring(), value: updateState)
                         .background(MaterialView(.systemUltraThinMaterialDark))
                         .padding(.vertical)
                     }
                     .zIndex(2)
-                    .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 400)
                 }
