@@ -516,14 +516,7 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .alert((isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"), message: {ScrollView {
-                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                            .opacity(1)
-                            .multilineTextAlignment(.center)
-                            .padding(.vertical)
-                    }
-                    .opacity(1)
-                    .frame(width: 250, height: 360)}, isPresented: $downloadUpdateAlert, actions: {
+        .alert((isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"), isPresented: $downloadUpdateAlert, actions: {
             Button("Button_Cancel", role: .cancel) { }
             Button("Button_Update") {
                 showDownloadPage = true
@@ -546,7 +539,14 @@ struct JailbreakView: View {
                     }
                 }
             }
-        })
+        }, message: ScrollView {
+                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                            .opacity(1)
+                            .multilineTextAlignment(.center)
+                            .padding(.vertical)
+                    }
+                    .opacity(1)
+                    .frame(width: 250, height: 360))
     }
     
     func uiJailbreak() {
