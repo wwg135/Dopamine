@@ -114,23 +114,25 @@ struct JailbreakView: View {
                     .ignoresSafeArea()
                     ZStack {
                         VStack {
-                            VStack {
+                            VStack(spacing: 10) {
                                 Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                                     .font(.title2)
+                                    .minimumScaleFactor(0.5)
                                     .multilineTextAlignment(.center)
                         
                                 Divider()
                                     .background(.white)
-                                    .padding(.horizontal, 32)
+                                    .padding(.horizontal, 15)
                                     .opacity(1)
                                 ScrollView {
                                     Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                         .opacity(1)
+                                        .minimumScaleFactor(0.5)
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)
                                 }
                                 .opacity(1)
-                                .frame(maxWidth: 200, maxHeight: 300)
+                                .frame(maxWidth: 250, maxHeight: 300)
                             }
 
                             HStack {
@@ -143,7 +145,7 @@ struct JailbreakView: View {
                                         .minimumScaleFactor(0.5)
                                         .opacity(1)
                                         .padding()
-                                        .frame(maxWidth: 80， maxHight: 30)
+                                        .frame(maxHeight: 50)
                                 }
                                 .fixedSize()
                                 Spacer()
@@ -181,7 +183,7 @@ struct JailbreakView: View {
                                         .minimumScaleFactor(0.5)
                                         .foregroundColor(.white)
                                         .padding()
-                                        .frame(maxWidth: 80， maxHight: 30)
+                                        .frame(maxHeight: 50)
                                         .background(MaterialView(.light)
                                             .opacity(1)
                                             .cornerRadius(8)
