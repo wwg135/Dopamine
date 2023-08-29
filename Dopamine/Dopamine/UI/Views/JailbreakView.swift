@@ -120,7 +120,6 @@ struct JailbreakView: View {
                                     .font(.title2)
                                     .minimumScaleFactor(0.5)
                                     .multilineTextAlignment(.center)
-                        
                                 Divider()
                                     .background(.white)
                                     .padding(.horizontal, 25)
@@ -143,7 +142,7 @@ struct JailbreakView: View {
                                         .font(.system(size: 18))
                                         .opacity(1)
                                         .padding()
-                                        .frame(maxHeight: 40)
+                                        .frame(maxHeight: 35)
                                 }
                                 .fixedSize()
                                 Button {
@@ -173,7 +172,7 @@ struct JailbreakView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(.white)
                                         .padding()
-                                        .frame(maxHeight: 40)
+                                        .frame(maxHeight: 35)
                                         .background(MaterialView(.light)
                                             .opacity(1)
                                             .cornerRadius(8)
