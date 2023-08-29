@@ -114,7 +114,7 @@ struct JailbreakView: View {
                     }
                     .ignoresSafeArea()
                     ZStack {
-                        VStack(spacing: 20)  {
+                        VStack {
                             VStack{
                                 Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
                                     .font(.title2)
@@ -185,14 +185,13 @@ struct JailbreakView: View {
                             .padding(.bottom, 20)
                             .padding(.horizontal)
                         }
-                        .padding()
-                        .cornerRadius(16)
+                        .padding(.vertical)
                         .background(Color.black.opacity(0.6))
                         .animation(.spring(), value: updateState)
                         .background(MaterialView(.systemUltraThinMaterialDark))
-                        .padding(.vertical)
                     }
                     .zIndex(2)
+                    .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 320, maxHeight: 480)
                 }
