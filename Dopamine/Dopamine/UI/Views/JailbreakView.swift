@@ -526,30 +526,29 @@ struct JailbreakView: View {
                                 .padding(.vertical)
                         }
                     }
-                }, actions: {
-                    Button("Button_Cancel", role: .cancel) { }
-                    Button("Button_Update") {
-                        showDownloadPage = true
-                        DispatchQueue.global().async {
-                            if requiresEnvironmentUpdate {
-                                updateState = .updating
-                                DispatchQueue.global(qos: .userInitiated).async {
-                                    updateEnvironment()
-                                }
-                            } else {
-                                updateState = .downloading
-                                Task {
-                                    do {
-                                        try await downloadUpdateAndInstall()
-                                        updateState = .updating
-                                    } catch {
-                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                    }
+                }, 
+                primaryButton: .cancel(Text("Button_Cancel")),
+                secondaryButton: .default(Text("Button_Update"), action: {
+                    showDownloadPage = true
+                    DispatchQueue.global().async {
+                        if requiresEnvironmentUpdate {
+                            updateState = .updating
+                            DispatchQueue.global(qos: .userInitiated).async {
+                                updateEnvironment()
+                            }
+                        } else {
+                            updateState = .downloading
+                            Task {
+                                do {
+                                    try await downloadUpdateAndInstall()
+                                    updateState = .updating
+                                } catch {
+                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
                                 }
                             }
                         }
                     }
-                }
+                })
             )
         }
         .frame(width: 250, height: 350)   
