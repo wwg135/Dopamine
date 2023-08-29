@@ -57,6 +57,7 @@ struct JailbreakView: View {
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
     @State var showDownloadPage = false
+    @State var showDownloading = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -112,6 +113,7 @@ struct JailbreakView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 showDownloadPage = false
+                                showDownloading = true
                             }
                     }
                     .ignoresSafeArea()
@@ -497,7 +499,7 @@ struct JailbreakView: View {
         Button {
             downloadUpdateAlert = true
         } label: {
-            Label(title: {Text(requiresEnvironmentUpdate ? "Button_Update_Environment" : "Button_Update_Available")}, icon: {
+            Label(title: {Text((showDownloadPage || showDownloading) ? "Update_Status_Downloading" :  (requiresEnvironmentUpdate ? "Button_Update_Environment" : "Button_Update_Available"))}, icon: {
                 ZStack {
                     if jailbreakingProgress == .jailbreaking {
                         LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
