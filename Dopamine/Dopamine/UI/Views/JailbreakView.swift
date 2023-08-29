@@ -141,8 +141,7 @@ struct JailbreakView: View {
                                         .foregroundColor(.white)
                                         .font(.system(size: 18))
                                         .opacity(1)
-                                        .padding()
-                                        .frame(maxHeight: 35)
+                                        .frame(maxHeight: 45)
                                 }
                                 .fixedSize()
                                 Button {
@@ -171,8 +170,7 @@ struct JailbreakView: View {
                                     Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
                                         .font(.system(size: 18))
                                         .foregroundColor(.white)
-                                        .padding()
-                                        .frame(maxHeight: 35)
+                                        .frame(maxHeight: 45)
                                         .background(MaterialView(.light)
                                             .opacity(1)
                                             .cornerRadius(8)
