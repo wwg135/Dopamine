@@ -38,7 +38,6 @@ struct JailbreakView: View {
 
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
-    @State var isUpdatelogPresented = false 
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?  
     @State var updateAvailable = false
@@ -123,18 +122,21 @@ struct JailbreakView: View {
                                 Divider()
                                     .background(.white)
                                     .padding(.horizontal, 32)
-                                    .opacity(0.5)
+                                    .opacity(1)
                                 ScrollView {
-                                    Text(try! AttributedString(markdown: type == .environment ? mismatchAndupdateChangelog : changelog, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                         .opacity(1)
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)
                                 }
+                                .opacity(1)
+                                .frame(maxWidth: 200, maxHeight: 50)
                             }
 
                             Button {
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                 showDownloadPage = true
+                                showUpdatelog = false
                                 DispatchQueue.global(qos: .userInitiated).async {
                                     if requiresEnvironmentUpdate {
                                         updateState = .updating
@@ -166,9 +168,9 @@ struct JailbreakView: View {
                                 Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
                                     .foregroundColor(.white)
                                     .padding()
-                                    .frame(maxWidth: 280)
+                                    .frame(maxWidth: 50)
                                     .background(MaterialView(.light)
-                                        .opacity(0.5)
+                                        .opacity(1)
                                         .cornerRadius(8)
                                     )
                             }
@@ -179,20 +181,21 @@ struct JailbreakView: View {
                             } label: {
                                 Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
                                     .foregroundColor(.white)
+                                    .opacity(1)
                                     .padding()
-                                    .frame(maxWidth: 280)
+                                    .frame(maxWidth: 100)
                             }
                             .fixedSize()
+                        }
+                        .background(Color.black.opacity(0.6))
+                        .animation(.spring(), value: updateState)
+                        .padding(.vertical)
                     }
-                    .opacity(updateState == .changelog ? 1 : 0)
-                    .animation(.spring(), value: updateState)
-                    .padding(.vertical, 64)
-                    .frame(maxWidth: 280)
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 400)
                 }
-
-
-
-
                             
                 if showDownloadPage {
                     GeometryReader { geometry in
@@ -290,20 +293,6 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320)
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
-
-                PopupView(title: {
-                    Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
-                }, contents: {
-                    ScrollView {
-                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                            .opacity(1)
-                            .multilineTextAlignment(.center)
-                            .padding(.vertical)
-                    }
-                    .opacity(1)
-                    .frame(maxWidth: 280, maxHeight: 480)
-                }, isPresented: $isUpdatelogPresented)
-                .zIndex(2)
             }
             .animation(.default)
         }
@@ -372,16 +361,11 @@ struct JailbreakView: View {
     @ViewBuilder
     var menu: some View {
         VStack {
-            let menuOptionsWithoutUpdate: [MenuOption] = [
+            let menuOptions: [MenuOption] = [
                 .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
                 .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
-            ]
-            let menuOptionsWithUpdate: [MenuOption] = [
-                .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
-            ]
-            let menuOptions = !showTexts ? menuOptionsWithoutUpdate : (menuOptionsWithoutUpdate + menuOptionsWithUpdate) 
             ForEach(menuOptions) { option in
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -393,8 +377,6 @@ struct JailbreakView: View {
                             isSettingsPresented = true
                         case "credits":
                             isCreditsPresented = true
-                        case "updatelog":
-                            isUpdatelogPresented = true
                         default: break
                         }
                     }
