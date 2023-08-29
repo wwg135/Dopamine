@@ -665,9 +665,9 @@ struct JailbreakView: View {
         // Get the releases
         let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
         let releasesRequest = URLRequest(url: releasesURL)
-        let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
-        guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
-            return
+        let releasesDataTask = try await URLSession.shared.data(for: releasesRequest)
+        let releasesJSON = try await Task {
+            try JSONSerialization.jsonObject(with: releasesDataTask, options: []) as? [[String: Any]] ?? []
         }
 
         if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
