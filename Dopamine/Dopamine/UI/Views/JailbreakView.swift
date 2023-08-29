@@ -539,7 +539,7 @@ struct JailbreakView: View {
                     }
                 }
             }
-        })
+        }, message: { Text("Settings_Remove_Jailbreak_Alert_Body") })
     }
     
     func uiJailbreak() {
