@@ -516,37 +516,43 @@ struct JailbreakView: View {
         }
         .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
         .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .alert((isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"), isPresented: $downloadUpdateAlert, actions: {
-            Button("Button_Cancel", role: .cancel) { }
-            Button("Button_Update") {
-                showDownloadPage = true
-                DispatchQueue.global().async {
-                    if requiresEnvironmentUpdate {
-                        updateState = .updating
-                        DispatchQueue.global(qos: .userInitiated).async {
-                            updateEnvironment()
-                        }    
-                    } else {
-                        updateState = .downloading  
-                        Task {
-                            do {
-                                try await downloadUpdateAndInstall()
+        .alert(isPresented: $downloadUpdateAlert) {
+            Alert(title: Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog"),
+                message: {
+                    ScrollView {
+                        VStack {
+                            Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ? mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                .multilineTextAlignment(.center)
+                                .padding(.vertical)
+                        }
+                    }
+                }, actions: {
+                    Button("Button_Cancel", role: .cancel) { }
+                    Button("Button_Update") {
+                        showDownloadPage = true
+                        DispatchQueue.global().async {
+                            if requiresEnvironmentUpdate {
                                 updateState = .updating
-                            } catch {
-                                Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                DispatchQueue.global(qos: .userInitiated).async {
+                                    updateEnvironment()
+                                }
+                            } else {
+                                updateState = .downloading
+                                Task {
+                                    do {
+                                        try await downloadUpdateAndInstall()
+                                        updateState = .updating
+                                    } catch {
+                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
-        }, message: ScrollView {
-                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                            .opacity(1)
-                            .multilineTextAlignment(.center)
-                            .padding(.vertical)
-                    }
-                    .opacity(1)
-                    .frame(width: 250, height: 360))
+            )
+        }
+        .frame(width: 250, height: 350)   
     }
     
     func uiJailbreak() {
