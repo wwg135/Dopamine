@@ -369,6 +369,7 @@ struct JailbreakView: View {
                 .onTapGesture(count: 1) {
                     showTexts.toggle()
                     UserDefaults.standard.set(showTexts, forKey: "showTexts")
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
                 Text(showTexts ? "AAA : AAB" : "")
                     .font(.subheadline)
