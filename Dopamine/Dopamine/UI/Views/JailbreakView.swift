@@ -668,7 +668,7 @@ struct JailbreakView: View {
                 continue
             }
             
-            if !version.isEmpty {    
+            if let version = version, !version.isEmpty {    
                 if !changelogBuf.isEmpty {
                     changelogBuf += "\n\n\n"
                 }
