@@ -58,7 +58,6 @@ struct JailbreakView: View {
     @State var showDownloadPage = false
     @State var showDownloading = false
     @State var showUpdatelog = false
-    @State var showLogView = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -166,7 +165,6 @@ struct JailbreakView: View {
                                                     try await downloadUpdateAndInstall()
                                                     updateState = .updating
                                                 } catch {
-                                                    showLogView = true
                                                     Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                 }
                                             }
