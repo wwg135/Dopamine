@@ -245,16 +245,16 @@ struct JailbreakView: View {
                             .frame(height: 50)
                             .animation(.spring(), value: updateState)
                             
-                            VStack {
-                                if showLogView {
+                            if showLogView {
+                                VStack {
                                     LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
                                     Text("Update_Log_Hint_Scrollable")
-                                        .foregroundColor(.white.opacity(0.5))
+                                        .foregroundColor(.white)
                                         .padding()
                                 }
+                                .opacity(showLogView ? 1 : 0)
+                                .frame(height: 100)
                             }
-                            .opacity(showLogView ? 1 : 0)
-                            .frame(height: 100)
                             
                             VStack {
                                 ZStack {
