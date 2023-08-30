@@ -237,11 +237,11 @@ struct JailbreakView: View {
                                     Text("Update_Log_Hint_Scrollable")
                                         .foregroundColor(.white)
                                         .padding()
-                                    }
                                 }
-                                .opacity(showLogView ? 1 : 0)
-                                .frame(height: 100)
                             }
+                            .opacity(showLogView ? 1 : 0)
+                            .frame(height: 100)
+                            
                             VStack {
                                 ZStack {
                                     ZStack {
