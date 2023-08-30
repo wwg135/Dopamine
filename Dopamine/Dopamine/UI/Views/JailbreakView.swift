@@ -40,32 +40,29 @@ struct JailbreakView: View {
     @State var isCreditsPresented = false
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?
-    
     @State var updateAvailable = false  
     @State var updateChangelog: String? = nil
     @State var mismatchChangelog: String? = nil
-
     @State private var upTime = "系统启动于: 加载中"
     @State private var index = 0
     @State private var showLaunchTime = true   
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     @State var advancedLogsTemporarilyEnabled: Bool = false
     @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
-
     @State var updateState: UpdateState = .downloading
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
     @State var showDownloadPage = false
     @State var showDownloading = false
     @State var showUpdatelog = false
+    @State var showLogView = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
     }
-    
-    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     
     var body: some View {
         GeometryReader { geometry in
@@ -169,6 +166,7 @@ struct JailbreakView: View {
                                                     try await downloadUpdateAndInstall()
                                                     updateState = .updating
                                                 } catch {
+                                                    showLogView = true
                                                     Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                 }
                                             }
@@ -246,6 +244,17 @@ struct JailbreakView: View {
                             }
                             .frame(height: 50)
                             .animation(.spring(), value: updateState)
+
+                            VStack {
+                                if showLogView {
+                                    LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
+                                    Text("Update_Log_Hint_Scrollable")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                }
+                            }
+                            .opacity(showLogView ? 1 : 0)
+                            .frame(height: 100)
                            
                             VStack {
                                 ZStack {
