@@ -111,6 +111,7 @@ struct JailbreakView: View {
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
+                            .allowsHitTesting(false)
                     }
                     .ignoresSafeArea()
                     ZStack {
@@ -201,6 +202,7 @@ struct JailbreakView: View {
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
+                            .allowsHitTesting(false)
                             .onTapGesture {
                                 showDownloadPage = false
                                 showDownloading = true
