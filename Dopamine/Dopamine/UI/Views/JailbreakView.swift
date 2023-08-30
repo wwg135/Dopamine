@@ -245,50 +245,39 @@ struct JailbreakView: View {
                             .frame(height: 50)
                             .animation(.spring(), value: updateState)
 
-                            if showLogView {
-                                VStack {
-                                    LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
-                                    Text("Update_Log_Hint_Scrollable")
-                                        .foregroundColor(.white)
-                                        .padding()
-                                }
-                                .opacity(showLogView ? 1 : 0)
-                                .frame(height: 100)
-                            } else {   
-                                VStack {
+                            VStack {
+                                ZStack {
                                     ZStack {
-                                        ZStack {
-                                            Text("\(Int(progressDouble * 100))%")
-                                                .font(.title)
+                                        Text("\(Int(progressDouble * 100))%")
+                                            .font(.title)
+                                            .opacity(1)
+                                        if updateState == .downloading || updateState == .updating {
+                                            LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
                                                 .opacity(1)
-                                            if updateState == .downloading || updateState == .updating {
-                                                LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                                    .opacity(1)
-                                            }
                                         }
-                                        Circle()
-                                            .stroke(
-                                                Color.white.opacity(0.1),
-                                                lineWidth: updateState == .downloading ? 16 : 8
-                                            )
-                                            .animation(.spring(), value: updateState)
-                                        Circle()
-                                            .trim(from: 0, to: progressDouble)
-                                            .stroke(
-                                                Color.white,
-                                                style: StrokeStyle(
-                                                    lineWidth: updateState == .downloading ? 16 : 0,
-                                                    lineCap: .round
-                                                )
-                                            )
-                                            .rotationEffect(.degrees(-90))
-                                            .animation(.easeOut, value: progressDouble)
-                                            .animation(.spring(), value: updateState) 
                                     }
+                                    Circle()
+                                        .stroke(
+                                            Color.white.opacity(0.1),
+                                            lineWidth: updateState == .downloading ? 16 : 8
+                                        )
+                                        .animation(.spring(), value: updateState)
+                                    Circle()
+                                        .trim(from: 0, to: progressDouble)
+                                        .stroke(
+                                            Color.white,
+                                            style: StrokeStyle(
+                                                lineWidth: updateState == .downloading ? 16 : 0,
+                                                lineCap: .round
+                                            )
+                                        )
+                                        .rotationEffect(.degrees(-90))
+                                        .animation(.easeOut, value: progressDouble)
+                                        .animation(.spring(), value: updateState) 
                                 }
-                                .frame(height: 90)
-                                .animation(.spring(), value: updateState)
                             }
+                            .frame(height: 90)
+                            .animation(.spring(), value: updateState)
                         }
                         .padding(.vertical)
                         .background(Color.black.opacity(0.5))
