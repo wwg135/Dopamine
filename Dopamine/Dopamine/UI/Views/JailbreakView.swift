@@ -57,6 +57,7 @@ struct JailbreakView: View {
     @State var showDownloadPage = false
     @State var showDownloading = false
     @State var showUpdatelog = false
+    @State var showLogView = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -163,6 +164,7 @@ struct JailbreakView: View {
                                                     try await downloadUpdateAndInstall()
                                                     updateState = .updating
                                                 } catch {
+                                                    showLogView = true
                                                     Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                 }
                                             }
@@ -228,7 +230,18 @@ struct JailbreakView: View {
                             }
                             .frame(height: 50)
                             .animation(.spring(), value: updateState)
-                           
+
+                            VStack {
+                                if showLogView {
+                                    LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
+                                    Text("Update_Log_Hint_Scrollable")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                    }
+                                }
+                                .opacity(showLogView ? 1 : 0)
+                                .frame(height: 100)
+                            }
                             VStack {
                                 ZStack {
                                     ZStack {
