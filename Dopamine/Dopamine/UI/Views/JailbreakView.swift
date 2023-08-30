@@ -681,7 +681,7 @@ struct JailbreakView: View {
                 continue
             }
             
-            if version != nil {   
+            if !version.isEmpty {  
                 if !changelogBuf.isEmpty {
                     changelogBuf += "\n\n\n"
                 }
