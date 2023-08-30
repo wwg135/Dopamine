@@ -681,7 +681,7 @@ struct JailbreakView: View {
                 continue
             }
             
-            if let version = version, !version.isEmpty {   
+            if version != nil {   
                 if !changelogBuf.isEmpty {
                     changelogBuf += "\n\n\n"
                 }
@@ -756,22 +756,13 @@ struct JailbreakView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        if changeVersion {
-            guard let release = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })
-                let assets = latestRelease["assets"] as? [[String: Any]],
-                let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
-                let downloadURLString = asset["browser_download_url"] as? String,
-                let downloadURL = URL(string: downloadURLString) else {
-                    throw "Could not find download URL for ipa"
-                }
-        } else {
-            guard let release = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" })
-                let assets = latestRelease["assets"] as? [[String: Any]],
-                let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
-                let downloadURLString = asset["browser_download_url"] as? String,
-                let downloadURL = URL(string: downloadURLString) else {
-                    throw "Could not find download URL for ipa"
-                }
+        let latest = changeVersion ? releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) : releasesJSON.first(where: { $0["name"] as? String == "1.0.5" })
+        guard let latestRelease = latest,
+              let assets = latestRelease["assets"] as? [[String: Any]],
+              let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
+              let downloadURLString = asset["browser_download_url"] as? String,
+              let downloadURL = URL(string: downloadURLString) else {
+                throw "Could not find download URL for ipa"
         }
 
         // Download the asset
