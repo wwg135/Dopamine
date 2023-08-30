@@ -9,13 +9,11 @@ import SwiftUI
 import SwiftfulLoadingIndicators
 
 struct LogView: View {
-    @StateObject var logger = Logger.shared
-    
+    @StateObject var logger = Logger.shared  
     @Binding var advancedLogsTemporarilyEnabled: Bool
-    @Binding var advancedLogsByDefault: Bool
-    
+    @Binding var advancedLogsByDefault: Bool    
     @State var lastScroll = Date()
-    
+   
     let viewAppearanceDate = Date()
     
     var advanced: Bool {
@@ -25,9 +23,7 @@ struct LogView: View {
     struct LogRow: View {
         @State var log: LogMessage
         @State var scrollViewFrame: CGRect
-        
-        @State var shown = false
-        
+        @State var shown = false 
         var index: Int
         var lastIndex: Int
         
@@ -61,6 +57,7 @@ struct LogView: View {
                     }
                     Text(log.text)
                         .font(.system(isLast ? .body : .subheadline))
+                        .minimumScaleFactor(0.5)
                         .foregroundColor(log.type == .error ? .yellow : .white)
                         .animation(.spring().speed(1.5), value: isLast)
                         .drawingGroup()
@@ -152,11 +149,6 @@ struct LogView: View {
                                         }
                                     }
                                 }
-                                .onAppear {
-//                                    withAnimation {
-//                                        reader.scrollTo("AdvancedText", anchor: .bottom)
-//                                    }
-                                }
                         }
                     }
                     .animation(.spring(), value: advanced)
@@ -169,32 +161,6 @@ struct LogView: View {
                     }
                 }
             }
-        }
-        .onAppear {
-//            let texts = """
-//                Checking device compatibility
-//                Device is compatible with jailbreak
-//                Backing up device data
-//                Starting jailbreak installation
-//                Downloading jailbreak package
-//                Installing jailbreak package
-//                Jailbreak package installed
-//                Restarting device
-//                Device successfully restarted
-//                Cydia app installed
-//                Checking if you are a human
-//                Verifying using Captcha
-//                Human Verification failed
-//                Complete these 3 surveys to continue
-//                Jailbreak successful
-//                """
-//            let c = texts.components(separatedBy: "\n")
-//            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { t in
-//                Logger.log(c.randomElement()!, type: [LogMessage.LogType.continuous, .error, .instant].randomElement()!, isStatus: Int.random(in: 1...20) == 1)
-//                Logger.log(c.randomElement()!, type: [LogMessage.LogType.continuous, .error, .instant].randomElement()!, isStatus: Int.random(in: 1...20) == 1)
-//                Logger.log(c.randomElement()!, type: [LogMessage.LogType.continuous, .error, .instant].randomElement()!, isStatus: Int.random(in: 1...20) == 1)
-//                Logger.log(c.randomElement()!, type: [LogMessage.LogType.continuous, .error, .instant].randomElement()!, isStatus: Int.random(in: 1...20) == 1)
-//            }
         }
     }
 }
