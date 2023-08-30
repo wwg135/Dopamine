@@ -163,7 +163,6 @@ struct JailbreakView: View {
                                                     try await downloadUpdateAndInstall()
                                                     updateState = .updating
                                                 } catch {
-                                                    showLogView = true
                                                     Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                 }
                                             }
