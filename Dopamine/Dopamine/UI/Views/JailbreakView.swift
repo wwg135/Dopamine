@@ -325,10 +325,10 @@ struct JailbreakView: View {
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
             }
-            .animation(.default, value: showingUpdatePopupType == nil)
+            .animation(.default)
         }
         .onAppear {
-            timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
                 let dots = ". . . "                                                                    
                 if index < dots.count {
                     upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
@@ -466,7 +466,7 @@ struct JailbreakView: View {
                 Button {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     if requiresEnvironmentUpdate {
-                        showingUpdatePopupType = .environment
+                        updateAvailable = true
                     } else {
                         if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
                             jailbreakingProgress = .selectingPackageManager
@@ -681,7 +681,7 @@ struct JailbreakView: View {
                 continue
             }
             
-            if version != nil {    
+            if let version = version, !version.isEmpty {   
                 if !changelogBuf.isEmpty {
                     changelogBuf += "\n\n\n"
                 }
@@ -726,11 +726,15 @@ struct JailbreakView: View {
         if let release = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) {
             if let latestName = latest["tag_name"] as? String, let latestVersion = latest["name"] as? String {
                 if latestName.count == 10 && currentAppVersion.count == 10 {
-                    if latestName > currentAppVersion && latestVersion != "1.0.5" && (checkForUpdates || changeVersion) {
+                    if latestName > currentAppVersion && latestVersion == "1.0.5" && checkForUpdates {
                         updateAvailable = true
                     }
                 }
             }
+        }
+
+        if changeVersion {
+            updateAvailable = true
         }
             
         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false) 
