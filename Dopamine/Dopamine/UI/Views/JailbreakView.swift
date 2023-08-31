@@ -216,6 +216,7 @@ struct JailbreakView: View {
                             VStack {
                                 LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
                                 Text("Update_Log_Hint_Scrollable")
+                                    .minimumScaleFactor(0.5)
                                     .foregroundColor(.white)
                                     .padding()
                             }
