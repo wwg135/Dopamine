@@ -56,8 +56,6 @@ struct JailbreakView: View {
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
     @State var showDownloadPage = false
-    @State var showDownloading = false
-    @State var showUpdatelog = false
     @State var showLogView = false
     
     var isJailbreaking: Bool {
@@ -95,7 +93,6 @@ struct JailbreakView: View {
                         }
                     }
                     bottomSection
-                    updateButton
                     if !isJailbreaking {
                         Spacer()
                     }
@@ -108,7 +105,7 @@ struct JailbreakView: View {
                 .transition(.opacity)
                 .zIndex(1)
 
-                if showUpdatelog {
+                if updateAvailable {
                     GeometryReader { geometry in
                         Color.clear
                             .zIndex(1)
@@ -139,7 +136,7 @@ struct JailbreakView: View {
 
                             HStack {
                                 Button {
-                                    showUpdatelog = false
+                                    updateAvailable = false
                                 } label: {
                                     Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
                                         .foregroundColor(.white)
@@ -152,7 +149,7 @@ struct JailbreakView: View {
                                 Button {
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     showDownloadPage = true
-                                    showUpdatelog = false
+                                    updateAvailable = false
                                     DispatchQueue.global(qos: .userInitiated).async {
                                         if requiresEnvironmentUpdate {
                                             updateState = .updating
@@ -221,7 +218,6 @@ struct JailbreakView: View {
                             .allowsHitTesting(false)
                             .onTapGesture {
                                 showDownloadPage = false
-                                showDownloading = true
                             }
                     }
                     .ignoresSafeArea()
@@ -615,30 +611,6 @@ struct JailbreakView: View {
         case .selectingPackageManager:
             Group {}
         }
-    }
-    
-    @ViewBuilder
-    var updateButton: some View {
-        Button {
-            showUpdatelog = true
-        } label: {
-            Label(title: {Text((showDownloadPage || showDownloading) ? "Update_Status_Downloading" :  (requiresEnvironmentUpdate ? "Button_Update_Environment" : "Button_Update_Available"))}, icon: {
-                ZStack {
-                    if jailbreakingProgress == .jailbreaking {
-                        LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                    } else if showDownloadPage || showDownloading {
-                        Image(systemName: "arrow.down.circle")
-                    } else {
-                        Image(systemName: requiresEnvironmentUpdate ? "arrow.clockwise.circle" : "arrow.down.circle")
-                    }
-                }
-            })
-            .foregroundColor(Color.white)
-            .padding()
-            .disabled(updateState == .downloading || updateState == .updating)
-        }
-        .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
-        .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
     }
     
     func uiJailbreak() {
