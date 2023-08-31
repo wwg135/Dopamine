@@ -56,7 +56,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.同步官方1.1.5正式版更新\n> - 2.改变更新日志、下载更新显示UI\n> - 3.优化OTA升级逻辑，后续只收到版本大于当前版本号才提示升级\n> - 4.首页、设置里面有显示/隐藏，自己探索点击屏幕某些地方（探索），保持简洁" >> body.txt
+          echo -e "\n> - 1.命名说明：1.1.5-，后续不接收1.1.5稳定版以及1.0.5版本的OTA升级。只接收1.1.5-类的OTA升级，含有桥接心浪、映射挂载、pre及基板预装\n> - 2.更新日志只显示要更新版本的日志，提高启动多巴胺后检测是否更新的效率！！！！！" >> body.txt
           
       - name: Build ipa
         run: |
