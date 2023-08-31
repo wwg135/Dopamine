@@ -55,7 +55,6 @@ struct JailbreakView: View {
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
     @State var showDownloadPage = false
-    @State var showDownloading = false
     @State var showLogView = false
     
     var isJailbreaking: Bool {
@@ -205,7 +204,6 @@ struct JailbreakView: View {
                             .allowsHitTesting(false)
                             .onTapGesture {
                                 updateAvailable = false
-                                showDownloading = true
                             }
                     }
                     .ignoresSafeArea()
