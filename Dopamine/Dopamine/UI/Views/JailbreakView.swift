@@ -615,16 +615,11 @@ struct JailbreakView: View {
     func getDeltaChangelog(json: [[String: Any]]) -> String? {
         var changelogBuf = ""
         for item in json {
-            guard let version = item["name"] as? String?,
-                  let changelog = item["body"] as? String else {
-                continue
-            }
-            
-            if let version = version, !version.isEmpty {    
-                if !changelogBuf.isEmpty {
-                    changelogBuf += "\n\n\n"
+            if let version = item["name"] as? String, versionString != "1.0.5" {
+                if let changelog = item["body"] as? String {
+                    changelogBuf = "**" + version + "**\n\n" + changelog
+                    break
                 }
-                changelogBuf += "**" + version + "**\n\n" + changelog
             }
         }
         return changelogBuf.isEmpty ? nil : changelogBuf 
