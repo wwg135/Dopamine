@@ -654,10 +654,10 @@ struct JailbreakView: View {
             return
         }
 
-        if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
+        if let latest = releasesJSON.first(where: { $0["name"] as? String == "1.1.5 稳定版" }) {
             if let latestName = latest["tag_name"] as? String, let latestVersion = latest["name"] as? String {
                 if latestName.count == 10 && currentAppVersion.count == 10 {
-                    if latestName > currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
+                    if latestName > currentAppVersion && latestVersion == "1.1.5 稳定版" && checkForUpdates {
                         updateAvailable = true
                         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
                     }
@@ -683,7 +683,7 @@ struct JailbreakView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }),
+        guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String == "1.1.5 稳定版" }),
               let assets = latestRelease["assets"] as? [[String: Any]],
               let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
               let downloadURLString = asset["browser_download_url"] as? String,
