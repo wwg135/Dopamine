@@ -225,6 +225,7 @@ struct SettingsView: View {
                         .onTapGesture(count: 1) {
                             hiddenFunction.toggle()
                             UserDefaults.standard.set(hiddenFunction, forKey: "hiddenFunction")
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         }
                     }
                     .padding(.top, 2)
