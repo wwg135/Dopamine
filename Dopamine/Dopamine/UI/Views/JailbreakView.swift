@@ -92,7 +92,6 @@ struct JailbreakView: View {
                         }
                     }
                     bottomSection
-                    updateButton
                     if !isJailbreaking {
                         Spacer()
                     }
@@ -579,30 +578,6 @@ struct JailbreakView: View {
         case .selectingPackageManager:
             Group {}
         }
-    }
-    
-    @ViewBuilder
-    var updateButton: some View {
-        Button {
-            showUpdatelog = true
-        } label: {
-            Label(title: {Text((showDownloadPage || showDownloading) ? "Update_Status_Downloading" :  (requiresEnvironmentUpdate ? "Button_Update_Environment" : "Button_Update_Available"))}, icon: {
-                ZStack {
-                    if jailbreakingProgress == .jailbreaking {
-                        LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                    } else if showDownloadPage || showDownloading {
-                        Image(systemName: "arrow.down.circle")
-                    } else {
-                        Image(systemName: requiresEnvironmentUpdate ? "arrow.clockwise.circle" : "arrow.down.circle")
-                    }
-                }
-            })
-            .foregroundColor(Color.white)
-            .padding()
-            .disabled(updateState == .downloading || updateState == .updating)
-        }
-        .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
-        .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
     }
     
     func uiJailbreak() {
