@@ -106,7 +106,7 @@ struct JailbreakView: View {
                 .transition(.opacity)
                 .zIndex(1)
 
-                if showUpdatelog {
+                if updateAvailable {
                     GeometryReader { geometry in
                         Color.clear
                             .zIndex(1)
@@ -206,7 +206,7 @@ struct JailbreakView: View {
                             .contentShape(Rectangle())
                             .allowsHitTesting(false)
                             .onTapGesture {
-                                showDownloadPage = false
+                                updateAvailable = false
                                 showDownloading = true
                             }
                     }
