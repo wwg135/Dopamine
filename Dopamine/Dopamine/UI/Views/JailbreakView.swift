@@ -657,7 +657,7 @@ struct JailbreakView: View {
             return
         }
 
-        if let latest = releasesJSON.first(where: {
+        if releasesJSON.first(where: {
             if let version = $0["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {   
                 if let latestName = $0["tag_name"] as? String, let latestVersion = $0["name"] as? String {
                     if latestName.count == 10 && currentAppVersion.count == 10 {
@@ -667,6 +667,7 @@ struct JailbreakView: View {
                     }
                 }
             }
+            return false
         }) {
             updateAvailable = true
             updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
