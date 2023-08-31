@@ -187,13 +187,17 @@ struct JailbreakView: View {
                         }
                         .padding(.vertical)
                         .background(Color.black.opacity(0.5))
-                        .animation(.spring(), value: updateState)
                         .background(MaterialView(.systemUltraThinMaterialDark))
                     }
                     .zIndex(2)
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 420)
+                    .scaleEffect(x: 1, y: updateAvailable ? 1 : 0)
+                    .animation(.spring())
+                    .onAppear {
+                        updateAvailable = true
+                    }
                 }
                             
                 if showDownloadPage {
