@@ -668,7 +668,7 @@ struct JailbreakView: View {
                 }
             }
             return false
-        }) {
+        }) != nil {
             updateAvailable = true
             updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
         }
