@@ -58,6 +58,7 @@ struct JailbreakView: View {
     @State var showDownloadPage = false
     @State var showDownloading = false
     @State var showUpdatelog = false
+    @State var showLogView = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -165,6 +166,7 @@ struct JailbreakView: View {
                                                     try await downloadUpdateAndInstall()
                                                     updateState = .updating
                                                 } catch {
+                                                    showLogView = true
                                                     Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                 }
                                             }
@@ -224,63 +226,75 @@ struct JailbreakView: View {
                     }
                     .ignoresSafeArea()
                     ZStack {
-                        VStack {
+                        if showLogView {
                             VStack {
-                                Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
-                                    .font(.title2)
-                                    .opacity(1)
+                                LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
+                                Text("Update_Log_Hint_Scrollable")
                                     .minimumScaleFactor(0.5)
-                                    .foregroundColor(Color.white)
-                                    .multilineTextAlignment(.center)
-                                    .drawingGroup()
-                                Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
-                                    .opacity(1)
-                                    .minimumScaleFactor(0.5)
-                                    .foregroundColor(Color.white)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.bottom, 10)
+                                    .foregroundColor(.white)
+                                    .padding()
                             }
-                            .frame(height: 50)
-                            .animation(.spring(), value: updateState)
-                            
+                            .opacity(showLogView ? 1 : 0)
+                            .frame(height: 150)
+                        } else {
                             VStack {
-                                ZStack {
-                                    ZStack {
-                                        Text("\(Int(progressDouble * 100))%")
-                                            .font(.title)
-                                            .opacity(1)
-                                        if updateState == .downloading || updateState == .updating {
-                                            LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                                .opacity(1)
-                                        }
-                                    }
-                                    Circle()
-                                        .stroke(
-                                            Color.white.opacity(0.1),
-                                            lineWidth: updateState == .downloading ? 16 : 8
-                                        )
-                                        .animation(.spring(), value: updateState)
-                                    Circle()
-                                        .trim(from: 0, to: progressDouble)
-                                        .stroke(
-                                            Color.white,
-                                            style: StrokeStyle(
-                                                lineWidth: updateState == .downloading ? 16 : 0,
-                                                lineCap: .round
-                                            )
-                                        )
-                                        .rotationEffect(.degrees(-90))
-                                        .animation(.easeOut, value: progressDouble)
-                                        .animation(.spring(), value: updateState) 
+                                VStack {
+                                    Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
+                                        .font(.title2)
+                                        .opacity(1)
+                                        .minimumScaleFactor(0.5)
+                                        .foregroundColor(Color.white)
+                                        .multilineTextAlignment(.center)
+                                        .drawingGroup()
+                                    Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
+                                        .opacity(1)
+                                        .minimumScaleFactor(0.5)
+                                        .foregroundColor(Color.white)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.bottom, 10)
                                 }
+                                .frame(height: 50)
+                                .animation(.spring(), value: updateState)
+
+                                VStack {
+                                    ZStack {
+                                        ZStack {
+                                            Text("\(Int(progressDouble * 100))%")
+                                                .font(.title)
+                                                .opacity(1)
+                                            if updateState == .downloading || updateState == .updating {
+                                                LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
+                                                    .opacity(1)
+                                            }
+                                        }
+                                        Circle()
+                                            .stroke(
+                                                Color.white.opacity(0.1),
+                                                lineWidth: updateState == .downloading ? 16 : 8
+                                            )
+                                            .animation(.spring(), value: updateState)
+                                        Circle()
+                                            .trim(from: 0, to: progressDouble)
+                                            .stroke(
+                                                Color.white,
+                                                style: StrokeStyle(
+                                                    lineWidth: updateState == .downloading ? 16 : 0,
+                                                    lineCap: .round
+                                                )
+                                            )
+                                            .rotationEffect(.degrees(-90))
+                                            .animation(.easeOut, value: progressDouble)
+                                            .animation(.spring(), value: updateState) 
+                                    }
+                                }
+                                .frame(height: 90)
+                                .animation(.spring(), value: updateState)
                             }
-                            .frame(height: 90)
-                            .animation(.spring(), value: updateState)
+                            .padding(.vertical)
+                            .background(Color.black.opacity(0.5))
+                            .background(MaterialView(.systemUltraThinMaterialDark))
+                            .zIndex(3)
                         }
-                        .padding(.vertical)
-                        .background(Color.black.opacity(0.5))
-                        .background(MaterialView(.systemUltraThinMaterialDark))
-                        .zIndex(3)
                     }
                     .zIndex(2)
                     .cornerRadius(16)
@@ -370,6 +384,7 @@ struct JailbreakView: View {
                 .onTapGesture(count: 1) {
                     showTexts.toggle()
                     UserDefaults.standard.set(showTexts, forKey: "showTexts")
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
                 Text(showTexts ? "AAA : AAB" : "")
                     .font(.subheadline)
