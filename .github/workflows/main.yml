@@ -8,11 +8,11 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1.5_2'
+  VERSION: '1.1.5_3'
  
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -56,8 +56,8 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.同步官方1.1.5正式版更新\n> - 2.重点更新：增加【隐藏第三方修改版所添加的功能手势】，首页点击上面开发说明、设置里面点击越狱成功率即开启显示/隐藏，保持界面简洁、以及其他细节优化" >> body.txt
-      
+          echo -e "\n> - 1.同步官方1.1.5正式版更新\n> - 2.改变更新日志、下载更新显示UI\n> - 3.优化OTA升级逻辑，后续只收到版本大于当前版本号才提示升级\n> - 4.首页、设置里面有显示/隐藏，自己探索点击屏幕某些地方（探索），保持简洁" >> body.txt
+          
       - name: Build ipa
         run: |
           set -x

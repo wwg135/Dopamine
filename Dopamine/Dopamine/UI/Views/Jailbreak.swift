@@ -104,9 +104,12 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
 }
 
 func removeZmount(rmpath: String) {
-    DispatchQueue.global().async {
-        _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
+    _ = execCmd(args: [CommandLine.arguments[0], "uninstall_Zmount", rmpath])
+
+    guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
+        return
     }
+    _ = execCmd(args: [jbctlPath, "unmountPath", rmpath])
 }
 
 func updateForbidUnject(toggleOn: Bool, newForbidUnject: String?) {

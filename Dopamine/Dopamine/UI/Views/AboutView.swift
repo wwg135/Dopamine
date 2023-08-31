@@ -140,6 +140,7 @@ struct AboutView: View {
             .opacity(1)
             .onTapGesture(count: 1) {
                 easterEgg.toggle()
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
             }
         }
         .foregroundColor(.white)

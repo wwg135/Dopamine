@@ -15,6 +15,10 @@ import UIKit
 import AppKit
 #endif
 
+enum UpdateState {
+    case downloading, updating
+}
+
 struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
@@ -32,39 +36,36 @@ struct JailbreakView: View {
         var action: (() -> ())? = nil
     }
 
-    @State var progressDouble: Double = 0
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
-    @State var isUpdatelogPresented = false
-    
     @State var jailbreakingProgress: JailbreakingProgress = .idle
     @State var jailbreakingError: Error?
-    
     @State var updateAvailable = false
-    @State var showingUpdatePopupType: UpdateType? = nil
-    @State var mismatchAndupdateChangelog: String? = nil
-
+    @State var updateChangelog: String? = nil
+    @State var mismatchChangelog: String? = nil
     @State private var upTime = "系统启动于: 加载中"
     @State private var index = 0
     @State private var showLaunchTime = true
-
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
     @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
+    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
+    @State var updateState: UpdateState = .downloading
+    @State var progressDouble: Double = 0
+    var downloadProgress = Progress()
+    @State var showDownloadPage = false
+    @State var showLogView = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
     }
     
-    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-    
     var body: some View {
         GeometryReader { geometry in                
             ZStack {
-                let isPopupPresented = isSettingsPresented || isCreditsPresented || isUpdatelogPresented
-                
+                let isPopupPresented = isSettingsPresented || isCreditsPresented
                 let imagePath = "/var/mobile/Wallpaper.jpg"
                 let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
                     Image(uiImage: backgroundImage!)
@@ -77,34 +78,235 @@ struct JailbreakView: View {
                         .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                         .animation(.spring(), value: isPopupPresented)
                 
-                if showingUpdatePopupType == nil {
-                    VStack {
+                VStack {
+                    Spacer()
+                    header
+                    Spacer()
+                    menu
+                    if !isJailbreaking {
                         Spacer()
-                        header
                         Spacer()
-                        menu
-                        if !isJailbreaking {
-                            Spacer()
-                            Spacer()
-                            if isSandboxed() {
-                                Text("(Demo version - Sandboxed)")
-                                    .foregroundColor(.white)
-                                    .opacity(0.5)
-                            }
-                        }
-                        bottomSection
-                        updateButton
-                        if !isJailbreaking {
-                            Spacer()
+                        if isSandboxed() {
+                            Text("(Demo version - Sandboxed)")
+                                .foregroundColor(.white)
+                                .opacity(0.5)
                         }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .blur(radius: isPopupPresented ? 4 : 0)
-                    .scaleEffect(isPopupPresented ? 0.85 : 1)
-                    .animation(.spring(), value: updateAvailable)
-                    .animation(.spring(), value: isPopupPresented)
-                    .transition(.opacity)
-                    .zIndex(1)
+                    bottomSection
+                    if !isJailbreaking {
+                        Spacer()
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .blur(radius: isPopupPresented ? 4 : 0)
+                .scaleEffect(isPopupPresented ? 0.85 : 1)
+                .animation(.spring(), value: updateAvailable)
+                .animation(.spring(), value: isPopupPresented)
+                .transition(.opacity)
+                .zIndex(1)
+
+                if updateAvailable {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(false)
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        VStack {
+                            VStack{
+                                Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
+                                    .font(.title2)
+                                    .minimumScaleFactor(0.5)
+                                    .multilineTextAlignment(.center)
+                                Divider()
+                                    .background(.white)
+                                    .padding(.horizontal, 25)
+                                ScrollView {
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                        .font(.system(size: 16))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical)
+                                }
+                                .opacity(1)
+                                .frame(maxWidth: 250, maxHeight: 300)
+                            }
+
+                            HStack {
+                                Button {
+                                    updateAvailable = false
+                                } label: {
+                                    Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 18))
+                                        .opacity(1)
+                                        .padding()
+                                        .frame(maxHeight: 45)
+                                }
+                                .fixedSize()
+                                Button {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    showDownloadPage = true
+                                    updateAvailable = false
+                                    DispatchQueue.global(qos: .userInitiated).async {
+                                        if requiresEnvironmentUpdate {
+                                            updateState = .updating
+                                            DispatchQueue.global(qos: .userInitiated).async {
+                                                updateEnvironment()
+                                            }
+                                        } else {
+                                            updateState = .downloading
+                                            Task {
+                                                do {
+                                                    try await downloadUpdateAndInstall()
+                                                    updateState = .updating
+                                                } catch {
+                                                    showLogView = true
+                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                }
+                                            }
+                                        }
+                                    }
+                                } label: {
+                                    if changeVersion {
+                                        Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })
+                                            .font(.system(size: 18))
+                                            .foregroundColor(.white)
+                                            .padding()
+                                            .frame(maxHeight: 45)
+                                            .background(MaterialView(.light)
+                                                .opacity(1)
+                                                .cornerRadius(8)
+                                            )
+                                    } else {
+                                        Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
+                                            .font(.system(size: 18))
+                                            .foregroundColor(.white)
+                                            .padding()
+                                            .frame(maxHeight: 45)
+                                            .background(MaterialView(.light)
+                                                .opacity(1)
+                                                .cornerRadius(8)
+                                            )
+                                    }
+                                }
+                                .fixedSize()
+                            }
+                            .padding(.vertical)
+                            .padding(.horizontal)
+                            .cornerRadius(16)
+                        }
+                        .padding(.vertical)
+                        .background(Color.black.opacity(0.5))
+                        .animation(.spring(), value: updateState)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 420)
+                }
+                            
+                if showDownloadPage {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(false)
+                            .onTapGesture {
+                                showDownloadPage = false
+                            }
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        if showLogView {
+                            VStack {
+                                LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
+                                Text("Update_Log_Hint_Scrollable")
+                                    .minimumScaleFactor(0.5)
+                                    .foregroundColor(.white)
+                                    .padding()
+                            }
+                            .opacity(showLogView ? 1 : 0)
+                            .frame(height: 150)
+                        } else {
+                            VStack {
+                                VStack {
+                                    Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
+                                        .font(.title2)
+                                        .opacity(1)
+                                        .minimumScaleFactor(0.5)
+                                        .foregroundColor(Color.white)
+                                        .multilineTextAlignment(.center)
+                                        .drawingGroup()
+                                    Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
+                                        .opacity(1)
+                                        .minimumScaleFactor(0.5)
+                                        .foregroundColor(Color.white)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.bottom, 10)
+                                }
+                                .frame(height: 50)
+                                .animation(.spring(), value: updateState)
+
+                                VStack {
+                                    ZStack {
+                                        ZStack {
+                                            Text("\(Int(progressDouble * 100))%")
+                                                .font(.title)
+                                                .opacity(1)
+                                            if updateState == .downloading || updateState == .updating {
+                                                LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
+                                                    .opacity(1)
+                                            }
+                                        }
+                                        Circle()
+                                            .stroke(
+                                                Color.white.opacity(0.1),
+                                                lineWidth: updateState == .downloading ? 16 : 8
+                                            )
+                                            .animation(.spring(), value: updateState)
+                                        Circle()
+                                            .trim(from: 0, to: progressDouble)
+                                            .stroke(
+                                                Color.white,
+                                                style: StrokeStyle(
+                                                    lineWidth: updateState == .downloading ? 16 : 0,
+                                                    lineCap: .round
+                                                )
+                                            )
+                                            .rotationEffect(.degrees(-90))
+                                            .animation(.easeOut, value: progressDouble)
+                                            .animation(.spring(), value: updateState) 
+                                    }
+                                }
+                                .frame(height: 90)
+                                .animation(.spring(), value: updateState)
+                            }
+                            .padding(.vertical)
+                            .background(Color.black.opacity(0.5))
+                            .background(MaterialView(.systemUltraThinMaterialDark))
+                            .zIndex(3)
+                        }
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 180, maxHeight: 180)
+                    .onAppear {
+                        if updateState == .downloading {
+                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                                progressDouble = downloadProgress.fractionCompleted
+                                
+                                if progressDouble == 1 {
+                                    t.invalidate()
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 PopupView(title: {
@@ -128,27 +330,11 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320)
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
-
-                PopupView(title: {
-                    Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
-                }, contents: {
-                    ScrollView {
-                        Text(try! AttributedString(markdown: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                            .opacity(1)
-                            .multilineTextAlignment(.center)
-                            .padding(.vertical)
-                    }
-                    .opacity(1)
-                    .frame(maxWidth: 280, maxHeight: 480)
-                }, isPresented: $isUpdatelogPresented)
-                .zIndex(2)
-                
-                UpdateDownloadingView(type: $showingUpdatePopupType, changelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchAndupdateChangelog: mismatchAndupdateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
             }
-            .animation(.default, value: showingUpdatePopupType == nil)
+            .animation(.default)
         }
         .onAppear {
-            let timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
                 let dots = ". . . "                                                                    
                 if index < dots.count {
                     upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
@@ -160,7 +346,7 @@ struct JailbreakView: View {
                     }
                 }
             }
-            DispatchQueue.global().async {
+            DispatchQueue.global(qos: .userInitiated).async {
                 Task {
                     do {
                         try await checkForUpdates()
@@ -194,6 +380,7 @@ struct JailbreakView: View {
                 .onTapGesture(count: 1) {
                     showTexts.toggle()
                     UserDefaults.standard.set(showTexts, forKey: "showTexts")
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
                 Text(showTexts ? "AAA : AAB" : "")
                     .font(.subheadline)
@@ -212,20 +399,12 @@ struct JailbreakView: View {
     @ViewBuilder
     var menu: some View {
         VStack {
-            let menuOptionsWithUpdate: [MenuOption] = [
-                .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
-                .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
-                .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
-                .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
-                .init(id: "updatelog", imageName: "book.circle", title: NSLocalizedString("Title_Changelog", comment: "")),
-            ]
-            let menuOptionsWithoutUpdate: [MenuOption] = [
+            let menuOptions: [MenuOption] = [
                 .init(id: "settings", imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: "")),
                 .init(id: "respring", imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
                 .init(id: "userspace", imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
                 .init(id: "credits", imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: "")),
             ]
-            let menuOptions = showTexts ? menuOptionsWithUpdate : menuOptionsWithoutUpdate
             ForEach(menuOptions) { option in
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -237,8 +416,6 @@ struct JailbreakView: View {
                             isSettingsPresented = true
                         case "credits":
                             isCreditsPresented = true
-                        case "updatelog":
-                            isUpdatelogPresented = true
                         default: break
                         }
                     }
@@ -295,9 +472,8 @@ struct JailbreakView: View {
             VStack {
                 Button {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                
                     if requiresEnvironmentUpdate {
-                        showingUpdatePopupType = .environment
+                        updateAvailable = true
                     } else {
                         if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
                             jailbreakingProgress = .selectingPackageManager
@@ -387,38 +563,6 @@ struct JailbreakView: View {
                 .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1) .opacity(0.25)
             )
             .animation(.spring(), value: isJailbreaking)
-
-            if (jailbreakingProgress == .jailbreaking) {
-                ZStack {
-                    ZStack {
-                        Text("\(Int(progressDouble * 100))%")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-                    }
-                    Circle()
-                        .stroke(
-                            Color.white.opacity(0.1),
-                            lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
-                        )
-                        .animation(.linear, value: progressDouble)
-                    Circle()
-                        .trim(from: 0, to: progressDouble)
-                        .stroke(
-                            Color.white,
-                            style: StrokeStyle(
-                                lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                                lineCap: .round
-                            )
-                        )
-                        .rotationEffect(.degrees(-90))
-                        .animation(.easeOut, value: progressDouble)
-                        .animation(.linear, value: progressDouble)
-                }
-                .frame(maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.1 : nil)
-                .animation(.linear, value: progressDouble)
-                .opacity(progressDouble < 1 ? 1 : 0)
-            }
         }
     }
 
@@ -469,50 +613,17 @@ struct JailbreakView: View {
         }
     }
     
-    @ViewBuilder
-    var updateButton: some View {
-        Button {
-            showingUpdatePopupType = .regular
-        } label: {
-            Label(title: { Text("Button_Update_Available") }, icon: {
-                ZStack {
-                    if jailbreakingProgress == .jailbreaking {
-                        LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                    } else {
-                        Image(systemName: "arrow.down.circle")
-                    }
-                }
-            })
-            .foregroundColor(Color.white)
-            .padding()
-        }
-        .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
-        .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .animation(Animation.easeInOut(duration: 1.0) .repeatForever(autoreverses: true), value: updateAvailable)
-    }
-    
     func uiJailbreak() {
         jailbreakingProgress = .jailbreaking
         let dpDefaults = dopamineDefaults()
         dpDefaults.set(dpDefaults.integer(forKey: "total_jailbreaks") + 1, forKey: "total_jailbreaks")
         dpDefaults.synchronize()
-
-        // 💀 code
-        Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { t in
-            progressDouble += 0.01              
-                                
-            if progressDouble >= 1 {
-                t.invalidate()
-            }
-        }
-        
         DispatchQueue(label: "Dopamine").async {
             sleep(1)
             
             jailbreak { e in
                 jailbreakingProgress = .finished
                 jailbreakingError = e
-                
                 if e == nil {
                     dpDefaults.set(dpDefaults.integer(forKey: "successful_jailbreaks") + 1, forKey: "successful_jailbreaks")
                     dpDefaults.synchronize()
@@ -539,12 +650,12 @@ struct JailbreakView: View {
     func getDeltaChangelog(json: [[String: Any]]) -> String? {
         var changelogBuf = ""
         for item in json {
-            guard let version = item["name"] as? String,
+            guard let version = item["name"] as? String?,
                   let changelog = item["body"] as? String else {
                 continue
             }
             
-            if version != nil {    
+            if let version = version, !version.isEmpty {    
                 if !changelogBuf.isEmpty {
                     changelogBuf += "\n\n\n"
                 }
@@ -558,7 +669,6 @@ struct JailbreakView: View {
         var userOrientedChangelog : String = ""
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
 
-        // Prefix
         if environmentMismatch {
             userOrientedChangelog += String(format:NSLocalizedString("Mismatching_Environment_Version_Update_Body", comment: ""), installedEnvironmentVersion(), appVersion!)
             userOrientedChangelog += "\n\n\n" + NSLocalizedString("Title_Changelog", comment: "") + ":\n\n"
@@ -566,7 +676,6 @@ struct JailbreakView: View {
         else {        
         }
 
-        // Changelog
         userOrientedChangelog += deltaChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: "")
 
         return userOrientedChangelog
@@ -585,8 +694,66 @@ struct JailbreakView: View {
             return
         }
 
-        updateAvailable = (checkForUpdates ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) != nil ? (releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["tag_name"] as? String != currentAppVersion && releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })?["name"] as? String != "1.0.5") : false) : false) || changeVersion      
-        mismatchAndupdateChangelog = isInstalledEnvironmentVersionMismatching() ? createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true) : createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+        if let latest = releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) {
+            if let latestName = latest["tag_name"] as? String, let latestVersion = latest["name"] as? String {
+                if latestName.count == 10 && currentAppVersion.count == 10 {
+                    if latestName > currentAppVersion && latestVersion != "1.0.5" && checkForUpdates {
+                        updateAvailable = true
+                    }
+                }
+            }
+        }
+
+        if changeVersion {
+            updateAvailable = true
+        }
+
+        updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false) 
+        if isInstalledEnvironmentVersionMismatching() {
+            mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
+        }
+    }
+
+    func downloadUpdateAndInstall() async throws {
+        let owner = "wwg135"
+        let repo = "Dopamine"
+        
+        // Get the releases
+        let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
+        let releasesRequest = URLRequest(url: releasesURL)
+        let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
+        let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as! [[String: Any]]
+        
+        Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
+
+        // Find the latest release
+        let latest = changeVersion ? releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }) : releasesJSON.first(where: { $0["name"] as? String != "1.0.5" })
+        guard let latestRelease = latest,
+              let assets = latestRelease["assets"] as? [[String: Any]],
+              let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
+              let downloadURLString = asset["browser_download_url"] as? String,
+              let downloadURL = URL(string: downloadURLString) else {
+                throw "Could not find download URL for ipa"
+        }
+
+        // Download the asset
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            downloadProgress.totalUnitCount = 1
+            group.addTask {
+                let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
+                if isJailbroken() {
+                    update(tipaURL: url)
+                } else {
+                    guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=\(url.absoluteString)") else {
+                        return
+                    }
+                    await UIApplication.shared.open(dopamineUpdateURL)
+                    exit(0)
+                    return
+                }
+            }
+            try await group.waitForAll()
+        }
     }
     
     func getLaunchTime() -> String {
