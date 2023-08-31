@@ -56,7 +56,6 @@ struct JailbreakView: View {
     var downloadProgress = Progress()
     @State var showDownloadPage = false
     @State var showDownloading = false
-    @State var showUpdatelog = false
     @State var showLogView = false
     
     var isJailbreaking: Bool {
@@ -137,7 +136,7 @@ struct JailbreakView: View {
 
                             HStack {
                                 Button {
-                                    showUpdatelog = false
+                                    updateAvailable = false
                                 } label: {
                                     Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
                                         .foregroundColor(.white)
@@ -150,7 +149,7 @@ struct JailbreakView: View {
                                 Button {
                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     showDownloadPage = true
-                                    showUpdatelog = false
+                                    updateAvailable = false
                                     DispatchQueue.global(qos: .userInitiated).async {
                                         if requiresEnvironmentUpdate {
                                             updateState = .updating
