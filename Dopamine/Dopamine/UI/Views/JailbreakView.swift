@@ -8,6 +8,7 @@
 import SwiftUI
 import Fugu15KernelExploit
 import SwiftfulLoadingIndicators
+import Foundation
 
 #if os(iOS)
 import UIKit
@@ -614,8 +615,9 @@ struct JailbreakView: View {
     
     func getDeltaChangelog(json: [[String: Any]]) -> String? {
         var changelogBuf = ""
+        let versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
         for item in json {
-            if let version = item["name"] as? String, version == "1.0.5 稳定版" {
+            if let version = item["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {
                 if let changelog = item["body"] as? String {
                     changelogBuf = "**" + version + "**\n\n" + changelog
                     break
@@ -645,6 +647,7 @@ struct JailbreakView: View {
         let currentAppVersion = "AAC"
         let owner = "wwg135"
         let repo = "Dopamine"
+        let versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
             
         // Get the releases
         let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
@@ -654,15 +657,19 @@ struct JailbreakView: View {
             return
         }
 
-        if let latest = releasesJSON.first(where: { $0["name"] as? String == "1.1.5 稳定版" }) {
-            if let latestName = latest["tag_name"] as? String, let latestVersion = latest["name"] as? String {
-                if latestName.count == 10 && currentAppVersion.count == 10 {
-                    if latestName > currentAppVersion && latestVersion == "1.1.5 稳定版" && checkForUpdates {
-                        updateAvailable = true
-                        updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+        if let latest = releasesJSON.first(where: {
+            if let version = $0["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {   
+                if let latestName = $0["tag_name"] as? String, let latestVersion = $0["name"] as? String {
+                    if latestName.count == 10 && currentAppVersion.count == 10 {
+                        if latestName > currentAppVersion && versionRegex.firstMatch(in: latestVersion, options: [], range: NSRange(location: 0, length: latestVersion.utf16.count)) != nil {
+                            return true  
+                        }
                     }
                 }
             }
+        }) {
+            updateAvailable = true
+            updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
         }
  
         if isInstalledEnvironmentVersionMismatching() {
@@ -673,6 +680,7 @@ struct JailbreakView: View {
     func downloadUpdateAndInstall() async throws {
         let owner = "wwg135"
         let repo = "Dopamine"
+        let versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
         
         // Get the releases
         let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
@@ -683,11 +691,16 @@ struct JailbreakView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String == "1.1.5 稳定版" }),
-              let assets = latestRelease["assets"] as? [[String: Any]],
-              let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
-              let downloadURLString = asset["browser_download_url"] as? String,
-              let downloadURL = URL(string: downloadURLString) else {
+        guard let latestRelease = releasesJSON.first(where: { 
+            if let version = $0["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {
+                return true  
+            }
+            return false
+        }),
+        let assets = latestRelease["assets"] as? [[String: Any]],
+        let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
+        let downloadURLString = asset["browser_download_url"] as? String,
+        let downloadURL = URL(string: downloadURLString) else {
             throw "Could not find download URL for ipa"
         }
 
