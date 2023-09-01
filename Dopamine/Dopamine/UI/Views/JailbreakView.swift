@@ -733,7 +733,7 @@ struct JailbreakView: View {
                 return true
             } 
             return false
-        }),
+        })
         guard let latestRelease = latest,
               let assets = latestRelease["assets"] as? [[String: Any]],
               let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
