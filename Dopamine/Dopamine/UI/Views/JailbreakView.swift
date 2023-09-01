@@ -660,10 +660,12 @@ struct JailbreakView: View {
     func getDeltaChangelog(json: [[String: Any]]) -> String? {
         var changelogBuf = ""
         for item in json {
-            if let version = item["name"] as? String == "1.0.5" {
-                if let changelog = item["body"] as? String {   
-                    changelogBuf = "**" + version + "**\n\n" + changelog   
-                    break
+            if let version = item["name"] as? String {
+                if version == "1.0.5" {
+                    if let changelog = item["body"] as? String {   
+                        changelogBuf = "**" + version + "**\n\n" + changelog   
+                        break
+                    }
                 }
             }
         }
@@ -740,7 +742,7 @@ struct JailbreakView: View {
                 return true  
             } 
             return false
-        }) : releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }),
+        }) : releasesJSON.first(where: { $0["name"] as? String == "1.0.5" })
         guard let latestRelease = latest,
               let assets = latestRelease["assets"] as? [[String: Any]],
               let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
