@@ -2,7 +2,7 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.5
+      - 1.1.5_
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -56,8 +56,8 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.命名说明：1.1.5-，后续不接收1.1.5稳定版以及1.0.5版本的OTA升级。只接收1.1.5-类的OTA升级，含有桥接心浪、映射挂载、pre及基板预装\n> - 2.更新日志只显示要更新版本的日志，提高启动多巴胺后检测是否更新的效率！！！！！" >> body.txt
-          
+          echo -e "\n> - 1.后续以3个版本维护更新分别是：【1.1.5】、【1.1.5_带数字】、【1.0.5】，详细说明往下看\n> - 2.OTA升级：1.1.5只接收到1.1.5的更新，1.1.5_带数字只接收到1.1.5_带数字的更新，1.0.5只接收到1.0.5的OTA升级\n> - 3.当前1.1.5_后缀带数字的版本，有映射挂载、桥接心浪、pre/基板" >> body.txt
+  
       - name: Build ipa
         run: |
           set -x
