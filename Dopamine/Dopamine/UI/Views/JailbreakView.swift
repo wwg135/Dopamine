@@ -8,6 +8,7 @@
 import SwiftUI
 import Fugu15KernelExploit
 import SwiftfulLoadingIndicators
+import Foundation
 
 #if os(iOS)
 import UIKit
