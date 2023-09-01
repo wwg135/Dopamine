@@ -57,6 +57,7 @@ struct JailbreakView: View {
     var downloadProgress = Progress()
     @State var showDownloadPage = false
     @State var showLogView = false
+    @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5_\\d+$")
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -659,19 +660,14 @@ struct JailbreakView: View {
     func getDeltaChangelog(json: [[String: Any]]) -> String? {
         var changelogBuf = ""
         for item in json {
-            guard let version = item["name"] as? String,
-                  let changelog = item["body"] as? String else {
-                continue
-            }
-            
-            if !version.isEmpty {  
-                if !changelogBuf.isEmpty {
-                    changelogBuf += "\n\n\n"
+            if let version = item["name"] as? String == "1.0.5" {
+                if let changelog = item["body"] as? String {   
+                    changelogBuf = "**" + version + "**\n\n" + changelog   
+                    break
                 }
-                changelogBuf += "**" + version + "**\n\n" + changelog
             }
         }
-        return changelogBuf.isEmpty ? nil : changelogBuf 
+        return changelogBuf.isEmpty ? nil : changelogBuf
     }
 
     func createUserOrientedChangelog(deltaChangelog: String?, environmentMismatch: Bool) -> String {
@@ -739,7 +735,12 @@ struct JailbreakView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        let latest = changeVersion ? releasesJSON.first(where: { $0["name"] as? String != "1.0.5" }) : releasesJSON.first(where: { $0["name"] as? String == "1.0.5" })
+        let latest = changeVersion ? releasesJSON.first(where: {
+            if let version = $0["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {
+                return true  
+            } 
+            return false
+        }) : releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }),
         guard let latestRelease = latest,
               let assets = latestRelease["assets"] as? [[String: Any]],
               let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
