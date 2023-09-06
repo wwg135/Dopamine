@@ -135,16 +135,15 @@ struct JailbreakView: View {
                                         Spacer() 
                                         HStack {
                                             Text("Button_Cancel")
-                                                .font(.system(size: 20))
+                                                .font(.system(size: 16))
                                                 .gesture(TapGesture().onEnded {
                                                     DispatchQueue.global(qos: .userInitiated).async {
                                                         updateAvailable = false
                                                     }
                                                 })
-                                                .padding(.horizontal)
                                             Spacer()
                                             Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
-                                                .font(.system(size: 20))
+                                                .font(.system(size: 16))
                                                 .gesture(TapGesture().onEnded {
                                                     checklog.toggle()
                                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -171,12 +170,11 @@ struct JailbreakView: View {
                                                         }
                                                     }
                                                 })
-                                                .padding(.horizontal)
                                         }
                                     }
                                 }
                                 .opacity(1)
-                                .frame(maxWidth: 250, maxHeight: 340)
+                                .frame(maxWidth: 250, maxHeight: 360)
                             }
                         }
                         .padding(.vertical)
