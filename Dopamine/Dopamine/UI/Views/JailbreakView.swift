@@ -149,32 +149,32 @@ struct JailbreakView: View {
                                         .frame(maxHeight: 45)
                                 }
                                 .fixedSize()
-                                HStack {
-                                    Button {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        showDownloadPage = true
-                                        updateAvailable = false
-                                        DispatchQueue.global(qos: .userInitiated).async {
-                                            if requiresEnvironmentUpdate {
-                                                updateState = .updating
-                                                DispatchQueue.global(qos: .userInitiated).async {
-                                                    updateEnvironment()
-                                                }
-                                            } else {
-                                                updateState = .downloading
-                                                Task {
-                                                    do {
-                                                        try await downloadUpdateAndInstall()
-                                                        updateState = .updating
-                                                    } catch {
-                                                        showLogView = true
-                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                                    }
+                                Button {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                    showDownloadPage = true
+                                    updateAvailable = false
+                                    DispatchQueue.global(qos: .userInitiated).async {
+                                        if requiresEnvironmentUpdate {
+                                            updateState = .updating
+                                            DispatchQueue.global(qos: .userInitiated).async {
+                                                updateEnvironment()
+                                            }
+                                        } else {
+                                            updateState = .downloading
+                                            Task {
+                                                do {
+                                                    try await downloadUpdateAndInstall()
+                                                    updateState = .updating
+                                                } catch {
+                                                    showLogView = true
+                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                 }
                                             }
                                         }
-                                    } label: {
-                                        Label(title: { Text(isCountdownVisible ? "Button_Update \(countdownSeconds)s" : "Button_Update") }, icon: { Image(systemName: "arrow.down") })
+                                    }
+                                } label: {
+                                    HStack {
+                                        Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
                                             .font(.system(size: 18))
                                             .padding()
                                             .frame(maxHeight: 45)
@@ -183,6 +183,12 @@ struct JailbreakView: View {
                                                 .cornerRadius(8)
                                             )
                                             .foregroundColor(isButtonEnabled ? .white : .gray) // 设置按钮的前景色
+
+                                        if isCountdownVisible {
+                                            Text("\(countdownSeconds)s")
+                                                .font(.system(size: 18))
+                                                .foregroundColor(.white)
+                                        }
                                     }
                                 }
                                 .disabled(!isButtonEnabled) // 根据按钮的可用状态设置禁用状态
