@@ -135,7 +135,7 @@ struct JailbreakView: View {
                                         Spacer() 
                                         HStack {
                                             Text("Button_Cancel")
-                                                .font(.system(size: 16))
+                                                .font(.system(size: 18))
                                                 .gesture(TapGesture().onEnded {
                                                     DispatchQueue.global(qos: .userInitiated).async {
                                                         updateAvailable = false
@@ -143,7 +143,7 @@ struct JailbreakView: View {
                                                 })
                                             Spacer()
                                             Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
-                                                .font(.system(size: 16))
+                                                .font(.system(size: 18))
                                                 .gesture(TapGesture().onEnded {
                                                     checklog.toggle()
                                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -171,6 +171,7 @@ struct JailbreakView: View {
                                                     }
                                                 })
                                         }
+                                        .padding(.horizontal, 25)
                                     }
                                 }
                                 .opacity(1)
