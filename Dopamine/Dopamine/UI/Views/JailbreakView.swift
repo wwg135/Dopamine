@@ -205,13 +205,16 @@ struct JailbreakView: View {
                         if showLogView {
                             VStack {
                                 LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
+                                    .opacity(1)
+                                    .foregroundColor(Color.white)
                                 Text("Update_Log_Hint_Scrollable")
-                                    .minimumScaleFactor(0.5)
+                                    .opacity(1)
+                                    .minimumScaleFactor(0.5)  
                                     .foregroundColor(.white)
                                     .padding()
                             }
-                            .opacity(showLogView ? 1 : 0)
-                            .frame(height: 150)
+                            .background(Color.black.opacity(0.5))
+                            .background(MaterialView(.systemUltraThinMaterialDark))
                         } else {
                             VStack {
                                 VStack {
