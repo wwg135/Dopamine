@@ -133,7 +133,7 @@ struct JailbreakView: View {
                                         .padding(.vertical)
                                 }
                                 .opacity(1)
-                                .frame(maxWidth: 250, maxHeight: 300)
+                                .frame(maxWidth: 250, maxHeight: 340)
                             }
 
                             HStack {
