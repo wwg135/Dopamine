@@ -134,77 +134,50 @@ struct JailbreakView: View {
                                             .padding(.vertical)
                                         Spacer() 
                                         HStack {
-                                            Text(checklog ? "☑ 已阅读" : "□ 已阅读")
-                                                .font(.system(size: 16))
+                                            Text("Button_Cancel")
+                                                .font(.system(size: 20))
+                                                .gesture(TapGesture().onEnded {
+                                                    DispatchQueue.global(qos: .userInitiated).async {
+                                                        updateAvailable = false
+                                                    }
+                                                })
+                                                .padding(horizontal)
+                                            Spacer()
+                                            Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
+                                                .font(.system(size: 20))
                                                 .gesture(TapGesture().onEnded {
                                                     checklog.toggle()
                                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                                        showupdate = true
+                                                        showDownloadPage = true
+                                                        updateAvailable = false
+                                                        DispatchQueue.global(qos: .userInitiated).async {
+                                                            if requiresEnvironmentUpdate {
+                                                                updateState = .updating
+                                                                DispatchQueue.global(qos: .userInitiated).async {
+                                                                    updateEnvironment()
+                                                                }
+                                                            } else {
+                                                                updateState = .downloading
+                                                                Task {
+                                                                    do {
+                                                                        try await downloadUpdateAndInstall()
+                                                                        updateState = .updating
+                                                                    } catch {
+                                                                        showLogView = true
+                                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 })
-                                                .padding(.trailing)
-                                            Image(systemName: "book")
-                                                .font(.system(size: 16))
-                                                .foregroundColor(.green)
+                                                .padding(horizontal)
                                         }
                                         .multilineTextAlignment(.center)
                                     }
                                 }
                                 .opacity(1)
                                 .frame(maxWidth: 250, maxHeight: 340)
-                            }
-                            if showupdate {
-                                HStack {
-                                    Button {
-                                        updateAvailable = false
-                                    } label: {
-                                        Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 18))
-                                            .opacity(1)
-                                            .padding()
-                                            .frame(maxHeight: 45)
-                                    }
-                                    .fixedSize()
-                                    Button {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        showDownloadPage = true
-                                        updateAvailable = false
-                                        DispatchQueue.global(qos: .userInitiated).async {
-                                            if requiresEnvironmentUpdate {
-                                                updateState = .updating
-                                                DispatchQueue.global(qos: .userInitiated).async {
-                                                    updateEnvironment()
-                                                }
-                                            } else {
-                                                updateState = .downloading
-                                                Task {
-                                                    do {
-                                                        try await downloadUpdateAndInstall()
-                                                        updateState = .updating
-                                                    } catch {
-                                                        showLogView = true
-                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    } label: {
-                                        Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
-                                            .font(.system(size: 18))
-                                            .padding()
-                                            .frame(maxHeight: 45)
-                                            .background(MaterialView(.light)
-                                                .opacity(1)
-                                                .cornerRadius(8)
-                                            )
-                                            .foregroundColor(.white)
-                                    }
-                                    .fixedSize()
-                                }
-                                .padding(.vertical)
-                                .padding(.horizontal)
-                                .cornerRadius(16)
                             }
                         }
                         .padding(.vertical)
