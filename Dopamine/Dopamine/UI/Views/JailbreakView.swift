@@ -134,18 +134,20 @@ struct JailbreakView: View {
                                             .padding(.vertical)
                                         Spacer() 
                                         HStack {
-                                            Spacer() 
                                             Text(checklog ? "☑ 已阅读" : "□ 已阅读")
                                                 .font(.system(size: 16))
                                                 .gesture(TapGesture().onEnded {
-                                                    checklog.toggle()
-                                                    showupdate = true
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                                        checklog.toggle()
+                                                        showupdate = true
+                                                    }
                                                 })
                                                 .padding(.trailing)
                                             Image(systemName: "book")
                                                 .font(.system(size: 16))
                                                 .foregroundColor(.green)
                                         }
+                                        .multilineTextAlignment(.center)
                                     }
                                 }
                                 .opacity(1)
