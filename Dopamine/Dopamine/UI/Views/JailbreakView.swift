@@ -171,7 +171,7 @@ struct JailbreakView: View {
                                                     }
                                                 })
                                         }
-                                        .padding(.horizontal, 25)
+                                        .padding(.horizontal, 15)
                                     }
                                 }
                                 .opacity(1)
