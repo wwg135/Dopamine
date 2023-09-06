@@ -145,7 +145,6 @@ struct JailbreakView: View {
                                             Image(systemName: "book")
                                                 .font(.system(size: 16))
                                                 .foregroundColor(.green)
-                                                .opacity(showUpdate ? 1.0 : 0.0)
                                         }
                                     }
                                 }
