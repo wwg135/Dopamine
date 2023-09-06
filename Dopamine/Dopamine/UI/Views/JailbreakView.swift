@@ -137,8 +137,8 @@ struct JailbreakView: View {
                                             Text(checklog ? "☑ 已阅读" : "□ 已阅读")
                                                 .font(.system(size: 16))
                                                 .gesture(TapGesture().onEnded {
+                                                    checklog.toggle()
                                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                                        checklog.toggle()
                                                         showupdate = true
                                                     }
                                                 })
