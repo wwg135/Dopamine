@@ -58,8 +58,8 @@ struct JailbreakView: View {
     @State var showDownloadPage = false
     @State var showLogView = false
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
-    @State var isCountdownVisible = true
-    @State var countdownSeconds = 5
+    @State var checklog = false
+    @State var showupdate = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -127,58 +127,68 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                        .font(.system(size: 16))
-                                        .multilineTextAlignment(.center)
-                                        .padding(.vertical)
+                                    VStack {
+                                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                            .font(.system(size: 16))
+                                            .multilineTextAlignment(.center)
+                                            .padding(.vertical)
+                                        Spacer() 
+                                        HStack {
+                                            Spacer() 
+                                            Text(checklog ? "☑ 已阅读" : "□ 已阅读")
+                                                .font(.system(size: 16))
+                                                .gesture(TapGesture().onEnded {
+                                                    checklog.toggle()
+                                                    showupdate = true
+                                                })
+                                                .padding(.trailing)
+                                            Image(systemName: "book")
+                                                .font(.system(size: 16))
+                                                .foregroundColor(.green)
+                                                .opacity(showUpdate ? 1.0 : 0.0)
+                                        }
+                                    }
                                 }
                                 .opacity(1)
                                 .frame(maxWidth: 250, maxHeight: 340)
                             }
-
-                            HStack {
-                                Button {
-                                    updateAvailable = false
-                                } label: {
-                                    Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 18))
-                                        .opacity(1)
-                                        .padding()
-                                        .frame(maxHeight: 45)
-                                }
-                                .fixedSize()
-                                Button {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    showDownloadPage = true
-                                    updateAvailable = false
-                                    DispatchQueue.global(qos: .userInitiated).async {
-                                        if requiresEnvironmentUpdate {
-                                            updateState = .updating
-                                            DispatchQueue.global(qos: .userInitiated).async {
-                                                updateEnvironment()
-                                            }
-                                        } else {
-                                            updateState = .downloading
-                                            Task {
-                                                do {
-                                                    try await downloadUpdateAndInstall()
-                                                    updateState = .updating
-                                                } catch {
-                                                    showLogView = true
-                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                            if showupdate {
+                                HStack {
+                                    Button {
+                                        updateAvailable = false
+                                    } label: {
+                                        Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 18))
+                                            .opacity(1)
+                                            .padding()
+                                            .frame(maxHeight: 45)
+                                    }
+                                    .fixedSize()
+                                    Button {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        showDownloadPage = true
+                                        updateAvailable = false
+                                        DispatchQueue.global(qos: .userInitiated).async {
+                                            if requiresEnvironmentUpdate {
+                                                updateState = .updating
+                                                DispatchQueue.global(qos: .userInitiated).async {
+                                                    updateEnvironment()
+                                                }
+                                            } else {
+                                                updateState = .downloading
+                                                Task {
+                                                    do {
+                                                        try await downloadUpdateAndInstall()
+                                                        updateState = .updating
+                                                    } catch {
+                                                        showLogView = true
+                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                } label: {
-                                    if isCountdownVisible {
-                                        Text("\(countdownSeconds)s")
-                                            .font(.system(size: 18))
-                                            .padding()
-                                            .frame(maxHeight: 45)
-                                            .foregroundColor(.white)
-                                    } else {
+                                    } label: {
                                         Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
                                             .font(.system(size: 18))
                                             .padding()
@@ -189,12 +199,12 @@ struct JailbreakView: View {
                                             )
                                             .foregroundColor(.white)
                                     }
+                                    .fixedSize()
                                 }
-                                .fixedSize()
+                                .padding(.vertical)
+                                .padding(.horizontal)
+                                .cornerRadius(16)
                             }
-                            .padding(.vertical)
-                            .padding(.horizontal)
-                            .cornerRadius(16)
                         }
                         .padding(.vertical)
                         .background(Color.black.opacity(0.25))
@@ -205,16 +215,6 @@ struct JailbreakView: View {
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 420)
-                    .onAppear {
-                        countdownSeconds = 5
-                        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
-                            countdownSeconds -= 1
-                            if countdownSeconds == 0 {
-                                timer.invalidate()
-                                isCountdownVisible = false
-                            }
-                        }
-                    }
                 }
                             
                 if showDownloadPage {
