@@ -141,7 +141,7 @@ struct JailbreakView: View {
                                                         updateAvailable = false
                                                     }
                                                 })
-                                                .padding(horizontal)
+                                                .padding(.horizontal)
                                             Spacer()
                                             Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
                                                 .font(.system(size: 20))
@@ -171,9 +171,8 @@ struct JailbreakView: View {
                                                         }
                                                     }
                                                 })
-                                                .padding(horizontal)
+                                                .padding(.horizontal)
                                         }
-                                        .multilineTextAlignment(.center)
                                     }
                                 }
                                 .opacity(1)
