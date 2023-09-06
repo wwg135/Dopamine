@@ -58,7 +58,6 @@ struct JailbreakView: View {
     @State var showDownloadPage = false
     @State var showLogView = false
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
-    @State var isButtonEnabled = true
     @State var isCountdownVisible = true
     @State var countdownSeconds = 5
     
@@ -173,25 +172,24 @@ struct JailbreakView: View {
                                         }
                                     }
                                 } label: {
-                                    HStack {
+                                    if isCountdownVisible {
+                                        Text("\(countdownSeconds)s")
+                                            .font(.system(size: 18))
+                                            .padding()
+                                            .frame(maxHeight: 45)
+                                            .foregroundColor(.white)
+                                    } else {
                                         Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
                                             .font(.system(size: 18))
                                             .padding()
                                             .frame(maxHeight: 45)
                                             .background(MaterialView(.light)
-                                            .opacity(1)
+                                                .opacity(1)
                                                 .cornerRadius(8)
                                             )
-                                            .foregroundColor(isButtonEnabled ? .white : .gray) // 设置按钮的前景色
-
-                                        if isCountdownVisible {
-                                            Text("\(countdownSeconds)s")
-                                                .font(.system(size: 18))
-                                                .foregroundColor(.white)
-                                        }
+                                            .foregroundColor(.white)
                                     }
                                 }
-                                .disabled(!isButtonEnabled) // 根据按钮的可用状态设置禁用状态
                                 .fixedSize()
                             }
                             .padding(.vertical)
@@ -209,13 +207,11 @@ struct JailbreakView: View {
                     .frame(maxWidth: 280, maxHeight: 420)
                     .onAppear {
                         countdownSeconds = 5
-                        isButtonEnabled = false // 将按钮禁用
                         Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
                             countdownSeconds -= 1
                             if countdownSeconds == 0 {
                                 timer.invalidate()
-                                isButtonEnabled = true // 倒计时结束后将按钮重新启用
-                                isCountdownVisible = false // 隐藏倒计时文本
+                                isCountdownVisible = false
                             }
                         }
                     }
