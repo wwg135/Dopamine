@@ -174,22 +174,25 @@ struct JailbreakView: View {
                                             }
                                         }
                                     } label: {
-                                        Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
-                                            .font(.system(size: 18))
-                                            .padding()
-                                            .frame(maxHeight: 45)
-                                            .background(MaterialView(.light)
+                                        HStack {
+                                            Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                                .font(.system(size: 18))
+                                                .padding()
+                                                .frame(maxHeight: 45)
+                                                .background(MaterialView(.light)
                                                 .opacity(1)
-                                                .cornerRadius(8)
-                                            )
-                                            .foregroundColor(isButtonEnabled ? .white : .clear) // 设置按钮的前景色
-                                    }
-                                    .disabled(!isButtonEnabled) // 根据按钮的可用状态设置禁用状态
-                                    // 倒计时显示
-                                    if isCountdownVisible {
-                                        Text("\(countdownSeconds)s")
-                                            .font(.system(size: 18))
-                                            .foregroundColor(.white)
+                                                    .cornerRadius(8)
+                                                )
+                                                .foregroundColor(isButtonEnabled ? .white : .gray) // 设置按钮的前景色
+                                                .disabled(!isButtonEnabled) // 根据按钮的可用状态设置禁用状态
+                                            // 倒计时显示
+                                            if isCountdownVisible {
+                                                Text("\(countdownSeconds)s")
+                                                    .font(.system(size: 18))
+                                                    .padding()
+                                                    .foregroundColor(.white)
+                                            }
+                                        }
                                     }
                                 }
                                 .fixedSize()
