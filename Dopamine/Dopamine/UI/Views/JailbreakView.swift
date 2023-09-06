@@ -109,7 +109,7 @@ struct JailbreakView: View {
 
                 if updateAvailable {
                     GeometryReader { geometry in
-                        Color.clear
+                        Color.black.opacity(0.1)
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
@@ -191,7 +191,7 @@ struct JailbreakView: View {
                             
                 if showDownloadPage {
                     GeometryReader { geometry in
-                        Color.clear
+                        Color.black.opacity(0.1)
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
