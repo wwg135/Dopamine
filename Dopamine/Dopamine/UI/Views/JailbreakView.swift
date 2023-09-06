@@ -58,6 +58,9 @@ struct JailbreakView: View {
     @State var showDownloadPage = false
     @State var showLogView = false
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
+    @State var isButtonEnabled = true
+    @State var isCountdownVisible = true
+    @State var countdownSeconds = 5
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -146,39 +149,58 @@ struct JailbreakView: View {
                                         .frame(maxHeight: 45)
                                 }
                                 .fixedSize()
-                                Button {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    showDownloadPage = true
-                                    updateAvailable = false
-                                    DispatchQueue.global(qos: .userInitiated).async {
-                                        if requiresEnvironmentUpdate {
-                                            updateState = .updating
-                                            DispatchQueue.global(qos: .userInitiated).async {
-                                                updateEnvironment()
-                                            }
-                                        } else {
-                                            updateState = .downloading
-                                            Task {
-                                                do {
-                                                    try await downloadUpdateAndInstall()
-                                                    updateState = .updating
-                                                } catch {
-                                                    showLogView = true
-                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                HStack {
+                                    Button {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        showDownloadPage = true
+                                        updateAvailable = false
+                                        isButtonEnabled = false // 将按钮禁用
+                                        DispatchQueue.global(qos: .userInitiated).async {
+                                            if requiresEnvironmentUpdate {
+                                                updateState = .updating
+                                                DispatchQueue.global(qos: .userInitiated).async {
+                                                    updateEnvironment()
+                                                }
+                                            } else {
+                                                updateState = .downloading
+                                                Task {
+                                                    do {
+                                                        try await downloadUpdateAndInstall()
+                                                        updateState = .updating
+                                                    } catch {
+                                                        showLogView = true
+                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                    }
                                                 }
                                             }
                                         }
+                                        countdownSeconds = 5
+                                        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+                                            countdownSeconds -= 1
+                                            if countdownSeconds == 0 {
+                                                timer.invalidate()
+                                                isButtonEnabled = true // 倒计时结束后将按钮重新启用
+                                                isCountdownVisible = false // 隐藏倒计时文本
+                                            }
+                                        }
+                                    } label: {
+                                        Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                            .font(.system(size: 18))
+                                            .padding()
+                                            .frame(maxHeight: 45)
+                                            .background(MaterialView(.light)
+                                                .opacity(1)
+                                                .cornerRadius(8)
+                                            )
+                                            .foregroundColor(isButtonEnabled ? .white : .clear) // 设置按钮的前景色
                                     }
-                                } label: {
-                                    Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
-                                        .font(.system(size: 18))
-                                        .foregroundColor(.white)
-                                        .padding()
-                                        .frame(maxHeight: 45)
-                                        .background(MaterialView(.light)
-                                            .opacity(1)
-                                            .cornerRadius(8)
-                                        )
+                                    .disabled(!isButtonEnabled) // 根据按钮的可用状态设置禁用状态
+                                    // 倒计时显示
+                                    if isCountdownVisible {
+                                        Text("\(countdownSeconds)s")
+                                            .font(.system(size: 18))
+                                            .foregroundColor(.white)
+                                    }
                                 }
                                 .fixedSize()
                             }
