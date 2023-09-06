@@ -154,7 +154,6 @@ struct JailbreakView: View {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                         showDownloadPage = true
                                         updateAvailable = false
-                                        isButtonEnabled = false // 将按钮禁用
                                         DispatchQueue.global(qos: .userInitiated).async {
                                             if requiresEnvironmentUpdate {
                                                 updateState = .updating
@@ -172,15 +171,6 @@ struct JailbreakView: View {
                                                         Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                     }
                                                 }
-                                            }
-                                        }
-                                        countdownSeconds = 5
-                                        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
-                                            countdownSeconds -= 1
-                                            if countdownSeconds == 0 {
-                                                timer.invalidate()
-                                                isButtonEnabled = true // 倒计时结束后将按钮重新启用
-                                                isCountdownVisible = false // 隐藏倒计时文本
                                             }
                                         }
                                     } label: {
@@ -217,6 +207,18 @@ struct JailbreakView: View {
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 420)
+                    .onAppear {
+                        countdownSeconds = 5
+                        isButtonEnabled = false // 将按钮禁用
+                        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+                            countdownSeconds -= 1
+                            if countdownSeconds == 0 {
+                                timer.invalidate()
+                                isButtonEnabled = true // 倒计时结束后将按钮重新启用
+                                isCountdownVisible = false // 隐藏倒计时文本
+                            }
+                        }
+                    }
                 }
                             
                 if showDownloadPage {
