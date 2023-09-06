@@ -114,6 +114,8 @@
 
 "Title_Supported_iOS_Versions" = "iOS 15.0 - 15.4.1 | A12 - A15 、 M1";
 
+"Update_Log_Hint_Scrollable" = "滚动查看日志";
+
 "Update_Status_Downloading" = "正在下载更新...";
 
 "Update_Status_Installing" = "正在安装更新...";
