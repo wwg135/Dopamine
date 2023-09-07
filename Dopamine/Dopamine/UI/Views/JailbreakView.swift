@@ -137,6 +137,7 @@ struct JailbreakView: View {
                                             Text("Button_Cancel")
                                                 .font(.system(size: 18))
                                                 .gesture(TapGesture().onEnded {
+                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     DispatchQueue.global(qos: .userInitiated).async {
                                                         updateAvailable = false
                                                     }
@@ -146,6 +147,7 @@ struct JailbreakView: View {
                                                 .font(.system(size: 18))
                                                 .gesture(TapGesture().onEnded {
                                                     checklog.toggle()
+                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                                         showDownloadPage = true
                                                         updateAvailable = false
