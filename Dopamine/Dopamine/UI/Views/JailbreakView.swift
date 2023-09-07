@@ -197,7 +197,7 @@ struct JailbreakView: View {
                             .contentShape(Rectangle())
                             .allowsHitTesting(false)
                             .onTapGesture {
-                                updateAvailable = false
+                                showDownloadPage = false
                             }
                     }
                     .ignoresSafeArea()
