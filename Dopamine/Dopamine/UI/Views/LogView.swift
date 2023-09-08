@@ -131,6 +131,7 @@ struct LogView: View {
                         if advanced {
                             Text(logger.log)
                                 .foregroundColor(.white)
+                                .font(.system(size: 16))
                                 .frame(minWidth: 0,
                                        maxWidth: .infinity,
                                        minHeight: 0,
