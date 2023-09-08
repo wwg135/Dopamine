@@ -328,7 +328,7 @@ struct JailbreakView: View {
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
             }
-            .animation(.default)
+            .animation(.spring(), value: updateAvailable)
         }
         .onAppear {
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
