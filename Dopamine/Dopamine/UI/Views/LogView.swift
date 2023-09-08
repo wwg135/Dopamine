@@ -56,7 +56,7 @@ struct LogView: View {
                             .foregroundColor(.yellow)
                     }
                     Text(log.text)
-                        .font(.system(size: 18))
+                        .font(.system(size: 17))
                         .foregroundColor(log.type == .error ? .yellow : .white)
                         .animation(.spring().speed(1.5), value: isLast)
                         .drawingGroup()
