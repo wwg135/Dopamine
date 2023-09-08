@@ -97,6 +97,7 @@ struct LogView: View {
                                     let frame = proxy1.frame(in: .global)
                                     ForEach(Array(logger.userFriendlyLogs.enumerated()), id: \.element.id) { (i,log) in
                                         LogRow(log: log, scrollViewFrame: frame, index: i, lastIndex: logger.userFriendlyLogs.count - 1)
+                                            .font(.system(size: 16))
                                     }
                                 }
                                 .padding(.horizontal, 32)
