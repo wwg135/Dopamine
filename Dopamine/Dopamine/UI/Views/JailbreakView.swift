@@ -192,7 +192,7 @@ struct JailbreakView: View {
                         }
                         .padding(.vertical)
                         .background(Color.black.opacity(0.25))
-                        .animation(.spring(), value: updateState)
+                        .animation(.spring(), value: updateAvailable)
                         .background(MaterialView(.systemUltraThinMaterialDark))
                     }
                     .zIndex(2)
