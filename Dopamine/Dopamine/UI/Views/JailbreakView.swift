@@ -179,14 +179,14 @@ struct JailbreakView: View {
                                         .onChange(of: updateAvailable) { updateAvailable in
                                             if updateAvailable {
                                                 withAnimation {
-                                                    scrollViewProxy.scrollTo(nil, anchor: .bottom)
+                                                    scrollViewProxy.scrollTo(anchor: .bottom)
                                                 }
                                             }
                                         }
                                     }
                                 }
                                 .opacity(1)
-                                .animation(.spring().speed(0.5))
+                                .animation(.spring().speed(0.5), value: updateState)
                                 .frame(maxWidth: 250, maxHeight: 360)
                             }
                         }
