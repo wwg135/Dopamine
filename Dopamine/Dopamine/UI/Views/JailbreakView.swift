@@ -174,12 +174,13 @@ struct JailbreakView: View {
                                                         }
                                                     })
                                             }
+                                            .id("scrolllog")
                                             .padding(.horizontal, 15)
                                         }
                                         .onChange(of: updateAvailable) { updateAvailable in
                                             if updateAvailable {
                                                 withAnimation {
-                                                    scrollViewProxy.scrollTo(anchor: .bottom)
+                                                    scrollViewProxy.scrollTo("scrolllog", anchor: .bottom)
                                                 }
                                             }
                                         }
@@ -327,7 +328,7 @@ struct JailbreakView: View {
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
             }
-            .animation(.default)
+            .animation(.default, value: UpdateState == nil)
         }
         .onAppear {
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
