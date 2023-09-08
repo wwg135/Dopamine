@@ -126,8 +126,8 @@ struct JailbreakView: View {
                                 Divider()
                                     .background(.white)
                                     .padding(.horizontal, 25)
-                                ScrollView {
-                                    ScrollViewReader { reader in
+                                ScrollViewReader { reader in
+                                    ScrollView {
                                         VStack {
                                             Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                                 .font(.system(size: 16))
