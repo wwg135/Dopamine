@@ -56,7 +56,7 @@ struct LogView: View {
                             .foregroundColor(.yellow)
                     }
                     Text(log.text)
-                        .minimumScaleFactor(0.5)
+                        .font(.system(size: 16))
                         .foregroundColor(log.type == .error ? .yellow : .white)
                         .animation(.spring().speed(1.5), value: isLast)
                         .drawingGroup()
@@ -97,7 +97,6 @@ struct LogView: View {
                                     let frame = proxy1.frame(in: .global)
                                     ForEach(Array(logger.userFriendlyLogs.enumerated()), id: \.element.id) { (i,log) in
                                         LogRow(log: log, scrollViewFrame: frame, index: i, lastIndex: logger.userFriendlyLogs.count - 1)
-                                            .font(.system(size: 16))
                                     }
                                 }
                                 .padding(.horizontal, 32)
