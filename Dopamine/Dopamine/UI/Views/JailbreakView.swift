@@ -127,7 +127,7 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    ScrollViewReader { scrollViewProxy in
+                                    ScrollViewReader { reader in
                                         VStack {
                                             Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                                 .font(.system(size: 16))
@@ -174,13 +174,13 @@ struct JailbreakView: View {
                                                         }
                                                     })
                                             }
-                                            .id("scrolllog")
                                             .padding(.horizontal, 15)
                                         }
+                                        .id("RegularLogs")
                                         .onChange(of: updateAvailable) { updateAvailable in
                                             if updateAvailable {
                                                 withAnimation {
-                                                    scrollViewProxy.scrollTo("scrolllog", anchor: .bottom)
+                                                    reader.scrollTo("RegularLogs", anchor: .bottom)
                                                 }
                                             }
                                         }
@@ -328,7 +328,7 @@ struct JailbreakView: View {
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
             }
-            .animation(.default, value: UpdateState == nil)
+            .animation(.default)
         }
         .onAppear {
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
