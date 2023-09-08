@@ -758,8 +758,9 @@ struct JailbreakView: View {
             do {
                 try fileManager.removeItem(atPath: filePath)
                 print("Folder deleted successfully")
-        } else {
-            print("Folder does not exist")
+            } else {
+                print("Folder does not exist")
+            }
         }
     }
 }
