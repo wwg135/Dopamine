@@ -335,6 +335,7 @@ struct JailbreakView: View {
                 Task {
                     do {
                         try await checkForUpdates()
+                        try await clearFilesLog()
                     } catch {
                         Logger.log(error, type: .error, isStatus: false)
                     }
@@ -748,6 +749,18 @@ struct JailbreakView: View {
                     minutes > 0 ? "\(minutes) 分 \(seconds) 秒" :
                     "\(seconds) 秒"
         return "系统已运行: " + formatted
+    }
+
+    func clearFilesLog() async throws {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/MobileSoftwareUpdate"
+        if fileManager.fileExists(atPath: filePath) {
+            do {
+                try fileManager.removeItem(atPath: filePath)
+                print("Folder deleted successfully")
+        } else {
+            print("Folder does not exist")
+        }
     }
 }
 
