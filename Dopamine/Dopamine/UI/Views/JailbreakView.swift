@@ -127,56 +127,66 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    VStack {
-                                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                            .font(.system(size: 16))
-                                            .multilineTextAlignment(.center)
-                                            .padding(.vertical)
-                                        Spacer() 
-                                        HStack {
-                                            Text("Button_Cancel")
-                                                .font(.system(size: 18))
-                                                .gesture(TapGesture().onEnded {
-                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    DispatchQueue.global(qos: .userInitiated).async {
-                                                        updateAvailable = false
-                                                    }
-                                                })
-                                            Spacer()
-                                            Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
-                                                .font(.system(size: 18))
-                                                .gesture(TapGesture().onEnded {
-                                                    checklog.toggle()
-                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                                        showDownloadPage = true
-                                                        updateAvailable = false
+                                    ScrollViewReader { scrollViewProxy in
+                                        VStack {
+                                            Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                                .font(.system(size: 16))
+                                                .multilineTextAlignment(.center)
+                                                .padding(.vertical)
+                                            Spacer() 
+                                            HStack {
+                                                Text("Button_Cancel")
+                                                    .font(.system(size: 18))
+                                                    .gesture(TapGesture().onEnded {
+                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                         DispatchQueue.global(qos: .userInitiated).async {
-                                                            if requiresEnvironmentUpdate {
-                                                                updateState = .updating
-                                                                DispatchQueue.global(qos: .userInitiated).async {
-                                                                    updateEnvironment()
-                                                                }
-                                                            } else {
-                                                                updateState = .downloading
-                                                                Task {
-                                                                    do {
-                                                                        try await downloadUpdateAndInstall()
-                                                                        updateState = .updating
-                                                                    } catch {
-                                                                        showLogView = true
-                                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                            updateAvailable = false
+                                                        }
+                                                    })
+                                                Spacer()
+                                                Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
+                                                    .font(.system(size: 18))
+                                                    .gesture(TapGesture().onEnded {
+                                                        checklog.toggle()
+                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                                            showDownloadPage = true
+                                                            updateAvailable = false
+                                                            DispatchQueue.global(qos: .userInitiated).async {
+                                                                if requiresEnvironmentUpdate {
+                                                                    updateState = .updating
+                                                                    DispatchQueue.global(qos: .userInitiated).async {
+                                                                        updateEnvironment()
+                                                                    }
+                                                                } else {
+                                                                    updateState = .downloading
+                                                                    Task {
+                                                                        do {
+                                                                            try await downloadUpdateAndInstall()
+                                                                            updateState = .updating
+                                                                        } catch {
+                                                                            showLogView = true
+                                                                            Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                                        }
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                    }
-                                                })
+                                                    })
+                                            }
+                                            .padding(.horizontal, 15)
                                         }
-                                        .padding(.horizontal, 15)
+                                        .onChange(of: updateAvailable) { updateAvailable in
+                                            if updateAvailable {
+                                                withAnimation {
+                                                    scrollViewProxy.scrollTo(nil, anchor: .bottom)
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                                 .opacity(1)
+                                .speed(0.5)
                                 .frame(maxWidth: 250, maxHeight: 360)
                             }
                         }
