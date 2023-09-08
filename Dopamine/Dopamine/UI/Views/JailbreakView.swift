@@ -109,11 +109,11 @@ struct JailbreakView: View {
 
                 if updateAvailable {
                     GeometryReader { geometry in
-                        Color.black.opacity(0.1)
+                        Color.black.opacity(0.15)
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(false)
+                            .allowsHitTesting(true)
                     }
                     .ignoresSafeArea()
                     ZStack {
@@ -192,11 +192,11 @@ struct JailbreakView: View {
                             
                 if showDownloadPage {
                     GeometryReader { geometry in
-                        Color.black.opacity(0.1)
+                        Color.black.opacity(0.15)
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(false)
+                            .allowsHitTesting(true)
                             .onTapGesture {
                                 showDownloadPage = false
                             }
