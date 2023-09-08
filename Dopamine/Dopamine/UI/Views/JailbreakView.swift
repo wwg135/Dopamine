@@ -132,8 +132,8 @@ struct JailbreakView: View {
                                             Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                                 .font(.system(size: 16))
                                                 .multilineTextAlignment(.center)
-                                                .padding(.vertical)
-                                            Spacer() 
+                                            Spacer()
+                                                .padding(.vertical) 
                                             HStack {
                                                 Text("Button_Cancel")
                                                     .font(.system(size: 18))
