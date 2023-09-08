@@ -186,7 +186,7 @@ struct JailbreakView: View {
                                     }
                                 }
                                 .opacity(1)
-                                .animation(.spring().speed(0.5), value: updateState)
+                                .animation(.spring().speed(0.5), value: updateAvailable)
                                 .frame(maxWidth: 250, maxHeight: 360)
                             }
                         }
