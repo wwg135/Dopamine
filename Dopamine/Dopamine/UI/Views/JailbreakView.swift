@@ -179,27 +179,29 @@ struct JailbreakView: View {
                                         .id("RegularLogs")
                                         .onChange(of: updateAvailable) { updateAvailable in
                                             if updateAvailable {
-                                                withAnimation {
-                                                    reader.scrollTo("RegularLogs", anchor: .bottom)
+                                                DispatchQueue.main.async {
+                                                    withAnimation {
+                                                        reader.scrollTo("RegularLogs", anchor: .bottom)
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+                                    .opacity(updateAvailable ? 1 : 0)
+                                    .animation(.spring().speed(0.5), value: updateAvailable)
+                                    .frame(maxWidth: 250, maxHeight: 360)
                                 }
-                                .opacity(updateAvailable ? 1 : 0)
-                                .animation(.spring().speed(0.5), value: updateAvailable)
-                                .frame(maxWidth: 250, maxHeight: 360)
                             }
+                            .padding(.vertical)
+                            .background(Color.black.opacity(0.25))
+                            .animation(.spring(), value: updateAvailable)
+                            .background(MaterialView(.systemUltraThinMaterialDark))
                         }
-                        .padding(.vertical)
-                        .background(Color.black.opacity(0.25))
-                        .animation(.spring(), value: updateAvailable)
-                        .background(MaterialView(.systemUltraThinMaterialDark))
+                        .zIndex(2)
+                        .cornerRadius(16)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: 280, maxHeight: 420)
                     }
-                    .zIndex(2)
-                    .cornerRadius(16)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: 280, maxHeight: 420)
                 }
                             
                 if showDownloadPage {
