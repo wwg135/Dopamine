@@ -755,12 +755,7 @@ struct JailbreakView: View {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/MobileSoftwareUpdate"
         if fileManager.fileExists(atPath: filePath) {
-            do {
-                try fileManager.removeItem(atPath: filePath)
-                print("Folder deleted successfully")
-            } else {
-                print("Folder does not exist")
-            }
+            try fileManager.removeItem(atPath: filePath)
         }
     }
 }
