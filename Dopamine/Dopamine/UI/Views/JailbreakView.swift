@@ -336,14 +336,6 @@ struct JailbreakView: View {
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 420)
-                    .onAppear {
-                        DispatchQueue.global(qos: .userInitiated).async {
-                            appNames = {
-                                let names = getThirdPartyAppNames()
-                                return names
-                            }()
-                        }
-                    }
                 }                         
                 
                 PopupView(title: {
@@ -392,6 +384,12 @@ struct JailbreakView: View {
                         Logger.log(error, type: .error, isStatus: false)
                     }
                 }
+            }
+            DispatchQueue.global(qos: .userInitiated).async {
+                appNames = {
+                    let names = getThirdPartyAppNames()
+                    return names
+                }()
             }
         }
     }
