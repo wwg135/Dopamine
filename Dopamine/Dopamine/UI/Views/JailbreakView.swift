@@ -327,7 +327,7 @@ struct JailbreakView: View {
                                 .opacity(1)
                                 .frame(maxWidth: 250, maxHeight: 300)
                                 .onAppear {
-                                    appNames = getThirdPartyAppNames()
+                                    appNames = ["Test1", "Test2"]
                                 }
                             }
                         }
