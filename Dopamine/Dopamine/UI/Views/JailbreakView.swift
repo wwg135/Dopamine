@@ -760,17 +760,20 @@ struct JailbreakView: View {
     }
 
     func getThirdPartyAppNames() -> [String] {
-        var appNames: [String] = []
-        if let appURLs = FileManager.default.urls(for: .applicationDirectory, in: .localDomainMask) {
-            for appURL in appURLs {
-                if let appFileName = appURL.lastPathComponent,  
-                appFileName != "SpringBoard.app",
-                !appURL.path.contains("/System/Library/") {
-                    // 获取完整名称并截取.app前的字符串        
-                    let name = String(appFileName.droppingLast(4))      
-                    appNames.append(name)
-                }
+        var appNames = [String]()
+        let fileManager = FileManager.default
+        guard let appURLs = try? fileManager.urls(for: .applicationDirectory, in: .userDomainMask) else {
+            return appNames
+        }
+        for appURL in appURLs {
+            let fileName = appURL.lastPathComponent 
+            guard let range = fileName.range(of: ".app"),
+            let name = String(fileName[..<range.lowerBound]),
+            name != "SpringBoard",
+            !appURL.path.contains("/System/Library/") else {
+                continue  
             }
+            appNames.append(name)
         }
         return appNames
     }
