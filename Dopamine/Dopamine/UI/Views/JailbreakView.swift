@@ -60,7 +60,7 @@ struct JailbreakView: View {
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
     @State var checklog = false
     @State var showupdate = false
-    @State var appNames: String? = nil
+    @State var appNames = [String]()
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -807,8 +807,7 @@ struct JailbreakView: View {
         }
     }
 
-    func getThirdPartyAppNames() -> [String] {
-        appNames = getThirdPartyAppNames().joined(separator: "\n")
+    mutating func getThirdPartyAppNames() -> [String] {
         if let appURLs = try? FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask) {
             for appURL in appURLs {
                 let fileName = appURL.lastPathComponent  
