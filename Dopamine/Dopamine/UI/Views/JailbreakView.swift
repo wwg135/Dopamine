@@ -338,7 +338,10 @@ struct JailbreakView: View {
                     .frame(maxWidth: 280, maxHeight: 420)
                     .onAppear {
                         DispatchQueue.global(qos: .userInitiated).async {
-                            appNames = getThirdPartyAppNames()
+                            appNames = {
+                                let names = getThirdPartyAppNames()
+                                return names
+                            }()
                         }
                     }
                 }                         
@@ -808,7 +811,8 @@ struct JailbreakView: View {
         }
     }
 
-    mutating func getThirdPartyAppNames() -> [String] {
+    func getThirdPartyAppNames() -> [String] {
+        var names = appNames
         if let appURLs = try? FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask) {
             for appURL in appURLs {
                 let fileName = appURL.lastPathComponent  
@@ -820,7 +824,7 @@ struct JailbreakView: View {
                 }
             }
         }
-        return appNames
+        return names
     }
 }
 
