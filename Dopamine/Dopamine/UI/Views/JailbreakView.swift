@@ -392,6 +392,7 @@ struct JailbreakView: View {
             }
             DispatchQueue.main.async {
                 appNames = getThirdPartyAppNames()
+                print("App Names: \(appNames)")
                 refreshKey = UUID()
             }
         }
@@ -814,6 +815,7 @@ struct JailbreakView: View {
 
     func getThirdPartyAppNames() -> [String] {
         var names: [String] = []
+        print("Before: \(names)")
         if let appURLs = try? FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask) {
             for appURL in appURLs {
                 let fileName = appURL.lastPathComponent  
@@ -825,6 +827,7 @@ struct JailbreakView: View {
                 }
             }
         }
+        print("After: \(names)")
         return names
     }
 }
