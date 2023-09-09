@@ -316,7 +316,8 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 25)
                                 ScrollView {
                                     VStack {
-                                        Text(try! AttributedString(markdown: appNames!, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                        let appNamesString = appNames.joined(separator: "\n")
+                                        Text(try! AttributedString(markdown: appNamesString, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                             .font(.system(size: 16))
                                             .multilineTextAlignment(.center)
                                             .padding(.vertical)
