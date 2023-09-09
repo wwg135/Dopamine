@@ -326,9 +326,6 @@ struct JailbreakView: View {
                                 }
                                 .opacity(1)
                                 .frame(maxWidth: 250, maxHeight: 300)
-                                .onAppear {
-                                    getThirdPartyAppNames()
-                                }
                             }
                         }
                         .padding(.vertical)
@@ -388,6 +385,9 @@ struct JailbreakView: View {
                         Logger.log(error, type: .error, isStatus: false)
                     }
                 }
+            }
+            DispatchQueue.main.async {
+                appNames = getThirdPartyAppNames()
             }
         }
     }
