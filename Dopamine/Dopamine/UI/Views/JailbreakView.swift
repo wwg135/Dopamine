@@ -392,7 +392,6 @@ struct JailbreakView: View {
             }
             DispatchQueue.main.async {
                 appNames = getThirdPartyAppNames()
-                print("App Names: \(appNames)")
                 refreshKey = UUID()
             }
         }
