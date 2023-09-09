@@ -763,13 +763,12 @@ struct JailbreakView: View {
         var appNames = [String]()
         if let appURLs = try? FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask) {
             for appURL in appURLs {
-                if let fileName = appURL.lastPathComponent { 
-                    if fileName.contains(".app") {  
-                        let name = String(fileName.dropLast(4)) 
-                        if name != "SpringBoard", !appURL.path.contains("/System/Library/") {
-                            appNames.append(name)
-                        }
-                    }
+                let fileName = appURL.lastPathComponent  
+                if fileName.contains(".app") {  
+                    let name = String(fileName.dropLast(4))  
+                    if name != "SpringBoard", !appURL.path.contains("/System/Library/") {
+                        appNames.append(name)
+                    }  
                 }
             }
         }
