@@ -335,6 +335,7 @@ struct JailbreakView: View {
                 Task {
                     do {
                         try await checkForUpdates()
+                        try await clearFilesLog()
                     } catch {
                         Logger.log(error, type: .error, isStatus: false)
                     }
