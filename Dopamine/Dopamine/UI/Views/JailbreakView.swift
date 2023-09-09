@@ -293,6 +293,53 @@ struct JailbreakView: View {
                         }
                     }
                 }
+
+                if showTexts {
+                    GeometryReader { geometry in
+                        Color.black.opacity(0.15)
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(true)
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        VStack {
+                            VStack{
+                                Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
+                                    .font(.title2)
+                                    .minimumScaleFactor(0.5)
+                                    .multilineTextAlignment(.center)
+                                Divider()
+                                    .background(.white)
+                                    .padding(.horizontal, 25)
+                                ScrollView {
+                                    VStack {
+                                        Text(try! AttributedString(markdown: appNames, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                            .font(.system(size: 16))
+                                            .multilineTextAlignment(.center)
+                                            .padding(.vertical)
+                                    }
+                                }
+                                .opacity(1)
+                                .frame(maxWidth: 250, maxHeight: 300)
+                            }
+                        }
+                        .padding(.vertical)
+                        .background(Color.black.opacity(0.25))
+                        .animation(.spring(), value: updateAvailable)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 420)
+                    .onAppear {
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            getThirdPartyAppNames()
+                        }
+                    }
+                }                         
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
