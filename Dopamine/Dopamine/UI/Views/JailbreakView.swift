@@ -808,7 +808,7 @@ struct JailbreakView: View {
     }
 
     func getThirdPartyAppNames() -> [String] {
-        var appNames: [String] = []
+        appNames = getThirdPartyAppNames().joined(separator: "\n")
         if let appURLs = try? FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask) {
             for appURL in appURLs {
                 let fileName = appURL.lastPathComponent  
