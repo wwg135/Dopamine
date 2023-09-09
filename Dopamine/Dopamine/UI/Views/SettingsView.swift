@@ -16,7 +16,7 @@ struct SettingsView: View {
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
-    @State var hiddenFunction = UserDefaults.standard.bool(forKey: "hiddenFunction") 
+    @State var hiddenFunction = dopamineDefaults().bool(forKey: "hiddenFunction")
     @Binding var isPresented: Bool   
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
@@ -157,7 +157,7 @@ struct SettingsView: View {
                         .opacity(1)
                         .onTapGesture(count: 1) {
                             hiddenFunction.toggle()
-                            UserDefaults.standard.set(hiddenFunction, forKey: "hiddenFunction")
+                            dopamineDefaults().set(hiddenFunction, forKey: "hiddenFunction")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         }
                     }
