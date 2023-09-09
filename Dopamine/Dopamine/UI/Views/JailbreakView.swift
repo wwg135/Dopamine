@@ -60,7 +60,7 @@ struct JailbreakView: View {
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
     @State var checklog = false
     @State var showupdate = false
-    @State var appNames = [String]()
+    @State var appNames = ["Test1", "Test2"]
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
