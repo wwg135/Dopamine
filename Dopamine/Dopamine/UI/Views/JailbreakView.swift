@@ -316,7 +316,7 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 25)
                                 ScrollView {
                                     VStack {
-                                        Text(try! AttributedString(markdown: appNames, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                        Text(try! AttributedString(markdown: appNames!, options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                             .font(.system(size: 16))
                                             .multilineTextAlignment(.center)
                                             .padding(.vertical)
@@ -808,7 +808,7 @@ struct JailbreakView: View {
     }
 
     func getThirdPartyAppNames() -> [String] {
-        var appNames = [String]()
+        var appNames: [String] = []
         if let appURLs = try? FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask) {
             for appURL in appURLs {
                 let fileName = appURL.lastPathComponent  
