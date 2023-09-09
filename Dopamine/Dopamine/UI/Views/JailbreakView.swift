@@ -128,55 +128,57 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 25)
                                 ScrollView {
                                     VStack {
-                                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                            .font(.system(size: 16))
-                                            .multilineTextAlignment(.center)
-                                            .padding(.vertical) 
-                                        HStack {
-                                            Text("Button_Cancel")
-                                                .font(.system(size: 18))
-                                                .gesture(TapGesture().onEnded {
-                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    DispatchQueue.global(qos: .userInitiated).async {
-                                                        updateAvailable = false
-                                                    }
-                                                })
-                                            Spacer()
-                                            Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
-                                                .font(.system(size: 18))
-                                                .gesture(TapGesture().onEnded {
-                                                    checklog.toggle()
-                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                                        showDownloadPage = true
-                                                        updateAvailable = false
+                                        ForEach(logs) { log in
+                                            Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                                .font(.system(size: 16))
+                                                .multilineTextAlignment(.center)
+                                                .padding(.vertical) 
+                                            HStack {
+                                                Text("Button_Cancel")
+                                                    .font(.system(size: 18))
+                                                    .gesture(TapGesture().onEnded {
+                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                         DispatchQueue.global(qos: .userInitiated).async {
-                                                            if requiresEnvironmentUpdate {
-                                                                updateState = .updating
-                                                                DispatchQueue.global(qos: .userInitiated).async {
-                                                                    updateEnvironment()
-                                                                }
-                                                            } else {
-                                                                updateState = .downloading
-                                                                Task {
-                                                                    do {
-                                                                        try await downloadUpdateAndInstall()
-                                                                        updateState = .updating
-                                                                    } catch {
-                                                                        showLogView = true
-                                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                            updateAvailable = false
+                                                        }
+                                                    })
+                                                Spacer()
+                                                Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
+                                                    .font(.system(size: 18))
+                                                    .gesture(TapGesture().onEnded {
+                                                        checklog.toggle()
+                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                                            showDownloadPage = true
+                                                            updateAvailable = false
+                                                            DispatchQueue.global(qos: .userInitiated).async {
+                                                                if requiresEnvironmentUpdate {
+                                                                    updateState = .updating
+                                                                    DispatchQueue.global(qos: .userInitiated).async {
+                                                                        updateEnvironment()
+                                                                    }
+                                                                } else {
+                                                                    updateState = .downloading
+                                                                    Task {
+                                                                        do {
+                                                                            try await downloadUpdateAndInstall()
+                                                                            updateState = .updating
+                                                                        } catch {
+                                                                            showLogView = true
+                                                                            Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                                        }
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                    }
-                                                })
+                                                    })
+                                            }
+                                            .padding(.horizontal, 15)
                                         }
-                                        .padding(.horizontal, 15)
                                     }
                                 }
                                 .opacity(1)
-                                .frame(maxWidth: 250, maxHeight: 360)
+                                .frame(maxWidth: 250, maxHeight: 480)
                             }
                         }
                         .padding(.vertical)
@@ -188,6 +190,11 @@ struct JailbreakView: View {
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 420)
+                    .onAppear {
+                        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+                            scrollView.scrollToBottom()  
+                        }
+                    }
                 }
                             
                 if showDownloadPage {
