@@ -809,17 +809,22 @@ struct JailbreakView: View {
 
     func getThirdPartyAppNames() -> [String] {
         var names: [String] = []
-        let fileManager = FileManager.default 
-        let applicationSupportURL = try! fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-        let appURLs = try! fileManager.contentsOfDirectory(at: applicationSupportURL, includingPropertiesForKeys: nil)
-        for url in appURLs {
-            let fileName = url.lastPathComponent
-            if fileName.hasSuffix(".app") {
-                let name = String(fileName.dropLast(4))
-                names.append(name)
+        let filePath = URL(fileURLWithPath: "/private/var/containers/Bundle/Application")
+        do {
+            let fileManager = FileManager.default
+            let fileURLs = try fileManager.contentsOfDirectory(at: filePath, includingPropertiesForKeys: nil)
+            for url in fileURLs {
+                let fileName = url.lastPathComponent
+                if fileName.hasSuffix(".app") {
+                    let name = fileName.replacingOccurrences(of: ".app", with: "")
+                    names.append(name)
+                }
             }
-        } 
-        return names
+            return names
+        } catch {
+            print("Error: \(error)")
+            return []
+        }
     }
 }
 
