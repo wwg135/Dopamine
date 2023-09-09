@@ -48,7 +48,7 @@ struct JailbreakView: View {
     @State var index = 0
     @State var showLaunchTime = true
     @State var advancedLogsTemporarilyEnabled: Bool = false
-    @State var showTexts = dopamineDefaults().standard.bool(forKey: "showTexts")
+    @State var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
@@ -365,7 +365,7 @@ struct JailbreakView: View {
                 }
                 .onTapGesture(count: 1) {
                     showTexts.toggle()
-                    dopamineDefaults().standard.set(showTexts, forKey: "showTexts")
+                    UserDefaults.standard.set(showTexts, forKey: "showTexts")
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
                 Text(showTexts ? "AAA : AAB" : "")
