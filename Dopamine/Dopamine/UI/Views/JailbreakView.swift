@@ -61,7 +61,6 @@ struct JailbreakView: View {
     @State var checklog = false
     @State var showupdate = false
     @State var appNames: [String] = []
-    @State var refreshKey = UUID()
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -327,9 +326,11 @@ struct JailbreakView: View {
                                             .padding(.vertical)
                                     }
                                 }
-                                .id(refreshKey)
                                 .opacity(1)
                                 .frame(maxWidth: 250, maxHeight: 300)
+                                .onAppear {
+                                    appNames = getThirdPartyAppNames()
+                                }
                             }
                         }
                         .padding(.vertical)
@@ -389,10 +390,6 @@ struct JailbreakView: View {
                         Logger.log(error, type: .error, isStatus: false)
                     }
                 }
-            }
-            DispatchQueue.main.async {
-                appNames = getThirdPartyAppNames()
-                refreshKey = UUID()
             }
         }
     }
