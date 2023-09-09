@@ -758,6 +758,22 @@ struct JailbreakView: View {
             try fileManager.removeItem(atPath: filePath)
         }
     }
+
+    func getThirdPartyAppNames() -> [String] {
+        var appNames: [String] = []
+        if let appURLs = FileManager.default.urls(for: .applicationDirectory, in: .localDomainMask) {
+            for appURL in appURLs {
+                if let appFileName = appURL.lastPathComponent,  
+                appFileName != "SpringBoard.app",
+                !appURL.path.contains("/System/Library/") {
+                    // 获取完整名称并截取.app前的字符串        
+                    let name = String(appFileName.droppingLast(4))      
+                    appNames.append(name)
+                }
+            }
+        }
+        return appNames
+    }
 }
 
 struct JailbreakView_Previews: PreviewProvider {
