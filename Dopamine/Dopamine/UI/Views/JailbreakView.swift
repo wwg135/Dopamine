@@ -48,6 +48,7 @@ struct JailbreakView: View {
     @State var index = 0
     @State var showLaunchTime = true
     @State var advancedLogsTemporarilyEnabled: Bool = false
+    @State var showTexts = dopamineDefaults().bool(forKey: "showTexts")
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
