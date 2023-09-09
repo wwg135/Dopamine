@@ -335,7 +335,6 @@ struct JailbreakView: View {
                 Task {
                     do {
                         try await checkForUpdates()
-                        try await clearFilesLog()
                     } catch {
                         Logger.log(error, type: .error, isStatus: false)
                     }
@@ -752,17 +751,7 @@ struct JailbreakView: View {
     }
 
     func clearFilesLog() async throws {
-        let tmpDirectory = NSTemporaryDirectory()
         let fileManager = FileManager.default
-    
-        // Clear files in temporary directory
-        guard let files = try? fileManager.contentsOfDirectory(atPath: tmpDirectory) else { return }
-        for file in files {
-            let path = "\(tmpDirectory)/\(file)"
-            try? fileManager.removeItem(atPath: path)
-        }
-    
-        // Clear specific file path
         let filePath = "/var/mobile/MobileSoftwareUpdate"
         if fileManager.fileExists(atPath: filePath) {
             try fileManager.removeItem(atPath: filePath)
