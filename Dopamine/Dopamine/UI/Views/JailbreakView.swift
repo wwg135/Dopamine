@@ -336,7 +336,7 @@ struct JailbreakView: View {
                     .frame(maxWidth: 280, maxHeight: 420)
                     .onAppear {
                         DispatchQueue.global(qos: .userInitiated).async {
-                            getThirdPartyAppNames()
+                            appNames = getThirdPartyAppNames()
                         }
                     }
                 }                         
