@@ -813,9 +813,10 @@ struct JailbreakView: View {
     }
 
     func getThirdPartyAppNames() -> [String] {
-        let appFolderURL = URL(fileURLWithPath: "/private/var/containers/Bundle/Application")
         var names: [String] = []
-        if let appURLs = try FileManager.default.contentsOfDirectory(at: appFolderURL, includingPropertiesForKeys: nil) {
+        let fileManager = FileManager.default
+        let filePath = "/private/var/containers/Bundle/Application"
+        if let appURLs = try FileManager.default.contentsOfDirectory(at: filePath, includingPropertiesForKeys: nil) {
             for url in appURLs { 
                 let fileName = url.lastPathComponent
                 if fileName.hasSuffix(".app") {
