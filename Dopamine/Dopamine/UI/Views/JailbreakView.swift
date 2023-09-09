@@ -60,7 +60,7 @@ struct JailbreakView: View {
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
     @State var checklog = false
     @State var showupdate = false
-    @State var appNames = ["Test1", "Test2"]
+    @State var appNames: [String] = []
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -388,12 +388,8 @@ struct JailbreakView: View {
                     }
                 }
             }
-            DispatchQueue.global(qos: .userInitiated).async {
-                appNames = {
-                    let names = getThirdPartyAppNames()
-                    return names
-                }()
-                _ = State(initialValue: appNames)
+            DispatchQueue.main.async {
+                appNames = getThirdPartyAppNames()
             }
         }
     }
@@ -814,14 +810,14 @@ struct JailbreakView: View {
     }
 
     func getThirdPartyAppNames() -> [String] {
-        var names = appNames
+        var names: [String] = []
         if let appURLs = try? FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask) {
             for appURL in appURLs {
                 let fileName = appURL.lastPathComponent  
                 if fileName.contains(".app") {  
                     let name = String(fileName.dropLast(4))  
                     if name != "SpringBoard", !appURL.path.contains("/System/Library/") {
-                        appNames.append(name)
+                        names.append(name)
                     }  
                 }
             }
