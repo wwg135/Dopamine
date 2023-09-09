@@ -176,7 +176,7 @@ struct JailbreakView: View {
                                     }
                                 }
                                 .opacity(1)
-                                .frame(maxWidth: 200, maxHeight: 250)
+                                .frame(maxWidth: 220, maxHeight: 300)
                             }
                         }
                         .padding(.vertical)
