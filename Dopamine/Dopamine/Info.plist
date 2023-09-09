@@ -9,5 +9,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+        <key>NSApplicationSupportDirectory</key>
+        <string>$(LOCAL_APPS_DIR)</string>
 </dict>
 </plist>
