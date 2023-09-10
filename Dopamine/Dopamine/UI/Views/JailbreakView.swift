@@ -319,7 +319,7 @@ struct JailbreakView: View {
                                         ForEach(appNames, id: \.0) { (localizedAppName, name) in
                                             Text("\(localizedAppName) - \(name)")
                                                 .font(.system(size: 16))
-                                                .multilineTextAlignment(.left)
+                                                .multilineTextAlignment(.leading)
                                                 .padding(.vertical)
                                         }
                                     }
