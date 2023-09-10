@@ -97,23 +97,6 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
     }
 }
 
-func ForbidUnject(newForbidUnject: String?) {
-    let fileManager = FileManager.default
-    let filePath = "/var/mobile/zp.unject.plist"
-    if fileManager.fileExists(atPath: filePath) { 
-        if var dict = NSMutableDictionary(contentsOfFile: filePath) { 
-            if let Key = newForbidUnject {
-                if let _ = dict[Key] {
-                    dict.removeObject(forKey: Key)
-                } else {
-                    dict[Key] = true
-                }
-            } 
-            dict.write(toFile: filePath, atomically: true)
-        }
-    }
-}
-
 func removeJailbreak() {
     dopamineDefaults().removeObject(forKey: "selectedPackageManagers")
     _ = execCmd(args: [CommandLine.arguments[0], "uninstall_environment"])
