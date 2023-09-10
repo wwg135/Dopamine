@@ -308,7 +308,7 @@ struct JailbreakView: View {
                         VStack {
                             VStack{
                                 Text("Option_Select_Custom_App")
-                                    .font(.title2)
+                                    .font(.system(size: 16))
                                     .minimumScaleFactor(0.5)
                                     .multilineTextAlignment(.center)
                                 Divider()
@@ -319,7 +319,6 @@ struct JailbreakView: View {
                                         ForEach(appNames, id: \.0) { (localizedAppName, name) in
                                             Text("\(localizedAppName) - \(name)")
                                                 .font(.system(size: 16))
-                                                .multilineTextAlignment(.leading)
                                                 .padding(.vertical, 5)
                                         }
                                     }
