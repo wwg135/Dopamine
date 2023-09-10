@@ -48,17 +48,22 @@ struct JailbreakView: View {
     @State private var index = 0
     @State private var showLaunchTime = true   
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
-    @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     @State var advancedLogsTemporarilyEnabled: Bool = false
-    @State private var showTexts = UserDefaults.standard.bool(forKey: "showTexts")
+    @State var showTexts = dopamineDefaults().bool(forKey: "showTexts")
     @State var updateState: UpdateState = .downloading
     @State var progressDouble: Double = 0
     var downloadProgress = Progress()
     @State var showDownloadPage = false
     @State var showLogView = false
-    @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5_\\d+$")
+    @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.0\\.5$")
+    @State var checklog = false
+    @State var showupdate = false
+    @State var appNames: [(String, String)] = []
+    @State var selectedNames: [String] = []
+    @State var MaskDetection = false
+    @State var searchText = ""
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -109,11 +114,11 @@ struct JailbreakView: View {
 
                 if updateAvailable {
                     GeometryReader { geometry in
-                        Color.clear
+                        Color.black.opacity(0.15)
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(false)
+                            .allowsHitTesting(true)
                     }
                     .ignoresSafeArea()
                     ZStack {
@@ -127,82 +132,61 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                        .font(.system(size: 16))
-                                        .multilineTextAlignment(.center)
-                                        .padding(.vertical)
+                                    VStack {
+                                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                            .font(.system(size: 16))
+                                            .multilineTextAlignment(.center)
+                                            .padding(.vertical) 
+                                        HStack {
+                                            Text("Button_Cancel")
+                                                .font(.system(size: 18))
+                                                .gesture(TapGesture().onEnded {
+                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                    DispatchQueue.global(qos: .userInitiated).async {
+                                                        updateAvailable = false
+                                                    }
+                                                })
+                                            Spacer()
+                                            Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
+                                                .font(.system(size: 18))
+                                                .gesture(TapGesture().onEnded {
+                                                    checklog.toggle()
+                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                                        showDownloadPage = true
+                                                        updateAvailable = false
+                                                        DispatchQueue.global(qos: .userInitiated).async {
+                                                            if requiresEnvironmentUpdate {
+                                                                updateState = .updating
+                                                                DispatchQueue.global(qos: .userInitiated).async {
+                                                                    updateEnvironment()
+                                                                }
+                                                            } else {
+                                                                updateState = .downloading
+                                                                Task {
+                                                                    do {
+                                                                        try await downloadUpdateAndInstall()
+                                                                        updateState = .updating
+                                                                    } catch {
+                                                                        showLogView = true
+                                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                })
+                                        }
+                                        .padding(.horizontal, 15)
+                                    }
                                 }
                                 .opacity(1)
                                 .frame(maxWidth: 250, maxHeight: 300)
                             }
-
-                            HStack {
-                                Button {
-                                    updateAvailable = false
-                                } label: {
-                                    Label(title: { Text("Button_Cancel")  }, icon: { Image(systemName: "xmark") })
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 18))
-                                        .opacity(1)
-                                        .padding()
-                                        .frame(maxHeight: 45)
-                                }
-                                .fixedSize()
-                                Button {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    showDownloadPage = true
-                                    updateAvailable = false
-                                    DispatchQueue.global(qos: .userInitiated).async {
-                                        if requiresEnvironmentUpdate {
-                                            updateState = .updating
-                                            DispatchQueue.global(qos: .userInitiated).async {
-                                                updateEnvironment()
-                                            }
-                                        } else {
-                                            updateState = .downloading
-                                            Task {
-                                                do {
-                                                    try await downloadUpdateAndInstall()
-                                                    updateState = .updating
-                                                } catch {
-                                                    showLogView = true
-                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                                }
-                                            }
-                                        }
-                                    }
-                                } label: {
-                                    if changeVersion {
-                                        Label(title: { Text("Button_Select_Update") }, icon: { Image(systemName: "arrow.down") })
-                                            .font(.system(size: 18))
-                                            .foregroundColor(.white)
-                                            .padding()
-                                            .frame(maxHeight: 45)
-                                            .background(MaterialView(.light)
-                                                .opacity(1)
-                                                .cornerRadius(8)
-                                            )
-                                    } else {
-                                        Label(title: { Text("Button_Update") }, icon: { Image(systemName: "arrow.down") })
-                                            .font(.system(size: 18))
-                                            .foregroundColor(.white)
-                                            .padding()
-                                            .frame(maxHeight: 45)
-                                            .background(MaterialView(.light)
-                                                .opacity(1)
-                                                .cornerRadius(8)
-                                            )
-                                    }
-                                }
-                                .fixedSize()
-                            }
-                            .padding(.vertical)
-                            .padding(.horizontal)
-                            .cornerRadius(16)
                         }
                         .padding(.vertical)
-                        .background(Color.black.opacity(0.5))
-                        .animation(.spring(), value: updateState)
+                        .background(Color.black.opacity(0.25))
+                        .animation(.spring(), value: updateAvailable)
                         .background(MaterialView(.systemUltraThinMaterialDark))
                     }
                     .zIndex(2)
@@ -213,11 +197,11 @@ struct JailbreakView: View {
                             
                 if showDownloadPage {
                     GeometryReader { geometry in
-                        Color.clear
+                        Color.black.opacity(0.15)
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(false)
+                            .allowsHitTesting(true)
                             .onTapGesture {
                                 showDownloadPage = false
                             }
@@ -227,13 +211,17 @@ struct JailbreakView: View {
                         if showLogView {
                             VStack {
                                 LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
+                                    .opacity(1)
+                                    .foregroundColor(Color.white)
                                 Text("Update_Log_Hint_Scrollable")
-                                    .minimumScaleFactor(0.5)
+                                    .opacity(1)
+                                    .minimumScaleFactor(0.5)  
                                     .foregroundColor(.white)
                                     .padding()
                             }
-                            .opacity(showLogView ? 1 : 0)
-                            .frame(height: 150)
+                            .frame(maxWidth: 250, maxHeight: 360)
+                            .background(Color.black.opacity(0.5))
+                            .background(MaterialView(.systemUltraThinMaterialDark))
                         } else {
                             VStack {
                                 VStack {
@@ -310,6 +298,72 @@ struct JailbreakView: View {
                         }
                     }
                 }
+
+                if MaskDetection {
+                    GeometryReader { geometry in
+                        Color.black.opacity(0.15)
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(false)
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        VStack {
+                            VStack{
+                                Text("Option_Select_Custom_App")
+                                    .font(.system(size: 18))
+                                    .minimumScaleFactor(0.5)
+                                    .multilineTextAlignment(.center)
+                                Divider()
+                                    .background(.white)
+                                    .padding(.horizontal, 25)
+                                ScrollView {
+                                    VStack(alignment: .leading) {
+                                        TextField("搜索一下", text: $searchText)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
+                                            .foregroundColor(.black)
+                                        ForEach(appNames, id: \.0) { (localizedAppName, name) in
+                                            if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
+                                                HStack {
+                                                    Text("\(localizedAppName) - \(name)")
+                                                        .font(.system(size: 16))
+                                                        .padding(.vertical, 5)
+                                                    Spacer()
+                                                    let isSelected = selectedNames.contains(name)
+                                                    Button(action: {
+                                                        if isSelected {
+                                                            selectedNames.removeAll(where: { $0 == name })
+                                                        } else {
+                                                            selectedNames.append(name)
+                                                        }
+                                                        ForbidApp(name)
+                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                    }) {
+                                                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                                            .foregroundColor(isSelected ? .white : .white.opacity(0.5))
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .opacity(1)
+                                .frame(maxWidth: 250, maxHeight: 300)
+                            }
+                        }
+                        .padding(.vertical)
+                        .background(Color.black.opacity(0.25))
+                        .animation(.spring(), value: updateAvailable)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 420)
+                }                         
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
@@ -317,8 +371,8 @@ struct JailbreakView: View {
                     SettingsView(isPresented: $isSettingsPresented)
                         .frame(maxWidth: 320)
                 }, isPresented: $isSettingsPresented)
-                .zIndex(2)
-                            
+                .zIndex(2)          
+                
                 PopupView(title: {
                     VStack(spacing: 4) {
                         Text("Credits_Made_By")
@@ -333,7 +387,7 @@ struct JailbreakView: View {
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
             }
-            .animation(.default)
+            .animation(.spring(), value: updateAvailable)
         }
         .onAppear {
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
@@ -352,10 +406,14 @@ struct JailbreakView: View {
                 Task {
                     do {
                         try await checkForUpdates()
+                        try await clearFilesLog()
                     } catch {
                         Logger.log(error, type: .error, isStatus: false)
                     }
                 }
+            }
+            DispatchQueue.main.async {
+                appNames = getThirdPartyAppNames()
             }
         }
     }
@@ -365,11 +423,17 @@ struct JailbreakView: View {
         let tint = Color.white
         HStack {
             VStack(alignment: .leading) {
-                Image(!isJailbroken() ? "DopamineLogo2" : "DopamineLogo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: 200)
-                    .padding(.top)
+                Group {
+                    Image(!isJailbroken() ? "DopamineLogo2" : "DopamineLogo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 200)
+                        .padding(.top)
+                }
+                .onTapGesture(count: 1) {
+                    MaskDetection.toggle()
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                }
                 
                 Group {
                     Text("Title_Supported_iOS_Versions")
@@ -557,38 +621,6 @@ struct JailbreakView: View {
                 .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1) .opacity(0.25)
             )
             .animation(.spring(), value: isJailbreaking)
-
-            if (jailbreakingProgress == .jailbreaking) {
-                ZStack {
-                    ZStack {
-                        Text("\(Int(progressDouble * 100))%")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .opacity(jailbreakingProgress == .jailbreaking ? 1 : 0)
-                    }
-                    Circle()
-                        .stroke(
-                            Color.white.opacity(0.1),
-                            lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0
-                        )
-                        .animation(.linear, value: progressDouble)
-                    Circle()
-                        .trim(from: 0, to: progressDouble)
-                        .stroke(
-                            Color.white,
-                            style: StrokeStyle(
-                                lineWidth: jailbreakingProgress == .jailbreaking ? 8 : 0,
-                                lineCap: .round
-                            )
-                        )
-                        .rotationEffect(.degrees(-90))
-                        .animation(.easeOut, value: progressDouble)
-                        .animation(.linear, value: progressDouble)
-                }
-                .frame(maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.1 : nil)
-                .animation(.linear, value: progressDouble)
-                .opacity(progressDouble < 1 ? 1 : 0)
-            }
         }
     }
     
@@ -738,13 +770,7 @@ struct JailbreakView: View {
         Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
 
         // Find the latest release
-        let latest = changeVersion ? releasesJSON.first(where: {
-            if let version = $0["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {
-                return true  
-            } 
-            return false
-        }) : releasesJSON.first(where: { $0["name"] as? String == "1.0.5" })
-        guard let latestRelease = latest,
+        guard let latestRelease = releasesJSON.first(where: { $0["name"] as? String == "1.0.5" }),
               let assets = latestRelease["assets"] as? [[String: Any]],
               let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
               let downloadURLString = asset["browser_download_url"] as? String,
@@ -800,6 +826,48 @@ struct JailbreakView: View {
                     minutes > 0 ? "\(minutes) 分 \(seconds) 秒" :
                     "\(seconds) 秒"
         return "系统已运行: " + formatted
+    }
+
+    func clearFilesLog() async throws {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/MobileSoftwareUpdate"
+        if fileManager.fileExists(atPath: filePath) {
+            try fileManager.removeItem(atPath: filePath)
+        }
+    }
+
+    func getThirdPartyAppNames() -> [(String, String)] {
+        var names: [(String, String)] = []
+        if let workspace = NSClassFromString("LSApplicationWorkspace") as? NSObject.Type {
+            let selector = NSSelectorFromString("defaultWorkspace")
+            let workspaceInstance = workspace.perform(selector)?.takeUnretainedValue()
+            if let apps = workspaceInstance?.perform(NSSelectorFromString("allApplications"))?.takeUnretainedValue() as? [NSObject] {
+                for app in apps {
+                    if let bundleURL = app.perform(NSSelectorFromString("bundleURL"))?.takeUnretainedValue() as? URL {
+                        let name = bundleURL.lastPathComponent.replacingOccurrences(of: ".app", with: "")
+                        let localizedAppName = (app.perform(NSSelectorFromString("localizedName"))?.takeUnretainedValue() as? String) ?? ""
+                        names.append((localizedAppName, name))
+                    }
+                }
+            }
+        }
+        return names
+    }
+    
+    func ForbidApp(_ name: String) {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if !fileManager.fileExists(atPath: filePath) {
+            fileManager.createFile(atPath: filePath, contents: nil, attributes: nil)
+        }
+        if let dict = NSMutableDictionary(contentsOfFile: filePath) {
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
+        } else {
+            let dict = NSMutableDictionary()
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
+        }
     }
 }
 
