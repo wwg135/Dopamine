@@ -61,8 +61,8 @@ struct JailbreakView: View {
     @State var checklog = false
     @State var showupdate = false
     @State var appNames: [(String, String)] = []
-    @State private var selectedApp: [String] = []
-    @State var MaskDetection = dopamineDefaults().bool(forKey: "MaskDetection")
+    @State var selectedApp: [String] = []
+    @State var MaskDetection = dopamineDefaults().bool(forKey: "MaskDetection") 
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
