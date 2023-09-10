@@ -20,8 +20,6 @@ struct SettingsView: View {
     @Binding var isPresented: Bool   
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
-    @State var customforbidunjectAlertShown = false
-    @State var customforbidunjectInput = ""
     @State var rebootRequiredAlertShown = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
@@ -58,32 +56,7 @@ struct SettingsView: View {
                             }
                         }
                         if isBootstrapped() {
-                            VStack {
-                                if isJailbroken() {
-                                    if hiddenFunction {
-                                        if forbidUnject {
-                                            Button(action: {
-                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                customforbidunjectAlertShown = true
-                                            }) {
-                                                HStack {
-                                                    Image(systemName: "eye")
-                                                    Text("Options_Custom_Forbid_Unject")
-                                                        .lineLimit(1)
-                                                        .minimumScaleFactor(0.5)
-                                                }
-                                                .padding(.horizontal, 4)
-                                                .padding(8)
-                                                .frame(maxWidth: .infinity)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 8)
-                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                                )
-                                            }
-                                        }
-                                    } else {
-                                    }
-                                }
+                            VStack {                   
                                 if isJailbroken() {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -164,11 +137,6 @@ struct SettingsView: View {
                     .padding(.top, 2)
                     
                     ZStack {}
-                        .textFieldAlert(isPresented: $customforbidunjectAlertShown) { () -> TextFieldAlert in
-                            TextFieldAlert(title: NSLocalizedString("Set_Custom_Forbid_Unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Custom_Forbid_Unject_Message", comment: ""), text: Binding<String?>($customforbidunjectInput), onSubmit: {
-                                ForbidUnject(newForbidUnject: customforbidunjectInput)
-                            })
-                        }
                         .textFieldAlert(isPresented: $mobilePasswordChangeAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Popup_Change_Mobile_Password_Title", comment: ""), message: NSLocalizedString("Popup_Change_Mobile_Password_Message", comment: ""), text: Binding<String?>($mobilePasswordInput), onSubmit: {
                                 changeMobilePassword(newPassword: mobilePasswordInput)
