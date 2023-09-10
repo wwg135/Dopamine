@@ -308,7 +308,7 @@ struct JailbreakView: View {
                         VStack {
                             VStack{
                                 Text("Option_Select_Custom_App")
-                                    .font(.system(size: 16))
+                                    .font(.system(size: 18))
                                     .minimumScaleFactor(0.5)
                                     .multilineTextAlignment(.center)
                                 Divider()
