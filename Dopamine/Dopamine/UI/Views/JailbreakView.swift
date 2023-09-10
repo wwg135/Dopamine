@@ -61,7 +61,7 @@ struct JailbreakView: View {
     @State var checklog = false
     @State var showupdate = false
     @State var appNames: [(String, String)] = []
-    @State var selectedApp: [String] = []
+    @State var selectedNames: [String] = []
     @State var MaskDetection = dopamineDefaults().bool(forKey: "MaskDetection") 
     
     var isJailbreaking: Bool {
@@ -303,7 +303,7 @@ struct JailbreakView: View {
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(true)
+                            .allowsHitTesting(false)
                     }
                     .ignoresSafeArea()
                     ZStack {
@@ -324,16 +324,15 @@ struct JailbreakView: View {
                                                     .font(.system(size: 16))
                                                     .padding(.vertical, 5)
                                                 Spacer()
-                                                let isSelected = selectedApp.contains(name)
+                                                let isSelected = selectedNames.contains(name)
                                                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                     .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     .onTapGesture {
                                                         if isSelected {
-                                                            selectedApp.removeAll(where: { $0 == name })
+                                                            selectedNames.removeAll(where: { $0 == name })
                                                         } else {
-                                                            selectedApp.append(name)
+                                                            selectedNames.append(name)
                                                         }
-                                                        saveSelectedApp(name)
                                                     }
                                             }
                                         }
@@ -344,25 +343,54 @@ struct JailbreakView: View {
                             }
                             VStack{
                                 HStack {
-                                    Text("Button_Allow")
-                                        .font(.system(size: 18))
-                                        .gesture(TapGesture().onEnded {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            DispatchQueue.global(qos: .userInitiated).async {
-                                                allowSelectedApp(name)
-                                            }
+                                    Button {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        DispatchQueue.global(qos: .userInitiated).async {
+                                            AllowApp(name)
+                                        }
+                                    } label: {
+                                        Label(title: { Text("Button_Allow") }, icon: {
+                                            Image(systemName: "checkmark.square")
                                         })
-                                        Spacer()
-                                        Text("Button_Forbid")
-                                            .font(.system(size: 18))
-                                            .gesture(TapGesture().onEnded {
-                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                DispatchQueue.global(qos: .userInitiated).async {
-                                                    saveSelectedApp(name)
-                                                }
-
-
-                                                        
+                                        .font(.system(size: 18))
+                                        .frame(maxHeight: 30)
+                                        .padding()
+                                        .foregroundColor(.white)
+                                        .background(MaterialView(.light)
+                                            .opacity(0.5)
+                                            .cornerRadius(8)
+                                        )
+                                        .opacity(selectedApp.isEmpty ? 0.5 : 1)
+                                    }
+                                    Spacer()
+                                    Button {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        DispatchQueue.global(qos: .userInitiated).async {
+                                            ForbidApp(name)
+                                        }
+                                    } label: {
+                                        Label(title: { Text("Button_Forbid") }, icon: {
+                                            Image(systemName: "x.square")
+                                        })
+                                        .font(.system(size: 18))
+                                        .frame(maxHeight: 30)
+                                        .padding()
+                                        .foregroundColor(.white)
+                                        .background(MaterialView(.light)
+                                            .opacity(0.5)
+                                            .cornerRadius(8)
+                                        )
+                                        .opacity(selectedNames.isEmpty ? 0.5 : 1)
+                                    }
+                                    
+                                }
+                                .disabled(selectedNames.isEmpty)
+                                .animation(.spring(), value: selectedNames)
+                                .padding(.horizontal, 15)
+                            }
+                            .cornerRadius(16)
+                            .foregroundColor(.white)
+                            .frame(maxHeight: 40)
                         }
                         .padding(.vertical)
                         .background(Color.black.opacity(0.25))
@@ -868,7 +896,18 @@ struct JailbreakView: View {
         return names
     }
 
-    func saveSelectedApp(_ name: String) {
+    func AllowApp(_ name: String) {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if fileManager.fileExists(atPath: filePath) {
+            if let dict = NSMutableDictionary(contentsOfFile: filePath) {
+                dict.removeObject(forKey: name)
+                dict.write(toFile: filePath, atomically: true) 
+            }
+        }
+    }
+    
+    func ForbidApp(_ name: String) {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
         if !fileManager.fileExists(atPath: filePath) {
