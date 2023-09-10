@@ -9,22 +9,16 @@ import SwiftUI
 import Fugu15KernelExploit
 
 struct SettingsView: View {
-    
     @AppStorage("total_jailbreaks", store: dopamineDefaults()) var totalJailbreaks: Int = 0
     @AppStorage("successful_jailbreaks", store: dopamineDefaults()) var successfulJailbreaks: Int = 0
-    
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
-    @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
-    @AppStorage("bottomforbidUnject", store: dopamineDefaults()) var bottomforbidUnject: Bool = false
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("changeVersion", store: dopamineDefaults()) var changeVersion: Bool = false
-    @State private var hiddenFunction = UserDefaults.standard.bool(forKey: "hiddenFunction")
-    
+    @State var hiddenFunction = dopamineDefaults().bool(forKey: "hiddenFunction")
     @Binding var isPresented: Bool
-
     @State var rebootRequiredAlertShown = false
     @State var customforbidunjectAlertShown = false
     @State var customforbidunjectInput = ""
@@ -51,7 +45,6 @@ struct SettingsView: View {
                         VStack(spacing: 10) {
                             if hiddenFunction {
                                 Toggle("Check_For_Updates", isOn: $checkForUpdates)
-                                Toggle("Change_Version", isOn: $changeVersion)
                             } else {
                             }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
@@ -61,21 +54,9 @@ struct SettingsView: View {
                                         tweakInjectionToggledAlertShown = true
                                     }
                                 }
-                            if isJailbroken() {
-                                if hiddenFunction {
-                                    if forbidUnject {    
-                                        Toggle("Options_Enble_Bottom_Forbid_Unject", isOn: $bottomforbidUnject)
-                                            .onChange(of: bottomforbidUnject) { newValue in
-                                                updateForbidUnject(toggleOn: newValue, newForbidUnject: nil)
-                                            }
-                                    }
-                                } else {
-                                }
-                            }
                             if !isJailbroken() {
                                 if hiddenFunction {
                                     Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
-                                    Toggle("Options_Forbid_Unject", isOn: $forbidUnject)
                                 } else {
                                 }
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
@@ -86,26 +67,6 @@ struct SettingsView: View {
                             VStack {
                                 if isJailbroken() {
                                     if hiddenFunction {
-                                        if bottomforbidUnject {
-                                            Button(action: {
-                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                customforbidunjectAlertShown = true
-                                            }) {
-                                                HStack {
-                                                    Image(systemName: "eye")
-                                                    Text("Options_Custom_Forbid_Unject")
-                                                        .lineLimit(1)
-                                                        .minimumScaleFactor(0.5)
-                                                }
-                                                .padding(.horizontal, 4)
-                                                .padding(8)
-                                                .frame(maxWidth: .infinity)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 8)
-                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                                )
-                                            }
-                                        }
                                         if enableMount {
                                             Button(action: {
                                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -224,18 +185,13 @@ struct SettingsView: View {
                         .opacity(1)
                         .onTapGesture(count: 1) {
                             hiddenFunction.toggle()
-                            UserDefaults.standard.set(hiddenFunction, forKey: "hiddenFunction")
+                            dopamineDefaults().set(hiddenFunction, forKey: "hiddenFunction")
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                         }
                     }
                     .padding(.top, 2)
                     
                     ZStack {}
-                        .textFieldAlert(isPresented: $customforbidunjectAlertShown) { () -> TextFieldAlert in
-                            TextFieldAlert(title: NSLocalizedString("Set_Custom_Forbid_Unject_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Custom_Forbid_Unject_Message", comment: ""), text: Binding<String?>($customforbidunjectInput), onSubmit: {
-                                updateForbidUnject(toggleOn: false, newForbidUnject: customforbidunjectInput)
-                            })
-                        }
                         .textFieldAlert(isPresented: $mountPathAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Set_Mount_Path_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Mount_Path_Message", comment: ""), text: Binding<String?>($mountPathInput), onSubmit: {
                                 if mountPathInput.count > 1 {
