@@ -307,7 +307,7 @@ struct JailbreakView: View {
                     ZStack {
                         VStack {
                             VStack{
-                                Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
+                                Text(Option_Select_Custom_App)
                                     .font(.title2)
                                     .minimumScaleFactor(0.5)
                                     .multilineTextAlignment(.center)
@@ -320,7 +320,7 @@ struct JailbreakView: View {
                                             Text("\(localizedAppName) - \(name)")
                                                 .font(.system(size: 16))
                                                 .multilineTextAlignment(.leading)
-                                                .padding(.vertical)
+                                                .padding(.vertical, 5)
                                         }
                                     }
                                 }
