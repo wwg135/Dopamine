@@ -315,7 +315,7 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    VStack {
+                                    VStack(alignment: .leading) {
                                         ForEach(appNames, id: \.0) { (localizedAppName, name) in
                                             Text("\(localizedAppName) - \(name)")
                                                 .font(.system(size: 16))
