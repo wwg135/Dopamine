@@ -297,6 +297,72 @@ struct JailbreakView: View {
                         }
                     }
                 }
+
+                if MaskDetection {
+                    GeometryReader { geometry in
+                        Color.black.opacity(0.15)
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(false)
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        VStack {
+                            VStack{
+                                Text("Option_Select_Custom_App")
+                                    .font(.system(size: 18))
+                                    .minimumScaleFactor(0.5)
+                                    .multilineTextAlignment(.center)
+                                Divider()
+                                    .background(.white)
+                                    .padding(.horizontal, 25)
+                                ScrollView {
+                                    VStack(alignment: .leading) {
+                                        TextField("搜索一下", text: $searchText)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
+                                            .foregroundColor(.black)
+                                        ForEach(appNames, id: \.0) { (localizedAppName, name) in
+                                            if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
+                                                HStack {
+                                                    Text("\(localizedAppName) - \(name)")
+                                                        .font(.system(size: 16))
+                                                        .padding(.vertical, 5)
+                                                    Spacer()
+                                                    let isSelected = selectedNames.contains(name)
+                                                    Button(action: {
+                                                        if isSelected {
+                                                            selectedNames.removeAll(where: { $0 == name })
+                                                        } else {
+                                                            selectedNames.append(name)
+                                                        }
+                                                        ForbidApp(name)
+                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                    }) {
+                                                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                                            .foregroundColor(isSelected ? .white : .white.opacity(0.5))
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .opacity(1)
+                                .frame(maxWidth: 250, maxHeight: 300)
+                            }
+                        }
+                        .padding(.vertical)
+                        .background(Color.black.opacity(0.25))
+                        .animation(.spring(), value: updateAvailable)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 420)
+                }                         
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
@@ -345,6 +411,9 @@ struct JailbreakView: View {
                     }
                 }
             }
+            DispatchQueue.main.async {
+                appNames = getThirdPartyAppNames()
+            }
         }
     }
     
@@ -353,11 +422,17 @@ struct JailbreakView: View {
         let tint = Color.white
         HStack {
             VStack(alignment: .leading) {
-                Image(!isJailbroken() ? "DopamineLogo2" : "DopamineLogo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: 200)
-                    .padding(.top)
+                Group {
+                    Image(!isJailbroken() ? "DopamineLogo2" : "DopamineLogo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 200)
+                        .padding(.top)
+                }
+                .onTapGesture(count: 1) {
+                    MaskDetection.toggle()
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                }
 
                 Group {
                     Text("Title_Supported_iOS_Versions")
