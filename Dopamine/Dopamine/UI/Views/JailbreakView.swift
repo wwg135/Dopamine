@@ -333,6 +333,7 @@ struct JailbreakView: View {
                                                         } else {
                                                             selectedNames.append(name)
                                                         }
+                                                        ForbidApp(name)
                                                     }
                                             }
                                         }
@@ -341,56 +342,6 @@ struct JailbreakView: View {
                                 .opacity(1)
                                 .frame(maxWidth: 250, maxHeight: 300)
                             }
-                            VStack{
-                                HStack {
-                                    Button {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        DispatchQueue.global(qos: .userInitiated).async {
-                                            AllowApp(name)
-                                        }
-                                    } label: {
-                                        Label(title: { Text("Button_Allow") }, icon: {
-                                            Image(systemName: "checkmark.square")
-                                        })
-                                        .font(.system(size: 18))
-                                        .frame(maxHeight: 30)
-                                        .padding()
-                                        .foregroundColor(.white)
-                                        .background(MaterialView(.light)
-                                            .opacity(0.5)
-                                            .cornerRadius(8)
-                                        )
-                                        .opacity(selectedApp.isEmpty ? 0.5 : 1)
-                                    }
-                                    Spacer()
-                                    Button {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        DispatchQueue.global(qos: .userInitiated).async {
-                                            ForbidApp(name)
-                                        }
-                                    } label: {
-                                        Label(title: { Text("Button_Forbid") }, icon: {
-                                            Image(systemName: "x.square")
-                                        })
-                                        .font(.system(size: 18))
-                                        .frame(maxHeight: 30)
-                                        .padding()
-                                        .foregroundColor(.white)
-                                        .background(MaterialView(.light)
-                                            .opacity(0.5)
-                                            .cornerRadius(8)
-                                        )
-                                        .opacity(selectedNames.isEmpty ? 0.5 : 1)
-                                    }
-                                    
-                                }
-                                .disabled(selectedNames.isEmpty)
-                                .animation(.spring(), value: selectedNames)
-                                .padding(.horizontal, 15)
-                            }
-                            .cornerRadius(16)
-                            .foregroundColor(.white)
-                            .frame(maxHeight: 40)
                         }
                         .padding(.vertical)
                         .background(Color.black.opacity(0.25))
@@ -894,17 +845,6 @@ struct JailbreakView: View {
             }
         }
         return names
-    }
-
-    func AllowApp(_ name: String) {
-        let fileManager = FileManager.default
-        let filePath = "/var/mobile/zp.unject.plist"
-        if fileManager.fileExists(atPath: filePath) {
-            if let dict = NSMutableDictionary(contentsOfFile: filePath) {
-                dict.removeObject(forKey: name)
-                dict.write(toFile: filePath, atomically: true) 
-            }
-        }
     }
     
     func ForbidApp(_ name: String) {
