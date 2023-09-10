@@ -51,7 +51,6 @@ struct JailbreakView: View {
     @State var showTexts = dopamineDefaults().bool(forKey: "showTexts")
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
-    @AppStorage("MaskDetection", store: dopamineDefaults()) var MaskDetection: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     @State var updateState: UpdateState = .downloading
     @State var progressDouble: Double = 0
@@ -63,6 +62,7 @@ struct JailbreakView: View {
     @State var showupdate = false
     @State var appNames: [(String, String)] = []
     @State var selectedNames: [String] = []
+    @State var MaskDetection = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
