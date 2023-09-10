@@ -328,11 +328,7 @@ struct JailbreakView: View {
                                                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                     .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     .onTapGesture {
-                                                        if isSelected {
-                                                            saveSelectedApp()
-                                                        } else {
-                                                            selectedApp.append(name)
-                                                        }
+                                                        saveSelectedApp()
                                                     }
                                             }
                                         }
