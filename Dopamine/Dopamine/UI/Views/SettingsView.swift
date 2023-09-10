@@ -15,7 +15,6 @@ struct SettingsView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
-    @AppStorage("forbidUnject", store: dopamineDefaults()) var forbidUnject: Bool = true
     @State var hiddenFunction = dopamineDefaults().bool(forKey: "hiddenFunction")
     @Binding var isPresented: Bool   
     @State var mobilePasswordChangeAlertShown = false
