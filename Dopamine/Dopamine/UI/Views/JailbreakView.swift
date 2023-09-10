@@ -630,24 +630,7 @@ struct JailbreakView: View {
     @ViewBuilder
     var endButtons: some View {
         switch jailbreakingProgress {
-        case .finished:
-            Button {
-                userspaceReboot()
-            } label: {
-                Label(title: { Text("Reboot_Userspace_Finish") }, icon: {
-                    Image(systemName: "arrow.clockwise")
-                })
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? 0 : nil)
-                .background(MaterialView(.light)
-                    .opacity(0.5)
-                    .cornerRadius(8)
-                )
-                .opacity(jailbreakingError != nil ? 0 : 1)
-            }
-            .opacity(jailbreakingError != nil ? 0 : 1)
-            
+        case .finished:  
             if !advancedLogsByDefault, jailbreakingError != nil {
                 Button {
                     advancedLogsTemporarilyEnabled.toggle()
@@ -695,7 +678,7 @@ struct JailbreakView: View {
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         if tweakInjectionEnabled {
-                            // userspaceReboot()
+                            userspaceReboot()
                         } else {
                             respring()
                             exit(0)
