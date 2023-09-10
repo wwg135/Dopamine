@@ -316,10 +316,10 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 25)
                                 ScrollView {
                                     VStack {
-                                        ForEach(appNames, id: \.self) { name in
-                                            Text(name)
+                                        ForEach(appNames, id: \.0) { (localizedAppName, name) in
+                                            Text("\(localizedAppName) - \(name)")
                                                 .font(.system(size: 16))
-                                                .multilineTextAlignment(.center)
+                                                .multilineTextAlignment(.left)
                                                 .padding(.vertical)
                                         }
                                     }
