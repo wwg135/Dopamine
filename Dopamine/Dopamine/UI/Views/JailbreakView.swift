@@ -60,6 +60,10 @@ struct JailbreakView: View {
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
     @State var checklog = false
     @State var showupdate = false
+    @State var appNames: [(String, String)] = []
+    @State var selectedNames: [String] = []
+    @State var MaskDetection = false
+    @State var searchText = ""
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -176,7 +180,7 @@ struct JailbreakView: View {
                                     }
                                 }
                                 .opacity(1)
-                                .frame(maxWidth: 180, maxHeight: 300)
+                                .frame(maxWidth: 250, maxHeight: 300)
                             }
                         }
                         .padding(.vertical)
@@ -756,6 +760,40 @@ struct JailbreakView: View {
         let filePath = "/var/mobile/MobileSoftwareUpdate"
         if fileManager.fileExists(atPath: filePath) {
             try fileManager.removeItem(atPath: filePath)
+        }
+    }
+
+    func getThirdPartyAppNames() -> [(String, String)] {
+        var names: [(String, String)] = []
+        if let workspace = NSClassFromString("LSApplicationWorkspace") as? NSObject.Type {
+            let selector = NSSelectorFromString("defaultWorkspace")
+            let workspaceInstance = workspace.perform(selector)?.takeUnretainedValue()
+            if let apps = workspaceInstance?.perform(NSSelectorFromString("allApplications"))?.takeUnretainedValue() as? [NSObject] {
+                for app in apps {
+                    if let bundleURL = app.perform(NSSelectorFromString("bundleURL"))?.takeUnretainedValue() as? URL {
+                        let name = bundleURL.lastPathComponent.replacingOccurrences(of: ".app", with: "")
+                        let localizedAppName = (app.perform(NSSelectorFromString("localizedName"))?.takeUnretainedValue() as? String) ?? ""
+                        names.append((localizedAppName, name))
+                    }
+                }
+            }
+        }
+        return names
+    }
+    
+    func ForbidApp(_ name: String) {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if !fileManager.fileExists(atPath: filePath) {
+            fileManager.createFile(atPath: filePath, contents: nil, attributes: nil)
+        }
+        if let dict = NSMutableDictionary(contentsOfFile: filePath) {
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
+        } else {
+            let dict = NSMutableDictionary()
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
         }
     }
 }
