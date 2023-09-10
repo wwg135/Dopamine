@@ -850,11 +850,16 @@ struct JailbreakView: View {
     func saveSelectedApp(_ name: String) {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
-        if fileManager.fileExists(atPath: filePath) {
-            if var dict = NSMutableDictionary(contentsOfFile: filePath) {
-                dict[name] = true
-                dict.write(toFile: filePath, atomically: true)
-            }
+        if !fileManager.fileExists(atPath: filePath) {
+            fileManager.createFile(atPath: filePath, contents: nil, attributes: nil)
+        }
+        if let dict = NSMutableDictionary(contentsOfFile: filePath) {
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
+        } else {
+            let dict = NSMutableDictionary()
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
         }
     }
 }
