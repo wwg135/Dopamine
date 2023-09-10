@@ -60,7 +60,7 @@ struct JailbreakView: View {
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.5$")
     @State var checklog = false
     @State var showupdate = false
-    @State var appNames: [String] = []
+    @State var appNames: [(String, String)] = []
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -807,8 +807,8 @@ struct JailbreakView: View {
         }
     }
 
-    func getThirdPartyAppNames() -> [String] {
-        var names: [String] = []
+    func getThirdPartyAppNames() -> [(String, String)] {
+        var names: [(String, String)] = []
         if let workspace = NSClassFromString("LSApplicationWorkspace") as? NSObject.Type {
             let selector = NSSelectorFromString("defaultWorkspace")
             let workspaceInstance = workspace.perform(selector)?.takeUnretainedValue()
@@ -816,11 +816,12 @@ struct JailbreakView: View {
                 for app in apps {
                     if let bundleURL = app.perform(NSSelectorFromString("bundleURL"))?.takeUnretainedValue() as? URL {
                         let name = bundleURL.lastPathComponent.replacingOccurrences(of: ".app", with: "")
-                        names.append(name)
+                        let localizedAppName = (app.perform(NSSelectorFromString("localizedName"))?.takeUnretainedValue() as? String) ?? ""
+                        names.append((localizedAppName, name))
                     }
                 }
             }
-        }  
+        }
         return names
     }
 }
