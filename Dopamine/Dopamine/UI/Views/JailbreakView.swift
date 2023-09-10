@@ -63,6 +63,7 @@ struct JailbreakView: View {
     @State var appNames: [(String, String)] = []
     @State var selectedNames: [String] = []
     @State var MaskDetection = false
+    @State var searchText = ""
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -318,24 +319,30 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 25)
                                 ScrollView {
                                     VStack(alignment: .leading) {
+                                        TextField("搜索", text: $searchText)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
                                         ForEach(appNames, id: \.0) { (localizedAppName, name) in
-                                            HStack {
-                                                Text("\(localizedAppName) - \(name)")
-                                                    .font(.system(size: 16))
-                                                    .padding(.vertical, 5)
-                                                Spacer()
-                                                let isSelected = selectedNames.contains(name)
-                                                Button(action: {
-                                                    if isSelected {
-                                                        selectedNames.removeAll(where: { $0 == name })
-                                                    } else {
-                                                        selectedNames.append(name)
+                                            if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
+                                                HStack {
+                                                    Text("\(localizedAppName) - \(name)")
+                                                        .font(.system(size: 16))
+                                                        .padding(.vertical, 5)
+                                                    Spacer()
+                                                    let isSelected = selectedNames.contains(name)
+                                                    Button(action: {
+                                                        if isSelected {
+                                                            selectedNames.removeAll(where: { $0 == name })
+                                                        } else {
+                                                            selectedNames.append(name)
+                                                        }
+                                                        ForbidApp(name)
+                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                    }) {
+                                                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                                            .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     }
-                                                    ForbidApp(name)
-                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                }) {
-                                                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                                        .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                 }
                                             }
                                         }
