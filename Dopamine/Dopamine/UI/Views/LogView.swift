@@ -10,10 +10,8 @@ import SwiftfulLoadingIndicators
 
 struct LogView: View {
     @StateObject var logger = Logger.shared
-    
     @Binding var advancedLogsTemporarilyEnabled: Bool
     @Binding var advancedLogsByDefault: Bool
-    
     @State var lastScroll = Date()
     
     let viewAppearanceDate = Date()
@@ -25,9 +23,7 @@ struct LogView: View {
     struct LogRow: View {
         @State var log: LogMessage
         @State var scrollViewFrame: CGRect
-        
         @State var shown = false
-        
         var index: Int
         var lastIndex: Int
         
@@ -60,8 +56,7 @@ struct LogView: View {
                             .foregroundColor(.yellow)
                     }
                     Text(log.text)
-                        .font(.system(isLast ? .body : .subheadline))
-                        .minimumScaleFactor(0.5)
+                        .font(.system(size: 17))
                         .foregroundColor(log.type == .error ? .yellow : .white)
                         .animation(.spring().speed(1.5), value: isLast)
                         .drawingGroup()
