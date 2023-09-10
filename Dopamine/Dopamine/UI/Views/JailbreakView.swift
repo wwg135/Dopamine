@@ -319,7 +319,7 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 25)
                                 ScrollView {
                                     VStack(alignment: .leading) {
-                                        TextField("搜索一下，没惊喜，只有快乐", text: $searchText)
+                                        TextField("搜索一下", text: $searchText)
                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 5)
