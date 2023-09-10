@@ -819,9 +819,12 @@ struct JailbreakView: View {
                     let name = fileName.replacingOccurrences(of: ".app", with: "")
                     names.append(name)
                 }
+                return names
+            } catch {
+                print("Error: \(error)")
+                return []
             }
         }
-        return names
     }
 }
 
