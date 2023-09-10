@@ -333,6 +333,7 @@ struct JailbreakView: View {
                                                             selectedApp.append(name)
                                                         }
                                                     }
+                                            }
                                         }
                                     }
                                 }
