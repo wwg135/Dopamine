@@ -51,6 +51,7 @@ struct JailbreakView: View {
     @State var showTexts = dopamineDefaults().bool(forKey: "showTexts")
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    @AppStorage("MaskDetection", store: dopamineDefaults()) var MaskDetection: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     @State var updateState: UpdateState = .downloading
     @State var progressDouble: Double = 0
@@ -62,7 +63,6 @@ struct JailbreakView: View {
     @State var showupdate = false
     @State var appNames: [(String, String)] = []
     @State var selectedNames: [String] = []
-    @State var MaskDetection = dopamineDefaults().bool(forKey: "MaskDetection") 
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -116,7 +116,7 @@ struct JailbreakView: View {
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(true)
+                            .allowsHitTesting(false)
                     }
                     .ignoresSafeArea()
                     ZStack {
@@ -199,7 +199,7 @@ struct JailbreakView: View {
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(true)
+                            .allowsHitTesting(false)
                             .onTapGesture {
                                 showDownloadPage = false
                             }
@@ -423,7 +423,6 @@ struct JailbreakView: View {
                 }
                 .onTapGesture(count: 1) {
                     MaskDetection.toggle()
-                    dopamineDefaults().set(MaskDetection, forKey: "MaskDetection")
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
 
