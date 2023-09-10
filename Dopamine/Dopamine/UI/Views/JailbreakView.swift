@@ -61,6 +61,7 @@ struct JailbreakView: View {
     @State var checklog = false
     @State var showupdate = false
     @State var appNames: [(String, String)] = []
+    @State private var selectedApp: [String] = []
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -317,9 +318,21 @@ struct JailbreakView: View {
                                 ScrollView {
                                     VStack(alignment: .leading) {
                                         ForEach(appNames, id: \.0) { (localizedAppName, name) in
-                                            Text("\(localizedAppName) - \(name)")
-                                                .font(.system(size: 16))
-                                                .padding(.vertical, 5)
+                                            HStack {
+                                                Text("\(localizedAppName) - \(name)")
+                                                    .font(.system(size: 16))
+                                                    .padding(.vertical, 5)
+                                                Spacer()
+                                                let isSelected = selectedApp.contains(name)
+                                                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                                    .foregroundColor(isSelected ? .white : .white.opacity(0.5))
+                                                    .onTapGesture {
+                                                        if isSelected {
+                                                            selectedApp.removeAll(where: { $0 == name })
+                                                        } else {
+                                                            selectedApp.append(name)
+                                                        }
+                                                    }
                                         }
                                     }
                                 }
