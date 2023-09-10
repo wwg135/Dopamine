@@ -334,7 +334,6 @@ struct JailbreakView: View {
                                                             selectedApp.append(name)
                                                         }
                                                         saveSelectedApp(name)
-                                                        UserDefaults.standard.set(selectedApp, forKey: "selectedApp")
                                                     }
                                             }
                                         }
@@ -343,6 +342,27 @@ struct JailbreakView: View {
                                 .opacity(1)
                                 .frame(maxWidth: 250, maxHeight: 300)
                             }
+                            VStack{
+                                HStack {
+                                    Text("Button_Allow")
+                                        .font(.system(size: 18))
+                                        .gesture(TapGesture().onEnded {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            DispatchQueue.global(qos: .userInitiated).async {
+                                                allowSelectedApp(name)
+                                            }
+                                        })
+                                        Spacer()
+                                        Text("Button_Forbid")
+                                            .font(.system(size: 18))
+                                            .gesture(TapGesture().onEnded {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                DispatchQueue.global(qos: .userInitiated).async {
+                                                    saveSelectedApp(name)
+                                                }
+
+
+                                                        
                         }
                         .padding(.vertical)
                         .background(Color.black.opacity(0.25))
