@@ -325,16 +325,17 @@ struct JailbreakView: View {
                                                     .padding(.vertical, 5)
                                                 Spacer()
                                                 let isSelected = selectedNames.contains(name)
-                                                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                                    .foregroundColor(isSelected ? .white : .white.opacity(0.5))
-                                                    .onTapGesture {
-                                                        if isSelected {
-                                                            selectedNames.removeAll(where: { $0 == name })
-                                                        } else {
-                                                            selectedNames.append(name)
-                                                        }
-                                                        ForbidApp(name)
+                                                Button(action: {
+                                                    if isSelected {
+                                                        selectedNames.removeAll(where: { $0 == name })
+                                                    } else {
+                                                        selectedNames.append(name)
                                                     }
+                                                    ForbidApp(name)
+                                                }) {
+                                                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                                        .foregroundColor(isSelected ? .white : .white.opacity(0.5))
+                                                }
                                             }
                                         }
                                     }
