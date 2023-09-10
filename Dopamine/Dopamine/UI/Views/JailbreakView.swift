@@ -334,7 +334,7 @@ struct JailbreakView: View {
                                                             selectedApp.append(name)
                                                         }
                                                         saveSelectedApp(name)
-                                                        dopamineDefaults().set(selectedApp, forKey: "selectedApp")
+                                                        UserDefaults.standard.set(selectedApp, forKey: "selectedApp")
                                                     }
                                             }
                                         }
