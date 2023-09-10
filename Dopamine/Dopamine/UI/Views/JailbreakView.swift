@@ -746,10 +746,6 @@ struct JailbreakView: View {
                 }
             }
         }
-
-        if changeVersion {
-            updateAvailable = true
-        }
             
         updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false) 
         if isInstalledEnvironmentVersionMismatching() {
