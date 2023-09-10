@@ -328,7 +328,7 @@ struct JailbreakView: View {
                                                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                     .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     .onTapGesture {
-                                                        saveSelectedApp()
+                                                        saveSelectedApp(name)
                                                     }
                                             }
                                         }
@@ -842,14 +842,12 @@ struct JailbreakView: View {
         return names
     }
 
-    func saveSelectedApp() {
+    func saveSelectedApp(_ name: String) {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
         if fileManager.fileExists(atPath: filePath) {
             if var dict = NSMutableDictionary(contentsOfFile: filePath) {
-                for name in selectedApp {
-                    dict[name] = true
-                } 
+                dict[name] = true
                 dict.write(toFile: filePath, atomically: true)
             }
         }
