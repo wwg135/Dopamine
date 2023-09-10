@@ -38,24 +38,7 @@ func respring() {
 }
 
 func userspaceReboot() {
-    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-    
-    // MARK: Fade out Animation
-    
-    let view = UIView(frame: UIScreen.main.bounds)
-    view.backgroundColor = .black
-    view.alpha = 0
-
-    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
-        window.addSubview(view)
-        UIView.animate(withDuration: 0.2, delay: 0, animations: {
-            view.alpha = 1
-        })
-    }
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-        _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
-    })
+    _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
 }
 
 func reboot() {
@@ -141,24 +124,6 @@ func changeMobilePassword(newPassword: String) {
     _ = execCmd(args: [dashPath, "-c", String(format: "printf \"%%s\\n\" \"\(newPassword)\" | \(pwPath) usermod 501 -h 0")])
 }
 
-
-func changeEnvironmentVisibility(hidden: Bool) {
-    if hidden {
-        _ = execCmd(args: [CommandLine.arguments[0], "hide_environment"])
-    }
-    else {
-        _ = execCmd(args: [CommandLine.arguments[0], "unhide_environment"])
-    }
-
-    if isJailbroken() {
-        jbdSetFakelibVisible(!hidden)
-    }
-}
-
-func isEnvironmentHidden() -> Bool {
-    return !FileManager.default.fileExists(atPath: "/var/jb")
-}
-
 func update(tipaURL: URL) {
     DispatchQueue.global(qos: .userInitiated).async {
         jbdUpdateFromTIPA(tipaURL.path, true)
@@ -178,7 +143,6 @@ func isInstalledEnvironmentVersionMismatching() -> Bool {
 func updateEnvironment() {
     jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
 }
-
 
 // debugging
 func isSandboxed() -> Bool {
