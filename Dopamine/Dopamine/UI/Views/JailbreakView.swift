@@ -325,7 +325,7 @@ struct JailbreakView: View {
                                                     .padding(.vertical, 5)
                                                 Spacer()
                                                 let isSelected = selectedApp.contains(name)
-                                                let imageName = isSelected ? "checkmark.circle.fill" : "circle"
+                                                var imageName = isSelected ? "checkmark.circle.fill" : "circle"
                                                 Image(systemName: imageName)
                                                     .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     .onTapGesture {
