@@ -62,6 +62,7 @@ struct JailbreakView: View {
     @State var showupdate = false
     @State var appNames: [(String, String)] = []
     @State private var selectedApp: [String] = []
+    @State var MaskDetection = dopamineDefaults().bool(forKey: "MaskDetection")  
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -296,7 +297,7 @@ struct JailbreakView: View {
                     }
                 }
 
-                if showTexts {
+                if MaskDetection {
                     GeometryReader { geometry in
                         Color.black.opacity(0.15)
                             .zIndex(1)
@@ -410,11 +411,18 @@ struct JailbreakView: View {
         let tint = Color.white
         HStack {
             VStack(alignment: .leading) {
-                Image(!isJailbroken() ? "DopamineLogo2" : "DopamineLogo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: 200)
-                    .padding(.top)
+                Group {
+                    Image(!isJailbroken() ? "DopamineLogo2" : "DopamineLogo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 200)
+                        .padding(.top)
+                }
+                .onTapGesture(count: 1) {
+                    MaskDetection.toggle()
+                    dopamineDefaults().set(MaskDetection, forKey: "MaskDetection")
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                }
 
                 Group {
                     Text("Title_Supported_iOS_Versions")
