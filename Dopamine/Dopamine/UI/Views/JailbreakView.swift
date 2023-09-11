@@ -64,7 +64,6 @@ struct JailbreakView: View {
     @State var selectedNames: [String] = []
     @State var MaskDetection = false
     @State var searchText = ""
-    @State var isban = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -339,16 +338,11 @@ struct JailbreakView: View {
                                                         } else {
                                                             selectedNames.append(name)
                                                         }
-                                                        isban = true
                                                         ForbidApp(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                             .foregroundColor(isSelected ? .white : .white.opacity(0.5))
-                                                    }
-                                                    if isban && isSelected {
-                                                        Text("✓")
-                                                            .foregroundColor(.green)
                                                     }
                                                 }
                                             }
