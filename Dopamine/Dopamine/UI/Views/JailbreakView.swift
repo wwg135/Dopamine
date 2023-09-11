@@ -334,7 +334,6 @@ struct JailbreakView: View {
                                                         .font(.system(size: 16))
                                                         .padding(.vertical, 5)
                                                     Spacer()
-                                                    let isSelected = selectedNames.contains(name)
                                                     Button(action: {
                                                         selectedName = isSelected ? nil : name
                                                         if !checked && selectedName == name {
