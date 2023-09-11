@@ -350,9 +350,9 @@ struct JailbreakView: View {
                                                             .foregroundColor(.green)
                                                     }
                                                 }
-                                                .onAppear {
-                                                    showcheckmark(name)
-                                                }
+                                            }
+                                            .onAppear {
+                                                showcheckmark(name)
                                             }
                                         }
                                     }
