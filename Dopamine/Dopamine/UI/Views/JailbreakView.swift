@@ -338,7 +338,6 @@ struct JailbreakView: View {
                                                     Button(action: {
                                                         if isSelected {
                                                             selectedNames.removeAll(where: { $0 == name })
-                                                            deletedNames.removeAll(where: { $0 == name })
                                                         } else {
                                                             selectedNames.append(name)
                                                         }
@@ -352,7 +351,6 @@ struct JailbreakView: View {
                                                     let isDeleted = deletedNames.contains(name)
                                                     Button(action: {
                                                         if isDeleted {
-                                                            selectedNames.removeAll(where: { $0 == name })
                                                             deletedNames.removeAll(where: { $0 == name })
                                                         } else {
                                                             deletedNames.append(name)
