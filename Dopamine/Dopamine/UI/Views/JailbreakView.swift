@@ -62,8 +62,10 @@ struct JailbreakView: View {
     @State var showupdate = false
     @State var appNames: [(String, String)] = []
     @State var selectedNames: [String] = []
+    @State var deletedNames: [String] = []
     @State var MaskDetection = false
     @State var searchText = ""
+    @Environment(\.colorScheme) var colorScheme
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -323,7 +325,7 @@ struct JailbreakView: View {
                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 5)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(colorScheme == .dark ? .white : .black)
                                         ForEach(appNames, id: \.0) { (localizedAppName, name) in
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
@@ -346,18 +348,18 @@ struct JailbreakView: View {
                                                             .foregroundColor(isSelected ? .green : .green.opacity(0.5))
                                                     }
                                                     Spacer().frame(width: 10)
-                                                    let deleteApp = selectedNames.contains(name)
+                                                    let isDeleted = deletedNames.contains(name)
                                                     Button(action: {
-                                                        if deleteApp {
-                                                            selectedNames.removeAll(where: { $0 == name })
+                                                        if isDeleted {
+                                                            deletedNames.removeAll(where: { $0 == name })
                                                         } else {
-                                                            selectedNames.append(name)
+                                                            deletedNames.append(name)
                                                         }
                                                         removeApp(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
-                                                        Image(systemName: deleteApp ? "xmark.circle.fill" : "circle")
-                                                            .foregroundColor(deleteApp ? .red : .red.opacity(0.5))
+                                                        Image(systemName: isDeleted ? "xmark.circle.fill" : "circle")
+                                                            .foregroundColor(isDeleted ? .red : .red.opacity(0.5))
                                                     }
                                                 }
                                             }
