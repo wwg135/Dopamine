@@ -61,7 +61,7 @@ struct JailbreakView: View {
     @State var checklog = false
     @State var showupdate = false
     @State var appNames: [(String, String)] = []
-    @State var selectedName: String?
+    @State var selectedNames: [String] = []
     @State var MaskDetection = false
     @State var searchText = ""
     @State var isban = false
@@ -326,22 +326,29 @@ struct JailbreakView: View {
                                             .padding(.vertical, 5)
                                             .foregroundColor(.black)
                                         ForEach(appNames, id: \.0) { (localizedAppName, name) in
-                                            let isSelected = selectedName == name
-                                            let checked = showCheckmark(name)
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
                                                     Text("\(localizedAppName) - \(name)")
                                                         .font(.system(size: 16))
                                                         .padding(.vertical, 5)
                                                     Spacer()
+                                                    let isSelected = selectedNames.contains(name)
                                                     Button(action: {
-                                                        selectedName = isSelected ? nil : name
-                                                        if !checked && selectedName == name {
-                                                            ForbidApp(name)
+                                                        if isSelected {
+                                                            selectedNames.removeAll(where: { $0 == name })
+                                                        } else {
+                                                            selectedNames.append(name)
                                                         }
+                                                        ForbidApp(name)
+                                                        showCheckmark(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
-                                                        Image(systemName: checked ? showCheckmark(name) ? "checkmark.circle.fill" : "circle" : checked ? .white : .white.opacity(0.5))
+                                                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                                            .foregroundColor(isSelected ? .white : .white.opacity(0.5))
+                                                    }
+                                                    if isban {
+                                                        Text("√")
+                                                            .foregroundColor(.green)
                                                     }
                                                 }
                                             }
@@ -877,11 +884,10 @@ struct JailbreakView: View {
         if fileManager.fileExists(atPath: filePath) {
             if let dict = NSDictionary(contentsOfFile: filePath) as? [String: Any] {
                 if dict[name] != nil {
-                    return true
+                    isban = true
                 }
             }
         }
-        return false
     }
 }
 
