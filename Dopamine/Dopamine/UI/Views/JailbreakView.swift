@@ -62,6 +62,7 @@ struct JailbreakView: View {
     @State var showupdate = false
     @State var appNames: [(String, String)] = []
     @State var selectedNames: [String] = []
+    @State var deletedNames: [String] = []
     @State var MaskDetection = false
     @State var searchText = ""
     @Environment(\.colorScheme) var colorScheme
