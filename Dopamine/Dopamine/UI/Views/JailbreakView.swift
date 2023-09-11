@@ -341,6 +341,7 @@ struct JailbreakView: View {
                                                         }
                                                         ForbidApp(name)
                                                         dopamineDefaults().set(selectedNames, forKey: selectNamesKey)
+                                                        dopamineDefaults().set(isSelected, forKey: "\(name)_isSelected")
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
