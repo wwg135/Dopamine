@@ -51,10 +51,9 @@ jobs:
       
       - name: Pre body
         run: |
-          echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 当前为自用测试版，谨慎安装，请下载上一个版本即可" >> body.txt
+          echo -e "\n> - 1.屏蔽越狱检测，增加绿色打勾“√”标识表示已经屏蔽\n> - 2.增加添加、删除操作，点击“绿色”圆圈添加，点击“红色”圆圈删除" >> body.txt
   
       - name: Build ipa
         run: |
