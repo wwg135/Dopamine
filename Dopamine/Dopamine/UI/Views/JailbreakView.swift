@@ -341,15 +341,10 @@ struct JailbreakView: View {
                                                             selectedNames.append(name)
                                                         }
                                                         ForbidApp(name)
-                                                        showcheckmark(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
-                                                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                                            .foregroundColor(isSelected ? .white : .white.opacity(0.5))
-                                                    }
-                                                    if isban {
-                                                        Text("✓")
-                                                            .foregroundColor(.green)
+                                                        Image(systemName: showCheckmark(name) ? "checkmark.circle.fill" : "circle")
+                                                            .foregroundColor(showCheckmark(name) ? .white : .white.opacity(0.5))
                                                     }
                                                 }
                                             }
@@ -879,16 +874,17 @@ struct JailbreakView: View {
         }
     }
 
-    func showcheckmark(_ name: String) {
+    func showcheckmark(_ name: String) -> Bool {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
         if fileManager.fileExists(atPath: filePath) {
             if let dict = NSDictionary(contentsOfFile: filePath) as? [String: Any] {
                 if dict[name] != nil {
-                    isban = true
+                    return true
                 }
             }
         }
+        return false
     }
 }
 
