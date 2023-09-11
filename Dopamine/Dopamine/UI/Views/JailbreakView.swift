@@ -347,7 +347,7 @@ struct JailbreakView: View {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                             .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     }
-                                                    if isban {
+                                                    if isban && isSelected {
                                                         Text("√")
                                                             .foregroundColor(.green)
                                                     }
