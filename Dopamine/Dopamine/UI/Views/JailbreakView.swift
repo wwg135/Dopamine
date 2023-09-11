@@ -351,9 +351,9 @@ struct JailbreakView: View {
                                                     }
                                                 }
                                             }
-                                            .onAppear {
-                                                showcheckmark(name)
-                                            }
+                                        }
+                                        .onAppear {
+                                            showcheckmark(name)
                                         }
                                     }
                                 }
