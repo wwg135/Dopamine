@@ -871,7 +871,7 @@ struct JailbreakView: View {
         }
     }
 
-    func showcheckmark(_ name: String) -> Bool {
+    func showCheckmark(_ name: String) -> Bool {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
         if fileManager.fileExists(atPath: filePath) {
