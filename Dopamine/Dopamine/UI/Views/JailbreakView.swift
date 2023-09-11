@@ -64,7 +64,7 @@ struct JailbreakView: View {
     @State var selectedNames: [String] = []
     @State var MaskDetection = false
     @State var searchText = ""
-    @State var selectNamesKey = "selectNamesKey"
+    @State var isban = dopamineDefaults().bool(forKey: "isban")
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -336,6 +336,8 @@ struct JailbreakView: View {
                                                     Button(action: {
                                                         if isSelected {
                                                             selectedNames.removeAll(where: { $0 == name })
+                                                            isban.toggle()
+                                                            dopamineDefaults().set(isban, forKey: "isban")
                                                         } else {
                                                             selectedNames.append(name)
                                                         }
@@ -344,6 +346,11 @@ struct JailbreakView: View {
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                             .foregroundColor(isSelected ? .white : .white.opacity(0.5))
+                                                    }
+                                                    Spacer()
+                                                    if isban {
+                                                        Image(systemName: "checkmark")
+                                                            .foregroundColor(.red)
                                                     }
                                                 }
                                             }
