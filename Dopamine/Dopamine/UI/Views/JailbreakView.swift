@@ -340,7 +340,6 @@ struct JailbreakView: View {
                                                             selectedNames.append(name)
                                                         }
                                                         ForbidApp(name)
-                                                        dopamineDefaults().set(isSelected, forKey: "\(name)_isSelected")
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
