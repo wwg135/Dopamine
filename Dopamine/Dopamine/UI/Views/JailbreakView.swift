@@ -336,18 +336,18 @@ struct JailbreakView: View {
                                                     Button(action: {
                                                         if isSelected {
                                                             selectedNames.removeAll(where: { $0 == name })
-                                                            isban.toggle()
-                                                            dopamineDefaults().set(isban, forKey: "isban")
                                                         } else {
                                                             selectedNames.append(name)
                                                         }
                                                         ForbidApp(name)
+                                                        isban.toggle()
+                                                        dopamineDefaults().set(isban, forKey: "isban")
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                             .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     }
-                                                    if isban {
+                                                    if isban && isSelected {
                                                         Text("✓")
                                                             .foregroundColor(.green)
                                                     }
