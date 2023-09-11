@@ -59,7 +59,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前版本更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.维护更新1.0.5版本\n> - 2.删除原来设置里面的屏蔽app检测越狱功能，新增窗口点击选中列表app进行屏蔽，可搜索（针对已安装的App）\n> - 3.自定义屏蔽请点击首页顶部“Dopamine”，就弹出来了\n> - 4.删除设置里面的更换版本，很多人用不上\n> - 5.其他优化" >> body.txt
+          echo -e "\n> - 1.维护更新1.0.5版本\n> - 2.屏蔽越狱检测，增加绿色打勾“√”标识表示已经屏蔽\n> - 3.增加添加、删除操作，点击“绿色”圆圈添加，点击“红色”圆圈删除" >> body.txt
   
       - name: Build ipa
         run: |
