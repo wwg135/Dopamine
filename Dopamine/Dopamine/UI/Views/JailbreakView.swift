@@ -335,11 +335,11 @@ struct JailbreakView: View {
                                                     let isSelected = selectedNames.contains(name)
                                                     Button(action: {
                                                         if isSelected {
-                                                            isban = true
                                                             selectedNames.removeAll(where: { $0 == name })
                                                         } else {
                                                             selectedNames.append(name)
                                                         }
+                                                        isban = true
                                                         ForbidApp(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
@@ -347,7 +347,7 @@ struct JailbreakView: View {
                                                             .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     }
                                                     if isban && isSelected {
-                                                        Text("✔")
+                                                        Text("✓")
                                                             .foregroundColor(.green)
                                                     }
                                                 }
