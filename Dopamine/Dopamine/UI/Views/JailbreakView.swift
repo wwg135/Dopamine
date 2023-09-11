@@ -325,7 +325,8 @@ struct JailbreakView: View {
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 5)
                                             .foregroundColor(.black)
-                                        ForEach(appNames, id: \.0) { (localizedAppName, name) in
+                                        ForEach(appNames, id: \.0) { item in
+                                            let (localizedAppName, name) = item
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
                                                     Text("\(localizedAppName) - \(name)")
@@ -882,15 +883,13 @@ struct JailbreakView: View {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
         if fileManager.fileExists(atPath: filePath) {
-            if let dict = NSDictionary(contentsOfFile: filePath) as? [String: Any],
-            let value = dict["key"] as? String,
-            value == name {
-                isban = true
-                return
+            if let dict = fileManager.contents(atPath: filePath)?.propertyList(from: nil) as? [String:Any] {
+                if dict[name] != nil {
+                    isban = true
+                }
             }
         }
-        isban = false
-    }  
+    }
 }
 
 struct JailbreakView_Previews: PreviewProvider {
