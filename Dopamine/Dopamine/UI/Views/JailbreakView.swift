@@ -876,14 +876,12 @@ struct JailbreakView: View {
     func isAppForbidden(_ name: String) -> Bool {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
-        if fileManager.fileExists(atPath: filePath) {
-            if let dict = NSMutableDictionary(contentsOfFile: filePath) {
-                dict[name] != nil {
-                    return true
-                }
-                return false
-            }
+        if fileManager.fileExists(atPath: filePath),
+        let dict = NSMutableDictionary(contentsOfFile: filePath),
+        dict[name] != nil {
+            return true
         }
+        return false
     }
 }
 
