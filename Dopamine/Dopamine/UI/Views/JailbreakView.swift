@@ -347,10 +347,9 @@ struct JailbreakView: View {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                             .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     }
-                                                    Spacer()
                                                     if isban {
-                                                        Image(systemName: "checkmark")
-                                                            .foregroundColor(.red)
+                                                        Text("✓")
+                                                            .foregroundColor(.green)
                                                     }
                                                 }
                                             }
