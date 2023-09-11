@@ -64,7 +64,7 @@ struct JailbreakView: View {
     @State var selectedNames: [String] = []
     @State var MaskDetection = false
     @State var searchText = ""
-    @State var selectNamesKey = dopamineDefaults().bool(forKey: "selectNamesKey")
+    @State var selectNamesKey = "selectNamesKey"
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
