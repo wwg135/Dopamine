@@ -340,7 +340,6 @@ struct JailbreakView: View {
                                                             selectedNames.append(name)
                                                         }
                                                         ForbidApp(name)
-                                                        showcheckmark(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
@@ -350,6 +349,9 @@ struct JailbreakView: View {
                                                         Text("✓")
                                                             .foregroundColor(.green)
                                                     }
+                                                }
+                                                .onAppear {
+                                                    showcheckmark(name)
                                                 }
                                             }
                                         }
