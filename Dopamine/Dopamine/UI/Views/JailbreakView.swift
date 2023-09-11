@@ -883,7 +883,7 @@ struct JailbreakView: View {
         let fileManager = FileManager.default
         let filePath = "/var/mobile/zp.unject.plist"
         if fileManager.fileExists(atPath: filePath) {
-            if let dict = fileManager.contents(atPath: filePath)?.propertyList(from: nil) as? [String:Any] {
+            if let dict = NSDictionary(contentsOfFile: filePath) as? [String: Any] {
                 if dict[name] != nil {
                     isban = true
                 }
