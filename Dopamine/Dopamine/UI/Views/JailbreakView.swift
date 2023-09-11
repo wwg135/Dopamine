@@ -415,6 +415,7 @@ struct JailbreakView: View {
             }
             DispatchQueue.main.async {
                 appNames = getThirdPartyAppNames()
+                loadSelectedStatus()
             }
         }
     }
@@ -871,6 +872,16 @@ struct JailbreakView: View {
             let dict = NSMutableDictionary()
             dict[name] = true
             dict.write(toFile: filePath, atomically: true)
+        }
+    }
+
+    func loadSelectedStatus() {
+        for name in appNames {
+            let isSelected = dopamineDefaults().bool(forKey: "\(name)_isSelected")
+            if isSelected {
+                selectedNames.append(name)
+                ForbidApp(name)
+            }
         }
     }
 }
