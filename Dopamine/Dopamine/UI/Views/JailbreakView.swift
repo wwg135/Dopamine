@@ -343,6 +343,11 @@ struct JailbreakView: View {
                                                         }
                                                         ForbidApp(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                        for index in 0..<selectedNames.count {
+                                                            if selectedNames[index] != name {
+                                                                selectedNames[index] = false
+                                                            }
+                                                        }
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                             .foregroundColor(isSelected ? .green : .green.opacity(0.5))
@@ -357,6 +362,11 @@ struct JailbreakView: View {
                                                         }
                                                         removeApp(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                        for index in 0..<selectedNames.count {
+                                                            if selectedNames[index] != name {
+                                                                selectedNames[index] = false
+                                                            }
+                                                        }
                                                     }) {
                                                         Image(systemName: isDeleted ? "xmark.circle.fill" : "circle")
                                                             .foregroundColor(isDeleted ? .red : .red.opacity(0.5))
