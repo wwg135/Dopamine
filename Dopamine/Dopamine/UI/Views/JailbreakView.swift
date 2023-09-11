@@ -327,7 +327,8 @@ struct JailbreakView: View {
                                         ForEach(appNames, id: \.0) { (localizedAppName, name) in
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
-                                                    Text("\(localizedAppName) - \(name)")
+                                                    let isForbidden = isAppForbidden(name)
+                                                    Text("\(localizedAppName) - \(name)\(isForbidden ? " 标识" : "")")
                                                         .font(.system(size: 16))
                                                         .padding(.vertical, 5)
                                                     Spacer()
@@ -869,6 +870,19 @@ struct JailbreakView: View {
             let dict = NSMutableDictionary()
             dict[name] = true
             dict.write(toFile: filePath, atomically: true)
+        }
+    }
+
+    func isAppForbidden(_ name: String) -> Bool {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if fileManager.fileExists(atPath: filePath) {
+            if let dict = NSMutableDictionary(contentsOfFile: filePath) {
+                dict[name] != nil {
+                    return true
+                }
+                return false
+            }
         }
     }
 }
