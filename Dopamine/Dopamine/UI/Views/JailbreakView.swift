@@ -341,7 +341,6 @@ struct JailbreakView: View {
                                                             selectedNames.append(name)
                                                         }
                                                         ForbidApp(name)
-                                                        showCheckmark(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
