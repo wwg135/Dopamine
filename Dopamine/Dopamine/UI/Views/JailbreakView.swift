@@ -335,6 +335,7 @@ struct JailbreakView: View {
                                                     let isSelected = selectedNames.contains(name)
                                                     Button(action: {
                                                         if isSelected {
+                                                            isban = true
                                                             selectedNames.removeAll(where: { $0 == name })
                                                         } else {
                                                             selectedNames.append(name)
@@ -875,18 +876,6 @@ struct JailbreakView: View {
             let dict = NSMutableDictionary()
             dict[name] = true
             dict.write(toFile: filePath, atomically: true)
-        }
-    }
-
-    func showCheckmark(_ name: String) -> Bool {
-        let fileManager = FileManager.default
-        let filePath = "/var/mobile/zp.unject.plist"
-        if fileManager.fileExists(atPath: filePath) {
-            if let dict = NSDictionary(contentsOfFile: filePath) as? [String: Any] {
-                if dict[name] != nil {
-                    isban = true
-                }
-            }
         }
     }
 }
