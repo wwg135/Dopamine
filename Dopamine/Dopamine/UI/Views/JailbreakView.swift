@@ -347,7 +347,7 @@ struct JailbreakView: View {
                                                             .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     }
                                                     if isban && isSelected {
-                                                        Text("√")
+                                                        Text("✔")
                                                             .foregroundColor(.green)
                                                     }
                                                 }
