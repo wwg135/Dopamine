@@ -327,7 +327,8 @@ struct JailbreakView: View {
                                         ForEach(appNames, id: \.0) { (localizedAppName, name) in
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
-                                                    Text("\(localizedAppName) - \(name)")
+                                                    let isForbidden = isAppForbidden(name)
+                                                    Text("\(localizedAppName) - \(name)\(isForbidden ? Text("  ✓").foregroundColor(.green) : Text(""))")
                                                         .font(.system(size: 16))
                                                         .padding(.vertical, 5)
                                                     Spacer()
@@ -342,7 +343,21 @@ struct JailbreakView: View {
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                                            .foregroundColor(isSelected ? .white : .white.opacity(0.5))
+                                                            .foregroundColor(isSelected ? .green : .green.opacity(0.5))
+                                                    }
+                                                    Spacer().frame(width: 10)
+                                                    let deleteApp = selectedNames.contains(name)
+                                                    Button(action: {
+                                                        if deleteApp {
+                                                            selectedNames.removeAll(where: { $0 == name })
+                                                        } else {
+                                                            selectedNames.append(name)
+                                                        }
+                                                        removeApp(name)
+                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                    }) {
+                                                        Image(systemName: deleteApp ? "xmark.circle.fill" : "circle")
+                                                            .foregroundColor(deleteApp ? .red : .red.opacity(0.5))
                                                     }
                                                 }
                                             }
@@ -868,6 +883,27 @@ struct JailbreakView: View {
         } else {
             let dict = NSMutableDictionary()
             dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
+        }
+    }
+
+    func isAppForbidden(_ name: String) -> Bool {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if fileManager.fileExists(atPath: filePath),
+        let dict = NSMutableDictionary(contentsOfFile: filePath),
+        dict[name] != nil {
+            return true
+        }
+        return false
+    }
+
+    func removeApp(_ name: String) {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if fileManager.fileExists(atPath: filePath),
+        let dict = NSMutableDictionary(contentsOfFile: filePath) {
+            dict.removeObject(forKey: name)
             dict.write(toFile: filePath, atomically: true)
         }
     }
