@@ -64,7 +64,7 @@ struct JailbreakView: View {
     @State var selectedNames: [String] = []
     @State var MaskDetection = false
     @State var searchText = ""
-    @State var isban = dopamineDefaults().bool(forKey: "isban")
+    @State var isban = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -340,14 +340,13 @@ struct JailbreakView: View {
                                                             selectedNames.append(name)
                                                         }
                                                         ForbidApp(name)
-                                                        isban.toggle()
-                                                        dopamineDefaults().set(isban, forKey: "isban")
+                                                        showcheckmark(name)
                                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     }) {
                                                         Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                                                             .foregroundColor(isSelected ? .white : .white.opacity(0.5))
                                                     }
-                                                    if isban && isSelected {
+                                                    if isban {
                                                         Text("✓")
                                                             .foregroundColor(.green)
                                                     }
@@ -878,6 +877,20 @@ struct JailbreakView: View {
             dict.write(toFile: filePath, atomically: true)
         }
     }
+
+    func showcheckmark(_ name: String) {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if fileManager.fileExists(atPath: filePath) {
+            if let dict = NSDictionary(contentsOfFile: filePath) as? [String: Any],
+            let value = dict["key"] as? String,
+            value == name {
+                isban = true
+                return
+            }
+        }
+        isban = false
+    }  
 }
 
 struct JailbreakView_Previews: PreviewProvider {
