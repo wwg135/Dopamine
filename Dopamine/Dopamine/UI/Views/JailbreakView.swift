@@ -139,29 +139,24 @@ struct JailbreakView: View {
                                             .multilineTextAlignment(.center)
                                             .padding(.vertical)
                                             .onTapGesture {
-                                                if let range = (try? AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace))).range(of: "点击当前版本下载") {
-                                                    let startIndex = range.lowerBound
-                                                    let endIndex = range.upperBound
-                                                    let targetRange = startIndex..<endIndex
-                                                    showDownloadPage = true
-                                                    updateAvailable = false
-                                                    DispatchQueue.global(qos: .userInitiated).async {
-                                                        if requiresEnvironmentUpdate {
-                                                            updateState = .updating
-                                                            DispatchQueue.global(qos: .userInitiated).async {
-                                                                updateEnvironment()
-                                                            }
-                                                        } else {
-                                                            updateState = .downloading
-                                                            if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), targetText: "点击当前版本下载") {
-                                                                Task {
-                                                                    do {
-                                                                        try await downloadUpdateAndInstall(downloadURL)
-                                                                        updateState = .updating
-                                                                    } catch {
-                                                                        showLogView = true
-                                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                                                    }
+                                                showDownloadPage = true
+                                                updateAvailable = false
+                                                DispatchQueue.global(qos: .userInitiated).async {
+                                                    if requiresEnvironmentUpdate {
+                                                        updateState = .updating
+                                                        DispatchQueue.global(qos: .userInitiated).async {
+                                                            updateEnvironment()
+                                                        }
+                                                    } else {
+                                                        updateState = .downloading
+                                                        if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), targetText: "点击当前版本下载") {
+                                                            Task {
+                                                                do {
+                                                                    try await downloadUpdateAndInstall(downloadURL)
+                                                                    updateState = .updating
+                                                                } catch {
+                                                                    showLogView = true
+                                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                                 }
                                                             }
                                                         }
