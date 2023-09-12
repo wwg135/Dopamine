@@ -878,6 +878,14 @@ struct JailbreakView: View {
             dict.write(toFile: filePath, atomically: true)
         }
     }
+
+    func extractDownloadURL(from text: String) -> URL? {
+        if let url = URL(string: text), url.scheme == "https" {
+            return url
+        } else {
+            return nil
+        }
+    }
 }
 
 struct JailbreakView_Previews: PreviewProvider {
