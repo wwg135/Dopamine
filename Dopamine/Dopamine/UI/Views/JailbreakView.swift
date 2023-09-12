@@ -153,7 +153,7 @@ struct JailbreakView: View {
                                         }
                                     } else {
                                         updateState = .downloading
-                                        if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), targetText: "点击当前版本下载") {
+                                        if let downloadURL = extractDownloadURL(from: updateChangelog, targetText: "点击当前版本下载") {
                                             Task {
                                                 do {
                                                     try await downloadUpdateAndInstall(downloadURL)
