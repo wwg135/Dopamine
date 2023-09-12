@@ -142,7 +142,7 @@ struct JailbreakView: View {
                                             .multilineTextAlignment(.center)
                                             .padding(.vertical)
                                             .onTapGesture {
-                                                if let attributedString = try? AttributedString(markdown: isVersionMismatch ? mismatchChangelog : updateChangelog ?? " ", options: []), 
+                                                if let attributedString = try? AttributedString(markdown: isInstalledEnvironmentVersionMismatching() ? mismatchChangelog : updateChangelog ?? " ", options: []), 
                                                 let string = attributedString.string,
                                                 let range = string.range(of: "点击当前版本下载") {
                                                     let startIndex = range.lowerBound
