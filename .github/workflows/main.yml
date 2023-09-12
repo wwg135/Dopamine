@@ -53,7 +53,7 @@ jobs:
         run: |
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 屏蔽越狱检测的搜索栏适配系统的深色、浅色模式" >> body.txt
+          echo -e "\n> - 当前为个人测试版，谨慎安装，后果自负" >> body.txt
   
       - name: Build ipa
         run: |
