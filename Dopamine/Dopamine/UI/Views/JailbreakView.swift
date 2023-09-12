@@ -141,6 +141,7 @@ struct JailbreakView: View {
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)
                                 }
+                                .padding(.horizontal, 15)
                             }
                             Button {
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
