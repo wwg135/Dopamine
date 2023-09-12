@@ -136,41 +136,47 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    VStack {
-                                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                            .font(.system(size: 16))
-                                            .multilineTextAlignment(.center)
-                                            .padding(.vertical)
-                                            .onTapGesture {
-                                                showDownloadPage = true
-                                                updateAvailable = false
-                                                DispatchQueue.global(qos: .userInitiated).async {
-                                                    if requiresEnvironmentUpdate {
-                                                        updateState = .updating
-                                                        DispatchQueue.global(qos: .userInitiated).async {
-                                                            updateEnvironment()
-                                                        }
-                                                    } else {
-                                                        updateState = .downloading
-                                                        if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), targetText: "点击当前版本下载") {
-                                                            Task {
-                                                                do {
-                                                                    try await downloadUpdateAndInstall(downloadURL)
-                                                                    updateState = .updating
-                                                                } catch {
-                                                                    showLogView = true
-                                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                                                }
-                                                            }
-                                                        }
-                                                    }
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                        .font(.system(size: 16))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical)
+                                }
+                            }
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                showDownloadPage = true
+                                updateAvailable = false
+                                DispatchQueue.global(qos: .userInitiated).async {
+                                    if requiresEnvironmentUpdate {
+                                        updateState = .updating
+                                        DispatchQueue.global(qos: .userInitiated).async {
+                                            updateEnvironment()
+                                        }
+                                    } else {
+                                        updateState = .downloading
+                                        if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), targetText: "点击当前版本下载") {
+                                            Task {
+                                                do {
+                                                    try await downloadUpdateAndInstall(downloadURL)
+                                                    updateState = .updating
+                                                } catch {
+                                                    showLogView = true
+                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                 }
                                             }
+                                        }
                                     }
                                 }
-                                .opacity(1)
-                                .frame(maxWidth: 250, maxHeight: 300)
+                            } label: {
+                                Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(MaterialView(.light)
+                                        .opacity(0.5)
+                                        .cornerRadius(8)
+                                    )
                             }
+                            .fixedSize()
                         }
                         .padding(.vertical)
                         .background(Color.black.opacity(0.25))
