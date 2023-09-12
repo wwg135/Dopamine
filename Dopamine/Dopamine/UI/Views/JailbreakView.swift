@@ -117,7 +117,7 @@ struct JailbreakView: View {
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(false)
+                            .allowsHitTesting(true)
                             .onTapGesture {
                                 updateAvailable = false
                             }
@@ -194,7 +194,7 @@ struct JailbreakView: View {
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(false)
+                            .allowsHitTesting(true)
                             .onTapGesture {
                                 showDownloadPage = false
                             }
@@ -298,7 +298,7 @@ struct JailbreakView: View {
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(false)
+                            .allowsHitTesting(true)
                             .onTapGesture {
                                 MaskDetection = false
                             }
