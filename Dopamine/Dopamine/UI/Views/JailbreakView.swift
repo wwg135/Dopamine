@@ -137,7 +137,32 @@ struct JailbreakView: View {
                                         Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                             .font(.system(size: 16))
                                             .multilineTextAlignment(.center)
-                                            .padding(.vertical) 
+                                            .padding(.vertical)
+                                            .onTapGesture {
+                                                showDownloadPage = true
+                                                updateAvailable = false
+                                                DispatchQueue.global(qos: .userInitiated).async {
+                                                    if requiresEnvironmentUpdate {
+                                                        updateState = .updating
+                                                        DispatchQueue.global(qos: .userInitiated).async {
+                                                            updateEnvironment()
+                                                        }
+                                                    } else {
+                                                        updateState = .downloading
+                                                        if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: "")) {
+                                                            Task {
+                                                                do {
+                                                                    try await downloadUpdateAndInstall(downloadURL)
+                                                                    updateState = .updating
+                                                                } catch {
+                                                                    showLogView = true
+                                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         HStack {
                                             Text("Button_Cancel")
                                                 .font(.system(size: 18))
@@ -145,36 +170,6 @@ struct JailbreakView: View {
                                                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                     DispatchQueue.global(qos: .userInitiated).async {
                                                         updateAvailable = false
-                                                    }
-                                                })
-                                            Spacer()
-                                            Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
-                                                .font(.system(size: 18))
-                                                .gesture(TapGesture().onEnded {
-                                                    checklog.toggle()
-                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                                        showDownloadPage = true
-                                                        updateAvailable = false
-                                                        DispatchQueue.global(qos: .userInitiated).async {
-                                                            if requiresEnvironmentUpdate {
-                                                                updateState = .updating
-                                                                DispatchQueue.global(qos: .userInitiated).async {
-                                                                    updateEnvironment()
-                                                                }
-                                                            } else {
-                                                                updateState = .downloading
-                                                                Task {
-                                                                    do {
-                                                                        try await downloadUpdateAndInstall()
-                                                                        updateState = .updating
-                                                                    } catch {
-                                                                        showLogView = true
-                                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
                                                     }
                                                 })
                                         }
@@ -771,33 +766,7 @@ struct JailbreakView: View {
         }
     }
 
-    func downloadUpdateAndInstall() async throws {
-        let owner = "wwg135"
-        let repo = "Dopamine"
-        
-        // Get the releases
-        let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
-        let releasesRequest = URLRequest(url: releasesURL)
-        let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
-        let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as! [[String: Any]]
-        
-        Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
-
-        // Find the latest release
-        guard let latestRelease = releasesJSON.first(where: { 
-            if let version = $0["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {
-                return true  
-            }
-            return false
-        }),
-        let assets = latestRelease["assets"] as? [[String: Any]],
-        let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
-        let downloadURLString = asset["browser_download_url"] as? String,
-        let downloadURL = URL(string: downloadURLString) else {
-            throw "Could not find download URL for ipa"
-        }
-
-        // Download the asset
+    func downloadUpdateAndInstall(_ downloadURL: URL) async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             downloadProgress.totalUnitCount = 1
             group.addTask {
