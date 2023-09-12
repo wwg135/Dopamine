@@ -138,6 +138,7 @@ struct JailbreakView: View {
                                             .font(.system(size: 16))
                                             .multilineTextAlignment(.center)
                                             .padding(.vertical)
+                                        if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), targetText: "点击当前版本下载") {                
                                             .onTapGesture {
                                                 showDownloadPage = true
                                                 updateAvailable = false
@@ -149,20 +150,19 @@ struct JailbreakView: View {
                                                         }
                                                     } else {
                                                         updateState = .downloading
-                                                        if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), targetText: "点击当前版本下载") {
-                                                            Task {
-                                                                do {
-                                                                    try await downloadUpdateAndInstall(downloadURL)
-                                                                    updateState = .updating
-                                                                } catch {
-                                                                    showLogView = true
-                                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                                                }
+                                                        Task {
+                                                            do {
+                                                                try await downloadUpdateAndInstall(downloadURL)
+                                                                updateState = .updating
+                                                            } catch {
+                                                                showLogView = true
+                                                                Logger.log("Error: \(error.localizedDescription)", type: .error)
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
+                                        }
                                     }
                                 }
                                 .opacity(1)
