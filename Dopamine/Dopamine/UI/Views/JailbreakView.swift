@@ -293,17 +293,6 @@ struct JailbreakView: View {
                 }
 
                 if MaskDetection {
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.15)
-                            .zIndex(1)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
-                            .contentShape(Rectangle())
-                            .allowsHitTesting(true)
-                            .onTapGesture {
-                                MaskDetection = false
-                            }
-                    }
-                    .ignoresSafeArea()
                     ZStack {
                         VStack {
                             VStack{
@@ -374,7 +363,17 @@ struct JailbreakView: View {
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 420)
-                }                         
+                    .overlay(
+                        GeometryReader { geometry in
+                            Color.clear
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    MaskDetection = false
+                                }
+                        }
+                    )
+                }
+                .zIndex(1)
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
