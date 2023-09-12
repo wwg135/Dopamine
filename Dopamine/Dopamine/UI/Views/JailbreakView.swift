@@ -373,7 +373,6 @@ struct JailbreakView: View {
                         }
                     )
                 }
-                .zIndex(1)
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
