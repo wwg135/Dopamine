@@ -120,6 +120,9 @@ struct JailbreakView: View {
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
                             .allowsHitTesting(true)
+                            .onTapGesture {
+                                updateAvailable = false
+                            }
                     }
                     .ignoresSafeArea()
                     ZStack {
