@@ -149,7 +149,7 @@ struct JailbreakView: View {
                                                         }
                                                     } else {
                                                         updateState = .downloading
-                                                        if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: "")) {
+                                                        if let downloadURL = extractDownloadURL(from: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), targetText: "点击当前版本下载") {
                                                             Task {
                                                                 do {
                                                                     try await downloadUpdateAndInstall(downloadURL)
@@ -879,12 +879,17 @@ struct JailbreakView: View {
         }
     }
 
-    func extractDownloadURL(from text: String) -> URL? {
-        if let url = URL(string: text), url.scheme == "https" {
-            return url
-        } else {
-            return nil
+    func extractDownloadURL(from text: String, targetText: String) -> URL? {
+        let pattern = "\\[.*?\\]\\((.*?)\\)"
+        let regex = try! NSRegularExpression(pattern: pattern, options: [])
+        let range = NSRange(location: 0, length: text.utf16.count)
+        if let match = regex.firstMatch(in: text, options: [], range: range) {
+            let urlRange = match.range(at: 1)
+            if let url = URL(string: (text as NSString).substring(with: urlRange)) {
+                return url
+            }
         }
+        return nil
     }
 }
 
