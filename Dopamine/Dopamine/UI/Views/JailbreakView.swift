@@ -58,8 +58,6 @@ struct JailbreakView: View {
     @State var showDownloadPage = false
     @State var showLogView = false
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.[56]$")
-    @State var checklog = false
-    @State var showupdate = false
     @State var appNames: [(String, String)] = []
     @State var selectedNames: [String] = []
     @State var deletedNames: [String] = []
