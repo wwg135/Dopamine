@@ -321,22 +321,22 @@ struct JailbreakView: View {
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 5)
                                             .foregroundColor(colorScheme == .dark ? .white : .black)
-                                        ForEach(appNames.sorted { (name1, name2) in
-                                            let isName1Forbidden = isAppForbidden(name1)
-                                            let isName2Forbidden = isAppForbidden(name2)
+                                        ForEach(appNames.sorted { (app1, app2) in
+                                            let isName1Forbidden = isAppForbidden(app1.1)
+                                            let isName2Forbidden = isAppForbidden(app2.1)
                                             if isName1Forbidden && !isName2Forbidden {
                                                 return true
                                             } else if !isName1Forbidden && isName2Forbidden {
                                                 return false
                                             } else {
-                                                let localizedNameComparison = name1.0.localizedCompare(name2.0)
+                                                let localizedNameComparison = app1.0.localizedCompare(app2.0)
                                                 if localizedNameComparison == .orderedSame {
-                                                    return name1.0 < name2.0
+                                                    return app1.0 < app2.0
                                                 } else {
                                                     return localizedNameComparison == .orderedAscending
                                                 }
                                             }
-                                        }, id: \.0) { (localizedAppName, name) in
+                                        }, id: \.1) { (localizedAppName, name) in
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
                                                     let isForbidden = isAppForbidden(name)
