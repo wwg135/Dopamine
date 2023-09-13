@@ -321,7 +321,22 @@ struct JailbreakView: View {
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 5)
                                             .foregroundColor(colorScheme == .dark ? .white : .black)
-                                        ForEach(appNames.sorted { $0.0.localizedCompare($1.0) == .orderedAscending }, id: \.0) { (localizedAppName, name) in
+                                        ForEach(appNames.sorted { (name1, name2) in
+                                            let isName1Checked = name1.0.localizedCaseInsensitiveContains("√")
+                                            let isName2Checked = name2.0.localizedCaseInsensitiveContains("√") 
+                                            if isName1Checked && !isName2Checked {
+                                                return true
+                                            } else if !isName1Checked && isName2Checked {
+                                                return false
+                                            } else {
+                                                let comparisonResult = name1.0.localizedCompare(name2.0)
+                                                if comparisonResult == .orderedSame {
+                                                    return name1.1.localizedCompare(name2.1) == .orderedAscending
+                                                } else {
+                                                    return comparisonResult == .orderedAscending
+                                                }
+                                            }
+                                        }, id: \.0) { (localizedAppName, name) in
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
                                                     let isForbidden = isAppForbidden(name)
