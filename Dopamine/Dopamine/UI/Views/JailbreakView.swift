@@ -64,6 +64,7 @@ struct JailbreakView: View {
     @State var MaskDetection = false
     @State var searchText = ""
     @Environment(\.colorScheme) var colorScheme
+    @State var showCheckedOnly = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
