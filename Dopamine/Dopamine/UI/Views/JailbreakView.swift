@@ -316,12 +316,12 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 25)
                                 ScrollView {
                                     VStack(alignment: .leading) {
-                                        TextField("搜索一下", text: $searchText)
+                                        TextField(Image(systemName: "magnifyingglass") + "搜索一下", text: $searchText)
                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 5)
                                             .foregroundColor(colorScheme == .dark ? .white : .black)
-                                        ForEach(appNames, id: \.0) { (localizedAppName, name) in
+                                        ForEach(appNames.sorted { $0.0.localizedCompare($1.0) == .orderedAscending }, id: \.0) { (localizedAppName, name) in
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
                                                     let isForbidden = isAppForbidden(name)
