@@ -322,18 +322,18 @@ struct JailbreakView: View {
                                             .padding(.vertical, 5)
                                             .foregroundColor(colorScheme == .dark ? .white : .black)
                                         ForEach(appNames.sorted { (name1, name2) in
-                                            let isName1Checked = name1.0.localizedCaseInsensitiveContains("√")
-                                            let isName2Checked = name2.0.localizedCaseInsensitiveContains("√") 
-                                            if isName1Checked && !isName2Checked {
+                                            let isName1Forbidden = isAppForbidden(name1)
+                                            let isName2Forbidden = isAppForbidden(name2)
+                                            if isName1Forbidden && !isName2Forbidden {
                                                 return true
-                                            } else if !isName1Checked && isName2Checked {
+                                            } else if !isName1Forbidden && isName2Forbidden {
                                                 return false
                                             } else {
-                                                let comparisonResult = name1.0.localizedCompare(name2.0)
-                                                if comparisonResult == .orderedSame {
-                                                    return name1.1.localizedCompare(name2.1) == .orderedAscending
+                                                let localizedNameComparison = name1.0.localizedCompare(name2.0)
+                                                if localizedNameComparison == .orderedSame {
+                                                    return name1.0 < name2.0
                                                 } else {
-                                                    return comparisonResult == .orderedAscending
+                                                    return localizedNameComparison == .orderedAscending
                                                 }
                                             }
                                         }, id: \.0) { (localizedAppName, name) in
