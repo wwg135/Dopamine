@@ -316,7 +316,7 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 25)
                                 ScrollView {
                                     VStack(alignment: .leading) {
-                                        TextField("搜索一下", text: $searchText)
+                                        TextField(Image(systemName: "magnifyingglass") + "搜索一下", text: $searchText)
                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 5)
