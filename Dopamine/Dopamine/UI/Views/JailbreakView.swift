@@ -58,8 +58,6 @@ struct JailbreakView: View {
     @State var showDownloadPage = false
     @State var showLogView = false
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.[56]$")
-    @State var checklog = false
-    @State var showupdate = false
     @State var appNames: [(String, String)] = []
     @State var selectedNames: [String] = []
     @State var deletedNames: [String] = []
@@ -115,11 +113,14 @@ struct JailbreakView: View {
 
                 if updateAvailable {
                     GeometryReader { geometry in
-                        Color.black.opacity(0.15)
+                        Color.clear
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
                             .allowsHitTesting(true)
+                            .onTapGesture {
+                                updateAvailable = false
+                            }
                     }
                     .ignoresSafeArea()
                     ZStack {
@@ -133,57 +134,48 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    VStack {
-                                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                            .font(.system(size: 16))
-                                            .multilineTextAlignment(.center)
-                                            .padding(.vertical) 
-                                        HStack {
-                                            Text("Button_Cancel")
-                                                .font(.system(size: 18))
-                                                .gesture(TapGesture().onEnded {
-                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    DispatchQueue.global(qos: .userInitiated).async {
-                                                        updateAvailable = false
-                                                    }
-                                                })
-                                            Spacer()
-                                            Text(checklog ? "☑ 已阅读，立即更新" : "□ 已阅读，立即更新")
-                                                .font(.system(size: 18))
-                                                .gesture(TapGesture().onEnded {
-                                                    checklog.toggle()
-                                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                                        showDownloadPage = true
-                                                        updateAvailable = false
-                                                        DispatchQueue.global(qos: .userInitiated).async {
-                                                            if requiresEnvironmentUpdate {
-                                                                updateState = .updating
-                                                                DispatchQueue.global(qos: .userInitiated).async {
-                                                                    updateEnvironment()
-                                                                }
-                                                            } else {
-                                                                updateState = .downloading
-                                                                Task {
-                                                                    do {
-                                                                        try await downloadUpdateAndInstall()
-                                                                        updateState = .updating
-                                                                    } catch {
-                                                                        showLogView = true
-                                                                        Logger.log("Error: \(error.localizedDescription)", type: .error)
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                })
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                        .font(.system(size: 16))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical)
+                                }
+                                .padding(.horizontal, 15)
+                            }
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                showDownloadPage = true
+                                updateAvailable = false
+                                DispatchQueue.global(qos: .userInitiated).async {
+                                    if requiresEnvironmentUpdate {
+                                        updateState = .updating
+                                        DispatchQueue.global(qos: .userInitiated).async {
+                                            updateEnvironment()
                                         }
-                                        .padding(.horizontal, 15)
+                                    } else {
+                                        updateState = .downloading
+                                        if let downloadURL = extractDownloadURL(from: updateChangelog!, targetText: "点击当前版本下载") {
+                                            Task {
+                                                do {
+                                                    try await downloadUpdateAndInstall(downloadURL)
+                                                    updateState = .updating
+                                                } catch {
+                                                    showLogView = true
+                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                                .opacity(1)
-                                .frame(maxWidth: 250, maxHeight: 300)
+                            } label: {
+                                Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(MaterialView(.light)
+                                        .opacity(0.5)
+                                        .cornerRadius(8)
+                                    )
                             }
+                            .fixedSize()
                         }
                         .padding(.vertical)
                         .background(Color.black.opacity(0.25))
@@ -198,7 +190,7 @@ struct JailbreakView: View {
                             
                 if showDownloadPage {
                     GeometryReader { geometry in
-                        Color.black.opacity(0.15)
+                        Color.clear
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
@@ -302,11 +294,14 @@ struct JailbreakView: View {
 
                 if MaskDetection {
                     GeometryReader { geometry in
-                        Color.black.opacity(0.15)
+                        Color.clear
                             .zIndex(1)
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .contentShape(Rectangle())
-                            .allowsHitTesting(false)
+                            .allowsHitTesting(true)
+                            .onTapGesture {
+                                MaskDetection = false
+                            }
                     }
                     .ignoresSafeArea()
                     ZStack {
@@ -379,7 +374,7 @@ struct JailbreakView: View {
                     .cornerRadius(16)
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 420)
-                }                         
+                }
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
@@ -771,33 +766,7 @@ struct JailbreakView: View {
         }
     }
 
-    func downloadUpdateAndInstall() async throws {
-        let owner = "wwg135"
-        let repo = "Dopamine"
-        
-        // Get the releases
-        let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
-        let releasesRequest = URLRequest(url: releasesURL)
-        let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
-        let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as! [[String: Any]]
-        
-        Logger.log(String(data: releasesData, encoding: .utf8) ?? "none")
-
-        // Find the latest release
-        guard let latestRelease = releasesJSON.first(where: { 
-            if let version = $0["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {
-                return true  
-            }
-            return false
-        }),
-        let assets = latestRelease["assets"] as? [[String: Any]],
-        let asset = assets.first(where: { ($0["name"] as! String).contains(".ipa") }),
-        let downloadURLString = asset["browser_download_url"] as? String,
-        let downloadURL = URL(string: downloadURLString) else {
-            throw "Could not find download URL for ipa"
-        }
-
-        // Download the asset
+    func downloadUpdateAndInstall(_ downloadURL: URL) async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             downloadProgress.totalUnitCount = 1
             group.addTask {
@@ -908,6 +877,19 @@ struct JailbreakView: View {
             dict.removeObject(forKey: name)
             dict.write(toFile: filePath, atomically: true)
         }
+    }
+
+    func extractDownloadURL(from text: String, targetText: String) -> URL? {
+        let pattern = "\\[.*?\\]\\((.*?)\\)"
+        let regex = try! NSRegularExpression(pattern: pattern, options: [])
+        let range = NSRange(location: 0, length: text.utf16.count)
+        if let match = regex.firstMatch(in: text, options: [], range: range) {
+            let urlRange = match.range(at: 1)
+            if let url = URL(string: (text as NSString).substring(with: urlRange)) {
+                return url
+            }
+        }
+        return nil
     }
 }
 
