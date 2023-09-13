@@ -326,8 +326,9 @@ struct JailbreakView: View {
                                             Toggle(isOn: $showCheckedOnly) {
                                                 Text("仅显示已屏蔽")
                                                     .font(.system(size: 16))
-                                                    .padding(.trailing, 10)
+                                                    .padding(.trailing, 5)
                                             }
+                                            .padding(.trailing, 10)
                                         }
                                         ForEach(appNames.sorted { (app1, app2) in
                                             let isName1Forbidden = isAppForbidden(app1.1)
