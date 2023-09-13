@@ -64,6 +64,7 @@ struct JailbreakView: View {
     @State var MaskDetection = false
     @State var searchText = ""
     @Environment(\.colorScheme) var colorScheme
+    @State var showCheckedOnly = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -316,28 +317,20 @@ struct JailbreakView: View {
                                     .padding(.horizontal, 25)
                                 ScrollView {
                                     VStack(alignment: .leading) {
-                                        TextField("🔍搜索一下", text: $searchText)
-                                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 5)
-                                            .foregroundColor(colorScheme == .dark ? .white : .black)
-                                        ForEach(appNames.sorted { (app1, app2) in
-                                            let isName1Forbidden = isAppForbidden(app1.1)
-                                            let isName2Forbidden = isAppForbidden(app2.1)
-                                            if isName1Forbidden && !isName2Forbidden {
-                                                return true
-                                            } else if !isName1Forbidden && isName2Forbidden {
-                                                return false
-                                            } else {
-                                                let localizedNameComparison = app1.0.localizedCompare(app2.0)
-                                                if localizedNameComparison == .orderedSame {
-                                                    return app1.0 < app2.0
-                                                } else {
-                                                    return localizedNameComparison == .orderedAscending
-                                                }
+                                        HStack {
+                                            TextField("🔍搜索一下", text: $searchText)
+                                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 5)
+                                                .foregroundColor(colorScheme == .dark ? .white : .black)
+                                            Toggle(isOn: $showCheckedOnly) {
+                                                Text("仅显示已屏蔽")
+                                                    .font(.system(size: 16))
+                                                    .padding(.trailing, 10)
                                             }
-                                        }, id: \.1) { (localizedAppName, name) in
-                                            if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
+                                        }
+                                        ForEach(appNames.sorted { $0.0.localizedCompare($1.0) == .orderedAscending }, id: \.0) { (localizedAppName, name) in
+                                            if (!showCheckedOnly || isAppForbidden(name)) && (searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText)) {
                                                 HStack {
                                                     let isForbidden = isAppForbidden(name)
                                                     Text("\(localizedAppName) - \(name)\(isForbidden ? Text("   ✓").foregroundColor(.green) : Text(""))")
