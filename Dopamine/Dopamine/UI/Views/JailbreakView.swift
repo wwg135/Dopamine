@@ -321,7 +321,6 @@ struct JailbreakView: View {
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 5)
                                             .foregroundColor(colorScheme == .dark ? .white : .black)
-                                        }
                                         ForEach(appNames.sorted { (app1, app2) in
                                             let isName1Forbidden = isAppForbidden(app1.1)
                                             let isName2Forbidden = isAppForbidden(app2.1)  
