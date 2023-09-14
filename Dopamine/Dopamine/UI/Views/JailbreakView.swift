@@ -346,7 +346,7 @@ struct JailbreakView: View {
                                                 }
                                             }
                                         }, id: \.1) { (localizedAppName, name) in
-                                            if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
+                                            if (!showCheckedOnly || isAppForbidden(name)) && (searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText)) {
                                                 HStack {
                                                     let isForbidden = isAppForbidden(name)
                                                     Text("\(localizedAppName) - \(name)\(isForbidden ? Text("  ✓").foregroundColor(.green) : Text(""))")
