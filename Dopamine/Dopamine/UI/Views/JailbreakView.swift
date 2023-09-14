@@ -84,9 +84,13 @@ struct JailbreakView: View {
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                     .animation(.spring(), value: isPopupPresented)
-                    .onTapGesture {
+                    .onTapGesture(count: 1, perform: {
                         isShowingPicker = true
-                    }
+                    })
+                    .onTapGesture(count: 2, perform: {
+                        backgroundImage = UIImage(named: "Wallpaper.jpg")
+                        saveImage(image: nil)
+                    })
                     .sheet(isPresented: $isShowingPicker) {
                         ImagePicker(completionHandler: { image in
                             if let image = image {
@@ -923,18 +927,19 @@ struct JailbreakView: View {
         return nil
     }
 
-    func saveImage(image: UIImage) {
-        if let data = image.jpegData(compressionQuality: 1.0) {
-            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            let fileURL = documentsDirectory.appendingPathComponent("background.jpg")
+    func saveImage(image: UIImage?) {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsDirectory.appendingPathComponent("background.jpg")
+        if let image = image, let data = image.jpegData(compressionQuality: 1.0) {
             try? data.write(to: fileURL)
+        } else {
+            try? FileManager.default.removeItem(at: fileURL)
         }
     }
     
     func loadImage() {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let fileURL = documentsDirectory.appendingPathComponent("background.jpg")
-        
         if let data = try? Data(contentsOf: fileURL) {
             backgroundImage = UIImage(data: data)
         }
