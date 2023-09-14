@@ -87,7 +87,7 @@ struct JailbreakView: View {
                     .onTapGesture(count: 1, perform: {
                         isShowingPicker = true
                     })
-                    .onTapGesture(count: 2, perform: {
+                    .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
                         backgroundImage = UIImage(named: "Wallpaper.jpg")
                         saveImage(image: nil)
                     })
