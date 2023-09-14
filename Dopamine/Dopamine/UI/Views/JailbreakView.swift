@@ -9,6 +9,7 @@ import SwiftUI
 import Fugu15KernelExploit
 import SwiftfulLoadingIndicators
 import Foundation
+import PhotosUI
 
 #if os(iOS)
 import UIKit
@@ -64,6 +65,8 @@ struct JailbreakView: View {
     @State var MaskDetection = false
     @State var searchText = ""
     @Environment(\.colorScheme) var colorScheme
+    @State var backgroundImage: UIImage?
+    @State var isShowingPicker = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -73,16 +76,33 @@ struct JailbreakView: View {
         GeometryReader { geometry in                
             ZStack {
                 let isPopupPresented = isSettingsPresented || isCreditsPresented            
-                let imagePath = "/var/mobile/Wallpaper.jpg"
-                let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
-                    Image(uiImage: backgroundImage!)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .edgesIgnoringSafeArea(.all)
-                        .blur(radius: 1)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
-                        .animation(.spring(), value: isPopupPresented)
+                Image(uiImage: backgroundImage ?? UIImage(named: "Wallpaper.jpg")!)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .edgesIgnoringSafeArea(.all)
+                    .blur(radius: 1)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .scaleEffect(isPopupPresented ? 1.2 : 1.4)
+                    .animation(.spring(), value: isPopupPresented)
+                    .onTapGesture(count: 1, perform: {
+                        isShowingPicker = true
+                    })
+                    .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+                        backgroundImage = UIImage(named: "Wallpaper.jpg")
+                        saveImage(image: nil)
+                    })
+                    .sheet(isPresented: $isShowingPicker) {
+                        ImagePicker(completionHandler: { image in
+                            if let image = image {
+                                self.backgroundImage = image
+                                saveImage(image: image)
+                            }
+                            isShowingPicker = false
+                        })
+                    }
+                    .onAppear {
+                        loadImage()
+                    }
                 
                 VStack {
                     Spacer()
@@ -906,10 +926,75 @@ struct JailbreakView: View {
         }
         return nil
     }
+
+    func saveImage(image: UIImage?) {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsDirectory.appendingPathComponent("background.jpg")
+        if let image = image, let data = image.jpegData(compressionQuality: 1.0) {
+            try? data.write(to: fileURL)
+        } else {
+            try? FileManager.default.removeItem(at: fileURL)
+        }
+    }
+    
+    func loadImage() {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsDirectory.appendingPathComponent("background.jpg")
+        if let data = try? Data(contentsOf: fileURL) {
+            backgroundImage = UIImage(data: data)
+        }
+    }
 }
 
 struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
         JailbreakView()
+    }
+}
+
+struct ImagePicker: UIViewControllerRepresentable {
+    typealias UIViewControllerType = PHPickerViewController
+    let completionHandler: (UIImage?) -> Void
+    
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 1
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(completionHandler: completionHandler)
+    }
+    
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let completionHandler: (UIImage?) -> Void
+        
+        init(completionHandler: @escaping (UIImage?) -> Void) {
+            self.completionHandler = completionHandler
+        }
+        
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            
+            guard let result = results.first else {
+                completionHandler(nil)
+                return
+            }
+            
+            result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (image, error) in
+                if let error = error {
+                    print("Error loading image: \(error.localizedDescription)")
+                    self?.completionHandler(nil)
+                } else if let image = image as? UIImage {
+                    self?.completionHandler(image)
+                } else {
+                    self?.completionHandler(nil)
+                }
+            }
+        }
     }
 }
