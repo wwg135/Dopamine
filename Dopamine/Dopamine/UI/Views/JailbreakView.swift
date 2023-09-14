@@ -9,6 +9,7 @@ import SwiftUI
 import Fugu15KernelExploit
 import SwiftfulLoadingIndicators
 import Foundation
+import PhotosUI
 
 #if os(iOS)
 import UIKit
