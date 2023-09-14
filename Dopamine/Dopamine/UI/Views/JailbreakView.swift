@@ -91,9 +91,13 @@ struct JailbreakView: View {
                         ImagePicker(completionHandler: { image in
                             if let image = image {
                                 self.backgroundImage = image
+                                saveImage(image: image)
                             }
                             isShowingPicker = false
                         })
+                    }
+                    .onAppear {
+                        loadImage()
                     }
                 
                 VStack {
@@ -917,6 +921,23 @@ struct JailbreakView: View {
             }
         }
         return nil
+    }
+
+    func saveImage(image: UIImage) {
+        if let data = image.jpegData(compressionQuality: 1.0) {
+            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let fileURL = documentsDirectory.appendingPathComponent("background.jpg")
+            try? data.write(to: fileURL)
+        }
+    }
+    
+    func loadImage() {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsDirectory.appendingPathComponent("background.jpg")
+        
+        if let data = try? Data(contentsOf: fileURL) {
+            backgroundImage = UIImage(data: data)
+        }
     }
 }
 
