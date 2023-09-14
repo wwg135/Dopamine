@@ -141,14 +141,6 @@ struct JailbreakView: View {
                                         .padding(.vertical)
                                 }
                                 .padding(.horizontal, 15)
-                                .contextMenu {
-                                    Button {
-                                        let changelogString: String = (try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace))).string
-                                        UIPasteboard.general.string = changelogString
-                                    } label: {
-                                        Label("Context_Menu_Copy_To_Clipboard", systemImage: "doc.on.doc")
-                                    }
-                                }
                             }
                             Button {
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
