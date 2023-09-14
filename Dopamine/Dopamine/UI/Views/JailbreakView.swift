@@ -66,6 +66,7 @@ struct JailbreakView: View {
     @State var searchText = ""
     @Environment(\.colorScheme) var colorScheme
     @State var backgroundImage: UIImage?
+    @State var isShowingPicker = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -83,14 +84,17 @@ struct JailbreakView: View {
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                     .animation(.spring(), value: isPopupPresented)
-                    .contextMenu {
-                    Button(action: {
-                        openPhotoPicker()
-                    }) {
-                        Text("Choose from Album")
-                        Image(systemName: "photo.on.rectangle")
+                    .onTapGesture {
+                        isShowingPicker = true
                     }
-                }
+                    .sheet(isPresented: $isShowingPicker) {
+                        ImagePicker(completionHandler: { image in
+                            if let image = image {
+                                self.backgroundImage = image
+                            }
+                            isShowingPicker = false
+                        })
+                    }
                 
                 VStack {
                     Spacer()
@@ -914,56 +918,6 @@ struct JailbreakView: View {
         }
         return nil
     }
-
-    func openPhotoPicker() {
-        var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 1
-        let picker = PHPickerViewController(configuration: configuration)
-        picker.delegate = Coordinator(completionHandler: { image in
-            if let image = image {
-                self.backgroundImage = image
-            }
-        })
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            if let sceneDelegate = windowScene.delegate as? SceneDelegate {
-                sceneDelegate.window?.rootViewController?.present(picker, animated: true, completion: nil)
-            }
-        }
-    }
-
-    class Coordinator: NSObject, PHPickerViewControllerDelegate, UINavigationControllerDelegate {
-        let completionHandler: (UIImage?) -> Void
-        
-        init(completionHandler: @escaping (UIImage?) -> Void) {
-            self.completionHandler = completionHandler
-        }
-        
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true, completion: nil)
-            
-            guard let result = results.first else {
-                completionHandler(nil)
-                return
-            }
-            
-            result.itemProvider.loadObject(ofClass: UIImage.self) { [self] (image, error) in
-                if let error = error {
-                    print("Error loading image: \(error.localizedDescription)")
-                    completionHandler(nil)
-                } else if let image = image as? UIImage {
-                    completionHandler(image)
-                } else {
-                    completionHandler(nil)
-                }
-            }
-        }
-        
-        func pickerDidCancel(_ picker: PHPickerViewController) {
-            picker.dismiss(animated: true, completion: nil)
-            completionHandler(nil)
-        }
-    }
 }
 
 struct JailbreakView_Previews: PreviewProvider {
@@ -972,6 +926,49 @@ struct JailbreakView_Previews: PreviewProvider {
     }
 }
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    var window: UIWindow?
+struct ImagePicker: UIViewControllerRepresentable {
+    typealias UIViewControllerType = PHPickerViewController
+    let completionHandler: (UIImage?) -> Void
+    
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 1
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(completionHandler: completionHandler)
+    }
+    
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let completionHandler: (UIImage?) -> Void
+        
+        init(completionHandler: @escaping (UIImage?) -> Void) {
+            self.completionHandler = completionHandler
+        }
+        
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            
+            guard let result = results.first else {
+                completionHandler(nil)
+                return
+            }
+            
+            result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (image, error) in
+                if let error = error {
+                    print("Error loading image: \(error.localizedDescription)")
+                    self?.completionHandler(nil)
+                } else if let image = image as? UIImage {
+                    self?.completionHandler(image)
+                } else {
+                    self?.completionHandler(nil)
+                }
+            }
+        }
+    }
 }
