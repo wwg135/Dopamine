@@ -64,6 +64,7 @@ struct JailbreakView: View {
     @State var MaskDetection = false
     @State var searchText = ""
     @Environment(\.colorScheme) var colorScheme
+    @State var backgroundImage: UIImage?
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -73,16 +74,22 @@ struct JailbreakView: View {
         GeometryReader { geometry in                
             ZStack {
                 let isPopupPresented = isSettingsPresented || isCreditsPresented            
-                let imagePath = "/var/mobile/Wallpaper.jpg"
-                let backgroundImage = (FileManager.default.contents(atPath: imagePath).flatMap { UIImage(data: $0) } ?? UIImage(named: "Wallpaper.jpg"))
-                    Image(uiImage: backgroundImage!)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .edgesIgnoringSafeArea(.all)
-                        .blur(radius: 1)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .scaleEffect(isPopupPresented ? 1.2 : 1.4)
-                        .animation(.spring(), value: isPopupPresented)
+                Image(uiImage: backgroundImage ?? UIImage(named: "Wallpaper.jpg")!)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .edgesIgnoringSafeArea(.all)
+                    .blur(radius: 1)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .scaleEffect(isPopupPresented ? 1.2 : 1.4)
+                    .animation(.spring(), value: isPopupPresented)
+                    .contextMenu {
+                    Button(action: {
+                        openPhotoPicker()
+                    }) {
+                        Text("Choose from Album")
+                        Image(systemName: "photo.on.rectangle")
+                    }
+                }
                 
                 VStack {
                     Spacer()
@@ -906,10 +913,53 @@ struct JailbreakView: View {
         }
         return nil
     }
+
+    func openPhotoPicker() {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 1
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = context.coordinator
+        
+        UIApplication.shared.windows.first?.rootViewController?.present(picker, animated: true, completion: nil)
+    }
 }
 
 struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
         JailbreakView()
+    }
+}
+
+struct Coordinator: NSObject, PHPickerViewControllerDelegate, UINavigationControllerDelegate {
+        let completionHandler: (UIImage?) -> Void
+        
+        init(completionHandler: @escaping (UIImage?) -> Void) {
+            self.completionHandler = completionHandler
+        }
+        
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true, completion: nil)
+            
+            guard let result = results.first else {
+                completionHandler(nil)
+                return
+            }
+            
+            result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
+                if let error = error {
+                    print("Error loading image: \(error.localizedDescription)")
+                    completionHandler(nil)
+                } else if let image = image as? UIImage {
+                    completionHandler(image)
+                } else {
+                    completionHandler(nil)
+                }
+            }
+        }
+        
+        func pickerDidCancel(_ picker: PHPickerViewController) {
+            picker.dismiss(animated: true, completion: nil)
+            completionHandler(nil)
+        }
     }
 }
