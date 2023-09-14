@@ -919,13 +919,22 @@ struct JailbreakView: View {
         var configuration = PHPickerConfiguration()
         configuration.selectionLimit = 1
         let picker = PHPickerViewController(configuration: configuration)
-        picker.delegate = context.coordinator
+        picker.delegate = Coordinator(completionHandler: { image in
+            if let image = image {
+                self.backgroundImage = image
+            }
+        })
         
-        UIApplication.shared.windows.first?.rootViewController?.present(picker, animated: true, completion: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            if let sceneDelegate = windowScene.delegate as? SceneDelegate {
+                sceneDelegate.window?.rootViewController?.present(picker, animated: true, completion: nil)
+            }
+        }
     }
 
     class Coordinator: NSObject, PHPickerViewControllerDelegate, UINavigationControllerDelegate {
         let completionHandler: (UIImage?) -> Void
+        
         init(completionHandler: @escaping (UIImage?) -> Void) {
             self.completionHandler = completionHandler
         }
@@ -938,7 +947,7 @@ struct JailbreakView: View {
                 return
             }
             
-            result.itemProvider.loadObject(ofClass: UIImage.self) { (image, error) in
+            result.itemProvider.loadObject(ofClass: UIImage.self) { [self] (image, error) in
                 if let error = error {
                     print("Error loading image: \(error.localizedDescription)")
                     completionHandler(nil)
@@ -961,4 +970,8 @@ struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
         JailbreakView()
     }
+}
+
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    var window: UIWindow?
 }
