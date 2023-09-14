@@ -923,17 +923,9 @@ struct JailbreakView: View {
         
         UIApplication.shared.windows.first?.rootViewController?.present(picker, animated: true, completion: nil)
     }
-}
 
-struct JailbreakView_Previews: PreviewProvider {
-    static var previews: some View {
-        JailbreakView()
-    }
-}
-
-struct Coordinator: NSObject, PHPickerViewControllerDelegate, UINavigationControllerDelegate {
+    class Coordinator: NSObject, PHPickerViewControllerDelegate, UINavigationControllerDelegate {
         let completionHandler: (UIImage?) -> Void
-        
         init(completionHandler: @escaping (UIImage?) -> Void) {
             self.completionHandler = completionHandler
         }
@@ -962,5 +954,11 @@ struct Coordinator: NSObject, PHPickerViewControllerDelegate, UINavigationContro
             picker.dismiss(animated: true, completion: nil)
             completionHandler(nil)
         }
+    }
+}
+
+struct JailbreakView_Previews: PreviewProvider {
+    static var previews: some View {
+        JailbreakView()
     }
 }
