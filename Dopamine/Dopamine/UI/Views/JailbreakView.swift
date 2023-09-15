@@ -364,31 +364,40 @@ struct JailbreakView: View {
                                                         .padding(.vertical, 5)
                                                     Spacer()
                                                     let isSelected = selectedNames.contains(name)
-                                                    Button(action: {
-                                                        if isSelected {
-                                                            selectedNames.removeAll(where: { $0 == name })
-                                                        } else {
-                                                            selectedNames.append(name)
-                                                        }
-                                                        ForbidApp(name)
-                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    }) {
-                                                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                                            .foregroundColor(isSelected ? .green : .green.opacity(0.5))
-                                                    }
-                                                    Spacer().frame(width: 10)
                                                     let isDeleted = deletedNames.contains(name)
-                                                    Button(action: {
-                                                        if isDeleted {
-                                                            deletedNames.removeAll(where: { $0 == name })
+                                                    Toggle(isOn: Binding(
+                                                        get: {
+                                                            return isSelected
+                                                        },
+                                                        set: { newValue in
+                                                            if newValue {
+                                                                if isDeleted {
+                                                                    deletedNames.removeAll(where: { $0 == name })
+                                                                }
+                                                                selectedNames.append(name)
+                                                                ForbidApp(name)
+                                                            } else {
+                                                                if isSelected {
+                                                                    selectedNames.removeAll(where: { $0 == name })
+                                                                }
+                                                                deletedNames.append(name)
+                                                                removeApp(name)
+                                                            }
+                                                            UserDefaults.standard.set(newValue, forKey: name)
+                                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                        }
+                                                    )) {
+                                                        isSelected ? Image(systemName: "checkmark.circle.fill") : Image(systemName: "xmark.circle.fill")
+                                                    }
+                                                    .foregroundColor(isSelected ? .green : .red)
+                                                    .onAppear {
+                                                        if let savedState = UserDefaults.standard.object(forKey: name) as? Bool {
+                                                            selectedNames.append(name)
+                                                            ForbidApp(name)
                                                         } else {
                                                             deletedNames.append(name)
+                                                            removeApp(name)
                                                         }
-                                                        removeApp(name)
-                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    }) {
-                                                        Image(systemName: isDeleted ? "xmark.circle.fill" : "circle")
-                                                            .foregroundColor(isDeleted ? .red : .red.opacity(0.5))
                                                     }
                                                 }
                                             }
