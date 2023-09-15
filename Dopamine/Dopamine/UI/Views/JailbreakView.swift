@@ -369,23 +369,25 @@ struct JailbreakView: View {
                                                             return isSelected
                                                         },
                                                         set: { newValue in
-                                                            if newValue {
-                                                                if isDeleted {
-                                                                    deletedNames.removeAll(where: { $0 == name })
+                                                            withAnimation {
+                                                                if newValue {
+                                                                    if isDeleted {
+                                                                        deletedNames.removeAll(where: { $0 == name })
+                                                                    }
+                                                                    selectedNames.append(name)
+                                                                    ForbidApp(name)
+                                                                    dopamineDefaults().set(true, forKey: name)
+                                                                } else {
+                                                                    if isSelected {
+                                                                        selectedNames.removeAll(where: { $0 == name })
+                                                                    }
+                                                                    deletedNames.append(name)
+                                                                    removeApp(name)
+                                                                    dopamineDefaults().set(false, forKey: name)
                                                                 }
-                                                                selectedNames.append(name)
-                                                                ForbidApp(name)
-                                                                dopamineDefaults().set(true, forKey: name)
-                                                            } else {
-                                                                if isSelected {
-                                                                    selectedNames.removeAll(where: { $0 == name })
-                                                                }
-                                                                deletedNames.append(name)
-                                                                removeApp(name)
-                                                                dopamineDefaults().set(false, forKey: name)
+                                                                dopamineDefaults().synchronize()
+                                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                             }
-                                                            dopamineDefaults().synchronize()
-                                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                         }
                                                     )) {
                                                         EmptyView()
