@@ -60,13 +60,33 @@ struct JailbreakView: View {
     @State var showLogView = false
     @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.1\\.[56]$")
     @State var appNames: [(String, String)] = []
-    @State var selectedNames: [String] = []
-    @State var deletedNames: [String] = []
     @State var MaskDetection = false
     @State var searchText = ""
     @Environment(\.colorScheme) var colorScheme
     @State var backgroundImage: UIImage?
     @State var isShowingPicker = false
+
+    @State var selectedNames: [String] = {
+        var names: [String] = []
+        for name in appNames {
+            if UserDefaults.standard.bool(forKey: name) {
+                names.append(name)
+                ForbidApp(name)
+            }
+        }
+        return names
+    }()
+
+    @State var deletedNames: [String] = {
+        var names: [String] = []
+        for name in appNames {
+            if !UserDefaults.standard.bool(forKey: name) {
+                names.append(name)
+                removeApp(name)
+            }
+        }
+        return names
+    }()
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
