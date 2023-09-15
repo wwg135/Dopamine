@@ -383,7 +383,8 @@ struct JailbreakView: View {
                                                                 deletedNames.append(name)
                                                                 removeApp(name)
                                                             }
-                                                            UserDefaults.standard.set(newValue, forKey: name)
+                                                            dopamineDefaults().set(newValue, forKey: name)
+                                                            dopamineDefaults().synchronize()
                                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                         }
                                                     )) {
@@ -391,7 +392,7 @@ struct JailbreakView: View {
                                                     }
                                                     .foregroundColor(isSelected ? .green : .red)
                                                     .onAppear {
-                                                        if let savedState = UserDefaults.standard.object(forKey: name) as? Bool {
+                                                        if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
                                                             selectedNames.append(name)
                                                             ForbidApp(name)
                                                         } else {
