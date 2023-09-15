@@ -387,7 +387,9 @@ struct JailbreakView: View {
                                                             dopamineDefaults().synchronize()
                                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                         }
-                                                    ))
+                                                    )) {
+                                                        EmptyView()
+                                                    }
                                                     .padding(.trailing, 10)
                                                     .onAppear {
                                                         if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
