@@ -387,11 +387,8 @@ struct JailbreakView: View {
                                                             dopamineDefaults().synchronize()
                                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                         }
-                                                    )) {
-                                                        isSelected ? Image(systemName: "checkmark.circle.fill") : Image(systemName: "xmark.circle.fill")
-                                                    }
+                                                    ))
                                                     .padding(.trailing, 10)
-                                                    .foregroundColor(isSelected ? .green : .red)
                                                     .onAppear {
                                                         if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
                                                             if savedState {
