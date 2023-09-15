@@ -358,7 +358,7 @@ struct JailbreakView: View {
                                         }, id: \.1) { (localizedAppName, name) in
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
-                                                    Text("\(localizedAppName) - \(name)")
+                                                    Text("\(localizedAppName)")
                                                         .font(.system(size: 16))
                                                         .padding(.vertical, 5)
                                                     Spacer()
