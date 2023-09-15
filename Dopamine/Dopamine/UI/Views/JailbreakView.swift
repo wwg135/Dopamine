@@ -341,11 +341,11 @@ struct JailbreakView: View {
                                             .padding(.vertical, 5)
                                             .foregroundColor(colorScheme == .dark ? .white : .black)
                                         ForEach(appNames.sorted { (app1, app2) in
-                                            let isName1Forbidden = isAppForbidden(app1.1)
-                                            let isName2Forbidden = isAppForbidden(app2.1)  
-                                            if isName1Forbidden && !isName2Forbidden {
+                                            let isSelected1 = selectedNames.contains(app1.1)
+                                            let isSelected2 = selectedNames.contains(app2.1)
+                                            if isSelected1 && !isSelected2 {
                                                 return true
-                                            } else if !isName1Forbidden && isName2Forbidden {
+                                            } else if !isSelected1 && isSelected2 {
                                                 return false
                                             } else {
                                                 let localizedNameComparison = app1.0.localizedCompare(app2.0)
@@ -358,37 +358,55 @@ struct JailbreakView: View {
                                         }, id: \.1) { (localizedAppName, name) in
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
-                                                    let isForbidden = isAppForbidden(name)
-                                                    Text("\(localizedAppName) - \(name)\(isForbidden ? Text("  ✓").foregroundColor(.green) : Text(""))")
+                                                    Text("\(localizedAppName) - \(name)")
                                                         .font(.system(size: 16))
                                                         .padding(.vertical, 5)
                                                     Spacer()
                                                     let isSelected = selectedNames.contains(name)
-                                                    Button(action: {
-                                                        if isSelected {
-                                                            selectedNames.removeAll(where: { $0 == name })
-                                                        } else {
-                                                            selectedNames.append(name)
-                                                        }
-                                                        ForbidApp(name)
-                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    }) {
-                                                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                                            .foregroundColor(isSelected ? .green : .green.opacity(0.5))
-                                                    }
-                                                    Spacer().frame(width: 10)
                                                     let isDeleted = deletedNames.contains(name)
-                                                    Button(action: {
-                                                        if isDeleted {
-                                                            deletedNames.removeAll(where: { $0 == name })
+                                                    Toggle(isOn: Binding(
+                                                        get: {
+                                                            return isSelected
+                                                        },
+                                                        set: { newValue in
+                                                            if newValue {
+                                                                if isDeleted {
+                                                                    deletedNames.removeAll(where: { $0 == name })
+                                                                }
+                                                                selectedNames.append(name)
+                                                                ForbidApp(name)
+                                                                dopamineDefaults().set(true, forKey: name)
+                                                            } else {
+                                                                if isSelected {
+                                                                    selectedNames.removeAll(where: { $0 == name })
+                                                                }
+                                                                deletedNames.append(name)
+                                                                removeApp(name)
+                                                                dopamineDefaults().set(false, forKey: name)
+                                                            }
+                                                            dopamineDefaults().synchronize()
+                                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                        }
+                                                    )) {
+                                                        isSelected ? Image(systemName: "checkmark.circle.fill") : Image(systemName: "xmark.circle.fill")
+                                                    }
+                                                    .padding(.trailing, 10)
+                                                    .foregroundColor(isSelected ? .green : .red)
+                                                    .onAppear {
+                                                        if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
+                                                            if savedState {
+                                                                selectedNames.append(name)
+                                                                ForbidApp(name)
+                                                            } else {
+                                                                deletedNames.append(name)
+                                                                removeApp(name)
+                                                            }
                                                         } else {
                                                             deletedNames.append(name)
+                                                            removeApp(name)
+                                                            dopamineDefaults().set(false, forKey: name)
                                                         }
-                                                        removeApp(name)
-                                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    }) {
-                                                        Image(systemName: isDeleted ? "xmark.circle.fill" : "circle")
-                                                            .foregroundColor(isDeleted ? .red : .red.opacity(0.5))
+                                                        dopamineDefaults().synchronize()
                                                     }
                                                 }
                                             }
@@ -890,17 +908,6 @@ struct JailbreakView: View {
             dict[name] = true
             dict.write(toFile: filePath, atomically: true)
         }
-    }
-
-    func isAppForbidden(_ name: String) -> Bool {
-        let fileManager = FileManager.default
-        let filePath = "/var/mobile/zp.unject.plist"
-        if fileManager.fileExists(atPath: filePath),
-        let dict = NSMutableDictionary(contentsOfFile: filePath),
-        dict[name] != nil {
-            return true
-        }
-        return false
     }
 
     func removeApp(_ name: String) {
