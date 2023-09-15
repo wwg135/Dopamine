@@ -99,9 +99,6 @@ struct JailbreakView: View {
                             isShowingPicker = false
                         })
                     }
-                    .onAppear {
-                        loadImage()
-                    }
                 
                 VStack {
                     Spacer()
@@ -467,6 +464,7 @@ struct JailbreakView: View {
                 }
             }
             DispatchQueue.global(qos: .userInitiated).async {
+                loadImage()
                 Task {
                     do {
                         try await checkForUpdates()
