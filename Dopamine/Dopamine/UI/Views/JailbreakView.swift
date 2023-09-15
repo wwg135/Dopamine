@@ -390,15 +390,6 @@ struct JailbreakView: View {
                                                         isSelected ? Image(systemName: "checkmark.circle.fill") : Image(systemName: "xmark.circle.fill")
                                                     }
                                                     .foregroundColor(isSelected ? .green : .red)
-                                                    .onAppear {
-                                                        if let savedState = UserDefaults.standard.object(forKey: name) as? Bool {
-                                                            selectedNames.append(name)
-                                                            ForbidApp(name)
-                                                        } else {
-                                                            deletedNames.append(name)
-                                                            removeApp(name)
-                                                        }
-                                                    }
                                                 }
                                             }
                                         }
@@ -406,6 +397,17 @@ struct JailbreakView: View {
                                 }
                                 .opacity(1)
                                 .frame(maxWidth: 250, maxHeight: 300)
+                                .onAppear {
+                                    for name in appNames {
+                                        if UserDefaults.standard.bool(forKey: name) {
+                                            selectedNames.append(name)
+                                            ForbidApp(name)
+                                        } else {
+                                            deletedNames.append(name)
+                                            removeApp(name)
+                                        }
+                                    }
+                                }
                             }
                         }
                         .padding(.vertical)
