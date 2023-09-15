@@ -358,7 +358,6 @@ struct JailbreakView: View {
                                         }, id: \.1) { (localizedAppName, name) in
                                             if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
                                                 HStack {
-                                                    let isForbidden = isAppForbidden(name)
                                                     Text("\(localizedAppName) - \(name)")
                                                         .font(.system(size: 16))
                                                         .padding(.vertical, 5)
