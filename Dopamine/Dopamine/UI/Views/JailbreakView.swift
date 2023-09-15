@@ -383,7 +383,6 @@ struct JailbreakView: View {
                                                                 deletedNames.append(name)
                                                                 removeApp(name)
                                                             }
-                                                            dopamineDefaults().set(newValue, forKey: name)
                                                             dopamineDefaults().synchronize()
                                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                                         }
@@ -393,12 +392,19 @@ struct JailbreakView: View {
                                                     .foregroundColor(isSelected ? .green : .red)
                                                     .onAppear {
                                                         if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
-                                                            selectedNames.append(name)
-                                                            ForbidApp(name)
+                                                            if savedState {
+                                                                selectedNames.append(name)
+                                                                ForbidApp(name)
+                                                            } else {
+                                                                deletedNames.append(name)
+                                                                removeApp(name)
+                                                            }
                                                         } else {
                                                             deletedNames.append(name)
                                                             removeApp(name)
+                                                            dopamineDefaults().set(false, forKey: name)
                                                         }
+                                                        dopamineDefaults().synchronize()
                                                     }
                                                 }
                                             }
