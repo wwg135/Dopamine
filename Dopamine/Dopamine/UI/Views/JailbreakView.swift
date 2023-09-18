@@ -7,6 +7,9 @@
 
 import SwiftUI
 import Fugu15KernelExploit
+import SwiftfulLoadingIndicators
+import Foundation
+import PhotosUI
 
 #if os(iOS)
 import UIKit
@@ -14,109 +17,413 @@ import UIKit
 import AppKit
 #endif
 
-import Fugu15KernelExploit
-import SwiftfulLoadingIndicators
+enum UpdateState {
+    case downloading, updating
+}
 
-struct JailbreakView: View {
-    
+struct JailbreakView: View {    
     enum JailbreakingProgress: Equatable {
         case idle, jailbreaking, selectingPackageManager, finished
     }
     
     struct MenuOption: Identifiable, Equatable {
-        
         static func == (lhs: JailbreakView.MenuOption, rhs: JailbreakView.MenuOption) -> Bool {
             lhs.id == rhs.id
         }
         
-        var id: String
-        
+        var id: String  
         var imageName: String
         var title: String
-        var showUnjailbroken: Bool = true
-        
-        
+        var showUnjailbroken: Bool = true   
         var action: (() -> ())? = nil
     }
-    
+
     @State var isSettingsPresented = false
     @State var isCreditsPresented = false
-    
     @State var jailbreakingProgress: JailbreakingProgress = .idle
-    @State var jailbreakingError: Error?
-    
+    @State var jailbreakingError: Error?  
     @State var updateAvailable = false
-    @State var showingUpdatePopupType: UpdateType? = nil
-    
-    
     @State var updateChangelog: String? = nil
-    @State var mismatchChangelog: String? = nil
-    
-    @State var aprilFirstAlert = whatCouldThisVariablePossiblyEvenMean
-    
-    @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    @State var mismatchChangelog: String? = nil 
+    @State var upTime = "系统启动于: 加载中"
+    @State var index = 0
+    @State var showLaunchTime = true
     @State var advancedLogsTemporarilyEnabled: Bool = false
+    @State var showTexts = dopamineDefaults().bool(forKey: "showTexts")
+    @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
+    @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
+    @State var updateState: UpdateState = .downloading
+    @State var progressDouble: Double = 0
+    var downloadProgress = Progress()
+    @State var showDownloadPage = false
+    @State var showLogView = false
+    @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.[1-9](\\.[0-9])?$")
+    @State var appNames: [(String, String)] = []
+    @State var selectedNames: [String] = []
+    @State var deletedNames: [String] = []
+    @State var MaskDetection = false
+    @State var searchText = ""
+    @Environment(\.colorScheme) var colorScheme
+    @State var backgroundImage: UIImage?
+    @State var isShowingPicker = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
     }
     
-    var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
-    
-//    init() {
-//        menuOptions = [
-//            .init(imageName: "gearshape", title: NSLocalizedString("Menu_Settings_Title", comment: ""), view: AnyView(SettingsView())),
-//            .init(imageName: "arrow.clockwise", title: NSLocalizedString("Menu_Restart_SpringBoard_Title", comment: ""), showUnjailbroken: false, action: respring),
-//            .init(imageName: "arrow.clockwise.circle", title: NSLocalizedString("Menu_Reboot_Userspace_Title", comment: ""), showUnjailbroken: false, action: userspaceReboot),
-//            .init(imageName: "info.circle", title: NSLocalizedString("Menu_Credits_Title", comment: ""), view: AnyView(AboutView())),
-//        ]
-//    }
-    
-    
     var body: some View {
-        GeometryReader { geometry in
+        GeometryReader { geometry in                
             ZStack {
-                
-                let isPopupPresented = isSettingsPresented || isCreditsPresented
-                
-                Image(whatCouldThisVariablePossiblyEvenMean ? "Clouds" : "Wallpaper")
+                let isPopupPresented = isSettingsPresented || isCreditsPresented            
+                Image(uiImage: backgroundImage ?? UIImage(named: "Wallpaper.jpg")!)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .edgesIgnoringSafeArea(.all)
-                    .blur(radius: 4)
                     .frame(width: geometry.size.width, height: geometry.size.height)
-                
                     .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                     .animation(.spring(), value: isPopupPresented)
-                
-                if showingUpdatePopupType == nil {
-                    VStack {
-                        Spacer()
-                        header
-                        Spacer()
-                        menu
-                        if !isJailbreaking {
-                            Spacer()
-                            Spacer()
-                            if isSandboxed() {
-                                Text("(Demo version - Sandboxed)")
-                                    .foregroundColor(.white)
-                                    .opacity(0.5)
+                    .onTapGesture(count: 1, perform: {
+                        isShowingPicker = true
+                    })
+                    .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+                        backgroundImage = UIImage(named: "Wallpaper.jpg")
+                        saveImage(image: nil)
+                    })
+                    .sheet(isPresented: $isShowingPicker) {
+                        ImagePicker(completionHandler: { image in
+                            if let image = image {
+                                self.backgroundImage = image
+                                saveImage(image: image)
                             }
-                        }
-                        bottomSection
-                        updateButton
-                        if !isJailbreaking {
-                            Spacer()
+                            isShowingPicker = false
+                        })
+                    }
+                
+                VStack {
+                    Spacer()
+                    header
+                    Spacer()
+                    menu
+                    if !isJailbreaking {
+                        Spacer()
+                        Spacer()
+                        if isSandboxed() {
+                            Text("(Demo version - Sandboxed)")
+                                .foregroundColor(.white)
+                                .opacity(0.5)
                         }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .blur(radius: isPopupPresented ? 4 : 0)
-                    .scaleEffect(isPopupPresented ? 0.85 : 1)
-                    .animation(.spring(), value: updateAvailable)
-                    .animation(.spring(), value: isPopupPresented)
-                    .transition(.opacity)
-                    .zIndex(1)
+                    bottomSection
+                    if !isJailbreaking {
+                        Spacer()
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .blur(radius: isPopupPresented ? 4 : 0)
+                .scaleEffect(isPopupPresented ? 0.85 : 1)
+                .animation(.spring(), value: updateAvailable)
+                .animation(.spring(), value: isPopupPresented)
+                .transition(.opacity)
+                .zIndex(1)
+
+                if updateAvailable {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(true)
+                            .onTapGesture {
+                                updateAvailable = false
+                            }
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        VStack {
+                            VStack{
+                                Text(isInstalledEnvironmentVersionMismatching() ? "Title_Mismatching_Environment_Version" : "Title_Changelog")
+                                    .font(.title2)
+                                    .minimumScaleFactor(0.5)
+                                    .multilineTextAlignment(.center)
+                                Divider()
+                                    .background(.white)
+                                    .padding(.horizontal, 25)
+                                ScrollView {
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                        .font(.system(size: 16))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical)
+                                }
+                                .padding(.horizontal, 15)
+                            }
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                showDownloadPage = true
+                                updateAvailable = false
+                                DispatchQueue.global(qos: .userInitiated).async {
+                                    if requiresEnvironmentUpdate {
+                                        updateState = .updating
+                                        DispatchQueue.global(qos: .userInitiated).async {
+                                            updateEnvironment()
+                                        }
+                                    } else {
+                                        updateState = .downloading
+                                        if let downloadURL = extractDownloadURL(from: updateChangelog!, targetText: "点击当前版本下载") {
+                                            Task {
+                                                do {
+                                                    try await downloadUpdateAndInstall(downloadURL)
+                                                    updateState = .updating
+                                                } catch {
+                                                    showLogView = true
+                                                    Logger.log("Error: \(error.localizedDescription)", type: .error)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } label: {
+                                Label(title: { Text("Button_Update")  }, icon: { Image(systemName: "arrow.down") })
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(MaterialView(.light)
+                                        .opacity(0.5)
+                                        .cornerRadius(8)
+                                    )
+                            }
+                            .fixedSize()
+                        }
+                        .padding(.vertical)
+                        .background(Color.black.opacity(0.25))
+                        .animation(.spring(), value: updateAvailable)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 420)
+                }
+                            
+                if showDownloadPage {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(true)
+                            .onTapGesture {
+                                showDownloadPage = false
+                            }
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        if showLogView {
+                            VStack {
+                                LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
+                                    .opacity(1)
+                                    .foregroundColor(Color.white)
+                                Text("Update_Log_Hint_Scrollable")
+                                    .opacity(1)
+                                    .minimumScaleFactor(0.5)  
+                                    .foregroundColor(.white)
+                                    .padding()
+                            }
+                            .frame(maxWidth: 250, maxHeight: 360)
+                            .background(Color.black.opacity(0.5))
+                            .background(MaterialView(.systemUltraThinMaterialDark))
+                        } else {
+                            VStack {
+                                VStack {
+                                    Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
+                                        .font(.title2)
+                                        .opacity(1)
+                                        .minimumScaleFactor(0.5)
+                                        .foregroundColor(Color.white)
+                                        .multilineTextAlignment(.center)
+                                        .drawingGroup()
+                                    Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
+                                        .opacity(1)
+                                        .minimumScaleFactor(0.5)
+                                        .foregroundColor(Color.white)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.bottom, 10)
+                                }
+                                .frame(height: 50)
+                                .animation(.spring(), value: updateState)
+
+                                VStack {
+                                    ZStack {
+                                        ZStack {
+                                            Text("\(Int(progressDouble * 100))%")
+                                                .font(.title)
+                                                .opacity(1)
+                                            if updateState == .downloading || updateState == .updating {
+                                                LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
+                                                    .opacity(1)
+                                            }
+                                        }
+                                        Circle()
+                                            .stroke(
+                                                Color.white.opacity(0.1),
+                                                lineWidth: updateState == .downloading ? 16 : 8
+                                            )
+                                            .animation(.spring(), value: updateState)
+                                        Circle()
+                                            .trim(from: 0, to: progressDouble)
+                                            .stroke(
+                                                Color.white,
+                                                style: StrokeStyle(
+                                                    lineWidth: updateState == .downloading ? 16 : 0,
+                                                    lineCap: .round
+                                                )
+                                            )
+                                            .rotationEffect(.degrees(-90))
+                                            .animation(.easeOut, value: progressDouble)
+                                            .animation(.spring(), value: updateState) 
+                                    }
+                                }
+                                .frame(height: 90)
+                                .animation(.spring(), value: updateState)
+                            }
+                            .padding(.vertical)
+                            .background(Color.black.opacity(0.5))
+                            .background(MaterialView(.systemUltraThinMaterialDark))
+                            .zIndex(3)
+                        }
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 180, maxHeight: 180)
+                    .onAppear {
+                        if updateState == .downloading {
+                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                                progressDouble = downloadProgress.fractionCompleted
+                                
+                                if progressDouble == 1 {
+                                    t.invalidate()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if MaskDetection {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(true)
+                            .onTapGesture {
+                                MaskDetection = false
+                            }
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        VStack {
+                            VStack{
+                                Text("Option_Select_Custom_App")
+                                    .font(.system(size: 18))
+                                    .minimumScaleFactor(0.5)
+                                    .multilineTextAlignment(.center)
+                                Divider()
+                                    .background(.white)
+                                    .padding(.horizontal, 25)
+                                ScrollView {
+                                    VStack(alignment: .leading) {
+                                        TextField("🔍搜索一下", text: $searchText)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
+                                            .foregroundColor(colorScheme == .dark ? .white : .black)
+                                        ForEach(appNames.sorted { (app1, app2) in
+                                            let isSelected1 = selectedNames.contains(app1.1)
+                                            let isSelected2 = selectedNames.contains(app2.1)
+                                            if isSelected1 && !isSelected2 {
+                                                return true
+                                            } else if !isSelected1 && isSelected2 {
+                                                return false
+                                            } else {
+                                                let localizedNameComparison = app1.0.localizedCompare(app2.0)
+                                                if localizedNameComparison == .orderedSame {
+                                                    return app1.0 < app2.0
+                                                } else {
+                                                    return localizedNameComparison == .orderedAscending
+                                                }
+                                            }
+                                        }, id: \.1) { (localizedAppName, name) in
+                                            if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
+                                                HStack {
+                                                    Text("\(localizedAppName)")
+                                                        .font(.system(size: 16))
+                                                        .padding(.vertical, 5)
+                                                    Spacer()
+                                                    let isSelected = selectedNames.contains(name)
+                                                    let isDeleted = deletedNames.contains(name)
+                                                    Toggle(isOn: Binding(
+                                                        get: {
+                                                            return isSelected
+                                                        },
+                                                        set: { newValue in
+                                                            withAnimation {
+                                                                if newValue {
+                                                                    if isDeleted {
+                                                                        deletedNames.removeAll(where: { $0 == name })
+                                                                    }
+                                                                    selectedNames.append(name)
+                                                                    ForbidApp(name)
+                                                                    dopamineDefaults().set(true, forKey: name)
+                                                                } else {
+                                                                    if isSelected {
+                                                                        selectedNames.removeAll(where: { $0 == name })
+                                                                    }
+                                                                    deletedNames.append(name)
+                                                                    removeApp(name)
+                                                                    dopamineDefaults().set(false, forKey: name)
+                                                                }
+                                                                dopamineDefaults().synchronize()
+                                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                            }
+                                                        }
+                                                    )) {
+                                                        EmptyView()
+                                                    }
+                                                    .padding(.trailing, 10)
+                                                    .onAppear {
+                                                        if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
+                                                            if savedState {
+                                                                selectedNames.append(name)
+                                                                ForbidApp(name)
+                                                            } else {
+                                                                deletedNames.append(name)
+                                                                removeApp(name)
+                                                            }
+                                                        } else {
+                                                            deletedNames.append(name)
+                                                            removeApp(name)
+                                                            dopamineDefaults().set(false, forKey: name)
+                                                        }
+                                                        dopamineDefaults().synchronize()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .opacity(1)
+                                .frame(maxWidth: 250, maxHeight: 300)
+                            }
+                        }
+                        .padding(.vertical)
+                        .background(Color.black.opacity(0.25))
+                        .animation(.spring(), value: updateAvailable)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 420)
                 }
                 
                 PopupView(title: {
@@ -125,8 +432,7 @@ struct JailbreakView: View {
                     SettingsView(isPresented: $isSettingsPresented)
                         .frame(maxWidth: 320)
                 }, isPresented: $isSettingsPresented)
-                .zIndex(2)
-                
+                .zIndex(2)          
                 
                 PopupView(title: {
                     VStack(spacing: 4) {
@@ -141,66 +447,75 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320)
                 }, isPresented: $isCreditsPresented)
                 .zIndex(2)
-                
-                
-                UpdateDownloadingView(type: $showingUpdatePopupType, changelog: updateChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), mismatchChangelog: mismatchChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""))
-
-//
-//                ZStack {
-//                    ForEach(menuOptions) { option in
-//                        option.view?
-//                            .padding(.vertical)
-//                            .background(showingUpdatePopupType != nil ? nil : MaterialView(.systemUltraThinMaterialDark)
-//                                        //                    .opacity(0.8)
-//                                .cornerRadius(16))
-//                            .opacity(option.id == optionPresentedID ? 1 : 0)
-//                            .animation(.spring().speed(1.5), value: optionPresentedID)
-//                    }
-//                    .opacity(showingUpdatePopupType != nil ? 1 : 0)
-//                    .animation(.spring().speed(1.5), value: showingUpdatePopupType)
-//                }
-//                .frame(maxWidth: showingUpdatePopupType != nil ? .infinity : 320)
-//                .scaleEffect(shouldShowBackground ? 1 : 0.9)
-//                .opacity(shouldShowBackground ? 1 : 0)
-//                .animation(.spring().speed(1.5), value: shouldShowBackground)
             }
-            .animation(.default, value: showingUpdatePopupType == nil)
+            .animation(.spring(), value: updateAvailable)
         }
         .onAppear {
-            Task {
-                do {
-                    try await checkForUpdates()
-                } catch {
-                    Logger.log(error, type: .error, isStatus: false)
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
+                let dots = ". . . "                                                                    
+                if index < dots.count {
+                    upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
+                    index += 1
+                } else {
+                    upTime = showLaunchTime ? getLaunchTime() : formatUptime()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        showLaunchTime = false
+                    }
                 }
             }
-        }
-        .alert("🤑 NEW SPONSORSHIP OFFER 🤑 \n\n⚠️ Hello iOS \(UIDevice.current.systemVersion) user! 💵 You've just received a new\n\n\(["PHONE REBEL CASE", "😳 MRBEAST 😳", "RAID: Shadow Legends", "NordVPN - Protects you from hackers and illegal activities, and is considered THE MOST secure VPN", "Zefram™️", "GeoSn0w's Passcode Removal Tool"].randomElement()!)\n\nsponsorship offer 💰💰💰 Would you like to accept it? 💸", isPresented: $aprilFirstAlert) {
-            Button("Ignore for now") { }
-            Button("✅ Accept") {
-                UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
+            DispatchQueue.global(qos: .userInitiated).async {
+                loadImage()
+                Task {
+                    do {
+                        try await checkForUpdates()
+                        try await clearFilesLog()
+                    } catch {
+                        Logger.log(error, type: .error, isStatus: false)
+                    }
+                }
+            }
+            DispatchQueue.main.async {
+                appNames = getThirdPartyAppNames()
             }
         }
     }
     
-    
     @ViewBuilder
     var header: some View {
-        let tint = whatCouldThisVariablePossiblyEvenMean ? Color.black : .white
+        let tint = Color.white
         HStack {
             VStack(alignment: .leading) {
-                Image(whatCouldThisVariablePossiblyEvenMean ? "DopamineLogo2" : "DopamineLogo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: 200)
-                    .padding(.top)
-                
-                Text("Title_Supported_iOS_Versions")
+                Group {
+                    Image(!isJailbroken() ? "DopamineLogo2" : "DopamineLogo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 200)
+                        .padding(.top)
+                }
+                .onTapGesture(count: 1) {
+                    MaskDetection.toggle()
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                }
+
+                Group {
+                    Text("Title_Supported_iOS_Versions")
+                        .font(.subheadline)
+                        .foregroundColor(tint)
+                    Text("Title_Made_By")
+                        .font(.subheadline)
+                        .foregroundColor(tint.opacity(0.5))
+                }
+                .onTapGesture(count: 1) {
+                    showTexts.toggle()
+                    dopamineDefaults().set(showTexts, forKey: "showTexts")
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                }
+                Text(showTexts ? "AAA : AAB" : "")
                     .font(.subheadline)
                     .foregroundColor(tint)
-                Text("Title_Made_By")
+                Text(showTexts ? upTime : "")
                     .font(.subheadline)
-                    .foregroundColor(tint.opacity(0.5))
+                    .foregroundColor(tint)
             }
             Spacer()
         }
@@ -236,36 +551,39 @@ struct JailbreakView: View {
                     HStack {
                         Label(title: { Text(option.title) }, icon: { Image(systemName: option.imageName) })
                             .foregroundColor(Color.white)
-                        
+
                         Spacer()
-                        
+
                         if option.action == nil {
                             Image(systemName: Locale.characterDirection(forLanguage: Locale.current.languageCode ?? "") == .rightToLeft ? "chevron.left" : "chevron.right")
                                 .font(.body)
                                 .symbolRenderingMode(.palette)
-                                .foregroundStyle(.white.opacity(0.5))
-                                .onLongPressGesture {
-                                    UIApplication.shared.open(.init(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!)
-                                }
+                                .foregroundStyle(.white.opacity(1))
                         }
                     }
                     .frame(maxWidth: .infinity)
                     .padding(16)
                     .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
+                    .contextMenu(
+                        option.id == "userspace"
+                        ? ContextMenu {
+                        Button(action: reboot,
+                            label: {Label("Menu_Reboot_Title", systemImage: "arrow.clockwise.circle.fill")})
+                        Button(action: updateEnvironment,
+                            label: {Label("Button_Update_Environment", systemImage: "arrow.counterclockwise.circle.fill")})
+                        }
+                        : nil
+                    )
                 }
                 .buttonStyle(.plain)
                 .disabled(!option.showUnjailbroken && !isJailbroken())
-                
+                                  
                 if menuOptions.last != option {
-                    Divider()
-                        .background(.white)
-                        .opacity(0.5)
-                        .padding(.horizontal)
                 }
             }
         }
         .padding()
-        .background(MaterialView(.systemUltraThinMaterialDark))
+        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
         .cornerRadius(16)
         .frame(maxWidth: 320, maxHeight: isJailbreaking ? 0 : nil)
         .opacity(isJailbreaking ? 0 : 1)
@@ -275,122 +593,107 @@ struct JailbreakView: View {
     @ViewBuilder
     var bottomSection: some View {
         VStack {
-            Button {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                
-                if requiresEnvironmentUpdate {
-                    showingUpdatePopupType = .environment
-                } else {
-                    if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
-                        jailbreakingProgress = .selectingPackageManager
+            VStack {
+                Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()       
+                    if requiresEnvironmentUpdate {
+                        updateAvailable = true
                     } else {
-                        uiJailbreak()
+                        if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
+                            jailbreakingProgress = .selectingPackageManager
+                        } else {
+                            uiJailbreak()
+                        }
                     }
-                }
-            } label: {
-                Label(title: {
-                    if Fugu15.supportsThisDeviceBool() {
-                        if !requiresEnvironmentUpdate {
-                            if isJailbroken() {
-                                Text("Status_Title_Jailbroken")
+                } label: {
+                    Label(title: {
+                        if Fugu15.supportsThisDeviceBool() {
+                            if !requiresEnvironmentUpdate {
+                                if isJailbroken() {
+                                    Text("Status_Title_Jailbroken")
+                                } else {
+                                    switch jailbreakingProgress {
+                                    case .idle:
+                                        Text("Button_Jailbreak_Title")
+                                    case .jailbreaking:
+                                        Text("Status_Title_Jailbreaking")
+                                    case .selectingPackageManager:
+                                        Text("Status_Title_Select_Package_Managers")
+                                    case .finished:
+                                        if jailbreakingError == nil {
+                                            Text("Status_Title_Jailbroken")
+                                        } else {
+                                            Text("Status_Title_Unsuccessful")
+                                        }
+                                    }
+                                }
                             } else {
-                                switch jailbreakingProgress {
-                                case .idle:
-                                    Text("Button_Jailbreak_Title")
-                                case .jailbreaking:
-                                    Text("Status_Title_Jailbreaking")
-                                case .selectingPackageManager:
-                                    Text("Status_Title_Select_Package_Managers")
-                                case .finished:
-                                    if jailbreakingError == nil {
-                                        Text("Status_Title_Jailbroken")
-                                    } else {
-                                        Text("Status_Title_Unsuccessful")
-                                    }
-                                }
+                                Text("Button_Update_Environment")
                             }
                         } else {
-                            Text("Button_Update_Environment")
+                            Text("Unsupported")
                         }
-                    } else {
-                        Text("Unsupported")
-                    }
-                    
-                }, icon: {
-                    if Fugu15.supportsThisDeviceBool() {
-                        if !requiresEnvironmentUpdate {
-                            ZStack {
-                                switch jailbreakingProgress {
-                                case .jailbreaking:
-                                    LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                                case .selectingPackageManager:
-                                    Image(systemName: "shippingbox")
-                                case .finished:
-                                    if jailbreakingError == nil {
+                    }, icon: {
+                        if Fugu15.supportsThisDeviceBool() {
+                            if !requiresEnvironmentUpdate {
+                                ZStack {
+                                    switch jailbreakingProgress {
+                                    case .jailbreaking:
+                                        LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
+                                    case .selectingPackageManager:
+                                        Image(systemName: "shippingbox")
+                                    case .finished:
+                                        if jailbreakingError == nil {
+                                            Image(systemName: "lock.open")
+                                        } else {
+                                            Image(systemName: "lock.slash")
+                                        }
+                                    case .idle:
                                         Image(systemName: "lock.open")
-                                    } else {
-                                        Image(systemName: "lock.slash")
                                     }
-                                case .idle:
-                                    Image(systemName: "lock.open")
                                 }
+                            } else {
+                                Image(systemName: "doc.badge.arrow.up")
                             }
                         } else {
-                            Image(systemName: "doc.badge.arrow.up")
+                            Image(systemName: "lock.slash")
                         }
-                    } else {
-                        Image(systemName: "lock.slash")
-                    }
-                })
-                .foregroundColor(whatCouldThisVariablePossiblyEvenMean ? .black : .white)
-                .padding()
-                .frame(maxWidth: isJailbreaking ? .infinity : 280)
-            }
-            .disabled((isJailbroken() || isJailbreaking || !Fugu15.supportsThisDeviceBool()) && !requiresEnvironmentUpdate)
-            .drawingGroup()
+                    })
+                    .foregroundColor(Color.white)
+                    .padding()
+                    .frame(maxWidth: isJailbreaking ? .infinity : 280)
+                }
+                .disabled((isJailbroken() || isJailbreaking || !Fugu15.supportsThisDeviceBool()) && !requiresEnvironmentUpdate)
+                .drawingGroup()
             
-            if jailbreakingProgress == .finished || jailbreakingProgress == .jailbreaking {
-                Spacer()
-                LogView(advancedLogsTemporarilyEnabled: $advancedLogsTemporarilyEnabled, advancedLogsByDefault: $advancedLogsByDefault)
-                endButtons
-            } else if jailbreakingProgress == .selectingPackageManager {
-                PackageManagerSelectionView(shown: .constant(true), onContinue: {
-                    uiJailbreak()
-                })
-                .padding(.horizontal)
+                if jailbreakingProgress == .finished || jailbreakingProgress == .jailbreaking {
+                    Spacer()
+                    LogView(advancedLogsTemporarilyEnabled: $advancedLogsTemporarilyEnabled, advancedLogsByDefault: $advancedLogsByDefault)
+                    endButtons
+                } else if jailbreakingProgress == .selectingPackageManager {
+                    PackageManagerSelectionView(shown: .constant(true), onContinue: {
+                        uiJailbreak()
+                    })
+                    .padding(.horizontal)
+                }
             }
+            .frame(maxWidth: isJailbreaking ? .infinity : 280, maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.65 : nil)
+            .padding(.horizontal, isJailbreaking ? 0 : 20)
+            .padding(.top, isJailbreaking ? 16 : 0)
+            .background(MaterialView(.systemUltraThinMaterialDark)
+                .cornerRadius(isJailbreaking ? 20 : 8)
+                .ignoresSafeArea(.all, edges: isJailbreaking ? .all : .top)
+                .offset(y: isJailbreaking ? 16 : 0)
+                .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1) .opacity(0.25)
+            )
+            .animation(.spring(), value: isJailbreaking)
         }
-        .frame(maxWidth: isJailbreaking ? .infinity : 280, maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.65 : nil)
-        .padding(.horizontal, isJailbreaking ? 0 : 20)
-        .padding(.top, isJailbreaking ? 16 : 0)
-        .background(MaterialView(.systemUltraThinMaterialDark)
-            .cornerRadius(isJailbreaking ? 20 : 8)
-            .ignoresSafeArea(.all, edges: isJailbreaking ? .all : .top)
-            .offset(y: isJailbreaking ? 16 : 0)
-            .opacity((isJailbroken() && !requiresEnvironmentUpdate) ? 0.5 : 1)
-        )
-        .animation(.spring(), value: isJailbreaking)
     }
-    
+
     @ViewBuilder
     var endButtons: some View {
         switch jailbreakingProgress {
-        case .finished:
-            //            Button {
-            //                userspaceReboot()
-            //            } label: {
-            //                Label(title: { Text("Reboot Userspace (Finish)") }, icon: {
-            //                    Image(systemName: "arrow.clockwise")
-            //                })
-            //                .foregroundColor(.white)
-            //                .padding()
-            //                .frame(maxWidth: 280, maxHeight: jailbreakingError != nil ? 0 : nil)
-            //                .background(MaterialView(.light)
-            //                    .opacity(0.5)
-            //                    .cornerRadius(8)
-            //                )
-            //                .opacity(jailbreakingError != nil ? 0 : 1)
-            //            }
+        case .finished: 
             if !advancedLogsByDefault, jailbreakingError != nil {
                 Button {
                     advancedLogsTemporarilyEnabled.toggle()
@@ -417,41 +720,17 @@ struct JailbreakView: View {
         }
     }
     
-    @ViewBuilder
-    var updateButton: some View {
-        Button {
-            showingUpdatePopupType = .regular
-        } label: {
-            Label(title: { Text("Button_Update_Available") }, icon: {
-                ZStack {
-                    if jailbreakingProgress == .jailbreaking {
-                        LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                    } else {
-                        Image(systemName: "arrow.down.circle")
-                    }
-                }
-            })
-            .foregroundColor(whatCouldThisVariablePossiblyEvenMean ? .black : .white)
-            .padding()
-        }
-        .frame(maxHeight: updateAvailable && jailbreakingProgress == .idle ? nil : 0)
-        .opacity(updateAvailable && jailbreakingProgress == .idle ? 1 : 0)
-        .animation(.spring(), value: updateAvailable)
-    }
-    
     func uiJailbreak() {
         jailbreakingProgress = .jailbreaking
         let dpDefaults = dopamineDefaults()
         dpDefaults.set(dpDefaults.integer(forKey: "total_jailbreaks") + 1, forKey: "total_jailbreaks")
-        dpDefaults.synchronize()
-        
+        dpDefaults.synchronize() 
         DispatchQueue(label: "Dopamine").async {
             sleep(1)
             
             jailbreak { e in
                 jailbreakingProgress = .finished
-                jailbreakingError = e
-                
+                jailbreakingError = e             
                 if e == nil {
                     dpDefaults.set(dpDefaults.integer(forKey: "successful_jailbreaks") + 1, forKey: "successful_jailbreaks")
                     dpDefaults.synchronize()
@@ -460,7 +739,7 @@ struct JailbreakView: View {
                     
                     Logger.log(NSLocalizedString("Restarting Userspace", comment: ""), type: .continuous, isStatus: true)
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    DispatchQueue.global().async {
                         if tweakInjectionEnabled {
                             userspaceReboot()
                         } else {
@@ -475,79 +754,199 @@ struct JailbreakView: View {
         }
     }
     
-    func getDeltaChangelog(json: [[String : Any]], fromVersion: String?, toVersion: String?) -> String? {
-        var include: Bool = toVersion == nil
-        var changelogBuf: String = ""
+    func getDeltaChangelog(json: [[String: Any]]) -> String? {
+        var changelogBuf = ""
         for item in json {
-            let versionString = item["tag_name"] as? String
-            if versionString != nil {
-                if toVersion != nil {
-                    if versionString! == toVersion {
-                        include = true
-                    }
-                }
-                
-                if fromVersion != nil {
-                    if versionString! == fromVersion {
-                        include = false
-                    }
-                }
-                
-                if include {
-                    let changelog = item["body"] as? String
-                    if changelog != nil {
-                        if !changelogBuf.isEmpty {
-                            changelogBuf += "\n\n\n"
-                        }
-                        changelogBuf += "**" + versionString! + "**\n\n" + changelog!
-                    }
+            if let version = item["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {
+                if let changelog = item["body"] as? String {
+                    changelogBuf = "**" + version + "**\n\n" + changelog
+                    break
                 }
             }
         }
-        return changelogBuf == "" ? nil : changelogBuf
+        return changelogBuf.isEmpty ? nil : changelogBuf 
     }
 
     func createUserOrientedChangelog(deltaChangelog: String?, environmentMismatch: Bool) -> String {
         var userOrientedChangelog : String = ""
-
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
 
-        // Prefix
         if environmentMismatch {
             userOrientedChangelog += String(format:NSLocalizedString("Mismatching_Environment_Version_Update_Body", comment: ""), installedEnvironmentVersion(), appVersion!)
             userOrientedChangelog += "\n\n\n" + NSLocalizedString("Title_Changelog", comment: "") + ":\n\n"
         }
-        else {
-            
+        else {        
         }
 
-        // Changelog
         userOrientedChangelog += deltaChangelog ?? NSLocalizedString("Changelog_Unavailable_Text", comment: "")
-
+        
         return userOrientedChangelog
     }
     
     func checkForUpdates() async throws {
-        if let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            let owner = "opa334"
-            let repo = "Dopamine"
+        let currentAppVersion = "AAC"
+        let owner = "wwg135"
+        let repo = "Dopamine"
             
-            // Get the releases
-            let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
-            let releasesRequest = URLRequest(url: releasesURL)
-            let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
-            guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
-                return
-            }
-            
-            if let latestTag = releasesJSON.first?["tag_name"] as? String, latestTag != currentAppVersion {
-                updateAvailable = true
-                updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: currentAppVersion, toVersion: nil), environmentMismatch: false)
-            }
+        // Get the releases
+        let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
+        let releasesRequest = URLRequest(url: releasesURL)
+        let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
+        guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
+            return
+        }
 
-            if isInstalledEnvironmentVersionMismatching() {
-                mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: installedEnvironmentVersion(), toVersion: currentAppVersion), environmentMismatch: true)
+        if releasesJSON.first(where: {
+            if let version = $0["name"] as? String, versionRegex.firstMatch(in: version, options: [], range: NSRange(location: 0, length: version.utf16.count)) != nil {   
+                if let latestName = $0["tag_name"] as? String, let latestVersion = $0["name"] as? String {
+                    if latestName.count == 10 && currentAppVersion.count == 10 {
+                        if latestName > currentAppVersion && checkForUpdates && versionRegex.firstMatch(in: latestVersion, options: [], range: NSRange(location: 0, length: latestVersion.utf16.count)) != nil {
+                            return true  
+                        }
+                    }
+                }
             }
+            return false
+        }) != nil {
+            updateAvailable = true
+            updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: false)
+        }
+ 
+        if isInstalledEnvironmentVersionMismatching() {
+            mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON), environmentMismatch: true)
+        }
+    }
+
+    func downloadUpdateAndInstall(_ downloadURL: URL) async throws {
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            downloadProgress.totalUnitCount = 1
+            group.addTask {
+                let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
+                if isJailbroken() {
+                    update(tipaURL: url)
+                } else {
+                    guard let dopamineUpdateURL = URL(string: "apple-magnifier://install?url=\(url.absoluteString)") else {
+                        return
+                    }
+                    await UIApplication.shared.open(dopamineUpdateURL)
+                    exit(0)
+                    return
+                }
+            }
+            try await group.waitForAll()
+        }
+    }
+    
+    func getLaunchTime() -> String {
+        var boottime = timeval()
+        var mib = [CTL_KERN, KERN_BOOTTIME]
+        var size = MemoryLayout<timeval>.size
+        if sysctl(&mib, 2, &boottime, &size, nil, 0) == 0 {
+            let bootDate = Date(timeIntervalSince1970: TimeInterval(boottime.tv_sec)) 
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            return "系统启动于: \(formatter.string(from: bootDate))"
+        } else {
+            return "获取启动时间失败"
+        }  
+    }
+
+    func formatUptime() -> String {
+        var formatted = ""
+        var ts = timespec()
+        clock_gettime(CLOCK_MONOTONIC_RAW, &ts)
+        let uptimeInt = Int(ts.tv_sec)
+        let days = uptimeInt / 86400
+        let hours = uptimeInt % 86400 / 3600
+        let minutes = uptimeInt % 3600 / 60
+        let seconds = uptimeInt % 60 
+        formatted = days > 0 ? "\(days) 天 \(hours) 时 \(minutes) 分 \(seconds) 秒" :
+                    hours > 0 ? "\(hours) 时 \(minutes) 分 \(seconds) 秒" :
+                    minutes > 0 ? "\(minutes) 分 \(seconds) 秒" :
+                    "\(seconds) 秒"
+        return "系统已运行: " + formatted
+    }
+
+    func clearFilesLog() async throws {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/MobileSoftwareUpdate"
+        if fileManager.fileExists(atPath: filePath) {
+            try fileManager.removeItem(atPath: filePath)
+        }
+    }
+
+    func getThirdPartyAppNames() -> [(String, String)] {
+        var names: [(String, String)] = []
+        if let workspace = NSClassFromString("LSApplicationWorkspace") as? NSObject.Type {
+            let selector = NSSelectorFromString("defaultWorkspace")
+            let workspaceInstance = workspace.perform(selector)?.takeUnretainedValue()
+            if let apps = workspaceInstance?.perform(NSSelectorFromString("allApplications"))?.takeUnretainedValue() as? [NSObject] {
+                for app in apps {
+                    if let bundleURL = app.perform(NSSelectorFromString("bundleURL"))?.takeUnretainedValue() as? URL {
+                        let name = bundleURL.lastPathComponent.replacingOccurrences(of: ".app", with: "")
+                        let localizedAppName = (app.perform(NSSelectorFromString("localizedName"))?.takeUnretainedValue() as? String) ?? ""
+                        names.append((localizedAppName, name))
+                    }
+                }
+            }
+        }
+        return names
+    }
+    
+    func ForbidApp(_ name: String) {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if !fileManager.fileExists(atPath: filePath) {
+            fileManager.createFile(atPath: filePath, contents: nil, attributes: nil)
+        }
+        if let dict = NSMutableDictionary(contentsOfFile: filePath) {
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
+        } else {
+            let dict = NSMutableDictionary()
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
+        }
+    }
+
+    func removeApp(_ name: String) {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if fileManager.fileExists(atPath: filePath),
+        let dict = NSMutableDictionary(contentsOfFile: filePath) {
+            dict.removeObject(forKey: name)
+            dict.write(toFile: filePath, atomically: true)
+        }
+    }
+
+    func extractDownloadURL(from text: String, targetText: String) -> URL? {
+        let pattern = "\\[.*?\\]\\((.*?)\\)"
+        let regex = try! NSRegularExpression(pattern: pattern, options: [])
+        let range = NSRange(location: 0, length: text.utf16.count)
+        if let match = regex.firstMatch(in: text, options: [], range: range) {
+            let urlRange = match.range(at: 1)
+            if let url = URL(string: (text as NSString).substring(with: urlRange)) {
+                return url
+            }
+        }
+        return nil
+    }
+
+    func saveImage(image: UIImage?) {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsDirectory.appendingPathComponent("background.jpg")
+        if let image = image, let data = image.jpegData(compressionQuality: 1.0) {
+            try? data.write(to: fileURL)
+        } else {
+            try? FileManager.default.removeItem(at: fileURL)
+        }
+    }
+    
+    func loadImage() {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsDirectory.appendingPathComponent("background.jpg")
+        if let data = try? Data(contentsOf: fileURL) {
+            backgroundImage = UIImage(data: data)
         }
     }
 }
@@ -555,5 +954,52 @@ struct JailbreakView: View {
 struct JailbreakView_Previews: PreviewProvider {
     static var previews: some View {
         JailbreakView()
+    }
+}
+
+struct ImagePicker: UIViewControllerRepresentable {
+    typealias UIViewControllerType = PHPickerViewController
+    let completionHandler: (UIImage?) -> Void
+    
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 1
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(completionHandler: completionHandler)
+    }
+    
+    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let completionHandler: (UIImage?) -> Void
+        
+        init(completionHandler: @escaping (UIImage?) -> Void) {
+            self.completionHandler = completionHandler
+        }
+        
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            
+            guard let result = results.first else {
+                completionHandler(nil)
+                return
+            }
+            
+            result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (image, error) in
+                if let error = error {
+                    print("Error loading image: \(error.localizedDescription)")
+                    self?.completionHandler(nil)
+                } else if let image = image as? UIImage {
+                    self?.completionHandler(image)
+                } else {
+                    self?.completionHandler(nil)
+                }
+            }
+        }
     }
 }
