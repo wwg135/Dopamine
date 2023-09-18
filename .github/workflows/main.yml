@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERSION: '1.1.6_5'
+  VERSION: '1.1.6_6'
  
 jobs:
   build:
@@ -56,7 +56,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.新增自定义Dopamine首页背景\n> - 2.操作：单击首页背景从相册选择图片自定义，长按首页背景恢复默认背景\n> - 3.其他优化" >> body.txt
+          echo -e "\n> - 同步官方最新代码更新" >> body.txt
   
       - name: Build ipa
         run: |
