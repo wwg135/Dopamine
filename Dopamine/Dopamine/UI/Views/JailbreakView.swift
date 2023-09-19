@@ -506,13 +506,13 @@ struct JailbreakView: View {
                         .foregroundColor(tint.opacity(0.5))
                 }
                 .onTapGesture(count: 1) {
-                    if !(updateAvailable || showDownloadPage || showLogView) {
+                    if !(updateAvailable || showDownloadPage || showLogView || MaskDetection) {
                         showTexts.toggle()
                         dopamineDefaults().set(showTexts, forKey: "showTexts")
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
                 }
-                .disabled(updateAvailable || showDownloadPage || showLogView)
+                .disabled(updateAvailable || showDownloadPage || showLogView || MaskDetection)
                 
                 Text(showTexts ? "AAA : AAB" : "")
                     .font(.subheadline)
@@ -581,7 +581,7 @@ struct JailbreakView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(!option.showUnjailbroken && !isJailbroken())
-                .disabled(updateAvailable || showDownloadPage || showLogView)
+                .disabled(updateAvailable || showDownloadPage || showLogView || MaskDetection)
                                   
                 if menuOptions.last != option {
                 }
