@@ -493,9 +493,12 @@ struct JailbreakView: View {
                         .padding(.top)
                 }
                 .onTapGesture(count: 1) {
-                    MaskDetection.toggle()
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    if isJailbroken() {
+                        MaskDetection.toggle()
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    }
                 }
+                .disabled(!isJailbroken())
                 
                 Group {
                     Text("Title_Supported_iOS_Versions")
