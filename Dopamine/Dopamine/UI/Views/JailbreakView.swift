@@ -915,7 +915,15 @@ struct JailbreakView: View {
         if fileManager.fileExists(atPath: filePath),
         let dict = NSMutableDictionary(contentsOfFile: filePath) {
             dict.removeObject(forKey: name)
-            dict.write(toFile: filePath, atomically: true)
+            if dict.count == 0 {
+                do {
+                    try fileManager.removeItem(atPath: filePath)
+                } catch {
+                    print("Failed to remove file: \(error)")
+                }
+            } else {
+                dict.write(toFile: filePath, atomically: true)
+            }
         }
     }
 
