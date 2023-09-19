@@ -83,13 +83,21 @@ struct JailbreakView: View {
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .scaleEffect(isPopupPresented ? 1.2 : 1.4)
                     .animation(.spring(), value: isPopupPresented)
-                    .onTapGesture(count: 1, perform: {
-                        isShowingPicker = true
-                    })
-                    .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-                        backgroundImage = UIImage(named: "Wallpaper.jpg")
-                        saveImage(image: nil)
-                    })
+                    .contextMenu {
+                        Button(action: {
+                            isShowingPicker = true
+                        }) {
+                            Text("从相册选择图片")
+                            Image(systemName: "photo.on.rectangle")
+                        }
+                        Button(action: {
+                            backgroundImage = UIImage(named: "Wallpaper.jpg")
+                            saveImage(image: nil)
+                        }) {
+                            Text("恢复默认")
+                            Image(systemName: "arrow.uturn.backward")
+                        }
+                    }
                     .sheet(isPresented: $isShowingPicker) {
                         ImagePicker(completionHandler: { image in
                             if let image = image {
