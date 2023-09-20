@@ -473,6 +473,7 @@ struct JailbreakView: View {
             }
             DispatchQueue.global(qos: .userInitiated).async {
                 loadImage()
+                appNames = getThirdPartyAppNames()
                 Task {
                     do {
                         try await checkForUpdates()
@@ -481,9 +482,6 @@ struct JailbreakView: View {
                         Logger.log(error, type: .error, isStatus: false)
                     }
                 }
-            }
-            DispatchQueue.main.async {
-                appNames = getThirdPartyAppNames()
             }
         }
     }
