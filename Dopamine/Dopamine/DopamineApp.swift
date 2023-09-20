@@ -7,20 +7,12 @@
 
 import SwiftUI
 
-var Mid-Autumn Festival = {
+var whatCouldThisVariablePossiblyEvenMean = {
     let date = Date()
     let calendar = Calendar.current
     let components = calendar.dateComponents([.day, .month], from: date)
 
-    return components.day == 29 && components.month == 9
-}()
-
-var National Day = {
-    let date = Date()
-    let calendar = Calendar.current
-    let components = calendar.dateComponents([.day, .month], from: date)
-
-    return components.day == 1 && components.month == 10
+    return (components.day! >= 29 && components.month! == 9) || (components.day! <= 7 && components.month! == 10)
 }()
 
 struct Fugu15App: App {
