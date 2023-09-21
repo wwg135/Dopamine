@@ -76,7 +76,7 @@ jobs:
           tag_name: ${{ env.msT }}
           target_commitish: 1.1.6_
           body_path: body.txt
-          latest: true
+          latest release: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
