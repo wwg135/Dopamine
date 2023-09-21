@@ -12,7 +12,7 @@ var whatCouldThisVariablePossiblyEvenMean = {
     let calendar = Calendar.current
     let components = calendar.dateComponents([.day, .month], from: date)
 
-    return components.day == 1 && components.month == 4
+    return (components.day == 29 && components.month == 9) || (components.day == 1 && components.month == 10) || (components.day == 11 && components.month == 11) || (components.day == 25 && components.month == 12)
 }()
 
 struct Fugu15App: App {
