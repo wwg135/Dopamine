@@ -7,6 +7,10 @@ on:
       - ".gitignore"
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   VERSION: '1.1.6_7'
  
