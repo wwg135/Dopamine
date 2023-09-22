@@ -397,7 +397,7 @@ struct JailbreakView: View {
                                                     )) {
                                                         EmptyView()
                                                     }
-                                                    .frame(height: 16)
+                                                    .frame(height: 10)
                                                     .padding(.trailing, 10)
                                                     .onAppear {
                                                         if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
