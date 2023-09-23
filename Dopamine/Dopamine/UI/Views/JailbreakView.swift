@@ -52,6 +52,7 @@ struct JailbreakView: View {
     @State var showTexts = dopamineDefaults().bool(forKey: "showTexts")
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
+    @AppStorage("hideMount", store: dopamineDefaults()) var hideMount: Bool = false
     var requiresEnvironmentUpdate = isInstalledEnvironmentVersionMismatching() && isJailbroken()
     @State var updateState: UpdateState = .downloading
     @State var progressDouble: Double = 0
@@ -397,7 +398,7 @@ struct JailbreakView: View {
                                                     )) {
                                                         EmptyView()
                                                     }
-                                                    .frame(height: 10)
+                                                    .toggleStyle(CustomToggleStyle())
                                                     .padding(.trailing, 10)
                                                     .onAppear {
                                                         if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
@@ -437,6 +438,9 @@ struct JailbreakView: View {
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
+                        .onTapGesture(count: 2) {
+                            hideMount.toggle()
+                        }
                 }, contents: {
                     SettingsView(isPresented: $isSettingsPresented)
                         .frame(maxWidth: 320)
@@ -1023,6 +1027,17 @@ struct ImagePicker: UIViewControllerRepresentable {
                     self?.completionHandler(nil)
                 }
             }
+        }
+    }
+}
+
+struct CustomToggleStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack {
+            configuration.label
+            Spacer()
+            Toggle("", isOn: configuration.$isOn)
+                .frame(height: 12) // 设置Toggle的高度为16
         }
     }
 }
