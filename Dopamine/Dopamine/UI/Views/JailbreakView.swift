@@ -398,7 +398,6 @@ struct JailbreakView: View {
                                                     )) {
                                                         EmptyView()
                                                     }
-                                                    .frame(height: 10)
                                                     .padding(.trailing, 10)
                                                     .onAppear {
                                                         if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
@@ -1027,17 +1026,6 @@ struct ImagePicker: UIViewControllerRepresentable {
                     self?.completionHandler(nil)
                 }
             }
-        }
-    }
-}
-
-struct CustomToggleStyle: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack {
-            configuration.label
-            Spacer()
-            Toggle("", isOn: configuration.$isOn)
-                .frame(height: 12) // 设置Toggle的高度为16
         }
     }
 }
