@@ -21,8 +21,12 @@ jobs:
         uses: wwg135/procursus-action@main
         with:
           packages: ldid trustcache make findutils coreutils xz-utils
-
-      - name: Install THEOS
+          cache: true
+          cache-path: ~/__cache
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          
+      - name: Pre theos
         run: |
          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos > theos
          sed -i '' 's/get_sdks$//g' theos
@@ -42,11 +46,14 @@ jobs:
           echo ${{ env.shT }}
           echo ${{ env.logT }}
 
-      - name: Pre code and keychain
+      - name: Pre code
         run: |
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+
+      - name: Pre keychain
+        run: |
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
 
       - name: Pre xcode-select
@@ -58,7 +65,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方1.1.7正式版更新，修复自旋锁恐慌问题" >> body.txt
+          echo -e "\n> - 测试版" >> body.txt
   
       - name: Build ipa
         run: |
