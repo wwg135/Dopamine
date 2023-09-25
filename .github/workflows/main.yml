@@ -20,7 +20,7 @@ jobs:
       - name: Install Procursus
         uses: wwg135/procursus-action@main
         with:
-          packages: ldid trustcache make findutils coreutils
+          packages: ldid trustcache make findutils coreutils xz-utils
 
       - name: Install THEOS
         run: |
@@ -48,6 +48,7 @@ jobs:
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
+          sudo xcode-select --switch /Applications/Xcode_15.0.app
       
       - name: Pre body
         run: |
