@@ -17,6 +17,7 @@ struct SettingsView: View {
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @State var hiddenFunction = dopamineDefaults().bool(forKey: "hiddenFunction")
+    @AppStorage("hideMount", store: dopamineDefaults()) var hideMount: Bool = false
     @Binding var isPresented: Bool   
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
@@ -49,7 +50,7 @@ struct SettingsView: View {
                                     }
                                 }
                             if !isJailbroken() {
-                                if hiddenFunction {
+                                if hideMount {
                                     Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
                                 } else {
                                 }
@@ -65,7 +66,7 @@ struct SettingsView: View {
                         if isBootstrapped() {
                             VStack {
                                 if isJailbroken() {
-                                    if hiddenFunction {
+                                    if hideMount {
                                         if enableMount {
                                             Button(action: {
                                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
