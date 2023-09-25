@@ -12,7 +12,7 @@ env:
  
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -48,7 +48,6 @@ jobs:
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
-          sudo xcode-select --switch /Applications/Xcode_15.0.app
       
       - name: Pre body
         run: |
@@ -56,6 +55,10 @@ jobs:
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
           echo -e "\n> - 同步官方1.1.7正式版更新，修复自旋锁恐慌问题" >> body.txt
+
+      - name: Pre xcode-select
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_15.0.app
   
       - name: Build ipa
         run: |
