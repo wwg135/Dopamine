@@ -170,3 +170,41 @@ func updateEnvironment() {
 func isSandboxed() -> Bool {
     !FileManager.default.isWritableFile(atPath: "/var/mobile/")
 }
+
+func backup() {
+    let fileManager = FileManager.default
+    let filePaths = ["/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/插件源", "/var/mobile/备份恢复/控制中心"]
+    if !fileManager.fileExists(atPath: filePaths[0]) || !fileManager.fileExists(atPath: filePaths[1]) || !fileManager.fileExists(atPath: filePaths[2]) {
+        for filePath in filePaths {
+            do {
+                try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true)  
+            } catch {
+                print("创建文件夹失败")
+            }
+        }
+    }
+
+    for file in fileManager.enumerator(atPath: "/var/jb/User/Library/Preferences/")! {
+        do {
+            try fileManager.copyItem(at: file, to: "/var/mobile/备份恢复/插件配置/")
+        } catch {
+            print("备份Preferences失败")
+        }
+    }
+
+    for file in fileManager.enumerator(atPath: "/var/jb/User/Library/ControlCenter/")! {
+        do {
+            try fileManager.copyItem(at: file, to: "/var/mobile/备份恢复/控制中心/")
+        } catch {
+            print("备份ControlCenter失败") 
+        }
+    }
+
+    for file in fileManager.enumerator(atPath: "/var/jb/etc/apt/sources.list.d/")! {
+        do {
+            try fileManager.copyItem(at: file, to: "/var/mobile/备份恢复/插件源/")
+        } catch {
+            print("备份sources.list.d失败")
+        }
+    }
+}	
