@@ -29,6 +29,8 @@ struct SettingsView: View {
     @State var mountPathInput = ""
     @State var removeZmountAlertShown = false
     @State var removeZmountInput = ""
+    @State var backupAlertShown = false
+    @State var restoreAlertShown = false
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -168,7 +170,7 @@ struct SettingsView: View {
                                 if isJailbroken() {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        isBackup = true
+                                        backupAlertShown = true
                                     }) {
                                         HStack {
                                             Image(systemName: "doc")
@@ -186,7 +188,7 @@ struct SettingsView: View {
                                     }
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        isRestore = true
+                                        restoreAlertShown = true
                                     }) {
                                         HStack {
                                             Image(systemName: "arrow.uturn.left")
@@ -263,6 +265,18 @@ struct SettingsView: View {
                                 userspaceReboot()
                             }
                         }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })
+                        .alert("Settings_Backup_Alert_Title", isPresented: $backupAlertShown, actions: {
+                            Button("Button_Cancel", role: .cancel) { }
+                            Button("Button_Set") {
+                                backup()
+                            }
+                        }, message: { Text("Settings_One-click_Backup") })
+                        .alert("Settings_Restore_Alert_Title", isPresented: $restoreAlertShown, actions: {
+                            Button("Button_Cancel", role: .cancel) { }
+                            Button("Button_Set") {
+                                restore()
+                            }
+                        }, message: { Text("Settings_One-click_Restore") })
                         .frame(maxHeight: 0)          
                 }
                 .foregroundColor(.white)              
