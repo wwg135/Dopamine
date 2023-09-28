@@ -30,7 +30,6 @@ struct SettingsView: View {
     @State var removeZmountAlertShown = false
     @State var removeZmountInput = ""
     @State var backupAlertShown = false
-    @State var restoreAlertShown = false
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -168,41 +167,26 @@ struct SettingsView: View {
                                     }
                                 }
                                 if isJailbroken() {
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        backupAlertShown = true
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "doc")
-                                            Text("Button_Backup")
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.5)
+                                    if hideMount {
+                                        Button(action: {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            backupAlertShown = true
+                                        }) {
+                                            HStack {
+                                                Image(systemName: "doc")
+                                                Text("Button_Backup")
+                                                    .lineLimit(1)
+                                                    .minimumScaleFactor(0.5)
+                                            }
+                                            .padding(.horizontal, 4)
+                                            .padding(8)
+                                            .frame(maxWidth: .infinity)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                            )
                                         }
-                                        .padding(.horizontal, 4)
-                                        .padding(8)
-                                        .frame(maxWidth: .infinity)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                        )
-                                    }
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        restoreAlertShown = true
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "arrow.uturn.left")
-                                            Text("Button_Restore")
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.5)
-                                        }
-                                        .padding(.horizontal, 4)
-                                        .padding(8)
-                                        .frame(maxWidth: .infinity)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                        )
+                                    } else {
                                     }
                                 }
                             }
@@ -271,12 +255,6 @@ struct SettingsView: View {
                                 backup()
                             }
                         }, message: { Text("Settings_One-click_Backup") })
-                        .alert("Settings_Restore_Alert_Title", isPresented: $restoreAlertShown, actions: {
-                            Button("Button_Cancel", role: .cancel) { }
-                            Button("Button_Set") {
-                                restore()
-                            }
-                        }, message: { Text("Settings_One-click_Restore") })
                         .frame(maxHeight: 0)          
                 }
                 .foregroundColor(.white)              
