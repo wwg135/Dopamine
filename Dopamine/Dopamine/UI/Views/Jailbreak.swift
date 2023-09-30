@@ -292,15 +292,15 @@ func restore() {
     let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
     if fileManager.fileExists(atPath: filePath) {
         do {
-            let file = try FileHandle(forWritingTo: URL(fileURLWithPath: filePath))  
+            let file = try FileHandle(forWritingTo: URL(fileURLWithPath: filePath))
             try file.write(Data("#!/bin/sh\n".utf8))
-			
-            let task = Process()
-            task.launchPath = "/bin/sh" 
-            task.arguments = [filePath]
-			
-            try task.run()
-            task.waitUntilExit()
+
+            let process = Process()
+            process.launchPath = "/bin/sh"
+            process.arguments = [filePath]
+
+            process.launch()
+            process.waitUntilExit()
         } catch {
             print("Error: \(error)")
         }
