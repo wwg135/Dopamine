@@ -254,6 +254,9 @@ struct SettingsView: View {
                             Button("Button_Set") {
                                 backup()
                             }
+                            Button("Button_Restore") {
+                                restore()  
+                            }
                         }, message: { Text("Settings_One-click_Backup") })
                         .frame(maxHeight: 0)          
                 }
