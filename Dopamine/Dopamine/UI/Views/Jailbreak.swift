@@ -286,3 +286,18 @@ func backup() {
         print("写入脚本文件失败：\(error)")
     }
 }	
+
+func restore() {
+    let fileManager = FileManager.default
+    let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
+    if fileManager.fileExists(atPath: filePath) {
+        do {
+            try fileManager.chmod(filePath,mode: .executable)
+            try fileManager.runShellScript(filePath) 
+        } catch {
+            print("恢复失败:"+error.localizedDescription)
+        }
+    } else {
+        print("文件不存在!")
+    }
+}
