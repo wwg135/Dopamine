@@ -174,7 +174,7 @@ struct SettingsView: View {
                                         }) {
                                             HStack {
                                                 Image(systemName: "doc")
-                                                Text("Button_Backup")
+                                                Text("Settings_backupRestore")
                                                     .lineLimit(1)
                                                     .minimumScaleFactor(0.5)
                                             }
