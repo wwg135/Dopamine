@@ -278,7 +278,6 @@ func backup() {
     """
 
     let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
-
     do {
         try scriptContent.write(toFile: filePath, atomically: true, encoding: .utf8)
         print("成功写入脚本文件：\(filePath)")
@@ -298,6 +297,6 @@ func restore() {
             print("恢复失败:\(error)")  
         }
     } else {
-        print("文件不存在!")}
-    }
+        print("文件不存在!")
+	}
 }
