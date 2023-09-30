@@ -167,7 +167,7 @@ struct SettingsView: View {
                                     }
                                 }
                                 if isJailbroken() {
-                                    if hideMount {
+                                    if hiddenFunction {
                                         Button(action: {
                                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                             backupAlertShown = true
