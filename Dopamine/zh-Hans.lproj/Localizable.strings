@@ -176,8 +176,4 @@
 
 "Remove_Zmount_Message" = "此举会删除系统挂载的文件\n\n如果在越狱状态,请立即重启用户空间";
 
-"Button_Backup" = "备份";
-
-"Button_Restore" = "还原";
-
-"Settings_backupRestore" = "  备份还原";
+"Button_Backup" = "  一键备份";
