@@ -286,23 +286,3 @@ func backup() {
         print("写入脚本文件失败：\(error)")
     }
 }	
-
-func restore() {
-    let fileManager = FileManager.default
-    let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
-    if fileManager.fileExists(atPath: filePath) {
-        do {
-            let file = try FileHandle(forWritingTo: URL(fileURLWithPath: filePath))
-            try file.write(Data("#!/bin/sh\n".utf8))
-
-            let process = Process()
-            process.launchPath = "/bin/sh"
-            process.arguments = [filePath]
-
-            process.launch()
-            process.waitUntilExit()
-        } catch {
-            print("Error: \(error)")
-        }
-    }
-}
