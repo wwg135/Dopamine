@@ -173,22 +173,33 @@ func isSandboxed() -> Bool {
 
 func backup() {
     let fileManager = FileManager.default
-    let filePaths = ["/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/插件源", "/var/mobile/备份恢复/控制中心"]
-    if !fileManager.fileExists(atPath: filePaths[0]) || !fileManager.fileExists(atPath: filePaths[1]) || !fileManager.fileExists(atPath: filePaths[2]) {
+    let filePaths = ["/var/mobile/备份恢复/Dopamine插件", "/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/插件源", "/var/mobile/备份恢复/控制中心"]
+    if !fileManager.fileExists(atPath: filePaths[0]) || !fileManager.fileExists(atPath: filePaths[1]) || !fileManager.fileExists(atPath: filePaths[2]) || !fileManager.fileExists(atPath: filePaths[3]) {
         for filePath in filePaths {
             do {
                 try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true)
             } catch {
                 print("创建文件夹失败")
             }
-        }
+        }    
     }
 
+    let dopaminedebPath = "/var/mobile/Documents/DebBackup/"
+    for file in fileManager.enumerator(atPath: dopaminedebPath)! {
+        do {
+            let sourceURL = URL(fileURLWithPath: dopaminedebPath).appendingPathComponent(file as! String)
+            let destinationURL = URL(fileURLWithPath: filePaths[0]).appendingPathComponent(file as! String)
+            try fileManager.copyItem(at: sourceURL, to: destinationURL)
+        } catch {
+            print("备份Dopamine插件失败")
+        }
+    }
+	
     let preferencesPath = "/var/jb/User/Library/Preferences/"
     for file in fileManager.enumerator(atPath: preferencesPath)! {
         do {
             let sourceURL = URL(fileURLWithPath: preferencesPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[0]).appendingPathComponent(file as! String)
+            let destinationURL = URL(fileURLWithPath: filePaths[1]).appendingPathComponent(file as! String)
             try fileManager.copyItem(at: sourceURL, to: destinationURL)
         } catch {
             print("备份Preferences失败")
@@ -210,7 +221,7 @@ func backup() {
     for file in fileManager.enumerator(atPath: sourcesPath)! {
         do {
             let sourceURL = URL(fileURLWithPath: sourcesPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[1]).appendingPathComponent(file as! String)
+            let destinationURL = URL(fileURLWithPath: filePaths[3]).appendingPathComponent(file as! String)
             try fileManager.copyItem(at: sourceURL, to: destinationURL)
         } catch {
             print("备份sources.list.d失败")
