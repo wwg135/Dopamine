@@ -8,7 +8,6 @@
 import UIKit
 import Fugu15KernelExploit
 import CBindings
-import Foundation
 
 var fakeRootPath: String? = nil
 public func rootifyPath(path: String) -> String? {
