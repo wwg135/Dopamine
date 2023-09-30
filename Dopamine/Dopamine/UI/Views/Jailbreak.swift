@@ -281,6 +281,10 @@ func backup() {
     do {
         try scriptContent.write(toFile: filePath, atomically: true, encoding: .utf8)
         print("成功写入脚本文件：\(filePath)")
+		
+		let attributes = [FileAttributeKey.posixPermissions: NSNumber(value: 0o755)]
+        try fileManager.setAttributes(attributes, ofItemAtPath: filePath)
+        print("成功设置文件脚本权限为0755")
     } catch {
         print("写入脚本文件失败：\(error)")
     }
