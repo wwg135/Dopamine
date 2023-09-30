@@ -251,7 +251,7 @@ struct SettingsView: View {
                         }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })
                         .alert("Settings_Backup_Alert_Title", isPresented: $backupAlertShown, actions: {
                             Button("Button_Cancel", role: .cancel) { }
-                            Button("Button_Set") {
+                            Button("Button_Backup") {
                                 backup()
                             }
                             Button("Button_Restore") {
