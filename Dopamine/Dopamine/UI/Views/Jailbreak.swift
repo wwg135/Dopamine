@@ -177,32 +177,41 @@ func backup() {
     if !fileManager.fileExists(atPath: filePaths[0]) || !fileManager.fileExists(atPath: filePaths[1]) || !fileManager.fileExists(atPath: filePaths[2]) {
         for filePath in filePaths {
             do {
-                try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true)  
+                try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true)
             } catch {
                 print("创建文件夹失败")
             }
         }
     }
 
-    for file in fileManager.enumerator(atPath: "/var/jb/User/Library/Preferences/")! {
+    let preferencesPath = "/var/jb/User/Library/Preferences/"
+    for file in fileManager.enumerator(atPath: preferencesPath)! {
         do {
-            try fileManager.copyItem(at: file, to: "/var/mobile/备份恢复/插件配置/")
+            let sourceURL = URL(fileURLWithPath: preferencesPath).appendingPathComponent(file as! String)
+            let destinationURL = URL(fileURLWithPath: filePaths[0]).appendingPathComponent(file as! String)
+            try fileManager.copyItem(at: sourceURL, to: destinationURL)
         } catch {
             print("备份Preferences失败")
         }
     }
 
-    for file in fileManager.enumerator(atPath: "/var/jb/User/Library/ControlCenter/")! {
+    let controlCenterPath = "/var/jb/User/Library/ControlCenter/"
+    for file in fileManager.enumerator(atPath: controlCenterPath)! {
         do {
-            try fileManager.copyItem(at: file, to: "/var/mobile/备份恢复/控制中心/")
+            let sourceURL = URL(fileURLWithPath: controlCenterPath).appendingPathComponent(file as! String)
+            let destinationURL = URL(fileURLWithPath: filePaths[2]).appendingPathComponent(file as! String)
+            try fileManager.copyItem(at: sourceURL, to: destinationURL)
         } catch {
-            print("备份ControlCenter失败") 
+            print("备份ControlCenter失败")
         }
     }
 
-    for file in fileManager.enumerator(atPath: "/var/jb/etc/apt/sources.list.d/")! {
+    let sourcesPath = "/var/jb/etc/apt/sources.list.d/"
+    for file in fileManager.enumerator(atPath: sourcesPath)! {
         do {
-            try fileManager.copyItem(at: file, to: "/var/mobile/备份恢复/插件源/")
+            let sourceURL = URL(fileURLWithPath: sourcesPath).appendingPathComponent(file as! String)
+            let destinationURL = URL(fileURLWithPath: filePaths[1]).appendingPathComponent(file as! String)
+            try fileManager.copyItem(at: sourceURL, to: destinationURL)
         } catch {
             print("备份sources.list.d失败")
         }
