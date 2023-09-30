@@ -292,12 +292,12 @@ func restore() {
     let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
     if fileManager.fileExists(atPath: filePath) {
         do {
-            try fileManager.chmod(filePath,mode: .executable)
-            try fileManager.runShellScript(filePath) 
+            try FileHandle(forWritingTo: filePath)?.write(Data("#!/bin/sh\n".utf8))
+            try Process().execute(filePath)
         } catch {
-            print("恢复失败:"+error.localizedDescription)
+            print("恢复失败:\(error)")  
         }
     } else {
-        print("文件不存在!")
+        print("文件不存在!")}
     }
 }
