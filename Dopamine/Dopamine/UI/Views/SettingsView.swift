@@ -174,7 +174,7 @@ struct SettingsView: View {
                                         }) {
                                             HStack {
                                                 Image(systemName: "doc")
-                                                Text("Settings_backupRestore")
+                                                Text("Button_Backup")
                                                     .lineLimit(1)
                                                     .minimumScaleFactor(0.5)
                                             }
@@ -251,11 +251,8 @@ struct SettingsView: View {
                         }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })
                         .alert("Settings_Backup_Alert_Title", isPresented: $backupAlertShown, actions: {
                             Button("Button_Cancel", role: .cancel) { }
-                            Button("Button_Backup") {
+                            Button("Button_Set") {
                                 backup()
-                            }
-                            Button("Button_Restore") {
-                                restore()  
                             }
                         }, message: { Text("Settings_One-click_Backup") })
                         .frame(maxHeight: 0)          
