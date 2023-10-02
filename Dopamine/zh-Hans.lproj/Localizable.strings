@@ -177,3 +177,7 @@
 "Remove_Zmount_Message" = "此举会删除系统挂载的文件\n\n如果在越狱状态,请立即重启用户空间";
 
 "Button_Backup" = "  一键备份";
+
+"Settings_Backup_Alert_Title" = "一键备份";
+
+"Settings_One-click_Backup" = "说明：1.请先使用“DEB备份”app先一键备份插件；\n2.再点击这里的一键备份，确定即可; \n3.清除越狱后，重新越狱后，进去var/mobile/备份恢复/，点击一键恢复插件及配置.sh运行，运行前请务必禁止Filza注入插件"
