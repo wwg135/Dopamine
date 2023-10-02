@@ -174,7 +174,7 @@ func isSandboxed() -> Bool {
 func backup() {
     let fileManager = FileManager.default
     let filePaths = ["/var/mobile/备份恢复/Dopamine插件", "/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/插件源", "/var/mobile/备份恢复/控制中心"]
-    if !fileManager.fileExists(atPath: filePaths[0]) || !fileManager.fileExists(atPath: filePaths[1]) || !fileManager.fileExists(atPath: filePaths[2]) || !fileManager.fileExists(atPath: filePaths[3]) {
+    if !fileManager.fileExists(atPath: filePaths[0]) || !fileManager.fileExists(atPath: filePaths[1]) || !fileManager.fileExists(atPath: filePaths[3]) || !fileManager.fileExists(atPath: filePaths[2]) {
         for filePath in filePaths {
             do {
                 try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true)
