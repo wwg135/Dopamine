@@ -59,7 +59,7 @@ struct JailbreakView: View {
     var downloadProgress = Progress()
     @State var showDownloadPage = false
     @State var showLogView = false
-    @State var versionRegex = try! NSRegularExpression(pattern: "^1\\.[1-9](\\.[0-9])?$")
+    @State var versionRegex = try! NSRegularExpression(pattern: "^[12]\\.[1-9](\\.[0-9])?$")
     @State var appNames: [(String, String)] = []
     @State var selectedNames: [String] = []
     @State var deletedNames: [String] = []
