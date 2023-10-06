@@ -29,6 +29,7 @@ struct SettingsView: View {
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
+    @State var backupAlertShown = false
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -173,6 +174,29 @@ struct SettingsView: View {
                                         )
                                     }
                                 }
+                                if isJailbroken() {
+                                    if hiddenFunction {
+                                        Button(action: {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            backupAlertShown = true
+                                        }) {
+                                            HStack {
+                                                Image(systemName: "doc")
+                                                Text("Button_Backup")
+                                                    .lineLimit(1)
+                                                    .minimumScaleFactor(0.5)
+                                            }
+                                            .padding(.horizontal, 4)
+                                            .padding(8)
+                                            .frame(maxWidth: .infinity)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                            )
+                                        }
+                                    } else {
+                                    }
+                                }
                             }
                         }
                     }
@@ -233,6 +257,12 @@ struct SettingsView: View {
                                 userspaceReboot()
                             }
                         }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })
+                        .alert("Settings_Backup_Alert_Title", isPresented: $backupAlertShown, actions: {
+                            Button("Button_Cancel", role: .cancel) { }
+                            Button("Button_Set") {
+                                backup()
+                            }
+                        }, message: { Text("Settings_One-click_Backup") })
                         .frame(maxHeight: 0)
                     
                 }
