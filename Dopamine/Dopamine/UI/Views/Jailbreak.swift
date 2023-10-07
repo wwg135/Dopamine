@@ -174,61 +174,43 @@ func isSandboxed() -> Bool {
 func backup() {
     let fileManager = FileManager.default
     let filePaths = ["/var/mobile/备份恢复/Dopamine插件", "/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/控制中心", "/var/mobile/备份恢复/插件源"]
-    if !fileManager.fileExists(atPath: filePaths[0]) || !fileManager.fileExists(atPath: filePaths[1]) || !fileManager.fileExists(atPath: filePaths[2]) || !fileManager.fileExists(atPath: filePaths[3]) {
-        for filePath in filePaths {
+
+    for filePath in filePaths {
+        if !fileManager.fileExists(atPath: filePath) {
             do {
                 try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true)
             } catch {
                 print("创建文件夹失败")
             }
-        }    
-    }
-
-    let dopaminedebPath = "/var/mobile/Documents/DebBackup/"
-    for file in fileManager.enumerator(atPath: dopaminedebPath)! {
-        do {
-            let sourceURL = URL(fileURLWithPath: dopaminedebPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[0]).appendingPathComponent(file as! String)
-            try fileManager.copyItem(at: sourceURL, to: destinationURL)
-        } catch {
-            print("备份Dopamine插件失败")
         }
     }
-	
+
+    let dopaminedebPath = "/var/mobile/Documents/DebBackup/"
     let preferencesPath = "/var/jb/User/Library/Preferences/"
-    for file in fileManager.enumerator(atPath: preferencesPath)! {
-        do {
-            let sourceURL = URL(fileURLWithPath: preferencesPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[1]).appendingPathComponent(file as! String)
-            try fileManager.copyItem(at: sourceURL, to: destinationURL)
-        } catch {
-            print("备份Preferences失败")
-        }
-    }
-
     let controlCenterPath = "/var/jb/User/Library/ControlCenter/"
-    for file in fileManager.enumerator(atPath: controlCenterPath)! {
-        do {
-            let sourceURL = URL(fileURLWithPath: controlCenterPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[2]).appendingPathComponent(file as! String)
-            try fileManager.copyItem(at: sourceURL, to: destinationURL)
-        } catch {
-            print("备份ControlCenter失败")
-        }
-    }
-
     let sourcesPath = "/var/jb/etc/apt/sources.list.d/"
-    for file in fileManager.enumerator(atPath: sourcesPath)! {
-        do {
-            let sourceURL = URL(fileURLWithPath: sourcesPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[3]).appendingPathComponent(file as! String)
-            try fileManager.copyItem(at: sourceURL, to: destinationURL)
-        } catch {
-            print("备份sources.list.d失败")
+
+    let copyItems: [(String, String, String)] = [
+        (dopaminedebPath, filePaths[0], "备份Dopamine插件失败"),
+        (preferencesPath, filePaths[1], "备份Preferences失败"),
+        (controlCenterPath, filePaths[2], "备份ControlCenter失败"),
+        (sourcesPath, filePaths[3], "备份sources.list.d失败")
+    ]
+
+    for (sourcePath, destinationPath, errorMessage) in copyItems {
+        if let enumerator = fileManager.enumerator(atPath: sourcePath) {
+            for file in enumerator {
+                do {
+                    let sourceURL = URL(fileURLWithPath: sourcePath).appendingPathComponent(file as! String)
+                    let destinationURL = URL(fileURLWithPath: destinationPath).appendingPathComponent(file as! String)
+                    try fileManager.copyItem(at: sourceURL, to: destinationURL)
+                } catch {
+                    print(errorMessage)
+                }
+            }
         }
     }
 
-    // 写入脚本文件
     let scriptContent = """
     #!/bin/sh
 
@@ -236,17 +218,13 @@ func backup() {
     PATH=/var/jb/bin:/var/jb/sbin:/var/jb/usr/bin:/var/jb/usr/sbin:$PATH
 
     echo ".........................."
-
     echo ".........................."
-
     echo "******Dopamine插件安装*******"
     sleep 1s
     #安装当前路径下所有插件
     dpkg -i ./Dopamine插件/*.deb
     echo ".........................."
-
     echo ".........................."
-
     echo "******开始创建插件目录*******"
     sleep 2s
     mkd()
@@ -255,25 +233,17 @@ func backup() {
             mkdir $1;
         fi;
     }
-
     mkd /var/jb/User/Library/Preferences
-
     mkd /var/jb/User/Library/ControlCenter
-
     echo "******开始恢复插件设置*****"
     sleep 1s
     cp -a ./插件源/* /var/jb/etc/apt/sources.list.d/
-
     cp -a ./插件配置/* /var/jb/User/Library/Preferences/
-
     cp -a ./控制中心/* /var/jb/var/mobile/Library/ControlCenter/
-
     echo "******插件设置恢复成功*******"
-
     echo "******正在准备注销生效*******"
     sleep 1s
     killall -9 backboardd
-
     echo "done"
     """
 
@@ -281,8 +251,8 @@ func backup() {
     do {
         try scriptContent.write(toFile: filePath, atomically: true, encoding: .utf8)
         print("成功写入脚本文件：\(filePath)")
-		
-	let attributes = [FileAttributeKey.posixPermissions: NSNumber(value: 0o755)]
+
+        let attributes = [FileAttributeKey.posixPermissions: NSNumber(value: 0o755)]
         try fileManager.setAttributes(attributes, ofItemAtPath: filePath)
         print("成功设置文件脚本权限为0755")
     } catch {
