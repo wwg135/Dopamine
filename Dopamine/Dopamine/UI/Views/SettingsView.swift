@@ -264,6 +264,7 @@ struct SettingsView: View {
                                         backup()
                                         completedAlert = true
                                     }
+                                } catch {
                                 }
                             }
                         }, message: { Text("Settings_One-click_Backup") })
