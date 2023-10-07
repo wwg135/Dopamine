@@ -191,65 +191,47 @@ func isSandboxed() -> Bool {
 func backup() {
     let fileManager = FileManager.default
     let filePaths = ["/var/mobile/备份恢复/Dopamine插件", "/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/控制中心", "/var/mobile/备份恢复/插件源"]
-    if !fileManager.fileExists(atPath: filePaths[0]) || !fileManager.fileExists(atPath: filePaths[1]) || !fileManager.fileExists(atPath: filePaths[2]) || !fileManager.fileExists(atPath: filePaths[3]) {
-        for filePath in filePaths {
+    for filePath in filePaths {
+        if !fileManager.fileExists(atPath: filePath) {
             do {
                 try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true)
             } catch {
                 print("创建文件夹失败")
             }
-        }    
+        }
     }
 
     let dopaminedebPath = "/var/mobile/Documents/DebBackup/"
-    for file in fileManager.enumerator(atPath: dopaminedebPath)! {
-        do {
-            let sourceURL = URL(fileURLWithPath: dopaminedebPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[0]).appendingPathComponent(file as! String)
-            try fileManager.copyItem(at: sourceURL, to: destinationURL)
-        } catch {
-            print("备份Dopamine插件失败")
-        }
-    }
-
     let preferencesPath = "/var/jb/User/Library/Preferences/"
-    for file in fileManager.enumerator(atPath: preferencesPath)! {
-        do {
-            let sourceURL = URL(fileURLWithPath: preferencesPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[1]).appendingPathComponent(file as! String)
-            try fileManager.copyItem(at: sourceURL, to: destinationURL)
-        } catch {
-            print("备份Preferences失败")
-        }
-    }
-
     let controlCenterPath = "/var/jb/User/Library/ControlCenter/"
-    for file in fileManager.enumerator(atPath: controlCenterPath)! {
-        do {
-            let sourceURL = URL(fileURLWithPath: controlCenterPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[2]).appendingPathComponent(file as! String)
-            try fileManager.copyItem(at: sourceURL, to: destinationURL)
-        } catch {
-            print("备份ControlCenter失败")
-        }
-    }
-
     let sourcesPath = "/var/jb/etc/apt/sources.list.d/"
-    for file in fileManager.enumerator(atPath: sourcesPath)! {
-        do {
-            let sourceURL = URL(fileURLWithPath: sourcesPath).appendingPathComponent(file as! String)
-            let destinationURL = URL(fileURLWithPath: filePaths[3]).appendingPathComponent(file as! String)
-            try fileManager.copyItem(at: sourceURL, to: destinationURL)
-        } catch {
-            print("备份sources.list.d失败")
+    let copyItems: [(String, String, String)] = [
+        (dopaminedebPath, filePaths[0], "备份Dopamine插件失败"),
+        (preferencesPath, filePaths[1], "备份Preferences失败"),
+        (controlCenterPath, filePaths[2], "备份ControlCenter失败"),
+        (sourcesPath, filePaths[3], "备份sources.list.d失败")
+    ]
+
+    for (sourcePath, destinationPath, errorMessage) in copyItems {
+        if let enumerator = fileManager.enumerator(atPath: sourcePath) {
+            for file in enumerator {
+                do {
+                    let sourceURL = URL(fileURLWithPath: sourcePath).appendingPathComponent(file as! String)
+                    let destinationURL = URL(fileURLWithPath: destinationPath).appendingPathComponent(file as! String)
+                    try fileManager.copyItem(at: sourceURL, to: destinationURL)
+                } catch {
+                    print(errorMessage)
+                }
+            }
         }
     }
 
-    // 写入脚本文件
     let scriptContent = """
     #!/bin/sh
+
     #环境变量
     PATH=/var/jb/bin:/var/jb/sbin:/var/jb/usr/bin:/var/jb/usr/sbin:$PATH
+
     echo ".........................."
     echo ".........................."
     echo "******Dopamine插件安装*******"
@@ -285,7 +267,7 @@ func backup() {
         try scriptContent.write(toFile: filePath, atomically: true, encoding: .utf8)
         print("成功写入脚本文件：\(filePath)")
 
-	let attributes = [FileAttributeKey.posixPermissions: NSNumber(value: 0o755)]
+        let attributes = [FileAttributeKey.posixPermissions: NSNumber(value: 0o755)]
         try fileManager.setAttributes(attributes, ofItemAtPath: filePath)
         print("成功设置文件脚本权限为0755")
     } catch {
