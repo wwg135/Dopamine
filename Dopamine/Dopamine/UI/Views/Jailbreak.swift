@@ -174,7 +174,6 @@ func isSandboxed() -> Bool {
 func backup() {
     let fileManager = FileManager.default
     let filePaths = ["/var/mobile/备份恢复/Dopamine插件", "/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/控制中心", "/var/mobile/备份恢复/插件源"]
-
     for filePath in filePaths {
         if !fileManager.fileExists(atPath: filePath) {
             do {
@@ -189,7 +188,6 @@ func backup() {
     let preferencesPath = "/var/jb/User/Library/Preferences/"
     let controlCenterPath = "/var/jb/User/Library/ControlCenter/"
     let sourcesPath = "/var/jb/etc/apt/sources.list.d/"
-
     let copyItems: [(String, String, String)] = [
         (dopaminedebPath, filePaths[0], "备份Dopamine插件失败"),
         (preferencesPath, filePaths[1], "备份Preferences失败"),
