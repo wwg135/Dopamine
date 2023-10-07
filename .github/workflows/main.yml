@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VERSION: '1.1.7_3'
+  VERSION: '1.1.7_4'
  
 jobs:
   build:
@@ -65,7 +65,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 设置--新增一键备份功能，清除越狱后再重新越狱，可在Filza快捷一键还原，务必查看操作说明" >> body.txt
+          echo -e "\n> - 增加一键备份成功、失败的提示，建议所有人更新" >> body.txt
   
       - name: Build ipa
         run: |
