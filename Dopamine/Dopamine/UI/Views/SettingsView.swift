@@ -13,11 +13,9 @@ struct SettingsView: View {
     @AppStorage("successful_jailbreaks", store: dopamineDefaults()) var successfulJailbreaks: Int = 0  
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var verboseLogs: Bool = false
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
-    @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @State var hiddenFunction = dopamineDefaults().bool(forKey: "hiddenFunction")
-    @AppStorage("hideMount", store: dopamineDefaults()) var hideMount: Bool = false
     @Binding var isPresented: Bool   
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
@@ -25,10 +23,6 @@ struct SettingsView: View {
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
-    @State var mountPathAlertShown = false
-    @State var mountPathInput = ""
-    @State var removeZmountAlertShown = false
-    @State var removeZmountInput = ""
     @State var backupAlertShown = false
     @State var completedAlert = false
     
@@ -52,10 +46,6 @@ struct SettingsView: View {
                                     }
                                 }
                             if !isJailbroken() {
-                                if hideMount {
-                                    Toggle("Options_Enable_Mount_Path", isOn: $enableMount)
-                                } else {
-                                }
                                 Toggle("Settings_iDownload", isOn: $enableiDownload)
                                     .onChange(of: enableiDownload) { newValue in
                                         if isJailbroken() {
@@ -67,49 +57,6 @@ struct SettingsView: View {
                         }
                         if isBootstrapped() {
                             VStack {
-                                if isJailbroken() {
-                                    if hideMount {
-                                        if enableMount {
-                                            Button(action: {
-                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                mountPathAlertShown = true
-                                            }) {
-                                                HStack {
-                                                    Image(systemName: "mappin.circle")
-                                                    Text("Button_Set_Mount_Path")
-                                                        .lineLimit(1)
-                                                        .minimumScaleFactor(0.5)
-                                                }
-                                                .padding(.horizontal, 4)
-                                                .padding(8)
-                                                .frame(maxWidth: .infinity)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 8)
-                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                                )
-                                            }
-                                            Button(action: {
-                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                                    removeZmountAlertShown = true
-                                            }) {
-                                                HStack {
-                                                    Image(systemName: "mappin.slash.circle")
-                                                    Text("Button_Remove_Zmount")
-                                                        .lineLimit(1)
-                                                        .minimumScaleFactor(0.5)
-                                                }
-                                                .padding(.horizontal, 4)
-                                                .padding(8)
-                                                .frame(maxWidth: .infinity)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 8)
-                                                        .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                                )
-                                            }
-                                        }
-                                    } else {
-                                    }
-                                }
                                 if isJailbroken() {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -213,20 +160,6 @@ struct SettingsView: View {
                     .padding(.top, 2)
                     
                     ZStack {}
-                        .textFieldAlert(isPresented: $mountPathAlertShown) { () -> TextFieldAlert in
-                            TextFieldAlert(title: NSLocalizedString("Set_Mount_Path_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Mount_Path_Message", comment: ""), text: Binding<String?>($mountPathInput), onSubmit: {
-                                if mountPathInput.count > 1 {
-                                    newMountPath(newPath: mountPathInput)
-                                }
-                            })
-                        }
-                        .textFieldAlert(isPresented: $removeZmountAlertShown) { () -> TextFieldAlert in
-                            TextFieldAlert(title: NSLocalizedString("Remove_Zmount_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Remove_Zmount_Message", comment: ""), text: Binding<String?>($removeZmountInput), onSubmit: {
-                                if removeZmountInput.count > 1 {
-                                    removeZmount(rmpath: removeZmountInput)
-                                }
-                            })
-                        }
                         .textFieldAlert(isPresented: $mobilePasswordChangeAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Popup_Change_Mobile_Password_Title", comment: ""), message: NSLocalizedString("Popup_Change_Mobile_Password_Message", comment: ""), text: Binding<String?>($mobilePasswordInput), onSubmit: {
                                 changeMobilePassword(newPassword: mobilePasswordInput)
