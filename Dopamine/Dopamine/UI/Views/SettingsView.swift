@@ -264,7 +264,7 @@ struct SettingsView: View {
                                 }
                             }
                         }, message: { Text("Settings_One-click_Backup") })
-                        .alert(isPresented: $completedAlert, actions: {
+                        .alert(" ", isPresented: $completedAlert, actions: {
                             Button("好的") {
                                 backupAlertShown = false
                             }
