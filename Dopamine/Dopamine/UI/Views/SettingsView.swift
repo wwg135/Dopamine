@@ -255,21 +255,24 @@ struct SettingsView: View {
                             Button("Button_Set") {
                                 let fileManager = FileManager.default
                                 let filePath = "/var/mobile/Documents/DebBackup/"
-                                if !fileManager.fileExists(atPath: filePath) {
-                                    backupAlertShown = false
-                                    showAlert(title: "备份失败", message: "请先使用DEB备份插件。")
-                                } else {
-                                    backup()
-                                    completedAlert = true
+                                do {
+                                    let contents = try fileManager.contentsOfDirectory(atPath: filePath)
+                                    if contents.isEmpty {
+                                        backupAlertShown = false
+                                        showAlert(title: "备份失败", message: "请先使用“DEB备份”app备份插件！！！")
+                                    } else {
+                                        backup()
+                                        completedAlert = true
+                                    }
                                 }
                             }
                         }, message: { Text("Settings_One-click_Backup") })
-                        .alert(" ", isPresented: $completedAlert, actions: {
+                        .alert("备份成功", isPresented: $completedAlert, actions: {
                             Button("好的") {
                                 backupAlertShown = false
                             }
-                        }, message: { Text("备份成功") })
-                        .frame(maxHeight: 0)          
+                        }, message: { Text(" ") })
+                        .frame(maxHeight: 0)        
                 }
                 .foregroundColor(.white)              
             } else {
