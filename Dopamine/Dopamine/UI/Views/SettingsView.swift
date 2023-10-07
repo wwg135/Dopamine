@@ -30,6 +30,7 @@ struct SettingsView: View {
     @State var removeZmountAlertShown = false
     @State var removeZmountInput = ""
     @State var backupAlertShown = false
+    @State var completedAlert = false
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -252,9 +253,22 @@ struct SettingsView: View {
                         .alert("Settings_Backup_Alert_Title", isPresented: $backupAlertShown, actions: {
                             Button("Button_Cancel", role: .cancel) { }
                             Button("Button_Set") {
-                                backup()
+                                let fileManager = FileManager.default
+                                let filePath = "/var/mobile/Documents/DebBackup/"
+                                if !fileManager.fileExists(atPath: filePath) {
+                                    backupAlertShown = false
+                                    showAlert(title: "备份失败", message: "请先使用DEB备份插件。")
+                                } else {
+                                    backup()
+                                    completedAlert = true
+                                }
                             }
                         }, message: { Text("Settings_One-click_Backup") })
+                        .alert(isPresented: $completedAlert, actions: {
+                            Button("好的") {
+                                backupAlertShown = false
+                            }
+                        }, message: { Text("备份成功") })
                         .frame(maxHeight: 0)          
                 }
                 .foregroundColor(.white)              
@@ -281,6 +295,12 @@ struct SettingsView: View {
         } else {
             return String(format: "%.1f", Double(successfulJailbreaks) / Double(totalJailbreaks) * 100)
         }
+    }
+
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "确定", style: .default, handler: nil))
+        UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true, completion: nil)
     }
 }
 
