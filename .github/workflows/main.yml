@@ -28,6 +28,14 @@ jobs:
          sed -i '' 's/get_sdks$//g' theos
          bash theos
 
+      - name: Build and Install trustcache
+        run: |
+          set -x
+          git clone https://github.com/CRKatri/trustcache
+          cd trustcache
+          gmake -j$(sysctl -n hw.physicalcpu) OPENSSL=1
+          sudo cp trustcache /opt/procursus/bin/
+
       - name: Set env
         run: |
           sT=$(TZ=UTC-8 date +'%S')
@@ -48,7 +56,6 @@ jobs:
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
-          sudo xcode-select --switch /Applications/Xcode_15.0.app
       
       - name: Pre body
         run: |
