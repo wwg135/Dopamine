@@ -2,13 +2,13 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.7
+      - 1.1.8
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
 
 env:
-  VERSION: '1.1.7'
+  VERSION: '1.1.8'
  
 jobs:
   build:
@@ -20,11 +20,7 @@ jobs:
       - name: Install Procursus
         uses: wwg135/procursus-action@main
         with:
-          packages: ldid trustcache make findutils coreutils xz-utils
-          cache: true
-          cache-path: ~/__cache
-        env:
-          DEBIAN_FRONTEND: noninteractive
+          packages: ldid findutils sed coreutils make
           
       - name: Pre theos
         run: |
