@@ -26,15 +26,11 @@ jobs:
         with:
           packages: ldid findutils sed coreutils make
 
-      - name: Install THEOS (without SDKs)
+      - name: Pre theos
         run: |
-          set -x
-          export BASEDIR="$(pwd)"
-          export THEOS="${BASEDIR}/theos"
-          mkdir -p $THEOS
-          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos >> install-theos.sh
-          gsed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
-          bash install-theos.sh
+         curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos > theos
+         sed -i '' 's/get_sdks$//g' theos
+         bash theos-theos.sh
           cd $BASEDIR
      
       - name: Build and Install trustcache
@@ -45,7 +41,7 @@ jobs:
           gmake -j$(sysctl -n hw.physicalcpu) OPENSSL=1
           sudo cp trustcache /opt/procursus/bin/
           
-      - name: Set Environment Variables
+      - name: Set env
         run: |
           sT=$(TZ=UTC-8 date +'%S')
           echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
@@ -73,7 +69,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 增加一键备份成功、失败的提示，建议所有人更新" >> body.txt
+          echo -e "\n> - 同步官方1.1.8正式版更新" >> body.txt
   
       - name: Build ipa
         run: |
