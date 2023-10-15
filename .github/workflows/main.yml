@@ -2,7 +2,7 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.7_
+      - 1.1.8_
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VERSION: '1.1.7_4'
+  VERSION: '1.1.8_1'
  
 jobs:
   build:
@@ -24,19 +24,28 @@ jobs:
       - name: Install Procursus
         uses: wwg135/procursus-action@main
         with:
-          packages: ldid trustcache make findutils coreutils xz-utils
-          cache: true
-          cache-path: ~/__cache
-        env:
-          DEBIAN_FRONTEND: noninteractive
+          packages: ldid findutils sed coreutils make
 
-      - name: Pre theos
+      - name: Install THEOS (without SDKs)
         run: |
-         curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos > theos
-         sed -i '' 's/get_sdks$//g' theos
-         bash theos
-
-      - name: Set env
+          set -x
+          export BASEDIR="$(pwd)"
+          export THEOS="${BASEDIR}/theos"
+          mkdir -p $THEOS
+          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos >> install-theos.sh
+          gsed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
+          bash install-theos.sh
+          cd $BASEDIR
+     
+      - name: Build and Install trustcache
+        run: |
+          set -x
+          git clone https://github.com/CRKatri/trustcache
+          cd trustcache
+          gmake -j$(sysctl -n hw.physicalcpu) OPENSSL=1
+          sudo cp trustcache /opt/procursus/bin/
+          
+      - name: Set Environment Variables
         run: |
           sT=$(TZ=UTC-8 date +'%S')
           echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
@@ -58,7 +67,6 @@ jobs:
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
           sed -i '' "s/BBB/${{ env.VERSION }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Fugu15.swift
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
-          sudo xcode-select --switch /Applications/Xcode_15.0.app
       
       - name: Pre body
         run: |
@@ -79,7 +87,7 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.7_
+          target_commitish: 1.1.8_
           body_path: body.txt
           latest: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
