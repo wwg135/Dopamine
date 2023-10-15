@@ -69,7 +69,7 @@ int64_t machoFindArch(FILE *machoFile, uint32_t subtypeToSearch)
 		struct mach_header_64 mh;
 		fseek(machoFile, archOffset, SEEK_SET);
 		fread(&mh, sizeof(mh), 1, machoFile);
-		uint32_t maskedSubtype = OSSwapLittleToHostInt32(mh.cpusubtype) & ~0x80000000;
+		uint32_t maskedSubtype = OSSwapLittleToHostInt32(mh.cpusubtype);
 		if (maskedSubtype == subtypeToSearch) {
 			outArchOffset = archOffset;
 			*stop = YES;
@@ -81,16 +81,19 @@ int64_t machoFindArch(FILE *machoFile, uint32_t subtypeToSearch)
 
 int64_t machoFindBestArch(FILE *machoFile)
 {
+	int64_t archOffsetCandidate = 0;
 #if __arm64e__
-	int64_t archOffsetCandidate = machoFindArch(machoFile, CPU_SUBTYPE_ARM64E);
+	archOffsetCandidate = machoFindArch(machoFile, CPU_SUBTYPE_ARM64E | 0x80000000); // arm64e new ABI
 	if (archOffsetCandidate < 0) {
-		archOffsetCandidate = machoFindArch(machoFile, CPU_SUBTYPE_ARM64_ALL);
-	}
-	return archOffsetCandidate;
-#else
-	int64_t archOffsetCandidate = machoFindArch(machoFile, CPU_SUBTYPE_ARM64_ALL);
-	return archOffsetCandidate;
+		archOffsetCandidate = machoFindArch(machoFile, CPU_SUBTYPE_ARM64E); // arm64e old ABI
+		if (archOffsetCandidate < 0) {
 #endif
+			archOffsetCandidate = machoFindArch(machoFile, CPU_SUBTYPE_ARM64_ALL);
+#if __arm64e__
+  		}
+	}
+#endif
+	return archOffsetCandidate;
 }
 
 void machoEnumerateLoadCommands(FILE *machoFile, uint32_t archOffset, void (^enumerateBlock)(struct load_command cmd, uint32_t cmdOffset))

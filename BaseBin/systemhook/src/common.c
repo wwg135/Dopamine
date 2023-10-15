@@ -16,7 +16,6 @@ int posix_spawnattr_getprocesstype_np(const posix_spawnattr_t * __restrict, int 
 char *JB_SandboxExtensions = NULL;
 char *JB_RootPath = NULL;
 
-#define HOOK_DYLIB_PATH "/usr/lib/systemhook.dylib"
 #define JBD_MSG_SETUID_FIX 21
 #define JBD_MSG_PROCESS_BINARY 22
 #define JBD_MSG_DEBUG_ME 24
@@ -253,8 +252,13 @@ int resolvePath(const char *file, const char *searchPath, int (^attemptHandler)(
 	struct stat sb;
 	char path_buf[PATH_MAX];
 
-	if ((env_path = getenv("PATH")) == NULL)
-		env_path = _PATH_DEFPATH;
+	env_path = searchPath;
+	if (!env_path) {
+		env_path = getenv("PATH");
+		if (!env_path) {
+			env_path = _PATH_DEFPATH;
+		}
+	}
 
 	/* If it's an absolute or relative path name, it's easy. */
 	if (index(file, '/')) {
