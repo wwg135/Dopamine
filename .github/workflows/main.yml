@@ -1,28 +1,19 @@
-name: "Dopamine: build and upload"
-
+name: build_Release
 on:
   push:
     branches:
-      - master
-    paths-ignore:
-      - ".gitignore"
-  pull_request:
-    branches:
-      - master
+      - 1.1.8_
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 1 1 *'
-    - cron: '0 0 1 4 *'
-    - cron: '0 0 30 6 *'
-    - cron: '0 0 28 9 *'
-    - cron: '0 0 27 12 *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  VERSION: '1.1.8_1'
+ 
 jobs:
   build:
     runs-on: macos-13
@@ -31,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install Procursus
-        uses: dhinakg/procursus-action@main
+        uses: wwg135/procursus-action@main
         with:
           packages: ldid findutils sed coreutils make
 
@@ -56,35 +47,49 @@ jobs:
           
       - name: Set Environment Variables
         run: |
-          set -x
-          T2=$(TZ=UTC-2 date +'%Y%m%d_%H%M%S')
-          TS=$(date -j -f "%Y%m%d_%H%M%S" "${T2}" +%s)
-          SHASH=$(git rev-parse --short HEAD)
-          echo "ctime=${T2}" >> $GITHUB_ENV
-          echo "ctimestamp=${TS}" >> $GITHUB_ENV
-          echo "shorthash=${SHASH}" >> $GITHUB_ENV
+          sT=$(TZ=UTC-8 date +'%S')
+          echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
+          echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
+          echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
 
-      - name: Build
+      - name: Print env
+        run: |
+          echo ${{ env.VERSION }}
+          echo ${{ env.msT }}
+          echo ${{ env.shT }}
+          echo ${{ env.logT }}
+
+      - name: Pre code
+        run: |
+          sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/BBB/${{ env.VERSION }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Fugu15.swift
+          sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
+      
+      - name: Pre body
+        run: |
+          echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
+          echo -e "\n更新时间：${{ env.logT }}" >> body.txt
+          echo -e "\n**当前更新日志如下：**" >> body.txt
+          echo -e "\n> - 增加一键备份成功、失败的提示，建议所有人更新" >> body.txt
+  
+      - name: Build ipa
         run: |
           set -x
-          sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
-          export BASEDIR="$(pwd)"
-          export THEOS="${BASEDIR}/theos"
+          export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
-          cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine_${{ env.shorthash }}_${{ env.ctime }}.tipa
-          cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine_Latest.tipa
+          mv Dopamine/Dopamine.tipa Dopamine.ipa
 
-      - name: Upload Latest Artifact
-        id: dopamine-latest-upload
-        uses: actions/upload-artifact@v3
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: Dopamine_Latest
-          path: |
-            ${{ github.workspace }}/Dopamine/Dopamine_Latest.tipa
-      - name: Upload Hashed Artifact
-        id: dopamine-hashed-upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: Dopamine_${{ env.shorthash }}_${{ env.ctime }}
-          path: |
-            ${{ github.workspace }}/Dopamine/Dopamine_${{ env.shorthash }}_${{ env.ctime }}.tipa
+          name: ${{ env.VERSION }}
+          tag_name: ${{ env.msT }}
+          target_commitish: 1.1.8_
+          body_path: body.txt
+          latest: true
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          files: |
+           *.ipa
