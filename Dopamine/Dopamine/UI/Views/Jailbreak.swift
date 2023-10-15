@@ -166,12 +166,30 @@ func backup() {
     let preferencesPath = "/var/jb/User/Library/Preferences/"
     let controlCenterPath = "/var/jb/User/Library/ControlCenter/"
     let sourcesPath = "/var/jb/etc/apt/sources.list.d/"
-    let copyItems: [(String, String, String)] = [
-        (dopaminedebPath, filePaths[0], "备份Dopamine插件失败"),
-        (preferencesPath, filePaths[1], "备份Preferences失败"),
-        (controlCenterPath, filePaths[2], "备份ControlCenter失败"),
-        (sourcesPath, filePaths[3], "备份sources.list.d失败")
+
+    let moveItems: [(String, String, String)] = [
+        (dopaminedebPath, filePaths[0], "剪切Dopamine插件失败"),
     ]
+
+    let copyItems: [(String, String, String)] = [
+        (preferencesPath, filePaths[1], "复制Preferences失败"),
+        (controlCenterPath, filePaths[2], "复制ControlCenter失败"),
+        (sourcesPath, filePaths[3], "复制sources.list.d失败")
+    ]
+
+    for (sourcePath, destinationPath, errorMessage) in moveItems {
+        if let enumerator = fileManager.enumerator(atPath: sourcePath) {
+            for file in enumerator {
+                do {
+                    let sourceURL = URL(fileURLWithPath: sourcePath).appendingPathComponent(file as! String)
+                    let destinationURL = URL(fileURLWithPath: destinationPath).appendingPathComponent(file as! String)
+                    try fileManager.moveItem(at: sourceURL, to: destinationURL)
+                } catch {
+                    print(errorMessage)
+                }
+            }
+        }
+    }
 
     for (sourcePath, destinationPath, errorMessage) in copyItems {
         if let enumerator = fileManager.enumerator(atPath: sourcePath) {
