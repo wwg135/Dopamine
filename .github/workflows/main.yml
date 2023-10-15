@@ -28,9 +28,9 @@ jobs:
 
       - name: Pre theos
         run: |
-         curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos > theos
-         sed -i '' 's/get_sdks$//g' theos
-         bash theos-theos.sh
+          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos > theos
+          sed -i '' 's/get_sdks$//g' theos
+          bash theos-theos.sh
           cd $BASEDIR
      
       - name: Build and Install trustcache
