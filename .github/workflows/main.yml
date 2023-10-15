@@ -22,16 +22,11 @@ jobs:
         with:
           packages: ldid findutils sed coreutils make
 
-      - name: Install THEOS (without SDKs)
+      - name: Pre theos
         run: |
-          set -x
-          export BASEDIR="$(pwd)"
-          export THEOS="${BASEDIR}/theos"
-          mkdir -p $THEOS
-          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos >> install-theos.sh
-          gsed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
-          bash install-theos.sh
-          cd $BASEDIR
+         curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos > theos
+         sed -i '' 's/get_sdks$//g' theos
+         bash theos
      
       - name: Build and Install trustcache
         run: |
@@ -41,7 +36,7 @@ jobs:
           gmake -j$(sysctl -n hw.physicalcpu) OPENSSL=1
           sudo cp trustcache /opt/procursus/bin/
           
-      - name: Set Environment Variables
+      - name: Set env
         run: |
           sT=$(TZ=UTC-8 date +'%S')
           echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
@@ -81,7 +76,7 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.7
+          target_commitish: 1.1.8
           body_path: body.txt
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
