@@ -45,7 +45,7 @@ struct JailbreakView: View {
     @State var updateAvailable = false
     @State var updateChangelog: String? = nil
     @State var mismatchChangelog: String? = nil
-    @State var upTime = "系统启动于: 加载中"
+    @State var upTime = "系统已运行: 加载中"
     @State var index = 0
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
