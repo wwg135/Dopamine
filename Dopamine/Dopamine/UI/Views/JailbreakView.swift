@@ -47,7 +47,6 @@ struct JailbreakView: View {
     @State var mismatchChangelog: String? = nil 
     @State var upTime = "系统启动于: 加载中"
     @State var index = 0
-    @State var showLaunchTime = true
     @State var advancedLogsTemporarilyEnabled: Bool = false
     @State var showTexts = dopamineDefaults().bool(forKey: "showTexts")
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
@@ -463,16 +462,13 @@ struct JailbreakView: View {
             .animation(.spring(), value: updateAvailable)
         }
         .onAppear {
-            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {_ in
+            Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) {_ in
                 let dots = ". . . "                                                                    
                 if index < dots.count {
                     upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
                     index += 1
                 } else {
-                    upTime = showLaunchTime ? getLaunchTime() : formatUptime()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        showLaunchTime = false
-                    }
+                    upTime = formatUptime()
                 }
             }
             DispatchQueue.global(qos: .userInitiated).async {
@@ -853,20 +849,6 @@ struct JailbreakView: View {
             }
             try await group.waitForAll()
         }
-    }
-    
-    func getLaunchTime() -> String {
-        var boottime = timeval()
-        var mib = [CTL_KERN, KERN_BOOTTIME]
-        var size = MemoryLayout<timeval>.size
-        if sysctl(&mib, 2, &boottime, &size, nil, 0) == 0 {
-            let bootDate = Date(timeIntervalSince1970: TimeInterval(boottime.tv_sec)) 
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            return "系统启动于: \(formatter.string(from: bootDate))"
-        } else {
-            return "获取启动时间失败"
-        }  
     }
 
     func formatUptime() -> String {
