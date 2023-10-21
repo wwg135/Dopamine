@@ -36,5 +36,3 @@ if isJailbroken() {
     let safeModeState = FileManager.default.fileExists(atPath: safeModePath!)
     dpDefaults.set(!safeModeState, forKey: "tweakInjectionEnabled")
 }
-
-Fugu15App.main()
