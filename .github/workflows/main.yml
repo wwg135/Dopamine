@@ -15,7 +15,13 @@ jobs:
     runs-on: macos-13
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Checkout tools repo
+        uses: actions/checkout@v4
+        with:
+          repository: opa334/kfd
+          path: Exploits/oobPCI/Sources/kfd
 
       - name: Install Procursus
         uses: wwg135/procursus-action@main
