@@ -2,7 +2,7 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.9
+      - kfd
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -62,7 +62,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方1.1.9正式版更新" >> body.txt
+          echo -e "\n> - 当前为kfd版本，有问题请退回前面的版本" >> body.txt
   
       - name: Build ipa
         run: |
@@ -74,9 +74,9 @@ jobs:
       - name: Release ipa
         uses: softprops/action-gh-release@v1
         with:
-          name: ${{ env.VERSION }}
+          name: 1.1.9_kfd
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.9
+          target_commitish: kfd
           body_path: body.txt
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
