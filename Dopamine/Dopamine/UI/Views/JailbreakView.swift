@@ -45,9 +45,8 @@ struct JailbreakView: View {
     @State var updateAvailable = false
     @State var updateChangelog: String? = nil
     @State var mismatchChangelog: String? = nil
-    @State private var upTime = "系统启动于: 加载中"
-    @State private var index = 0
-    @State private var showLaunchTime = true
+    @State var upTime = "系统已运行: 加载中"
+    @State var index = 0
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("verboseLogsEnabled", store: dopamineDefaults()) var advancedLogsByDefault: Bool = false
     @State var advancedLogsTemporarilyEnabled: Bool = false
@@ -465,10 +464,7 @@ struct JailbreakView: View {
                     upTime += String(dots[dots.index(dots.startIndex, offsetBy: index)])
                     index += 1
                 } else {
-                    upTime = showLaunchTime ? getLaunchTime() : formatUptime()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        showLaunchTime = false
-                    }
+                    upTime = formatUptime()
                 }
             }
             DispatchQueue.global(qos: .userInitiated).async {
@@ -849,20 +845,6 @@ struct JailbreakView: View {
             }
             try await group.waitForAll()
         }
-    }
-    
-    func getLaunchTime() -> String {
-        var boottime = timeval()
-        var mib = [CTL_KERN, KERN_BOOTTIME]
-        var size = MemoryLayout<timeval>.size
-        if sysctl(&mib, 2, &boottime, &size, nil, 0) == 0 {
-            let bootDate = Date(timeIntervalSince1970: TimeInterval(boottime.tv_sec)) 
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            return "系统启动于: \(formatter.string(from: bootDate))"
-        } else {
-            return "获取启动时间失败"
-        }  
     }
 
     func formatUptime() -> String {
