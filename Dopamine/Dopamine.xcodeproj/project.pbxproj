@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		0C65CFE62A47EA9D00EDF5F2 /* ellekit_1.0_iphoneos-arm64.deb in Resources */ = {isa = PBXBuildFile; fileRef = 0C65CFE42A47EA9D00EDF5F2 /* ellekit_1.0_iphoneos-arm64.deb */; };
                 0C65CFE52A47EA9D00EDF5F2 /* preferenceloader_2.2.6-1_iphoneos-arm64.deb in Resources */ = {isa = PBXBuildFile; fileRef = 0C65CFE32A47EA9D00EDF5F2 /* preferenceloader_2.2.6-1_iphoneos-arm64.deb */; };
-		1502A40C2891B03F0011CB6E /* DopamineApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1502A40B2891B03F0011CB6E /* DopamineApp.swift */; };
 		1502A4102891B0410011CB6E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1502A40F2891B0410011CB6E /* Assets.xcassets */; };
 		1502A4132891B0410011CB6E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1502A4122891B0410011CB6E /* Preview Assets.xcassets */; };
 		1502A4242891BD800011CB6E /* Fugu15KernelExploit in Frameworks */ = {isa = PBXBuildFile; productRef = 1502A4232891BD800011CB6E /* Fugu15KernelExploit */; };
@@ -51,7 +50,6 @@
 		0C5D3B0929F2DA27002924C0 /* zh_HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_HK; path = zh_HK.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0C5D3B0A29F2DA3C002924C0 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
 		1502A4082891B03F0011CB6E /* Dopamine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dopamine.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1502A40B2891B03F0011CB6E /* DopamineApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DopamineApp.swift; sourceTree = "<group>"; };
 		1502A40F2891B0410011CB6E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1502A4122891B0410011CB6E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1502A41B2891B0980011CB6E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -158,7 +156,6 @@
 				CE53628529D64DBA00E4332B /* UI */,
 				15372E9E28DDF5D300514A73 /* bootstrap */,
 				1502A41B2891B0980011CB6E /* Info.plist */,
-				1502A40B2891B03F0011CB6E /* DopamineApp.swift */,
 				151CAFB22894041D00B2A6BA /* main.swift */,
 				1502A40F2891B0410011CB6E /* Assets.xcassets */,
 				1502A4112891B0410011CB6E /* Preview Content */,
@@ -396,7 +393,6 @@
 				CE6CA69329D6D7C100A6E513 /* AboutView.swift in Sources */,
 				CEBBF6DB29D9DCD900AD7299 /* SettingsView.swift in Sources */,
 				CE284DE729D478620096D99D /* LogView.swift in Sources */,
-				1502A40C2891B03F0011CB6E /* DopamineApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
