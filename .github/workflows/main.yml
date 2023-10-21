@@ -2,17 +2,13 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.8_
+      - 1.1.9_
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
-  VERSION: '1.1.8_1'
+  VERSION: '1.1.9_1'
  
 jobs:
   build:
@@ -68,7 +64,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方1.1.8正式版更新" >> body.txt
+          echo -e "\n> - 同步官方1.1.9正式版更新" >> body.txt
   
       - name: Build ipa
         run: |
@@ -82,7 +78,7 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.8_
+          target_commitish: 1.1.9_
           body_path: body.txt
           latest: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
