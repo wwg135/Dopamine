@@ -488,7 +488,7 @@ struct JailbreakView: View {
         HStack {
             VStack(alignment: .leading) {
                 Group {
-                    Image(whatCouldThisVariablePossiblyEvenMean ? "DopamineLogo2" : "DopamineLogo")
+                    Image("DopamineLogo")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(maxWidth: 200)
