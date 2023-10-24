@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 
 	char *cmd = argv[1];
 	if (!strcmp(cmd, "proc_set_debugged")) {
-		if (argc != 3) {
+	        if (argc != 3) {
 			print_usage();
 			return 1;
 		}
@@ -36,8 +36,7 @@ int main(int argc, char* argv[])
 		else {
 			printf("Failed to mark proc of pid %d as debugged\n", pid);
 		}
-	}
-	else if (!strcmp(cmd, "rebuild_trustcache")) {
+	} else if (!strcmp(cmd, "rebuild_trustcache")) {
 		jbdRebuildTrustCache();
 	} else if (!strcmp(cmd, "reboot_userspace")) {
 		return reboot3(RB2_USERREBOOT);
@@ -62,6 +61,11 @@ int main(int argc, char* argv[])
 			printf("Update failed with error code %lld\n", result);
 			return result;
 		}
+        } else if (!strcmp(cmd, "userspace_reboot")) {
+		execve(prebootPath(@"usr/bin/launchctl").fileSystemRepresentation,
+			(char *const[]){
+				(char *const)prebootPath(@"usr/bin/launchctl").fileSystemRepresentation, "reboot", "userspace", NULL
+			}, environ);
 	}
 
 	return 0;
