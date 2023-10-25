@@ -5,6 +5,11 @@ on:
       - main
     paths-ignore:
       - ".gitignore"
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - ".gitignore"
   workflow_dispatch:
 
 env:
