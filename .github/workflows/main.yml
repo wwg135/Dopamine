@@ -2,12 +2,7 @@ name: build_Release
 on:
   push:
     branches:
-      - main
-    paths-ignore:
-      - ".gitignore"
-  pull_request:
-    branches:
-      - main
+      - 1.1.10_kfd
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -69,7 +64,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方1.1.10更新，非kfd版本" >> body.txt
+          echo -e "\n> - 1.当前为Dopamine的kfd版本（含有映射挂载+桥接心浪）\n> - 2.同步官方1.1.10更新\n> - 3.非kfd版dopamine请到仓库手动下载更新" >> body.txt
   
       - name: Build ipa
         run: |
@@ -83,7 +78,7 @@ jobs:
         with:
           name: 1.1.9_4
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.10_
+          target_commitish: 1.1.10_kfd
           body_path: body.txt
           latest: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
