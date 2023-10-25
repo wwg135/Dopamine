@@ -76,7 +76,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          name: 1.1.9
+          name: 1.1.9_4
           tag_name: ${{ env.msT }}
           target_commitish: 1.1.10_
           body_path: body.txt
