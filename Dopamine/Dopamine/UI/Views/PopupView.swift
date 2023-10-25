@@ -11,7 +11,6 @@ struct PopupView<Title: View, Content: View>: View {
     
     @ViewBuilder var title: Title
     @ViewBuilder var contents: Content
-    
     @Binding var isPresented: Bool
     
     var body: some View {
