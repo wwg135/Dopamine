@@ -2,10 +2,19 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.10_
+      - 1.1.10
+    paths-ignore:
+      - ".gitignore"
+  pull_request:
+    branches:
+      - 1.1.10
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   VERSION: '1.1.10_1'
@@ -64,7 +73,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方1.1.10更新，非kfd版本" >> body.txt
+          echo -e "\n> - 1.同步官方1.1.10更新，非kfd版本\n> - 2.优化修改版的功能代码（长按首页背景更改壁纸）" >> body.txt
   
       - name: Build ipa
         run: |
@@ -76,7 +85,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          name: 1.1.9_4
+          name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
           target_commitish: 1.1.10_
           body_path: body.txt
