@@ -436,9 +436,6 @@ struct JailbreakView: View {
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
-                        .onTapGesture(count: 2) {
-                            hideMount.toggle()
-                        }
                 }, contents: {
                     SettingsView(isPresented: $isSettingsPresented)
                         .frame(maxWidth: 320)
@@ -492,7 +489,7 @@ struct JailbreakView: View {
         HStack {
             VStack(alignment: .leading) {
                 Group {
-                    Image(whatCouldThisVariablePossiblyEvenMean ? "DopamineLogo2" : "DopamineLogo")
+                    Image("DopamineLogo")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(maxWidth: 200)
