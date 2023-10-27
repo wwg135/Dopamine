@@ -2,10 +2,19 @@ name: build_Release
 on:
   push:
     branches:
-      - kfd
+      - main
+    paths-ignore:
+      - ".gitignore"
+  pull_request:
+    branches:
+      - main
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   VERSION: '1.1.10'
