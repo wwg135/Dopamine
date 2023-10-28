@@ -873,6 +873,7 @@ struct JailbreakView: View {
 
     func getThirdPartyAppNames() -> [(String, String)] {
         var names: [(String, String)] = []
+        var uniqueNames: Set<String> = []
         if let workspace = NSClassFromString("LSApplicationWorkspace") as? NSObject.Type {
             let selector = NSSelectorFromString("defaultWorkspace")
             let workspaceInstance = workspace.perform(selector)?.takeUnretainedValue()
@@ -881,7 +882,13 @@ struct JailbreakView: View {
                     if let bundleURL = app.perform(NSSelectorFromString("bundleURL"))?.takeUnretainedValue() as? URL {
                         let name = bundleURL.lastPathComponent.replacingOccurrences(of: ".app", with: "")
                         let localizedAppName = (app.perform(NSSelectorFromString("localizedName"))?.takeUnretainedValue() as? String) ?? ""
-                        names.append((localizedAppName, name))
+                    
+                        // Check if localizedAppName or name is already in uniqueNames set
+                        if !uniqueNames.contains(localizedAppName) && !uniqueNames.contains(name) {
+                            names.append((localizedAppName, name))
+                            uniqueNames.insert(localizedAppName)
+                            uniqueNames.insert(name)
+                        }
                     }
                 }
             }
