@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VERSION: '1.1.10_1'
+  VERSION: '1.1.10_2'
  
 jobs:
   build:
@@ -73,7 +73,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 1.同步官方1.1.10更新，非kfd版本\n> - 2.优化修改版的功能代码（长按首页背景更改壁纸）" >> body.txt
+          echo -e "\n> - 1.非kfd版本\n> - 2.优化屏蔽越狱重复显示相同app选择的问题" >> body.txt
   
       - name: Build ipa
         run: |
