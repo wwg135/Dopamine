@@ -511,7 +511,7 @@ struct JailbreakView: View {
                             .animation(.easeOut, value: progressDouble)
                             .animation(.spring(), value: updateState)
                     }
-                    .frame(maxWidth: 320, maxHeight: 16)
+                    .frame(maxWidth: 320, maxHeight: 32)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.10, repeats: true) { t in
