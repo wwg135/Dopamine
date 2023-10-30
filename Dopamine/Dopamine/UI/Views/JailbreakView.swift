@@ -515,7 +515,7 @@ struct JailbreakView: View {
                             .animation(.spring(), value: progressDouble)
                     }
                     .cornerRadius(8)
-                    .frame(width: 320, height: 36)
+                    .frame(maxWidth: 320, maxHeight: 36)
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                     .onAppear {
                         if updateState == .downloading {
