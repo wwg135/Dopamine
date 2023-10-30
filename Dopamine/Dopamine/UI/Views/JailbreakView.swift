@@ -501,10 +501,13 @@ struct JailbreakView: View {
         VStack {
             VStack {
                 if showDownloadPage {
-                    ZStack {  
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .foregroundColor(Color.white.opacity(0.1))
+                            .animation(.spring(), value: updateState)
                         RoundedRectangle(cornerRadius: 8)
                             .trim(from: 0, to: CGFloat(progressDouble))
-                            .foregroundColor(Color.white.opacity(0.1))
+                            .foregroundColor(Color.white)
                             .animation(.easeOut, value: progressDouble)
                             .animation(.spring(), value: updateState)
                             .rotationEffect(.degrees(90)) // 将进度条逆时针旋转180度
