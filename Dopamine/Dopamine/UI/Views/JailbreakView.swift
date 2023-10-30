@@ -505,6 +505,7 @@ struct JailbreakView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .foregroundColor(Color.white.opacity(0.1))
                             .animation(.spring(), value: updateState)
+                            .frame(maxWidth: 320, maxHeight: 32)
                         RoundedRectangle(cornerRadius: 8)
                             .foregroundColor(Color.white)
                             .frame(width: 320 * CGFloat(progressDouble), height: 32)
@@ -515,7 +516,7 @@ struct JailbreakView: View {
                     .frame(maxWidth: 320, maxHeight: 32)
                     .onAppear {
                         if updateState == .downloading {
-                            Timer.scheduledTimer(withTimeInterval: 0.10, repeats: true) { t in
+                            Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
                                 progressDouble = downloadProgress.fractionCompleted
                                 
                                 if progressDouble == 1 {
