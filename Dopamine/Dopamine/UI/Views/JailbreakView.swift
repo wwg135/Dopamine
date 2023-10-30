@@ -509,8 +509,7 @@ struct JailbreakView: View {
                             .animation(.spring(), value: updateState)
                             .rotationEffect(.degrees(180)) // 将进度条逆时针旋转180度
                     }
-                    .frame(maxWidth: isJailbreaking ? .infinity : 280)
-                    .fixedSize(horizontal: false, vertical: true) // 设置进度条的固定高度
+                    .frame(maxWidth: 320, maxHeight: 16)
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.10, repeats: true) { t in
