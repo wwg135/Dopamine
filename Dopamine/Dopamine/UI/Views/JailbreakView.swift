@@ -502,7 +502,7 @@ struct JailbreakView: View {
             VStack {
                 if showDownloadPage {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: 8)
                             .foregroundColor(Color.white)
                             .frame(width: 320 * CGFloat(progressDouble), height: 32)
                             .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
@@ -511,7 +511,7 @@ struct JailbreakView: View {
                         Text("\(Int(progressDouble * 100))%")
                             .foregroundColor(.black)
                             .font(.headline)
-                            .offset(x: (320 * CGFloat(progressDouble)) - 160 + 160 * CGFloat(progressDouble))
+                            .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
                             .animation(.spring(), value: progressDouble)
                     }
                     .cornerRadius(8)
