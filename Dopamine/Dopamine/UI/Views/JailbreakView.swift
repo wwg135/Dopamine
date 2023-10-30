@@ -504,7 +504,7 @@ struct JailbreakView: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
                             .foregroundColor(Color.white)
-                            .frame(width: 320 * CGFloat(progressDouble), height: 32)
+                            .frame(width: 320 * CGFloat(progressDouble), height: 36)
                             .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
                             .animation(.spring(), value: progressDouble)
                             .animation(.spring(), value: updateState)
@@ -514,7 +514,8 @@ struct JailbreakView: View {
                             .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
                             .animation(.spring(), value: progressDouble)
                     }
-                    .frame(maxWidth: 320, maxHeight: 32)
+                    .cornerRadius(8)
+                    .frame(width: 320, height: 36)
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                     .onAppear {
                         if updateState == .downloading {
