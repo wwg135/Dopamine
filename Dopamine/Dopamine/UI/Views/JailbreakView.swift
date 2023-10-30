@@ -508,6 +508,11 @@ struct JailbreakView: View {
                             .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
                             .animation(.spring(), value: progressDouble)
                             .animation(.spring(), value: updateState)
+                        Text("\(Int(progressDouble * 100))%")
+                            .foregroundColor(.black)
+                            .font(.headline)
+                            .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
+                            .animation(.spring(), value: progressDouble)
                     }
                     .frame(maxWidth: 320, maxHeight: 32)
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
