@@ -211,110 +211,6 @@ struct JailbreakView: View {
                     .frame(maxWidth: 280, maxHeight: 420)
                 }
                             
-                if showDownloadPage {
-                    GeometryReader { geometry in
-                        Color.clear
-                            .zIndex(1)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
-                            .contentShape(Rectangle())
-                            .allowsHitTesting(true)
-                            .onTapGesture {
-                                showDownloadPage = false
-                            }
-                    }
-                    .ignoresSafeArea()
-                    ZStack {
-                        if showLogView {
-                            VStack {
-                                LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
-                                    .opacity(1)
-                                    .foregroundColor(Color.white)
-                                Text("Update_Log_Hint_Scrollable")
-                                    .opacity(1)
-                                    .minimumScaleFactor(0.5)  
-                                    .foregroundColor(.white)
-                                    .padding()
-                            }
-                            .frame(maxWidth: 250, maxHeight: 360)
-                            .background(Color.black.opacity(0.5))
-                            .background(MaterialView(.systemUltraThinMaterialDark))
-                        } else {
-                            VStack {
-                                VStack {
-                                    Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
-                                        .font(.title2)
-                                        .opacity(1)
-                                        .minimumScaleFactor(0.5)
-                                        .foregroundColor(Color.white)
-                                        .multilineTextAlignment(.center)
-                                        .drawingGroup()
-                                    Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
-                                        .opacity(1)
-                                        .minimumScaleFactor(0.5)
-                                        .foregroundColor(Color.white)
-                                        .multilineTextAlignment(.center)
-                                        .padding(.bottom, 10)
-                                }
-                                .frame(height: 50)
-                                .animation(.spring(), value: updateState)
-
-                                VStack {
-                                    ZStack {
-                                        ZStack {
-                                            Text("\(Int(progressDouble * 100))%")
-                                                .font(.title)
-                                                .opacity(1)
-                                            if updateState == .downloading || updateState == .updating {
-                                                LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                                    .opacity(1)
-                                            }
-                                        }
-                                        Circle()
-                                            .stroke(
-                                                Color.white.opacity(0.1),
-                                                lineWidth: updateState == .downloading ? 16 : 8
-                                            )
-                                            .animation(.spring(), value: updateState)
-                                        Circle()
-                                            .trim(from: 0, to: progressDouble)
-                                            .stroke(
-                                                Color.white,
-                                                style: StrokeStyle(
-                                                    lineWidth: updateState == .downloading ? 16 : 0,
-                                                    lineCap: .round
-                                                )
-                                            )
-                                            .rotationEffect(.degrees(-90))
-                                            .animation(.easeOut, value: progressDouble)
-                                            .animation(.spring(), value: updateState) 
-                                    }
-                                }
-                                .frame(height: 90)
-                                .animation(.spring(), value: updateState)
-                            }
-                            .padding(.vertical)
-                            .background(Color.black.opacity(0.5))
-                            .background(MaterialView(.systemUltraThinMaterialDark))
-                            .zIndex(3)
-                        }
-                    }
-                    .zIndex(2)
-                    .cornerRadius(16)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: 180, maxHeight: 180)
-                    .onAppear {
-                        if updateState == .downloading {
-                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
-                                progressDouble = downloadProgress.fractionCompleted
-                                
-                                if progressDouble == 1 {
-                                    t.invalidate()
-                                }
-                            }
-                        }
-                    }
-                }
-
                 if MaskDetection {
                     GeometryReader { geometry in
                         Color.clear
@@ -604,87 +500,116 @@ struct JailbreakView: View {
     var bottomSection: some View {
         VStack {
             VStack {
-                Button {
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    if requiresEnvironmentUpdate {
-                        updateAvailable = true
-                    } else {
-                        if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
-                            jailbreakingProgress = .selectingPackageManager
-                        } else {
-                            uiJailbreak()
+                if showDownloadPage {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 16)
+                            .foregroundColor(Color.white)
+                            .frame(width: 320 * CGFloat(progressDouble), height: 32)
+                            .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
+                            .animation(.spring(), value: progressDouble)
+                            .animation(.spring(), value: updateState)
+                        Text("\(Int(progressDouble * 100))%")
+                            .foregroundColor(.black)
+                            .font(.headline)
+                            .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
+                            .animation(.spring(), value: progressDouble)
+                    }
+                    .frame(maxWidth: 320, maxHeight: 32)
+                    .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
+                    .onAppear {
+                        if updateState == .downloading {
+                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                                progressDouble = downloadProgress.fractionCompleted
+                                
+                                if progressDouble == 1 {
+                                    t.invalidate()
+                                }
+                            }
                         }
                     }
-                } label: {
-                    Label(title: {
-                        if Fugu15.supportsThisDeviceBool() {
-                            if !requiresEnvironmentUpdate {
-                                if isJailbroken() {
-                                    Text("Status_Title_Jailbroken")
+                } else {
+                    Button {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()       
+                        if requiresEnvironmentUpdate {
+                            updateAvailable = true
+                        } else {
+                            if (dopamineDefaults().array(forKey: "selectedPackageManagers") as? [String] ?? []).isEmpty && !isBootstrapped() {
+                                jailbreakingProgress = .selectingPackageManager
+                            } else {
+                                uiJailbreak()
+                            }
+                        }
+                    } label: {
+                        Label(title: {
+                            if Fugu15.supportsThisDeviceBool() {
+                                if !requiresEnvironmentUpdate {
+                                    if isJailbroken() {
+                                        Text("Status_Title_Jailbroken")
+                                    } else {
+                                        switch jailbreakingProgress {
+                                        case .idle:
+                                            Text("Button_Jailbreak_Title")
+                                        case .jailbreaking:
+                                            Text("Status_Title_Jailbreaking")
+                                        case .selectingPackageManager:
+                                            Text("Status_Title_Select_Package_Managers")
+                                        case .finished:
+                                            if jailbreakingError == nil {
+                                                Text("Status_Title_Jailbroken")
+                                            } else {
+                                                Text("Status_Title_Unsuccessful")
+                                            }
+                                        }
+                                    }
                                 } else {
-                                    switch jailbreakingProgress {
-                                    case .idle:
-                                        Text("Button_Jailbreak_Title")
-                                    case .jailbreaking:
-                                        Text("Status_Title_Jailbreaking")
-                                    case .selectingPackageManager:
-                                        Text("Status_Title_Select_Package_Managers")
-                                    case .finished:
-                                        if jailbreakingError == nil {
-                                            Text("Status_Title_Jailbroken")
-                                        } else {
-                                            Text("Status_Title_Unsuccessful")
-                                        }
-                                    }
+                                    Text("Button_Update_Environment")
                                 }
                             } else {
-                                Text("Button_Update_Environment")
+                                Text("Unsupported")
                             }
-                        } else {
-                            Text("Unsupported")
-                        }
-                    }, icon: {
-                        if Fugu15.supportsThisDeviceBool() {
-                            if !requiresEnvironmentUpdate {
-                                ZStack {
-                                    switch jailbreakingProgress {
-                                    case .jailbreaking:
-                                        LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
-                                    case .selectingPackageManager:
-                                        Image(systemName: "shippingbox")
-                                    case .finished:
-                                        if jailbreakingError == nil {
+                        }, icon: {
+                            if Fugu15.supportsThisDeviceBool() {
+                                if !requiresEnvironmentUpdate {
+                                    ZStack {
+                                        switch jailbreakingProgress {
+                                        case .jailbreaking:
+                                            LoadingIndicator(animation: .doubleHelix, color: .white, size: .small)
+                                        case .selectingPackageManager:
+                                            Image(systemName: "shippingbox")
+                                        case .finished:
+                                            if jailbreakingError == nil {
+                                                Image(systemName: "lock.open")
+                                            } else {
+                                                Image(systemName: "lock.slash")
+                                            }
+                                        case .idle:
                                             Image(systemName: "lock.open")
-                                        } else {
-                                            Image(systemName: "lock.slash")
                                         }
-                                    case .idle:
-                                        Image(systemName: "lock.open")
                                     }
+                                } else {
+                                    Image(systemName: "doc.badge.arrow.up")
                                 }
                             } else {
-                                Image(systemName: "doc.badge.arrow.up")
+                                Image(systemName: "lock.slash")
                             }
-                        } else {
-                            Image(systemName: "lock.slash")
-                        }
-                    })
-                    .foregroundColor(Color.white)
-                    .padding()
-                    .frame(maxWidth: isJailbreaking ? .infinity : 280)
-                }
-                .disabled((isJailbroken() || isJailbreaking || !Fugu15.supportsThisDeviceBool()) && !requiresEnvironmentUpdate)
-                .drawingGroup()
+                        })
+                        .foregroundColor(Color.white)
+                        .padding()
+                        .frame(maxWidth: isJailbreaking ? .infinity : 280)
+                    }
+                    .disabled((isJailbroken() || isJailbreaking || !Fugu15.supportsThisDeviceBool()) && !requiresEnvironmentUpdate)
+                    .drawingGroup()
             
-                if jailbreakingProgress == .finished || jailbreakingProgress == .jailbreaking {
-                    Spacer()
-                    LogView(advancedLogsTemporarilyEnabled: $advancedLogsTemporarilyEnabled, advancedLogsByDefault: $advancedLogsByDefault)
-                    endButtons
-                } else if jailbreakingProgress == .selectingPackageManager {
-                    PackageManagerSelectionView(shown: .constant(true), onContinue: {
-                        uiJailbreak()
-                    })
-                    .padding(.horizontal)
+                    if jailbreakingProgress == .finished || jailbreakingProgress == .jailbreaking {
+                        Spacer()
+                        LogView(advancedLogsTemporarilyEnabled: $advancedLogsTemporarilyEnabled, advancedLogsByDefault: $advancedLogsByDefault)
+                        endButtons
+                    } else if jailbreakingProgress == .selectingPackageManager {
+                        PackageManagerSelectionView(shown: .constant(true), onContinue: {
+                            uiJailbreak()
+                        })
+                        .padding(.horizontal)
+                    }
                 }
             }
             .frame(maxWidth: isJailbreaking ? .infinity : 280, maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.65 : nil)
@@ -699,7 +624,7 @@ struct JailbreakView: View {
             .animation(.spring(), value: isJailbreaking)
         }
     }
-
+    
     @ViewBuilder
     var endButtons: some View {
         switch jailbreakingProgress {
