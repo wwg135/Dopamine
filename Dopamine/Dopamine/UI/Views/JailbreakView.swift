@@ -511,7 +511,8 @@ struct JailbreakView: View {
                             .animation(.easeOut, value: progressDouble)
                             .animation(.spring(), value: updateState)
                     }
-                    .frame(maxWidth: isJailbreaking ? .infinity : 280, height: 16) // 设置进度条的大小 
+                    .frame(maxWidth: isJailbreaking ? .infinity : 280)
+                    .fixedSize(horizontal: false, vertical: true) // 设置进度条的固定高度
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
