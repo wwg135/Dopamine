@@ -510,6 +510,7 @@ struct JailbreakView: View {
                             .animation(.spring(), value: updateState)
                     }
                     .frame(maxWidth: 320, maxHeight: 32)
+                    .background(MaterialView(.systemUltraThinMaterialDark))
                     .onAppear {
                         if updateState == .downloading {
                             Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
