@@ -607,6 +607,7 @@ struct JailbreakView: View {
                     })
                     .padding(.horizontal)
                 }
+                }
             }
             .frame(maxWidth: isJailbreaking ? .infinity : 280, maxHeight: isJailbreaking ? UIScreen.main.bounds.height * 0.65 : nil)
             .padding(.horizontal, isJailbreaking ? 0 : 20)
@@ -619,7 +620,6 @@ struct JailbreakView: View {
             )
             .animation(.spring(), value: isJailbreaking)
         }
-    }
     }
 
     @ViewBuilder
