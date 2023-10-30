@@ -507,7 +507,7 @@ struct JailbreakView: View {
                             .foregroundColor(Color.white.opacity(0.1))
                             .animation(.easeOut, value: progressDouble)
                             .animation(.spring(), value: updateState)
-                            .rotationEffect(.degrees(180)) // 将进度条逆时针旋转180度
+                            .rotationEffect(.degrees(90)) // 将进度条逆时针旋转180度
                     }
                     .frame(maxWidth: 320, maxHeight: 16)
                     .onAppear {
