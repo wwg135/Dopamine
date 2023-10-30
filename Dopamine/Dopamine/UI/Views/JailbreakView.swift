@@ -502,7 +502,7 @@ struct JailbreakView: View {
             VStack {
                 if showDownloadPage {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: 8)
                             .foregroundColor(Color.white)
                             .frame(width: 320 * CGFloat(progressDouble), height: 32)
                             .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
