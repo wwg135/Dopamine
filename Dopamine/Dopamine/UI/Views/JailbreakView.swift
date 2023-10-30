@@ -501,15 +501,13 @@ struct JailbreakView: View {
         VStack {
             VStack {
                 if showDownloadPage {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8)
-                            .foregroundColor(Color.white.opacity(0.1))
-                            .animation(.spring(), value: updateState)  
+                    ZStack {  
                         RoundedRectangle(cornerRadius: 8)
                             .trim(from: 0, to: CGFloat(progressDouble))
-                            .foregroundColor(Color.white)
+                            .foregroundColor(Color.white.opacity(0.1))
                             .animation(.easeOut, value: progressDouble)
                             .animation(.spring(), value: updateState)
+                            .rotationEffect(.degrees(180)) // 将进度条逆时针旋转180度
                     }
                     .frame(maxWidth: isJailbreaking ? .infinity : 280)
                     .fixedSize(horizontal: false, vertical: true) // 设置进度条的固定高度
