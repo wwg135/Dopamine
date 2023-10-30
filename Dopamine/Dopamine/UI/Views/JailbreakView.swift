@@ -511,7 +511,7 @@ struct JailbreakView: View {
                         Text("\(Int(progressDouble * 100))%")
                             .foregroundColor(.black)
                             .font(.headline)
-                            .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
+                            .offset(x: (320 * CGFloat(progressDouble)) - 160 + 160 * CGFloat(progressDouble))
                             .animation(.spring(), value: progressDouble)
                     }
                     .cornerRadius(8)
@@ -519,7 +519,7 @@ struct JailbreakView: View {
                     .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                     .onAppear {
                         if updateState == .downloading {
-                            Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { t in
+                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
                                 progressDouble = downloadProgress.fractionCompleted
                                 
                                 if progressDouble == 1 {
