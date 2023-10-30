@@ -210,110 +210,6 @@ struct JailbreakView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 420)
                 }
-                            
-                if showDownloadPage {
-                    GeometryReader { geometry in
-                        Color.clear
-                            .zIndex(1)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
-                            .contentShape(Rectangle())
-                            .allowsHitTesting(true)
-                            .onTapGesture {
-                                showDownloadPage = false
-                            }
-                    }
-                    .ignoresSafeArea()
-                    ZStack {
-                        if showLogView {
-                            VStack {
-                                LogView(advancedLogsTemporarilyEnabled: .constant(true), advancedLogsByDefault: .constant(true))
-                                    .opacity(1)
-                                    .foregroundColor(Color.white)
-                                Text("Update_Log_Hint_Scrollable")
-                                    .opacity(1)
-                                    .minimumScaleFactor(0.5)  
-                                    .foregroundColor(.white)
-                                    .padding()
-                            }
-                            .frame(maxWidth: 250, maxHeight: 360)
-                            .background(Color.black.opacity(0.5))
-                            .background(MaterialView(.systemUltraThinMaterialDark))
-                        } else {
-                            VStack {
-                                VStack {
-                                    Text(updateState != .updating ? NSLocalizedString("Update_Status_Downloading", comment: "") : NSLocalizedString("Update_Status_Installing", comment: ""))
-                                        .font(.title2)
-                                        .opacity(1)
-                                        .minimumScaleFactor(0.5)
-                                        .foregroundColor(Color.white)
-                                        .multilineTextAlignment(.center)
-                                        .drawingGroup()
-                                    Text(updateState == .downloading ? NSLocalizedString("Update_Status_Subtitle_Please_Wait", comment: "") : NSLocalizedString("Update_Status_Subtitle_Restart_Soon", comment: ""))
-                                        .opacity(1)
-                                        .minimumScaleFactor(0.5)
-                                        .foregroundColor(Color.white)
-                                        .multilineTextAlignment(.center)
-                                        .padding(.bottom, 10)
-                                }
-                                .frame(height: 50)
-                                .animation(.spring(), value: updateState)
-
-                                VStack {
-                                    ZStack {
-                                        ZStack {
-                                            Text("\(Int(progressDouble * 100))%")
-                                                .font(.title)
-                                                .opacity(1)
-                                            if updateState == .downloading || updateState == .updating {
-                                                LoadingIndicator(animation: .circleRunner, color: .white, size: .medium, speed: .normal)
-                                                    .opacity(1)
-                                            }
-                                        }
-                                        Circle()
-                                            .stroke(
-                                                Color.white.opacity(0.1),
-                                                lineWidth: updateState == .downloading ? 16 : 8
-                                            )
-                                            .animation(.spring(), value: updateState)
-                                        Circle()
-                                            .trim(from: 0, to: progressDouble)
-                                            .stroke(
-                                                Color.white,
-                                                style: StrokeStyle(
-                                                    lineWidth: updateState == .downloading ? 16 : 0,
-                                                    lineCap: .round
-                                                )
-                                            )
-                                            .rotationEffect(.degrees(-90))
-                                            .animation(.easeOut, value: progressDouble)
-                                            .animation(.spring(), value: updateState) 
-                                    }
-                                }
-                                .frame(height: 90)
-                                .animation(.spring(), value: updateState)
-                            }
-                            .padding(.vertical)
-                            .background(Color.black.opacity(0.5))
-                            .background(MaterialView(.systemUltraThinMaterialDark))
-                            .zIndex(3)
-                        }
-                    }
-                    .zIndex(2)
-                    .cornerRadius(16)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: 180, maxHeight: 180)
-                    .onAppear {
-                        if updateState == .downloading {
-                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
-                                progressDouble = downloadProgress.fractionCompleted
-                                
-                                if progressDouble == 1 {
-                                    t.invalidate()
-                                }
-                            }
-                        }
-                    }
-                }
 
                 if MaskDetection {
                     GeometryReader { geometry in
@@ -604,6 +500,30 @@ struct JailbreakView: View {
     var bottomSection: some View {
         VStack {
             VStack {
+                if showDownloadPage {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .foregroundColor(Color.white.opacity(0.1))
+                            .animation(.spring(), value: updateState)  
+                        RoundedRectangle(cornerRadius: 8)
+                            .trim(from: 0, to: CGFloat(progressDouble))
+                            .foregroundColor(Color.white)
+                            .animation(.easeOut, value: progressDouble)
+                            .animation(.spring(), value: updateState)
+                    }
+                    .frame(maxWidth: isJailbreaking ? .infinity : 280, height: 16) // 设置进度条的大小 
+                    .onAppear {
+                        if updateState == .downloading {
+                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                                progressDouble = downloadProgress.fractionCompleted
+                                
+                                if progressDouble == 1 {
+                                    t.invalidate()
+                                }
+                            }
+                        }
+                    }
+            } else {
                 Button {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()       
                     if requiresEnvironmentUpdate {
