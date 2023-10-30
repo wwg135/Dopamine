@@ -506,9 +506,10 @@ struct JailbreakView: View {
                             .foregroundColor(Color.white.opacity(0.1))
                             .animation(.spring(), value: updateState)
                         RoundedRectangle(cornerRadius: 8)
-                            .frame(width: 320 * CGFloat(progressDouble), height: 32)
                             .foregroundColor(Color.white)
-                            .animation(.easeOut, value: progressDouble)
+                            .frame(width: 320 * CGFloat(progressDouble), height: 32)
+                            .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
+                            .animation(.spring(), value: progressDouble)
                             .animation(.spring(), value: updateState)
                     }
                     .frame(maxWidth: 320, maxHeight: 32)
