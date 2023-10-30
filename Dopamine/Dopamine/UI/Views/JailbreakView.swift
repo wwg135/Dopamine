@@ -619,6 +619,7 @@ struct JailbreakView: View {
             .animation(.spring(), value: isJailbreaking)
         }
     }
+    }
 
     @ViewBuilder
     var endButtons: some View {
