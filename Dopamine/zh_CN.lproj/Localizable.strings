@@ -20,8 +20,6 @@
 
 "Button_Update" = "立即更新";
 
-"Button_Update_Available" = "有新版本，请点击更新";
-
 "Button_Update_Environment" = "更新环境";
 
 "Unsupported" = "不支持";
@@ -113,16 +111,6 @@
 "Title_Made_By" = "开发: opa334、évelyne  UI: sourceloc \nDopamine 越狱基于 Fugu 15";
 
 "Title_Supported_iOS_Versions" = "iOS 15.0 - 15.4.1 | A12 - A15 、 M1";
-
-"Update_Log_Hint_Scrollable" = "滚动查看日志";
-
-"Update_Status_Downloading" = "正在下载更新...";
-
-"Update_Status_Installing" = "正在安装更新...";
-
-"Update_Status_Subtitle_Please_Wait" = "请等待完成下载...";
-
-"Update_Status_Subtitle_Restart_Soon" = "设备即将重启用户空间...";
 
 "Alert_Button_Uninstall" = "清除越狱";
 
