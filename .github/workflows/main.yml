@@ -71,7 +71,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 个人测试版，谨慎安装" >> body.txt
+          echo -e "\n> - 1.同步官方最新代码更新（非kfd版，kfd目前为beta，成功率较低暂不更新）\n> - 2.重新编写下载更新显示进度条代码" >> body.txt
   
       - name: Build ipa
         run: |
