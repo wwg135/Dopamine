@@ -508,6 +508,7 @@ struct JailbreakView: View {
                                 .foregroundColor(Color.white)
                                 .multilineTextAlignment(.center)
                         }
+                        .cornerRadius(8)
                         .frame(maxWidth: 320, maxHeight: 32)
                         .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                     } else {
@@ -525,7 +526,6 @@ struct JailbreakView: View {
                                 .animation(.spring(), value: progressDouble)
                         }
                         .frame(maxWidth: 320, maxHeight: 32)
-                        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                         .onAppear {
                             if updateState == .downloading {
                                 Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
