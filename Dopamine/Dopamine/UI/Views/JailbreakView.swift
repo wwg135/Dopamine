@@ -501,28 +501,39 @@ struct JailbreakView: View {
         VStack {
             VStack {
                 if showDownloadPage {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 16)
-                            .foregroundColor(Color.white)
-                            .frame(width: 320 * CGFloat(progressDouble), height: 32)
-                            .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
-                            .animation(.spring(), value: progressDouble)
-                            .animation(.spring(), value: updateState)
-                        Text("\(Int(progressDouble * 100))%")
-                            .foregroundColor(.black)
-                            .font(.headline)
-                            .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
-                            .animation(.spring(), value: progressDouble)
-                    }
-                    .frame(maxWidth: 320, maxHeight: 32)
-                    .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
-                    .onAppear {
-                        if updateState == .downloading {
-                            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
-                                progressDouble = downloadProgress.fractionCompleted
+                    if showLogView {
+                        ZStack {
+                            Text("OTA更新失败, 请重试")
+                                .font(.headline)
+                                .foregroundColor(Color.white)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: 320, maxHeight: 32)
+                        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
+                    } else {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundColor(Color.white)
+                                .frame(width: 320 * CGFloat(progressDouble), height: 32)
+                                .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
+                                .animation(.spring(), value: progressDouble)
+                                .animation(.spring(), value: updateState)
+                            Text("\(Int(progressDouble * 100))%")
+                                .foregroundColor(.black)
+                                .font(.headline)
+                                .offset(x: (320 * CGFloat(progressDouble)) - 320 / 2)
+                                .animation(.spring(), value: progressDouble)
+                        }
+                        .frame(maxWidth: 320, maxHeight: 32)
+                        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
+                        .onAppear {
+                            if updateState == .downloading {
+                                Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+                                    progressDouble = downloadProgress.fractionCompleted
                                 
-                                if progressDouble == 1 {
-                                    t.invalidate()
+                                    if progressDouble == 1 {
+                                        t.invalidate()
+                                    }
                                 }
                             }
                         }
