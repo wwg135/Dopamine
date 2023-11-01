@@ -525,6 +525,7 @@ struct JailbreakView: View {
                         }
                         .cornerRadius(16)
                         .frame(width: 320, height: 40)
+                        .background(Rectangle() .cornerRadius(16) .foregroundColor(.clear))
                         .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.5))
                         .overlay(
                             Text("\(Int(progressDouble * 100))%")
