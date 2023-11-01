@@ -523,7 +523,7 @@ struct JailbreakView: View {
                                 .frame(width: 320 * CGFloat(progressDouble), height: 40)
                                 .animation(.spring(), value: progressDouble)
                             GeometryReader { geometry in
-                                Image(systemName: "person.fill.running") // 替换为你的运动员跑步图标的名称
+                                Image(systemName: "figure.running") // 替换为你的运动员跑步图标的名称
                                     .resizable()
                                     .frame(width: 16, height: 16) // 调整运动员跑步图标的大小
                                     .offset(x: (320 * CGFloat(progressDouble)) - 320 / 2)
