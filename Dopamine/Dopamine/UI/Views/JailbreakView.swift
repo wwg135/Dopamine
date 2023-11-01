@@ -510,7 +510,7 @@ struct JailbreakView: View {
                         }
                         .cornerRadius(8)
                         .frame(maxWidth: 320, maxHeight: 40)
-                        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.5))
+                        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                     } else {
                         ZStack(alignment: .leading) {
                             Rectangle()
@@ -523,9 +523,12 @@ struct JailbreakView: View {
                                 .frame(width: 320 * CGFloat(progressDouble), height: 40)
                                 .animation(.spring(), value: progressDouble)
                         }
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.clear, lineWidth: 0)
+                                .background(MaterialView(.systemUltraThinMaterialDark).opacity(0.25))
+                        )
                         .frame(width: 320, height: 40)
-                        .background(RoundedRectangle(cornerRadius: 16))
-                        .background(MaterialView(.systemUltraThinMaterialDark).opacity(0.5))
                         .overlay(
                             Text("\(Int(progressDouble * 100))%")
                                 .foregroundColor(.black)
