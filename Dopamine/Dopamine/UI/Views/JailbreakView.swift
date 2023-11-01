@@ -512,20 +512,26 @@ struct JailbreakView: View {
                         .frame(maxWidth: 320, maxHeight: 32)
                         .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                     } else {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 20)
+                        ZStack(alignment: .leading) {
+                            Rectangle()
+                                .cornerRadius(16)
+                                .foregroundColor(.clear)
+                                .frame(width: 320, height: 40)
+                            Rectangle()
+                                .cornerRadius(16)
                                 .foregroundColor(Color.white)
-                                .frame(width: 320 * CGFloat(progressDouble), height: 32)
-                                .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
+                                .frame(width: 320 * CGFloat(progressDouble), height: 40)
                                 .animation(.spring(), value: progressDouble)
-                                .animation(.spring(), value: updateState)
+                        }
+                        .frame(width: 320, height: 40)
+                        .background(MaterialView(.systemUltraThinMaterialDark).opacity(0.25).cornerRadius(16))
+                        .overlay(
                             Text("\(Int(progressDouble * 100))%")
                                 .foregroundColor(.black)
                                 .font(.headline)
                                 .offset(x: (320 * CGFloat(progressDouble)) - 320 / 2)
                                 .animation(.spring(), value: progressDouble)
-                        }
-                        .frame(maxWidth: 320, maxHeight: 32)
+                        )
                         .onAppear {
                             if updateState == .downloading {
                                 Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
