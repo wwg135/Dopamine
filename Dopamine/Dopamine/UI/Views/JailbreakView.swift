@@ -508,8 +508,8 @@ struct JailbreakView: View {
                                 .foregroundColor(Color.white)
                                 .multilineTextAlignment(.center)
                         }
-                        .cornerRadius(8)
-                        .frame(maxWidth: 320, maxHeight: 32)
+                        .cornerRadius(16)
+                        .frame(maxWidth: 320, maxHeight: 40)
                         .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                     } else {
                         ZStack(alignment: .leading) {
