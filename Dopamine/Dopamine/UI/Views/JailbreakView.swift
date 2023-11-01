@@ -513,7 +513,7 @@ struct JailbreakView: View {
                         .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                     } else {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
+                            Capsule()
                                 .foregroundColor(Color.white)
                                 .frame(width: 320 * CGFloat(progressDouble), height: 32)
                                 .offset(x: (320 * CGFloat(progressDouble)) / 2 - 320 / 2)
