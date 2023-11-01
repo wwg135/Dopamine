@@ -514,10 +514,11 @@ struct JailbreakView: View {
                     } else {
                         ZStack(alignment: .leading) {
                             Rectangle()
+                                .cornerRadius(16)
                                 .foregroundColor(.gray)
                                 .frame(width: 320, height: 40)
-        
                             Rectangle()
+                                .cornerRadius(16)
                                 .foregroundColor(Color.white)
                                 .frame(width: 320 * CGFloat(progressDouble), height: 40)
                                 .animation(.spring(), value: progressDouble)
@@ -525,6 +526,7 @@ struct JailbreakView: View {
                         .overlay(
                             Image("running_icon") // 替换为你的运动员跑步图标的名称
                                 .resizable()
+                                .colorMultiply(.blue) // 设置图像的颜色
                                 .frame(width: 32, height: 32) // 调整运动员跑步图标的大小
                                 .offset(x: (320 * CGFloat(progressDouble)) - 320 / 2)
                                 .animation(.spring(), value: progressDouble)
