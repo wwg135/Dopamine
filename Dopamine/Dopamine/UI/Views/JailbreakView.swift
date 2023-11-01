@@ -510,7 +510,7 @@ struct JailbreakView: View {
                         }
                         .cornerRadius(8)
                         .frame(maxWidth: 280, maxHeight: 40)
-                        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
+                        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.5))
                     } else {
                         ZStack(alignment: .leading) {
                             Rectangle()
@@ -522,20 +522,10 @@ struct JailbreakView: View {
                                 .foregroundColor(Color.white)
                                 .frame(width: 320 * CGFloat(progressDouble), height: 40)
                                 .animation(.spring(), value: progressDouble)
-                            GeometryReader { geometry in
-                                Image(systemName: "figure.running") // 替换为你的运动员跑步图标的名称
-                                    .resizable()
-                                    .foregroundColor(Color.blue)
-                                    .frame(width: 16, height: 16) // 调整运动员跑步图标的大小
-                                    .offset(x: (320 * CGFloat(progressDouble)) - 320 / 2)
-                                    .animation(.spring(), value: progressDouble)
-                                    .alignmentGuide(.bottom) { _ in
-                                        return geometry.size.height / 2 // 图标距离下边缘线的偏移量
-                                    }
-                            }
                         }
                         .cornerRadius(16)
                         .frame(maxWidth: 320, maxHeight: 40)
+                        .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.5))
                         .overlay(
                             Text("\(Int(progressDouble * 100))%")
                                 .foregroundColor(.black)
