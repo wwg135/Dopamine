@@ -509,7 +509,7 @@ struct JailbreakView: View {
                                 .multilineTextAlignment(.center)
                         }
                         .cornerRadius(8)
-                        .frame(maxWidth: 280, maxHeight: 40)
+                        .frame(maxWidth: 320, maxHeight: 40)
                         .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.5))
                     } else {
                         ZStack(alignment: .leading) {
@@ -524,7 +524,7 @@ struct JailbreakView: View {
                                 .animation(.spring(), value: progressDouble)
                         }
                         .cornerRadius(16)
-                        .frame(maxWidth: 320, maxHeight: 40)
+                        .frame(width: 320, height: 40)
                         .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.5))
                         .overlay(
                             Text("\(Int(progressDouble * 100))%")
