@@ -512,26 +512,31 @@ struct JailbreakView: View {
                         .frame(maxWidth: 280, maxHeight: 40)
                         .background(MaterialView(.systemUltraThinMaterialDark) .opacity(0.25))
                     } else {
-                        ZStack {
+                        ZStack(alignment: .leading) {
+                            Rectangle()
+                                .foregroundColor(.gray)
+                                .frame(width: 320, height: 40)
+        
+                            Rectangle()
+                                .foregroundColor(Color.white)
+                                .frame(width: 320 * CGFloat(progressDouble), height: 40)
+                                .animation(.spring(), value: progressDouble)
+                        }
+                        .overlay(
                             Image("running_icon") // 替换为你的运动员跑步图标的名称
                                 .resizable()
                                 .frame(width: 32, height: 32) // 调整运动员跑步图标的大小
-                                .offset(x: (280 * CGFloat(progressDouble)) - 280 / 2)
+                                .offset(x: (320 * CGFloat(progressDouble)) - 320 / 2)
                                 .animation(.spring(), value: progressDouble)
-                            Capsule()
-                                .foregroundColor(Color.white)
-                                .frame(width: 280 * CGFloat(progressDouble), height: 40)
-                                .overlay(
-                                    Text("\(Int(progressDouble * 100))%")
-                                        .foregroundColor(.black)
-                                        .font(.headline)
-                                        .offset(x: (280 * CGFloat(progressDouble)) - 280 / 2)
-                                        .animation(.spring(), value: progressDouble)
-                                )
+                        )
+                        .frame(maxWidth: 320, maxHeight: 40)
+                        .overlay(
+                            Text("\(Int(progressDouble * 100))%")
+                                .foregroundColor(.black)
+                                .font(.headline)
+                                .offset(x: (320 * CGFloat(progressDouble)) - 320 / 2)
                                 .animation(.spring(), value: progressDouble)
-                                .animation(.spring(), value: updateState)
-                        }
-                        .frame(maxWidth: 280, maxHeight: 40)
+                        )
                         .onAppear {
                             if updateState == .downloading {
                                 Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
