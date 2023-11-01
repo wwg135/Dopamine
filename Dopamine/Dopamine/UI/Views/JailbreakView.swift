@@ -515,7 +515,7 @@ struct JailbreakView: View {
                         ZStack(alignment: .leading) {
                             Rectangle()
                                 .cornerRadius(16)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.clear)
                                 .frame(width: 320, height: 40)
                             Rectangle()
                                 .cornerRadius(16)
