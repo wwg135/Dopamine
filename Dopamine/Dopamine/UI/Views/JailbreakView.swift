@@ -515,10 +515,6 @@ struct JailbreakView: View {
                         ZStack(alignment: .leading) {
                             Rectangle()
                                 .cornerRadius(16)
-                                .foregroundColor(.clear)
-                                .frame(width: 320, height: 40)
-                            Rectangle()
-                                .cornerRadius(16)
                                 .foregroundColor(Color.white)
                                 .frame(width: 320 * CGFloat(progressDouble), height: 40)
                                 .animation(.spring(), value: progressDouble)
