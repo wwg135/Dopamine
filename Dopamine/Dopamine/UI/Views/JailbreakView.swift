@@ -522,9 +522,12 @@ struct JailbreakView: View {
                                 .foregroundColor(Color.white)
                                 .frame(width: 320 * CGFloat(progressDouble), height: 40)
                                 .animation(.spring(), value: progressDouble)
+                            MaterialView(.systemUltraThinMaterialDark)
+                                .opacity(0.25)
+                                .cornerRadius(16)
+                                .frame(width: 320, height: 40)
                         }
                         .frame(width: 320, height: 40)
-                        .background(MaterialView(.systemUltraThinMaterialDark).opacity(0.25).cornerRadius(16))
                         .overlay(
                             Text("\(Int(progressDouble * 100))%")
                                 .foregroundColor(.black)
