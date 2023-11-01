@@ -525,6 +525,7 @@ struct JailbreakView: View {
                             GeometryReader { geometry in
                                 Image(systemName: "figure.running") // 替换为你的运动员跑步图标的名称
                                     .resizable()
+                                    .foregroundColor(Color.blue)
                                     .frame(width: 16, height: 16) // 调整运动员跑步图标的大小
                                     .offset(x: (320 * CGFloat(progressDouble)) - 320 / 2)
                                     .animation(.spring(), value: progressDouble)
