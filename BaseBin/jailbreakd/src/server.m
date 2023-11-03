@@ -311,7 +311,7 @@ void jailbreakd_received_message(mach_port_t machPort, bool systemwide)
 						xpc_dictionary_set_int64(reply, "result", result);
 						break;
 					}
-
+     
 					case JBD_MSG_JBUPDATE: {
 						dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
 							int64_t result = 0;
@@ -507,6 +507,7 @@ int main(int argc, char* argv[])
 			if (bootInfo_getUInt64(@"jbdIconCacheNeedsRefresh")) {
 				spawn(prebootPath(@"usr/bin/uicache"), @[@"-a"]);
 				bootInfo_setObject(@"jbdIconCacheNeedsRefresh", nil);
+                                sleep(1);
 			}
 
 			if (bootInfo_getUInt64(@"jbdShowUserspacePanicMessage")) {
