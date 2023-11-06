@@ -18,7 +18,7 @@ concurrency:
 
 env:
   VERSION: '1.1.10'
-  BUNDLEID: 'cpm.wwg135.Dopamine'
+  BUNDLEID: 'com.wwg135.Dopamine'
  
 jobs:
   build:
