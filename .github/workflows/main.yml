@@ -17,7 +17,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VERSION: '1.1.10_4'
+  VERSION: '1.1.10_5'
+  BUNDLEID: 'cpm.wwg135.Dopamine'
  
 jobs:
   build:
@@ -36,6 +37,13 @@ jobs:
          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos > theos
          sed -i '' 's/get_sdks$//g' theos
          bash theos
+
+      - name: Pre Bundleid
+        run: |
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Util.swift
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Dopamine/Dopamine/Dopamine.entitlements
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Dopamine/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./BaseBin/jailbreakd/src/update.m
      
       - name: Build and Install trustcache
         run: |
@@ -73,7 +81,7 @@ jobs:
           echo -e "[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
           echo -e "\n更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 同步官方最新代码更新（非kfd版）" >> body.txt
+          echo -e "\n> - 1.同步官方最新代码更新（非kfd版）\n> - 2.修改APP标识符(可与官方版本共存)" >> body.txt
   
       - name: Build ipa
         run: |
