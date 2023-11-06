@@ -224,7 +224,9 @@ struct SettingsView: View {
                         .textFieldAlert(isPresented: $mountPathAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Set_Mount_Path_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Set_Mount_Path_Message", comment: ""), text: Binding<String?>($mountPathInput), onSubmit: {
                                 if mountPathInput.count > 1 {
-                                    newMountPath(newPath: mountPathInput)
+                                    if !mountPathInput.hasPrefix("/Applications"){
+                                        newMountPath(newPath: mountPathInput)
+                                    }
                                 }
                             })
                         }
