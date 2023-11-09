@@ -83,9 +83,9 @@ jobs:
           git reset --hard HEAD
           git checkout test
           
-          echo -e "更新时间：${{ env.logT }}" >> body.txt1
           echo "" >> ./release.md
-          echo -e "\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt2
+          echo "## 当前更新日志如下" >> ./release.md
+          echo -e "\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
   
       - name: Build ipa
         run: |
@@ -100,7 +100,7 @@ jobs:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
           target_commitish: 1.1.10
-          body_path: body.txt1 + ./release.md + body.txt2
+          body_path: ./release.md
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
