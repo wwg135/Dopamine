@@ -86,6 +86,12 @@ jobs:
           echo -e "\n" >> body.text
           echo "" >> ./release.md
           echo -e "\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" ./release.md
+
+      - name: Combine body files
+        run: |
+          cat body.text > combined_body.txt
+          echo "" >> combined_body.txt
+          cat ./release.md >> combined_body.txt
   
       - name: Build ipa
         run: |
@@ -100,9 +106,7 @@ jobs:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
           target_commitish: 1.1.10
-          body: |
-            $(cat body.text)
-            $(cat ./release.md)
+          body_path: combined_body.txt
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
