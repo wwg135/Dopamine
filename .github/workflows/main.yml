@@ -81,7 +81,7 @@ jobs:
         run: |
           set -x
           git reset --hard HEAD
-          git checkout test
+          git checkout 1.1.10
           echo -e "更新时间：${{ env.logT }}" >> body.text
           echo -e "\n" >> body.text
           echo "" >> ./release.md
