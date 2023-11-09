@@ -81,13 +81,13 @@ jobs:
           set -x
           git reset --hard HEAD
           git checkout 1.1.10_
-          echo -e "更新时间：${{ env.logT }}" >> body.text
+          echo -e "更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n**当前更新日志如下：**" >> body.txt
           echo -e "\n> - 修复更新日志显示问题" >> body.txt
-          echo -e "\n" >> body.text
+          echo -e "\n" >> body.txt
           echo "" >> ./release.md
           echo -e "\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> ./release.md
-          cat body.text > combined.txt
+          cat body.txt > combined.txt
           echo "" >> combined.txt
           cat ./release.md >> combined.txt
   
