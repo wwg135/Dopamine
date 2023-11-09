@@ -2,23 +2,23 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.10
+      - test
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - 1.1.10
+      - test
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
-
+  
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
+  
 permissions:
   contents: write
-
+  
 env:
   VERSION: '1.1.10'
   BUNDLEID: 'com.wwg135.Dopamine'
@@ -29,18 +29,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Install Procursus
         uses: wwg135/procursus-action@main
         with:
           packages: ldid findutils sed coreutils make
-
+          
       - name: Pre theos
         run: |
          curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos > theos
          sed -i '' 's/get_sdks$//g' theos
          bash theos
-
+         
       - name: Pre Bundleid
         run: |
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Util.swift
@@ -62,14 +61,14 @@ jobs:
           echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
           echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
           echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
-
+          
       - name: Print env
         run: |
           echo ${{ env.VERSION }}
           echo ${{ env.msT }}
           echo ${{ env.shT }}
           echo ${{ env.logT }}
-
+          
       - name: Pre code
         run: |
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
@@ -81,9 +80,17 @@ jobs:
         run: |
           set -x
           git reset --hard HEAD
-          git checkout 1.1.10
+          git checkout test
+          echo -e "更新时间：${{ env.logT }}" >> body.txt
+          echo -e "\n**当前更新日志如下：**" >> body.txt
+          echo -e "\n> - 修复更新日志显示问题" >> body.txt
+          echo -e "\n" >> body.txt
           echo "" >> ./release.md
           echo -e "\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> ./release.md
+          
+          cat body.txt > combined.txt
+          echo "" >> combined.txt
+          cat ./release.md >> combined.txt
   
       - name: Build ipa
         run: |
@@ -91,14 +98,14 @@ jobs:
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
           mv Dopamine/Dopamine.tipa Dopamine.ipa
-
+          
       - name: Release ipa
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.10
-          body_path: ./release.md
+          target_commitish: test
+          body_path: combined.txt
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
