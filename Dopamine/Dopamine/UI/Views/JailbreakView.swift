@@ -157,12 +157,14 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                        .font(.system(size: 16))
-                                        .multilineTextAlignment(.center)
-                                        .padding(.vertical)
-                                    if let range = updateChangelog?.range(of: "点击当前版本下载") {
-                                        updateChangelog?.replaceSubrange(range, with: "")
+                                    Group {
+                                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                            .font(.system(size: 16))
+                                            .multilineTextAlignment(.center)
+                                            .padding(.vertical)
+                                        if let range = updateChangelog?.range(of: "点击当前版本下载") {
+                                            updateChangelog?.replaceSubrange(range, with: "")
+                                        }
                                     }
                                 }
                                 .padding(.horizontal, 15)
