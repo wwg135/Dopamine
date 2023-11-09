@@ -163,7 +163,7 @@ struct JailbreakView: View {
                                         .padding(.vertical)
                                         .onAppear {
                                             if let range = updateChangelog?.range(of: "点击当前版本下载") {
-                                                updateChangelog?.replaceSubrange(range, with: "")
+                                                updateChangelog?.replaceSubrange(range, with: "\u{200B}")
                                                 updateChangelog = updateChangelog?.trimmingCharacters(in: .whitespacesAndNewlines)
                                             }
                                         }
