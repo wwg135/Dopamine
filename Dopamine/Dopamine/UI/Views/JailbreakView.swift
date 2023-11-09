@@ -157,15 +157,17 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    Group {
-                                        Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-                                            .font(.system(size: 16))
-                                            .multilineTextAlignment(.center)
-                                            .padding(.vertical)
-                                        if let range = updateChangelog?.range(of: "点击当前版本下载") {
-                                            updateChangelog?.replaceSubrange(range, with: "")
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                        .font(.system(size: 16))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical)
+                                        .onAppear {
+                                            if var updatedChangelog = updateChangelog {
+                                                let range = updatedChangelog.range(of: "点击当前版本下载")
+                                                updatedChangelog.replaceSubrange(range, with: "")
+                                                updateChangelog = updatedChangelog
+                                            }
                                         }
-                                    }
                                 }
                                 .padding(.horizontal, 15)
                             }
