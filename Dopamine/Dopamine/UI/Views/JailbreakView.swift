@@ -163,9 +163,10 @@ struct JailbreakView: View {
                                         .padding(.vertical)
                                         .onAppear {
                                             if var updatedChangelog = updateChangelog {
-                                                let range = updatedChangelog.range(of: "点击当前版本下载")
-                                                updatedChangelog.replaceSubrange(range, with: "")
-                                                updateChangelog = updatedChangelog
+                                                if let range = updatedChangelog.range(of: "点击当前版本下载") {
+                                                    updatedChangelog.replaceSubrange(range, with: "")
+                                                    updateChangelog = updatedChangelog
+                                                }
                                             }
                                         }
                                 }
