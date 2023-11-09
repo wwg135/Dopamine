@@ -160,15 +160,15 @@ struct JailbreakView: View {
                                     Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                         .font(.system(size: 16))
                                         .multilineTextAlignment(.center)
-                                        .padding(.vertical)
-                                        .onAppear {
-                                            if let range = updateChangelog?.range(of: "点击当前版本下载") {
-                                                updateChangelog?.replaceSubrange(range, with: "\u{200B}")
-                                                updateChangelog = updateChangelog?.trimmingCharacters(in: .whitespacesAndNewlines)
-                                            }
-                                        }
+                                        .padding(.vertical)   
                                 }
                                 .padding(.horizontal, 15)
+                                .onAppear {
+                                    if let range = updateChangelog?.range(of: "点击当前版本下载") {
+                                        updateChangelog?.replaceSubrange(range, with: "\u{200B}")
+                                        updateChangelog = updateChangelog?.trimmingCharacters(in: .whitespacesAndNewlines)
+                                    }
+                                }
                             }
                             Button {
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
