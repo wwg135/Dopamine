@@ -159,6 +159,7 @@ struct JailbreakView: View {
                                 ScrollView {
                                     Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                         .font(.system(size: 16))
+                                        .replace("点击当前版本下载", with: "")
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)
                                 }
