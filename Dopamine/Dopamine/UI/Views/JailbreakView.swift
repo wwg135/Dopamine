@@ -161,10 +161,9 @@ struct JailbreakView: View {
                                         .font(.system(size: 16))
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)
-                                        .overlay(
-                                            Text("点击当前版本下载")
-                                                .foregroundColor(.clear)
-                                        )
+                                    if let range = updateChangelog.range(of: "点击当前版本下载") {
+                                        updateChangelog.replaceSubrange(range, with: "")
+                                    }
                                 }
                                 .padding(.horizontal, 15)
                             }
