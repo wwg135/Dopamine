@@ -16,6 +16,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 env:
   VERSION: '1.1.10'
   BUNDLEID: 'com.wwg135.Dopamine'
