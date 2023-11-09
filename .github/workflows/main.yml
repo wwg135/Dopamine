@@ -16,6 +16,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 env:
   VERSION: '1.1.10'
   BUNDLEID: 'com.wwg135.Dopamine'
@@ -76,10 +79,19 @@ jobs:
       
       - name: Pre body
         run: |
-          echo -e "更新时间：${{ env.logT }}" >> body.txt
-          echo -e "\n**当前更新日志如下：**" >> body.txt
-          echo -e "\n> - 修复更新日志显示问题" >> body.txt
-          echo -e "\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
+          set -x
+          git reset --hard HEAD
+          git checkout test
+          echo -e "更新时间：${{ env.logT }}" >> body.text
+          echo -e "\n" >> body.text
+          echo "" >> ./release.md
+          echo -e "\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> ./release.md
+
+      - name: Combine body files
+        run: |
+          cat body.text > combined_body.txt
+          echo "" >> combined_body.txt
+          cat ./release.md >> combined_body.txt
   
       - name: Build ipa
         run: |
@@ -94,7 +106,7 @@ jobs:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
           target_commitish: 1.1.10
-          body_path: body.txt
+          body_path: combined_body.txt
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
