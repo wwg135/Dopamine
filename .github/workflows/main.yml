@@ -74,7 +74,7 @@ jobs:
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
       
-     - name: Pre body
+      - name: Pre body
         run: |
           echo -e "更新时间：${{ env.logT }}" >> body.txt
           echo -e "\n当前更新日志如下：" >> body.txt
