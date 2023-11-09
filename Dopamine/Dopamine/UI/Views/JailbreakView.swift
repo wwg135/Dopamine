@@ -162,11 +162,9 @@ struct JailbreakView: View {
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)
                                         .onAppear {
-                                            if var updatedChangelog = updateChangelog {
-                                                if let range = updatedChangelog.range(of: "点击当前版本下载") {
-                                                    updatedChangelog.replaceSubrange(range, with: "")
-                                                    updateChangelog = updatedChangelog
-                                                }
+                                            if let range = updateChangelog?.range(of: "点击当前版本下载") {
+                                                updateChangelog?.replaceSubrange(range, with: "")
+                                                updateChangelog = updateChangelog?.trimmingCharacters(in: .whitespacesAndNewlines)
                                             }
                                         }
                                 }
