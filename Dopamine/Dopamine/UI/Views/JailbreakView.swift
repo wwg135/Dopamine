@@ -157,7 +157,7 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog?.replacingOccurrences(of: "点击当前版本下载", with: "M哥修改版", options: .regularExpression)) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog?.replacingOccurrences(of: "点击当前版本下载", with: "", options: .regularExpression)) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                         .font(.system(size: 16))
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)   
