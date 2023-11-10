@@ -72,7 +72,7 @@ jobs:
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
-          sed -i '' "s/# M哥修改版的功能/\n# M哥修改版的功能/g" ./release.md
+          sed -i '' 's/# M哥修改版的功能/\n&/g' ./release.md
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
       
       - name: Pre body
