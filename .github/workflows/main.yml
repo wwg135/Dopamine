@@ -78,12 +78,15 @@ jobs:
       
       - name: Pre body
         run: |
+          set -x
           echo -e "更新时间：${{ env.logT }}" >> body.txt
-          echo -e "\n当前更新日志如下：" >> body.txt
-          echo -e "\n> - 修复更新日志显示问题" >> body.txt
-          echo -e "\n\nM哥修改版的功能：" >> body.txt
-          echo -e "\n> - 1.映射挂载+桥接心浪版本（应用内支持OTA单独升级版本，不接收非挂载版本升级）.\n> - 2.增加真皮底层屏蔽App越狱检测开关（首页点击“Dopamine”即显示/隐藏），感谢真皮大佬.\n> - 3.修改app标识符，可与官方版本共存.\n> - 4.增加重启、更新环境按钮（长按重启用户空间弹出），感谢liam0205大佬代码.\n> - 5.设置增加显示/隐藏式功能（点击设置里面的“成功率”，即可开启显示/隐藏）.\n> - 6.增加检查更新功能，以便开启/关闭OTA升级提示.\n> - 7.首页增加运行时间显示（点击首页开发者信息，即可显示/隐藏）.\n> - 8.增加自定义背景（首页长按背景即可，开关：从相册选择图片或者恢复默认）.\n> - 9.改变下载进度条，添加到首页下方.\n> - 10.设置增加“一键备份”功能，点击有详细说明。\n> - 11.增加“清除越狱”提示，避免越狱状态下清除越狱出现未知问题.\n> - 12.增加“映射挂载”功能，越狱前点击设置中的成功率显示、隐藏打开开关，越狱后显示.\n> - 13.增加“桥接心浪”功能，以便以 XinA 的模式安装有根插件，感谢liam0205大佬代码.\n> - 14.其他优化及新功能开发中，敬请期待..." >> body.txt
-          echo -e "\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> body.txt
+          echo -e "\n" >> body.txt
+          echo "" >> ./release.md
+          echo -e "\n[点击当前版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> ./release.md
+
+          cat body.txt > release.txt
+          echo "" >> release.txt
+          cat ./release.md >> release.txt
   
       - name: Build ipa`  
         run: |
@@ -98,7 +101,7 @@ jobs:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
           target_commitish: 1.1.10_
-          body_path: body.txt
+          body_path: release.txt
           latest: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
