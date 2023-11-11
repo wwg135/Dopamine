@@ -50,7 +50,7 @@ struct AboutView: View {
                     .padding(.horizontal, 32)
                 }
                 Button(action: {
-                    openURL(URL(string: "https://github.com/opa334/Dopamine/LICENSE.md")!)
+                    openURL(URL(string: "https://github.com/opa334/Dopamine/blob/main/LICENSE.md")!)
                 }) {
                     HStack {
                         Spacer()
@@ -132,19 +132,19 @@ struct AboutView: View {
                 if !easterEgg {
                     Text("Credits_Footer_Dopamine_Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")\nOS:\(ProcessInfo.processInfo.operatingSystemVersionString)")
                 } else {
-                    Text(verbatim: "Wait, it's all Evyrest?\nAlways has been.")
+                    Text(verbatim: "不要为了越狱放弃升级的乐趣！！！")
                 }
             }
             .fixedSize()
             .font(.footnote)
-            .opacity(0.6)
-            .onTapGesture(count: 5) {
+            .opacity(1)
+            .onTapGesture(count: 1) {
                 easterEgg.toggle()
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
             }
         }
         .foregroundColor(.white)
         .multilineTextAlignment(.center)
-//        .frame(maxHeight: 600)
     }
 }
 
