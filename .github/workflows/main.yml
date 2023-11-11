@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1
+      - 1.1.10_kfd
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - 1.1
+      - 1.1.10_kfd
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -98,9 +98,9 @@ jobs:
       - name: Release ipa
         uses: softprops/action-gh-release@v1
         with:
-          name: 1.1.10_kfd
+          name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.10
+          target_commitish: 1.1.10_kfd
           body_path: release.txt
           prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
