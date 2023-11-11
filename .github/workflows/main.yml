@@ -96,7 +96,7 @@ jobs:
       - name: Release ipa
         uses: softprops/action-gh-release@v1
         with:
-          name: ${{ env.VERSION }}
+          name: 1.1.10_kfd
           tag_name: ${{ env.msT }}
           target_commitish: 1.1.10
           body_path: release.txt
