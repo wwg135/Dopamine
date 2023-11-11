@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - main
+      - 1.1
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - main
+      - 1.1
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VERSION: '1.1.10'
+  VERSION: '1.1.10_kfd'
   BUNDLEID: 'com.wwg135.Dopamine'
  
 jobs:
@@ -72,6 +72,8 @@ jobs:
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/BBB/${{ env.VERSION }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Fugu15.swift
           sed -i '' "s/# M哥修改版的功能/\n# M哥修改版的功能/g" ./release.md
           sudo security import Exploits/fastPath/arm.pfx -k /Library/Keychains/System.keychain -P password -A
       
