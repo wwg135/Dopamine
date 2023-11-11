@@ -27,6 +27,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Checkout kfd
+        uses: actions/checkout@main
+        with:
+          repository: opa334/kfd
+          path: Exploits/oobPCI/Sources/kfd
+
       - name: Install Procursus
         uses: wwg135/procursus-action@main
         with:
