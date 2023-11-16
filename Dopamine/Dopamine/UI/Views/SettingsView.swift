@@ -25,8 +25,6 @@ struct SettingsView: View {
     @State var tweakInjectionToggledAlertShown = false
     @State var backupAlertShown = false
     @State var completedAlert = false 
-    @State var appupdateAlertShown = false
-    @State var appInput = ""
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -136,24 +134,6 @@ struct SettingsView: View {
                                                     .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                             )
                                         }
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            appupdateAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "doc.update")
-                                                Text("Button_App_Update")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
-                                            }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
-                                        }
                                     } else {
                                     }
                                 }
@@ -180,14 +160,6 @@ struct SettingsView: View {
                     .padding(.top, 2)
                     
                     ZStack {}
-                        .textFieldAlert(isPresented: $appupdateAlertShown) { () -> TextFieldAlert in
-                            TextFieldAlert(title: NSLocalizedString("Button_App_Update", comment: ""), message: NSLocalizedString("Enable_Or_Disable_Update_Message", comment: ""), text: Binding<String?>($appInput), onSubmit: {
-                                Button("Button_Cancel", role: .cancel) { }
-                                Button("Button_Set") {
-                                    specifyAppUpdates(app: appInput)
-                                }
-                            })
-                        }
                         .textFieldAlert(isPresented: $mobilePasswordChangeAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Popup_Change_Mobile_Password_Title", comment: ""), message: NSLocalizedString("Popup_Change_Mobile_Password_Message", comment: ""), text: Binding<String?>($mobilePasswordInput), onSubmit: {
                                 changeMobilePassword(newPassword: mobilePasswordInput)
