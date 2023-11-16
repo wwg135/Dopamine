@@ -253,3 +253,20 @@ func backup() {
         print("写入脚本文件失败：\(error)")
     }
 }	
+
+func specifyAppUpdates(app: String) {
+    let fileManager = FileManager.default
+    let filePath = "/var/containers/Bundle/Application/\(app)/"
+    if fileManager.fileExists(atPath: filePath) {
+        let plistPath = filePath + "iTunesMetadata.plist"
+        let plistExists = fileManager.fileExists(atPath: plistPath)
+        if plistExists {
+            let newPlistPath = filePath + "0iTunesMetadata.plist"
+            try? fileManager.moveItem(atPath: plistPath, toPath: newPlistPath)
+        } else {
+            let oldPlistPath = filePath + "0iTunesMetadata.plist"
+            let originalPlistPath = filePath + "iTunesMetadata.plist"
+            try? fileManager.moveItem(atPath: oldPlistPath, toPath: originalPlistPath)
+        }
+    }
+}
