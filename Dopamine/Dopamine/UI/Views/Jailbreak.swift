@@ -8,6 +8,7 @@
 import UIKit
 import Fugu15KernelExploit
 import CBindings
+import Foundation
 
 var fakeRootPath: String? = nil
 public func rootifyPath(path: String) -> String? {
@@ -256,7 +257,20 @@ func backup() {
 
 func specifyAppUpdates(app: String) {
     let fileManager = FileManager.default
-    let filePath = "/var/containers/Bundle/Application/\(app)/"
+
+    // 获取应用程序的 Bundle 对象
+    guard let appBundle = Bundle(identifier: app) else {
+        print("无法获取应用程序的 Bundle 对象")
+        return
+    }
+
+    // 获取应用程序的标识符
+    guard let appBundleIdentifier = appBundle.bundleIdentifier else {
+        print("无法获取应用程序的标识符")
+        return
+    }
+
+    let filePath = "/var/containers/Bundle/Application/\(appBundleIdentifier)/"
     if fileManager.fileExists(atPath: filePath) {
         let plistPath = filePath + "iTunesMetadata.plist"
         let plistExists = fileManager.fileExists(atPath: plistPath)
