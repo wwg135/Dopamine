@@ -157,7 +157,3 @@
 "Settings_Backup_Alert_Title" = "一键备份";
 
 "Settings_One-click_Backup" = "说明：1.请先使用“DEB备份”app先一键备份插件；\n2.再点击这里的一键备份，确定即可; \n3.清除越狱后，重新越狱进去：/var/mobile/备份恢复/，点击“一键恢复插件及配置.sh”运行，运行前请务必禁止Filza注入插件";
-
-"Button_App_Update" = "禁止Appstore指定App更新";
-
-"Enable_Or_Disable_Update_Message" = "禁止苹果商店的app应用更新，不影响app应用内更新，操作说明：输入要禁止的App名字点“确定”---进入“TrollStore”巨魔商店刷新图标缓存--最后重启用户空间（苹果应用商店已不显示）。若要恢复更新输入app名字点击“确定”，后续操作一样";
