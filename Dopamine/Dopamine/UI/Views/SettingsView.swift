@@ -184,7 +184,7 @@ struct SettingsView: View {
                             TextFieldAlert(title: NSLocalizedString("Button_App_Update", comment: ""), message: NSLocalizedString("Enable_Or_Disable_Update_Message", comment: ""), text: Binding<String?>($appInput), onSubmit: {
                                 Button("Button_Cancel", role: .cancel) { }
                                 Button("Button_Set") {
-                                    specifyappupdates(app: appInput)
+                                    specifyAppUpdates(app: appInput)
                                 }
                             })
                         }
