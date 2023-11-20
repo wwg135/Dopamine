@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.10_
+      - 1.1.11_Mount
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - 1.1.10_
+      - 1.1.11_Mount
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VERSION: '1.1.10_5'
+  VERSION: '1.1.11_Mount'
   BUNDLEID: 'com.wwg135.Dopamine'
  
 jobs:
@@ -101,7 +101,7 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.msT }}
-          target_commitish: 1.1.10_
+          target_commitish: 1.1.11_Mount
           body_path: release.txt
           latest: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
