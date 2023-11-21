@@ -150,6 +150,8 @@
 
 "Jailbroken currently, please reboot the device." = "当前为越狱状态，请重启设备后再清除越狱。确定重启吗？";
 
+"Option_Select_Custom_App" = "选择app屏蔽越狱检测";
+
 "Button_Backup" = "  一键备份";
 
 "Settings_Backup_Alert_Title" = "一键备份";
