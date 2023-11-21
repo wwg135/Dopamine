@@ -58,6 +58,12 @@ struct JailbreakView: View {
     @State var showDownloadPage = false
     @State var showLogView = false
     @State var versionRegex = try! NSRegularExpression(pattern: "^[12]\\.[0-9]\\.([0-9]{0,2}|\\s)_kfd$")
+    @State var appNames: [(String, String)] = []
+    @State var selectedNames: [String] = []
+    @State var deletedNames: [String] = []
+    @State var MaskDetection = false
+    @State var searchText = ""
+    @Environment(\.colorScheme) var colorScheme
     @State var backgroundImage: UIImage?
     @State var isShowingPicker = false
     
@@ -204,6 +210,124 @@ struct JailbreakView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: 280, maxHeight: 420)
                 }
+
+                if MaskDetection {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .zIndex(1)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(true)
+                            .onTapGesture {
+                                MaskDetection = false
+                            }
+                    }
+                    .ignoresSafeArea()
+                    ZStack {
+                        VStack {
+                            VStack{
+                                Text("Option_Select_Custom_App")
+                                    .font(.system(size: 18))
+                                    .minimumScaleFactor(0.5)
+                                    .multilineTextAlignment(.center)
+                                Divider()
+                                    .background(.white)
+                                    .padding(.horizontal, 25)
+                                ScrollView {
+                                    VStack(alignment: .leading) {
+                                        TextField("🔍搜索一下", text: $searchText)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
+                                            .foregroundColor(colorScheme == .dark ? .white : .black)
+                                        ForEach(appNames.sorted { (app1, app2) in
+                                            let isSelected1 = selectedNames.contains(app1.1)
+                                            let isSelected2 = selectedNames.contains(app2.1)
+                                            if isSelected1 && !isSelected2 {
+                                                return true
+                                            } else if !isSelected1 && isSelected2 {
+                                                return false
+                                            } else {
+                                                let localizedNameComparison = app1.0.localizedCompare(app2.0)
+                                                if localizedNameComparison == .orderedSame {
+                                                    return app1.0 < app2.0
+                                                } else {
+                                                    return localizedNameComparison == .orderedAscending
+                                                }
+                                            }
+                                        }, id: \.1) { (localizedAppName, name) in
+                                            if searchText.isEmpty || localizedAppName.localizedCaseInsensitiveContains(searchText) {
+                                                HStack {
+                                                    Text("\(localizedAppName)")
+                                                        .font(.system(size: 16))
+                                                        .padding(.vertical, 5)
+                                                    Spacer()
+                                                    let isSelected = selectedNames.contains(name)
+                                                    let isDeleted = deletedNames.contains(name)
+                                                    Toggle(isOn: Binding(
+                                                        get: {
+                                                            return isSelected
+                                                        },
+                                                        set: { newValue in
+                                                            withAnimation {
+                                                                if newValue {
+                                                                    if isDeleted {
+                                                                        deletedNames.removeAll(where: { $0 == name })
+                                                                    }
+                                                                    selectedNames.append(name)
+                                                                    ForbidApp(name)
+                                                                    dopamineDefaults().set(true, forKey: name)
+                                                                } else {
+                                                                    if isSelected {
+                                                                        selectedNames.removeAll(where: { $0 == name })
+                                                                    }
+                                                                    deletedNames.append(name)
+                                                                    removeApp(name)
+                                                                    dopamineDefaults().set(false, forKey: name)
+                                                                }
+                                                                dopamineDefaults().synchronize()
+                                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                            }
+                                                        }
+                                                    )) {
+                                                        EmptyView()
+                                                    }
+                                                    .padding(.trailing, 10)
+                                                    .onAppear {
+                                                        if let savedState = dopamineDefaults().object(forKey: name) as? Bool {
+                                                            if savedState {
+                                                                selectedNames.append(name)
+                                                                ForbidApp(name)
+                                                            } else {
+                                                                deletedNames.append(name)
+                                                                removeApp(name)
+                                                            }
+                                                        } else {
+                                                            deletedNames.append(name)
+                                                            removeApp(name)
+                                                            dopamineDefaults().set(false, forKey: name)
+                                                        }
+                                                        dopamineDefaults().synchronize()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .opacity(1)
+                                .frame(maxWidth: 250, maxHeight: 300)
+                            }
+                        }
+                        .padding(.vertical)
+                        .background(Color.black.opacity(0.25))
+                        .animation(.spring(), value: updateAvailable)
+                        .background(MaterialView(.systemUltraThinMaterialDark))
+                    }
+                    .zIndex(2)
+                    .cornerRadius(16)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 280, maxHeight: 420)
+                }
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
@@ -241,6 +365,7 @@ struct JailbreakView: View {
             }
             DispatchQueue.global(qos: .userInitiated).async {
                 loadImage()
+                appNames = getThirdPartyAppNames()
                 Task {
                     do {
                         try await checkForUpdates()
@@ -258,11 +383,20 @@ struct JailbreakView: View {
         let tint = Color.white
         HStack {
             VStack(alignment: .leading) {
-                Image("DopamineLogo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: 200)
-                    .padding(.top)
+                Group {
+                    Image("DopamineLogo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 200)
+                        .padding(.top)
+                }
+                .onTapGesture(count: 1) {
+                    if isJailbroken() {
+                        MaskDetection.toggle()
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    }
+                }
+                .disabled(!isJailbroken())
 
                 Group {
                     Text("Title_Supported_iOS_Versions")
@@ -273,13 +407,13 @@ struct JailbreakView: View {
                         .foregroundColor(tint.opacity(0.5))
                 }
                 .onTapGesture(count: 1) {
-                    if !(updateAvailable || showDownloadPage || showLogView) {
+                    if !(updateAvailable || showDownloadPage || showLogView || MaskDetection) {
                         showTexts.toggle()
                         dopamineDefaults().set(showTexts, forKey: "showTexts")
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
                 }
-                .disabled(updateAvailable || showDownloadPage || showLogView)
+                .disabled(updateAvailable || showDownloadPage || showLogView || MaskDetection)
                 
                 Text(showTexts ? "AAA : AAB" : "")
                     .font(.subheadline)
@@ -348,7 +482,7 @@ struct JailbreakView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(!option.showUnjailbroken && !isJailbroken())
-                .disabled(updateAvailable || showDownloadPage || showLogView)
+                .disabled(updateAvailable || showDownloadPage || showLogView || MaskDetection)
                                   
                 if menuOptions.last != option {
                 }
@@ -679,6 +813,65 @@ struct JailbreakView: View {
         }
     }
 
+    func getThirdPartyAppNames() -> [(String, String)] {
+        var names: [(String, String)] = []
+        var uniqueNames: Set<String> = []
+        if let workspace = NSClassFromString("LSApplicationWorkspace") as? NSObject.Type {
+            let selector = NSSelectorFromString("defaultWorkspace")
+            let workspaceInstance = workspace.perform(selector)?.takeUnretainedValue()
+            if let apps = workspaceInstance?.perform(NSSelectorFromString("allApplications"))?.takeUnretainedValue() as? [NSObject] {
+                for app in apps {
+                    if let bundleURL = app.perform(NSSelectorFromString("bundleURL"))?.takeUnretainedValue() as? URL {
+                        let name = bundleURL.lastPathComponent.replacingOccurrences(of: ".app", with: "")
+                        let localizedAppName = (app.perform(NSSelectorFromString("localizedName"))?.takeUnretainedValue() as? String) ?? ""
+
+                        // Check if localizedAppName or name is already in uniqueNames set
+                        if !uniqueNames.contains(localizedAppName) && !uniqueNames.contains(name) {
+                            names.append((localizedAppName, name))
+                            uniqueNames.insert(localizedAppName)
+                            uniqueNames.insert(name)
+                        }
+                    }
+                }
+            }
+        }
+        return names
+    }
+
+    func ForbidApp(_ name: String) {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if !fileManager.fileExists(atPath: filePath) {
+            fileManager.createFile(atPath: filePath, contents: nil, attributes: nil)
+        }
+        if let dict = NSMutableDictionary(contentsOfFile: filePath) {
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
+        } else {
+            let dict = NSMutableDictionary()
+            dict[name] = true
+            dict.write(toFile: filePath, atomically: true)
+        }
+    }
+
+    func removeApp(_ name: String) {
+        let fileManager = FileManager.default
+        let filePath = "/var/mobile/zp.unject.plist"
+        if fileManager.fileExists(atPath: filePath),
+        let dict = NSMutableDictionary(contentsOfFile: filePath) {
+            dict.removeObject(forKey: name)
+            if dict.count == 0 {
+                do {
+                    try fileManager.removeItem(atPath: filePath)
+                } catch {
+                    print("Failed to remove file: \(error)")
+                }
+            } else {
+                dict.write(toFile: filePath, atomically: true)
+            }
+        }
+    }
+    
     func extractDownloadURL(from text: String, targetText: String) -> URL? {
         let pattern = "\\[.*?\\]\\((.*?)\\)"
         let regex = try! NSRegularExpression(pattern: pattern, options: [])
