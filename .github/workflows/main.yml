@@ -22,6 +22,7 @@ permissions:
 env:
   VERSION: '1.1.11'
   VERSION_kfd: '1.1.11_kfd'
+  VERSION_mount: '1.1.11_mount'
   BUNDLEID: 'com.wwg135.Dopamine'
  
 jobs:
@@ -71,6 +72,7 @@ jobs:
         run: |
           echo ${{ env.VERSION }}
           echo ${{ env.VERSION_kfd }}
+          echo ${{ env.VERSION_mount }}
           echo ${{ env.msT }}
           echo ${{ env.shT }}
           echo ${{ env.logT }}
@@ -110,6 +112,27 @@ jobs:
           gmake -j$(sysctl -n hw.physicalcpu)
           mv Dopamine/Dopamine.tipa KFDDopamine.ipa
 
+      - name: Build mount
+        run: |
+          git reset --hard HEAD
+          git checkout 1.1.11_mount
+          git submodule update --init --remote --recursive
+
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Util.swift
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Dopamine/Dopamine/Dopamine.entitlements
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Dopamine/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./BaseBin/jailbreakd/src/update.m
+          
+          sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION_mount }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/BBB/${{ env.VERSION_mount }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Fugu15.swift
+
+          export THEOS=$HOME/theos
+          gmake -j$(sysctl -n hw.physicalcpu)
+          mv Dopamine/Dopamine.tipa Dopamine_mount.ipa
+
       - name: Release Logs
         run: |
           set -x
@@ -119,6 +142,7 @@ jobs:
           echo "" >> ./release.md
           echo -e "\n[点击普通版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> ./release.md
           echo -e "\n[点击KFD版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/KFDDopamine.ipa)" >> ./release.md
+          echo -e "\n[点击挂载版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine_mount.ipa)" >> ./release.md
 
           cat body.txt > release.txt
           echo "" >> release.txt
