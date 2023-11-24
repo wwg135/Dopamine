@@ -113,7 +113,7 @@ jobs:
           echo -e "更新时间：${{ env.logT }}" >> body.txt
           echo "" >> ./release.md
           echo -e "\n[点击普通版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> ./release.md
-          echo -e "\n[点击KFD版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/KFDDopamine.kfd.ipa)" >> ./release.md
+          echo -e "\n[点击KFD版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/KFDDopamine.ipa)" >> ./release.md
 
           cat body.txt > release.txt
           echo "" >> release.txt
