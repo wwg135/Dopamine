@@ -99,7 +99,7 @@ NSString *trollStoreRootHelperPath(void)
 
 int basebinUpdateFromTar(NSString *basebinPath, bool rebootWhenDone)
 {
-	LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:@"com.opa334.Dopamine"];
+	LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:@"com.wwg135.Dopamine"];
 	if (appProxy) {
 		NSString *executablePath = [appProxy.bundleURL.path stringByAppendingPathComponent:appProxy.bundleExecutable];
 		if (executablePath) {
@@ -191,7 +191,7 @@ int jbUpdateFromTIPA(NSString *tipaPath, bool rebootWhenDone)
 	int installRet = spawn(tsRootHelperPath, @[@"install", tipaPath]);
 	if (installRet != 0) return 2;
 
-	LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:@"com.opa334.Dopamine"];
+	LSApplicationProxy *appProxy = [LSApplicationProxy applicationProxyForIdentifier:@"com.wwg135.Dopamine"];
 	int bbRet = basebinUpdateFromTar([appProxy.bundleURL.path stringByAppendingPathComponent:@"basebin.tar"], rebootWhenDone);
 	if (bbRet != 0) return 2 + bbRet;
 	return 0;
