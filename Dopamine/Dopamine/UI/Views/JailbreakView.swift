@@ -176,10 +176,10 @@ struct JailbreakView: View {
                                         }
                                     } else {
                                         updateState = .downloading
-                                        if let downloadURL = extractDownloadURL(from: updateChangelog!, targetText: "点击普通版本下载") {
+                                        if let normalDownloadURL = extractDownloadURL(from: updateChangelog!, targetText: "点击普通版本下载") {
                                             Task {
                                                 do {
-                                                    try await downloadUpdateAndInstall(downloadURL)
+                                                    try await downloadUpdateAndInstall(normalDownloadURL)
                                                     updateState = .updating
                                                 } catch {
                                                     showLogView = true
@@ -769,11 +769,11 @@ struct JailbreakView: View {
         }
     }
 
-    func downloadUpdateAndInstall(_ downloadURL: URL) async throws {
+    func downloadUpdateAndInstall(_ normalDownloadURL: URL) async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             downloadProgress.totalUnitCount = 1
             group.addTask {
-                let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
+                let (url, _) = try await URLSession.shared.download(from: normalDownloadURL, progress: downloadProgress)
                 if isJailbroken() {
                     update(tipaURL: url)
                 } else {
