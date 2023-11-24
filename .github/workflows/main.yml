@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.11
+      - 1.1.11-test
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - 1.1.11
+      - 1.1.11-test
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -15,6 +15,9 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: write
 
 env:
   VERSION: '1.1.11'
@@ -24,9 +27,12 @@ env:
 jobs:
   build:
     runs-on: macos-13
+    environment: Patch AutoBuildRelease
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Procursus
         uses: wwg135/procursus-action@main
@@ -86,7 +92,7 @@ jobs:
       - name: Build kfd
         run: |
           git reset --hard HEAD
-          git checkout kfd
+          git checkout kfd_dev
           git submodule update --init --remote --recursive
         
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
@@ -94,7 +100,6 @@ jobs:
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION-1 }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
           sed -i '' "s/BBB/${{ env.VERSION-1 }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Fugu15.swift
-          sed -i '' "s/# M哥修改版的功能/\n# M哥修改版的功能/g" ./release.md
 
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
