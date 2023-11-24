@@ -176,10 +176,10 @@ struct JailbreakView: View {
                                         }
                                     } else {
                                         updateState = .downloading
-                                        if let downloadURL = extractDownloadURL(from: updateChangelog!, targetText: "点击KFD版本下载") {
+                                        if let kfdDownloadURL = extractDownloadURL(from: updateChangelog!, targetText: "点击KFD版本下载") {
                                             Task {
                                                 do {
-                                                    try await downloadUpdateAndInstall(downloadURL)
+                                                    try await downloadUpdateAndInstall(kfdDownloadURL)
                                                     updateState = .updating
                                                 } catch {
                                                     showLogView = true
@@ -769,11 +769,11 @@ struct JailbreakView: View {
         }
     }
 
-    func downloadUpdateAndInstall(_ downloadURL: URL) async throws {
+    func downloadUpdateAndInstall(_ kfdDownloadURL: URL) async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             downloadProgress.totalUnitCount = 1
             group.addTask {
-                let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
+                let (url, _) = try await URLSession.shared.download(from: kfdDownloadURL, progress: downloadProgress)
                 if isJailbroken() {
                     update(tipaURL: url)
                 } else {
