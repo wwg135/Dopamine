@@ -94,7 +94,12 @@ jobs:
           git reset --hard HEAD
           git checkout 1.1.11_kfd
           git submodule update --init --remote --recursive
-        
+
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Util.swift
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Dopamine/Dopamine/Dopamine.entitlements
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Dopamine/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./BaseBin/jailbreakd/src/update.m
+          
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
