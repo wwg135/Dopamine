@@ -115,6 +115,7 @@ jobs:
       - name: Build mount
         run: |
           git reset --hard HEAD
+          git clean -fd
           git checkout 1.1.11_mount
 
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Util.swift
