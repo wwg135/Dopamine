@@ -57,7 +57,7 @@ struct JailbreakView: View {
     var downloadProgress = Progress()
     @State var showDownloadPage = false
     @State var showLogView = false
-    @State var versionRegex = try! NSRegularExpression(pattern: "^[12]\\.[0-9]\\.([0-9]{0,2}|\\s)_Mount$")
+    @State var versionRegex = try! NSRegularExpression(pattern: "^[12]\\.[0-9]\\.([0-9]{0,2}|\\s)$")
     @State var appNames: [(String, String)] = []
     @State var selectedNames: [String] = []
     @State var deletedNames: [String] = []
@@ -157,7 +157,7 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog?.replacingOccurrences(of: "点击当前版本下载", with: "", options: .regularExpression)) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog?.replacingOccurrences(of: "(点击普通版本下载|点击KFD版本下载|点击挂载版本下载)", with: "", options: .regularExpression)) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                         .font(.system(size: 16))
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)   
@@ -176,10 +176,10 @@ struct JailbreakView: View {
                                         }
                                     } else {
                                         updateState = .downloading
-                                        if let downloadURL = extractDownloadURL(from: updateChangelog!, targetText: "点击当前版本下载") {
+                                        if let mountDownloadURL = extractDownloadURL(from: updateChangelog!, targetText: "点击挂载版本下载") {
                                             Task {
                                                 do {
-                                                    try await downloadUpdateAndInstall(downloadURL)
+                                                    try await downloadUpdateAndInstall(mountDownloadURL)
                                                     updateState = .updating
                                                 } catch {
                                                     showLogView = true
@@ -769,11 +769,11 @@ struct JailbreakView: View {
         }
     }
 
-    func downloadUpdateAndInstall(_ downloadURL: URL) async throws {
+    func downloadUpdateAndInstall(_ mountDownloadURL: URL) async throws {
         try await withThrowingTaskGroup(of: Void.self) { group in
             downloadProgress.totalUnitCount = 1
             group.addTask {
-                let (url, _) = try await URLSession.shared.download(from: downloadURL, progress: downloadProgress)
+                let (url, _) = try await URLSession.shared.download(from: mountDownloadURL, progress: downloadProgress)
                 if isJailbroken() {
                     update(tipaURL: url)
                 } else {
@@ -873,11 +873,15 @@ struct JailbreakView: View {
     }
 
     func extractDownloadURL(from text: String, targetText: String) -> URL? {
-        let pattern = "\\[.*?\\]\\((.*?)\\)"
+        let pattern = "\\[(.*?)\\]\\((.*?)\\)"
         let regex = try! NSRegularExpression(pattern: pattern, options: [])
         let range = NSRange(location: 0, length: text.utf16.count)
-        if let match = regex.firstMatch(in: text, options: [], range: range) {
-            let urlRange = match.range(at: 1)
+        if let match = regex.matches(in: text, options: [], range: range).first(where: { (result) -> Bool in
+            let linkRange = result.range(at: 1)
+            let linkText = (text as NSString).substring(with: linkRange)
+            return linkText.contains(targetText)
+        }) {
+            let urlRange = match.range(at: 2)
             if let url = URL(string: (text as NSString).substring(with: urlRange)) {
                 return url
             }
