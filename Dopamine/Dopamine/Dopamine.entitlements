@@ -73,7 +73,7 @@
 	<true/>
 	<key>com.apple.security.exception.shared-preference.read-write</key>
 	<array>
-		<string>com.opa334.Dopamine</string>
+		<string>com.wwg135.Dopamine</string>
 	</array>
 </dict>
 </plist>
