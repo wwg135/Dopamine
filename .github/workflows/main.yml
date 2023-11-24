@@ -70,7 +70,7 @@ jobs:
       - name: Print env
         run: |
           echo ${{ env.VERSION }}
-          echo ${{ env.VERSION-1 }}
+          echo ${{ env.VERSION_kfd }}
           echo ${{ env.msT }}
           echo ${{ env.shT }}
           echo ${{ env.logT }}
