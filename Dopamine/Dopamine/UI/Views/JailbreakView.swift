@@ -878,7 +878,8 @@ struct JailbreakView: View {
         let range = NSRange(location: 0, length: text.utf16.count)
         if let match = regex.firstMatch(in: text, options: [], range: range) {
             let urlRange = match.range(at: 1)
-            if let url = URL(string: (text as NSString).substring(with: urlRange)) {
+            let matchedText = (text as NSString).substring(with: urlRange)
+            if matchedText.contains(targetText), let url = URL(string: matchedText) {
                 return url
             }
         }
