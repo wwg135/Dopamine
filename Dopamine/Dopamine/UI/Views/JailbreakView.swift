@@ -873,13 +873,13 @@ struct JailbreakView: View {
     }
     
     func extractDownloadURL(from text: String, targetText: String) -> URL? {
-        let pattern = "\\[(.*?)\\]\\((.*?)\\)" // 修改了正则表达式的模式
+        let pattern = "\\[(.*?)\\]\\((.*?)\\)"
         let regex = try! NSRegularExpression(pattern: pattern, options: [])
         let range = NSRange(location: 0, length: text.utf16.count)
         if let match = regex.matches(in: text, options: [], range: range).first(where: { (result) -> Bool in
             let linkRange = result.range(at: 1)
             let linkText = (text as NSString).substring(with: linkRange)
-            return linkText.contains(targetText) // 修改了匹配条件
+            return linkText.contains(targetText)
         }) {
             let urlRange = match.range(at: 2)
             if let url = URL(string: (text as NSString).substring(with: urlRange)) {
