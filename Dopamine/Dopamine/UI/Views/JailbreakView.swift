@@ -873,7 +873,7 @@ struct JailbreakView: View {
     }
     
     func extractDownloadURL(from text: String, targetText: String) -> URL? {
-        let pattern = "\\(\\[(.*?)\\]\\((.*?)\\)\\)"
+        let pattern = "\\[(.*?)\\]\\((.*?)\\)"
         let regex = try! NSRegularExpression(pattern: pattern, options: [])
         let range = NSRange(location: 0, length: text.utf16.count)
         if let match = regex.firstMatch(in: text, options: [], range: range) {
@@ -881,7 +881,7 @@ struct JailbreakView: View {
             if let url = URL(string: (text as NSString).substring(with: urlRange)) {
                 return url
             }
-        }
+        } 
         return nil
     }
     
