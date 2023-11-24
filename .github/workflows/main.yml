@@ -116,7 +116,6 @@ jobs:
         run: |
           git reset --hard HEAD
           git checkout 1.1.11_mount
-          git submodule update --init --remote --recursive
 
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Util.swift
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Dopamine/Dopamine/Dopamine.entitlements
@@ -155,7 +154,7 @@ jobs:
           tag_name: ${{ env.msT }}
           target_commitish: 1.1.11
           body_path: release.txt
-          prerelease: true
+          latest: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
