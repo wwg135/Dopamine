@@ -157,7 +157,7 @@ struct JailbreakView: View {
                                     .background(.white)
                                     .padding(.horizontal, 25)
                                 ScrollView {
-                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog?.replacingOccurrences(of: "(点击普通|点击KFD)版本下载", with: "", options: .regularExpression)) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                                    Text(try! AttributedString(markdown: (isInstalledEnvironmentVersionMismatching() ?  mismatchChangelog : updateChangelog?.replacingOccurrences(of: "(点击普通版本下载|点击KFD版本下载)", with: "", options: .regularExpression)) ?? NSLocalizedString("Changelog_Unavailable_Text", comment: ""), options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
                                         .font(.system(size: 16))
                                         .multilineTextAlignment(.center)
                                         .padding(.vertical)   
@@ -878,11 +878,8 @@ struct JailbreakView: View {
         let range = NSRange(location: 0, length: text.utf16.count)
         if let match = regex.firstMatch(in: text, options: [], range: range) {
             let urlRange = match.range(at: 1)
-            let urlString = (text as NSString).substring(with: urlRange)
-            if urlString.contains(targetText) {
-                if let url = URL(string: urlString) {
-                    return url
-                }
+            if let url = URL(string: (text as NSString).substring(with: urlRange)) {
+                return url
             }
         }
         return nil
