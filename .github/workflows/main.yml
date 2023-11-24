@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.11-test
+      - 1.1.11
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - 1.1.11-test
+      - 1.1.11
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -21,13 +21,13 @@ permissions:
 
 env:
   VERSION: '1.1.11'
-  VERSION-1: '1.1.11_kfd'
+  VERSION_kfd: '1.1.11_kfd'
   BUNDLEID: 'com.wwg135.Dopamine'
  
 jobs:
   build:
     runs-on: macos-13
-    environment: Patch AutoBuildRelease
+    environment: Auto Build And Release
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -92,22 +92,24 @@ jobs:
       - name: Build kfd
         run: |
           git reset --hard HEAD
-          git checkout kfd_dev
+          git checkout 1.1.11_kfd
           git submodule update --init --remote --recursive
         
           sed -i '' "s/AAA/更新时间/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAB/${{ env.shT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
-          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION-1 }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/BBB/${{ env.VERSION-1 }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Fugu15.swift
+          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION_kfd }};/g' ./Dopamine/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/BBB/${{ env.VERSION_kfd }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Fugu15.swift
 
           export THEOS=$HOME/theos
           gmake -j$(sysctl -n hw.physicalcpu)
           mv Dopamine/Dopamine.tipa KFDDopamine.ipa
-      
-      - name: Pre body
+
+      - name: Release Logs
         run: |
           set -x
+          git reset --hard HEAD
+          git checkout 1.1.11
           echo -e "更新时间：${{ env.logT }}" >> body.txt
           echo "" >> ./release.md
           echo -e "\n[点击普通版本下载](https://github.com/wwg135/Dopamine/releases/download/${{ env.msT }}/Dopamine.ipa)" >> ./release.md
