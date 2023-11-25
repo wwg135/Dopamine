@@ -112,7 +112,6 @@ jobs:
         run: |
           git reset --hard HEAD
           git checkout -f 1.1.11_kfd
-          git submodule update --init --remote --recursive
 
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Packages/Fugu15KernelExploit/Sources/Fugu15KernelExploit/Util.swift
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Dopamine/Dopamine/Dopamine.entitlements
