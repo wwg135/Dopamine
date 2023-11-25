@@ -10,7 +10,6 @@ import Fugu15KernelExploit
 import SwiftfulLoadingIndicators
 import Foundation
 import PhotosUI
-import Regex
 
 #if os(iOS)
 import UIKit
@@ -875,9 +874,17 @@ struct JailbreakView: View {
 
     func extractDownloadURL(from text: String, targetText: String) -> URL? {
         let pattern = "\\[(.*?)\\]\\((.*?)\\)"
-        if let match = text.match(pattern).first,
-        let url = URL(string: match.group(at: 2)), match.group(at: 1)?.contains(targetText) ?? false {
-            return url
+        let regex = try! NSRegularExpression(pattern: pattern, options: [])
+        let range = NSRange(location: 0, length: text.utf16.count)
+        if let match = regex.matches(in: text, options: [], range: range).first(where: { (result) -> Bool in
+            let linkRange = result.range(at: 1)
+            let linkText = (text as NSString).substring(with: linkRange)
+            return linkText.contains(targetText)
+        }) {
+            let urlRange = match.range(at: 2)
+            if let url = URL(string: (text as NSString).substring(with: urlRange)) {
+                return url
+            }
         }
         return nil
     }
