@@ -334,17 +334,21 @@ struct SettingsView: View {
     func improveBackgroundRunning() {
         let fileManager = FileManager.default
         let filePath = "/var/jb/System/Library/LaunchDaemons/"
-        let files = try fileManager.contentsOfDirectory(atPath: filePath)
-        for file in files {
-            if file.contains("com.apple.jetsamproperties.plist") {
-                let plistPath = filePath + file
-                var dict = NSDictionary(contentsOfFile: plistPath) as? [String: Any]
-                if let appDict = dict?["App"] as? [String: Any] {
-                    appDict["ThreadLimit"] = 864
-                    dict?["App"] = appDict
-                    (dict as NSDictionary?)?.write(toFile: plistPath, atomically: true)
+        do {
+            let files = try fileManager.contentsOfDirectory(atPath: filePath)
+            for file in files {
+                if file.contains("com.apple.jetsamproperties.plist") {
+                    let plistPath = filePath + file
+                    var dict = NSDictionary(contentsOfFile: plistPath) as? [String: Any]
+                    if var appDict = dict?["App"] as? [String: Any] {
+                        appDict["ThreadLimit"] = 864
+                        dict?["App"] = appDict
+                        (dict as NSDictionary?)?.write(toFile: plistPath, atomically: true)
+                    }
                 }
             }
+        } catch {
+            print("Error accessing directory: \(error)")
         }
     }
 }
