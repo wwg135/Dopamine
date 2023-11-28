@@ -18,6 +18,7 @@ struct SettingsView: View {
     @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
     @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
     @State var hiddenFunction = dopamineDefaults().bool(forKey: "hiddenFunction")
+    @AppStorage("backgroundRunningOptimization", store: dopamineDefaults()) var backgroundRun: Bool = false
     @Binding var isPresented: Bool
     @State var mountPathAlertShown = false
     @State var mountPathInput = ""
@@ -46,6 +47,17 @@ struct SettingsView: View {
                             if hiddenFunction {
                                 Toggle("Check_For_Updates", isOn: $checkForUpdates)
                             } else {
+                            }
+                            if isJailbroken() {
+                                if hiddenFunction {
+                                    if enableMount {
+                                        Toggle("Background_Running_Optimization", isOn: $backgroundRun)
+                                            .onChange(of: backgroundRun) { newValue in
+                                                improveBackgroundRunning()
+                                            }
+                                    }
+                                } else {
+                                }
                             }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
