@@ -18,7 +18,6 @@ struct SettingsView: View {
     @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
     @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
     @State var hiddenFunction = dopamineDefaults().bool(forKey: "hiddenFunction")
-    @AppStorage("backgroundRunningOptimization", store: dopamineDefaults()) var backgroundRun: Bool = false
     @Binding var isPresented: Bool
     @State var mountPathAlertShown = false
     @State var mountPathInput = ""
@@ -47,17 +46,6 @@ struct SettingsView: View {
                             if hiddenFunction {
                                 Toggle("Check_For_Updates", isOn: $checkForUpdates)
                             } else {
-                            }
-                            if isJailbroken() {
-                                if hiddenFunction {
-                                    if enableMount {
-                                        Toggle("Background_Running_Optimization", isOn: $backgroundRun)
-                                            .onChange(of: backgroundRun) { newValue in
-                                                improveBackgroundRunning()
-                                            }
-                                    }
-                                } else {
-                                }
                             }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
@@ -329,27 +317,6 @@ struct SettingsView: View {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "确定", style: .default, handler: nil))
         UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true, completion: nil)
-    }
-
-    func improveBackgroundRunning() {
-        let fileManager = FileManager.default
-        let filePath = "/var/jb/System/Library/LaunchDaemons/"
-        do {
-            let files = try fileManager.contentsOfDirectory(atPath: filePath)
-            for file in files {
-                if file.contains("com.apple.jetsamproperties.plist") {
-                    let plistPath = filePath + file
-                    var dict = NSDictionary(contentsOfFile: plistPath) as? [String: Any]
-                    if var appDict = dict?["App"] as? [String: Any] {
-                        appDict["ThreadLimit"] = 864
-                        dict?["App"] = appDict
-                        (dict as NSDictionary?)?.write(toFile: plistPath, atomically: true)
-                    }
-                }
-            }
-        } catch {
-            print("Error accessing directory: \(error)")
-        }
     }
 }
 
