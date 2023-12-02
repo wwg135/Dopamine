@@ -25,7 +25,6 @@ struct SettingsView: View {
     @State var removeZmountInput = ""
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
-    @State var rebootRequiredAlertShown = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
@@ -151,14 +150,10 @@ struct SettingsView: View {
                                         )
                                     }
                                 }
-                                VStack {
+                                if !isJailbroken() {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        if isJailbroken() {
-                                            rebootRequiredAlertShown = true
-                                        } else {
-                                            removeJailbreakAlertShown = true
-                                        }
+                                        removeJailbreakAlertShown = true
                                     }) {
                                         HStack {
                                             Image(systemName: "trash")
@@ -230,12 +225,6 @@ struct SettingsView: View {
                                 }
                             })
                         }
-                        .alert("Settings_Remove_Jailbreak_Alert_Title", isPresented: $rebootRequiredAlertShown, actions: {
-                            Button("Button_Cancel", role: .cancel) { }
-                            Button("Menu_Reboot_Title") {
-                                reboot()
-                            }
-                        }, message: { Text("Jailbroken currently, please reboot the device.") })
                         .textFieldAlert(isPresented: $removeZmountAlertShown) { () -> TextFieldAlert in
                             TextFieldAlert(title: NSLocalizedString("Remove_Zmount_Alert_Shown_Title", comment: ""), message: NSLocalizedString("Remove_Zmount_Message", comment: ""), text: Binding<String?>($removeZmountInput), onSubmit: {
                                 if removeZmountInput.count > 1 {
