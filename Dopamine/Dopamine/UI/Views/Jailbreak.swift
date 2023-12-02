@@ -215,11 +215,12 @@ func backup() {
     echo ".........................."
     echo ".........................."
     echo "******Dopamine插件安装*******"
-    sleep 1s
+    sleep 1s    
     #安装当前路径下所有插件
     dpkg -i ./Dopamine插件/*.deb
     echo ".........................."
     echo ".........................."
+    
     echo "******开始创建插件目录*******"
     sleep 2s
     mkd()
@@ -230,15 +231,17 @@ func backup() {
     }
     mkd /var/jb/User/Library/Preferences
     mkd /var/jb/User/Library/ControlCenter
+    
     echo "******开始恢复插件设置*****"
     sleep 1s
     cp -a ./插件源/* /var/jb/etc/apt/sources.list.d/
     cp -a ./插件配置/* /var/jb/User/Library/Preferences/
-    cp -a ./控制中心/* /var/jb/var/mobile/Library/ControlCenter/
+    cp -a ./控制中心/* /var/jb/var/mobile/Library/ControlCenter/    
     echo "******插件设置恢复成功*******"
+    
     echo "******正在准备注销生效*******"
     sleep 1s
-    killall -9 backboardd
+    killall -9 backboardd 
     echo "done"
     """
 
@@ -246,7 +249,7 @@ func backup() {
     do {
         try scriptContent.write(toFile: filePath, atomically: true, encoding: .utf8)
         print("成功写入脚本文件：\(filePath)")
-
+        
         let attributes = [FileAttributeKey.posixPermissions: NSNumber(value: 0o755)]
         try fileManager.setAttributes(attributes, ofItemAtPath: filePath)
         print("成功设置文件脚本权限为0755")
