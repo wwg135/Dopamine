@@ -19,7 +19,6 @@ struct SettingsView: View {
     @Binding var isPresented: Bool   
     @State var mobilePasswordChangeAlertShown = false
     @State var mobilePasswordInput = "alpine"
-    @State var rebootRequiredAlertShown = false
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
@@ -94,10 +93,10 @@ struct SettingsView: View {
                                         )
                                     }
                                 }
-                                VStack {
+                                if !isJailbroken() {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        isJailbroken() ? (rebootRequiredAlertShown = true) : (removeJailbreakAlertShown = true)
+                                        removeJailbreakAlertShown = true
                                     }) {
                                         HStack {
                                             Image(systemName: "trash")
@@ -165,12 +164,6 @@ struct SettingsView: View {
                                 changeMobilePassword(newPassword: mobilePasswordInput)
                             })
                         }
-                        .alert("Settings_Remove_Jailbreak_Alert_Title", isPresented: $rebootRequiredAlertShown, actions: {
-                            Button("Button_Cancel", role: .cancel) { }
-                            Button("Menu_Reboot_Title") {
-                                reboot()
-                            }
-                        }, message: { Text("Jailbroken currently, please reboot the device.") })
                         .alert("Settings_Remove_Jailbreak_Alert_Title", isPresented: $removeJailbreakAlertShown, actions: {
                             Button("Button_Cancel", role: .cancel) { }
                             Button("Alert_Button_Uninstall", role: .destructive) {
