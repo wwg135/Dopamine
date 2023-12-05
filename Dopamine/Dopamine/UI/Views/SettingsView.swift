@@ -201,8 +201,10 @@ struct SettingsView: View {
                     .padding(.horizontal, 32)
                     
                     VStack(spacing: 6) {
+                        Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
+                            .font(.footnote)
+                            .opacity(1)
                         Group {
-                            Text(isBootstrapped() ? "Settings_Footer_Device_Bootstrapped" :  "Settings_Footer_Device_Not_Bootstrapped")
                             Text("Success_Rate \(successRate())% (\(successfulJailbreaks)/\(totalJailbreaks))")
                         }
                         .font(.footnote)
