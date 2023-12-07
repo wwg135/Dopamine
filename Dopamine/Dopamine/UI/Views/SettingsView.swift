@@ -24,6 +24,7 @@ struct SettingsView: View {
     @State var tweakInjectionToggledAlertShown = false
     @State var backupAlertShown = false
     @State var completedAlert = false
+    @AppStorage("movedeb", store: dopamineDefaults()) var movedeb: Bool = false
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -136,6 +137,27 @@ struct SettingsView: View {
                                     } else {
                                     }
                                 }
+                                if movedeb {
+                                    Button(action: {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        MoveDeb()
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "book")
+                                            Text("开发插件")
+                                                .lineLimit(1)
+                                                .minimumScaleFactor(0.5)
+                                        }
+                                        .padding(.horizontal, 4)
+                                        .padding(8)
+                                        .frame(maxWidth: .infinity)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                        )
+                                    }
+                                } else {
+                                }
                             }
                         }
                     }
@@ -233,6 +255,23 @@ struct SettingsView: View {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "确定", style: .default, handler: nil))
         UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true, completion: nil)
+    }
+
+    func MoveDeb() {
+        let fileManager = FileManager.default
+        let filePath = "/var/Making/"
+        do {
+            let currentPathFiles = try fileManager.contentsOfDirectory(atPath: filePath)
+            for file in currentPathFiles {
+                if file.contains("arm64.deb") {
+                    let sourceURL = URL(fileURLWithPath: "\(filePath)\(file)")
+                    let destinationURL = URL(fileURLWithPath: "/var/mobile/deb/\(file)")
+                    try fileManager.moveItem(at: sourceURL, to: destinationURL)
+                }
+            }  
+        } catch {
+            print("Error: \(error)")
+        }
     }
 }
 
