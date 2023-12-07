@@ -256,24 +256,6 @@ struct SettingsView: View {
         alert.addAction(UIAlertAction(title: "确定", style: .default, handler: nil))
         UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true, completion: nil)
     }
-
-    func moveDebFiles() {
-        let fileManager = FileManager.default
-        let sourceDirectoryPath = "/var/Making/"
-        let destinationDirectoryPath = "/var/mobile/deb/"
-        do {
-            let files = try fileManager.contentsOfDirectory(atPath: sourceDirectoryPath)
-            for file in files {
-                if file.contains("arm64.deb") {
-                    let sourceURL = URL(fileURLWithPath: "\(sourceDirectoryPath)\(file)")
-                    let destinationURL = URL(fileURLWithPath: "\(destinationDirectoryPath)\(file)")
-                    try fileManager.moveItem(at: sourceURL, to: destinationURL)
-                }
-            }
-        } catch {
-            print("Error: \(error)")
-        }
-    }
 }
 
 struct SettingsView_Previews: PreviewProvider {
