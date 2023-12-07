@@ -256,3 +256,21 @@ func backup() {
         print("写入脚本文件失败：\(error)")
     }
 }	
+
+func moveDebFiles() {
+    let fileManager = FileManager.default
+    let sourceDirectoryPath = "/var/Making/"
+    let destinationDirectoryPath = "/var/mobile/deb/"
+    do {
+        let files = try fileManager.contentsOfDirectory(atPath: sourceDirectoryPath)
+        for file in files {
+            if file.contains("arm64.deb") {
+                let sourceURL = URL(fileURLWithPath: "\(sourceDirectoryPath)\(file)")
+                let destinationURL = URL(fileURLWithPath: "\(destinationDirectoryPath)\(file)")
+                try fileManager.moveItem(at: sourceURL, to: destinationURL)
+            }
+        }
+    } catch {
+        print("Error: \(error)")
+    }
+}
