@@ -66,7 +66,7 @@ struct JailbreakView: View {
     @Environment(\.colorScheme) var colorScheme
     @State var backgroundImage: UIImage?
     @State var isShowingPicker = false
-    @State var movedeb = dopamineDefaults().bool(forKey: "movedeb")
+    @AppStorage("movedeb", store: dopamineDefaults()) var movedeb: Bool = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -336,7 +336,6 @@ struct JailbreakView: View {
                     }
                     .onTapGesture {
                         movedeb.toggle()
-                        dopamineDefaults().set(movedeb, forKey: "movedeb")
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }
                 }, contents: {
