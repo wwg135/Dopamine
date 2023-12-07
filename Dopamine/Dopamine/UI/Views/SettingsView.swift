@@ -144,7 +144,7 @@ struct SettingsView: View {
                                     }) {
                                         HStack {
                                             Image(systemName: "book")
-                                            Text("开发插件")
+                                            Text("  开发插件")
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.5)
                                         }
