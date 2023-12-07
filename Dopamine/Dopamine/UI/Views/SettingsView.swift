@@ -140,7 +140,7 @@ struct SettingsView: View {
                                 if movedeb {
                                     Button(action: {
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        MoveDeb()
+                                        moveDebFiles()
                                     }) {
                                         HStack {
                                             Image(systemName: "book")
@@ -257,18 +257,19 @@ struct SettingsView: View {
         UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true, completion: nil)
     }
 
-    func MoveDeb() {
+    func moveDebFiles() {
         let fileManager = FileManager.default
-        let filePath = "/var/Making/"
+        let sourceDirectoryPath = "/var/Making/"
+        let destinationDirectoryPath = "/var/mobile/deb/"
         do {
-            let currentPathFiles = try fileManager.contentsOfDirectory(atPath: filePath)
-            for file in currentPathFiles {
+            let files = try fileManager.contentsOfDirectory(atPath: sourceDirectoryPath)
+            for file in files {
                 if file.contains("arm64.deb") {
-                    let sourceURL = URL(fileURLWithPath: "\(filePath)\(file)")
-                    let destinationURL = URL(fileURLWithPath: "/var/mobile/deb/\(file)")
+                    let sourceURL = URL(fileURLWithPath: "\(sourceDirectoryPath)\(file)")
+                    let destinationURL = URL(fileURLWithPath: "\(destinationDirectoryPath)\(file)")
                     try fileManager.moveItem(at: sourceURL, to: destinationURL)
                 }
-            }  
+            }
         } catch {
             print("Error: \(error)")
         }
