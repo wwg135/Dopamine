@@ -24,7 +24,6 @@ struct SettingsView: View {
     @State var tweakInjectionToggledAlertShown = false
     @State var backupAlertShown = false
     @State var completedAlert = false
-    @AppStorage("movedeb", store: dopamineDefaults()) var movedeb: Bool = false
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -136,27 +135,6 @@ struct SettingsView: View {
                                         }
                                     } else {
                                     }
-                                }
-                                if movedeb {
-                                    Button(action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        moveDebFiles()
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "book")
-                                            Text("  开发插件")
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.5)
-                                        }
-                                        .padding(.horizontal, 4)
-                                        .padding(8)
-                                        .frame(maxWidth: .infinity)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                        )
-                                    }
-                                } else {
                                 }
                             }
                         }
