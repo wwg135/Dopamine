@@ -331,7 +331,6 @@ struct JailbreakView: View {
                 
                 PopupView(title: {
                     Text("Menu_Settings_Title")
-                    }
                 }, contents: {
                     SettingsView(isPresented: $isSettingsPresented)
                         .frame(maxWidth: 320)
