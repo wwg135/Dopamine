@@ -66,7 +66,6 @@ struct JailbreakView: View {
     @Environment(\.colorScheme) var colorScheme
     @State var backgroundImage: UIImage?
     @State var isShowingPicker = false
-    @AppStorage("movedeb", store: dopamineDefaults()) var movedeb: Bool = false
     
     var isJailbreaking: Bool {
         jailbreakingProgress != .idle
@@ -331,12 +330,7 @@ struct JailbreakView: View {
                 }
                 
                 PopupView(title: {
-                    Group {
-                        Text("Menu_Settings_Title")
-                    }
-                    .onTapGesture {
-                        movedeb.toggle()
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    Text("Menu_Settings_Title")
                     }
                 }, contents: {
                     SettingsView(isPresented: $isSettingsPresented)
