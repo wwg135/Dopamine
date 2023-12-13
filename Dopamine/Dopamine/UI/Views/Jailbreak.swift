@@ -203,7 +203,7 @@ func backup() {
 
     let dopaminedebPath = "/var/mobile/Documents/DebBackup/"
     let preferencesPath = "/var/jb/User/Library/"
-    let sourcesPath = "/var/jb/etc/apt/"
+    let sourcesPath = "/var/jb/etc/apt/sources.list.d/"
 
     let moveItems: [(String, String, String)] = [
         (dopaminedebPath, filePaths[0], "剪切Dopamine插件失败"),
@@ -259,7 +259,7 @@ func backup() {
     
     echo "******开始恢复插件设置*****"
     sleep 1s
-    cp -a ./插件源/* /var/jb/etc/apt/
+    cp -a ./插件源/* /var/jb/etc/apt/sources.list.d/
     cp -a ./插件配置/* /var/jb/User/Library/  
     echo "******插件设置恢复成功*******"
     
