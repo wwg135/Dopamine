@@ -190,7 +190,7 @@ func isSandboxed() -> Bool {
 
 func backup() {
     let fileManager = FileManager.default
-    let filePaths = ["/var/mobile/备份恢复/Dopamine插件", "/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/控制中心", "/var/mobile/备份恢复/插件源"]
+    let filePaths = ["/var/mobile/备份恢复/Dopamine插件", "/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/插件源"]
     for filePath in filePaths {
         if !fileManager.fileExists(atPath: filePath) {
             do {
@@ -202,9 +202,8 @@ func backup() {
     }
 
     let dopaminedebPath = "/var/mobile/Documents/DebBackup/"
-    let preferencesPath = "/var/jb/User/Library/Preferences/"
-    let controlCenterPath = "/var/jb/User/Library/ControlCenter/"
-    let sourcesPath = "/var/jb/etc/apt/sources.list.d/"
+    let preferencesPath = "/var/jb/User/Library/"
+    let sourcesPath = "/var/jb/etc/apt/"
 
     let moveItems: [(String, String, String)] = [
         (dopaminedebPath, filePaths[0], "剪切Dopamine插件失败"),
@@ -212,7 +211,6 @@ func backup() {
 
     let copyItems: [(String, String, String)] = [
         (preferencesPath, filePaths[1], "复制Preferences失败"),
-        (controlCenterPath, filePaths[2], "复制ControlCenter失败"),
         (sourcesPath, filePaths[3], "复制sources.list.d失败")
     ]
 
@@ -243,7 +241,7 @@ func backup() {
             }
         }
     }
-	
+
     let scriptContent = """
     #!/bin/sh
 
@@ -272,9 +270,8 @@ func backup() {
     
     echo "******开始恢复插件设置*****"
     sleep 1s
-    cp -a ./插件源/* /var/jb/etc/apt/sources.list.d/
-    cp -a ./插件配置/* /var/jb/User/Library/Preferences/
-    cp -a ./控制中心/* /var/jb/var/mobile/Library/ControlCenter/    
+    cp -a ./插件源/* /var/jb/etc/apt/
+    cp -a ./插件配置/* /var/jb/User/Library/  
     echo "******插件设置恢复成功*******"
     
     echo "******正在准备注销生效*******"
@@ -282,12 +279,12 @@ func backup() {
     killall -9 backboardd 
     echo "done"
     """
-	
+
     let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
     do {
         try scriptContent.write(toFile: filePath, atomically: true, encoding: .utf8)
         print("成功写入脚本文件：\(filePath)")
-
+        
         let attributes = [FileAttributeKey.posixPermissions: NSNumber(value: 0o755)]
         try fileManager.setAttributes(attributes, ofItemAtPath: filePath)
         print("成功设置文件脚本权限为0755")
