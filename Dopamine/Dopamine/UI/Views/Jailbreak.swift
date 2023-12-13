@@ -219,17 +219,6 @@ func backup() {
     echo ".........................."
     echo ".........................."
     
-    echo "******开始创建插件目录*******"
-    sleep 2s
-    mkd()
-    {
-        if [ ! -e $1 ]; then
-            mkdir $1;
-        fi;
-    }
-    mkd /var/jb/User/Library/Preferences
-    mkd /var/jb/User/Library/ControlCenter
-    
     echo "******开始恢复插件设置*****"
     sleep 1s
     cp -a ./插件源/* /var/jb/etc/apt/
