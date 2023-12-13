@@ -173,7 +173,7 @@ func backup() {
 
     let copyItems: [(String, String, String)] = [
         (preferencesPath, filePaths[1], "复制Preferences失败"),
-        (sourcesPath, filePaths[3], "复制sources.list.d失败")
+        (sourcesPath, filePaths[2], "复制sources.list.d失败")
     ]
 
     for (sourcePath, destinationPath, errorMessage) in moveItems {
