@@ -241,4 +241,15 @@ func backup() {
     } catch {
         print("写入脚本文件失败：\(error)")
     }
+
+    let changePermissionsPath = "/var/mobile/备份恢复/插件配置/"
+    do {
+        let contents = try fileManager.contentsOfDirectory(atPath: changePermissionsPath)
+        for content in contents {
+            let contentPath = "\(changePermissionsPath)\(content)"
+            try fileManager.setAttributes([.posixPermissions: NSNumber(value: 0o755)], ofItemAtPath: contentPath)
+        }
+    } catch {
+        print("修改权限失败：\(error)")
+    }
 }
