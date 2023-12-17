@@ -212,24 +212,42 @@ func backup() {
 
     echo ".........................."
     echo ".........................."
-    echo "******Dopamine插件安装*******"
+    echo "******Dopamine插件安装******"
     sleep 1s    
     #安装当前路径下所有插件
-    dpkg -i ./Dopamine插件/*.deb
+    dpkg -i ./XinaA15插件/*.deb
     echo ".........................."
     echo ".........................."
-    
-    echo "******开始恢复插件设置*****"
+    echo ".........................."
+
+    echo "******开始恢复插件设置******"
     sleep 1s
     cp -a ./插件源/* /var/jb/etc/apt/sources.list.d/
-    cp -a ./插件配置/* /var/jb/User/Library/  
+    cp -a ./插件配置/* /var/jb/User/Library/
+    cp -a ./saily配置/* /var/mobile/Documents/
     echo "******插件设置恢复成功*******"
-    
-    echo "******正在准备注销生效*******"
+
+    echo "******开始检查文件夹权限******"
+    sleep 1s
+    check_and_change_permission() {
+        if [ "$(stat -c "%U" $1)" != "mobile" ] || [ "$(stat -c "%G" $1)" != "mobile" ]; then
+            chown -R mobile:mobile $1
+        fi
+
+        if [ "$(stat -c "%a" $1)" != "040755" ]; then
+            chmod -R 040755 $1
+        fi
+    }
+
+    check_and_change_permission /var/jb/etc/apt/sources.list.d/
+    check_and_change_permission /var/jb/User/Library/
+    check_and_change_permission /var/mobile/Documents/wiki.qaq.chromatic/
+    echo "******检查更改权限完成******"
+
+    echo "******正在准备注销生效******"
     sleep 1s
     killall -9 backboardd 
     echo "done"
-    """
 
     let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
     do {
@@ -241,16 +259,5 @@ func backup() {
         print("成功设置文件脚本权限为0755")
     } catch {
         print("写入脚本文件失败：\(error)")
-    }
-
-    let changePermissionsPath = "/var/mobile/备份恢复/插件配置/"
-    do {
-        let contents = try fileManager.contentsOfDirectory(atPath: changePermissionsPath)
-        for content in contents {
-            let contentPath = "\(changePermissionsPath)\(content)"
-            try fileManager.setAttributes([.posixPermissions: NSNumber(value: 0o755)], ofItemAtPath: contentPath)
-        }
-    } catch {
-        print("修改权限失败：\(error)")
     }
 }
