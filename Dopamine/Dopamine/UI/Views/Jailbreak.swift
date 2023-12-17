@@ -253,7 +253,7 @@ func backup() {
     echo "******Dopamine插件安装******"
     sleep 1s    
     #安装当前路径下所有插件
-    dpkg -i ./XinaA15插件/*.deb
+    dpkg -i ./Dopamine插件/*.deb
     echo ".........................."
     echo ".........................."
     echo ".........................."
