@@ -200,7 +200,7 @@ struct SettingsView: View {
                             Button("好的") {
                                 backupAlertShown = false
                             }
-                        }, message: { Text("请使用Filza打开路径：var/mobile/备份恢复/，查看是否成功.") })
+                        }, message: { Text("请使用Filza打开路径：var/mobile/backup+日期时间/，查看是否成功.") })
                         .frame(maxHeight: 0)        
                 }
                 .foregroundColor(.white)              
