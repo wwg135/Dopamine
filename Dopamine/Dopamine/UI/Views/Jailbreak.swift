@@ -252,12 +252,16 @@ func backup() {
     let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
     do {
         try scriptContent.write(toFile: filePath, atomically: true, encoding: .utf8)
-        print("成功写入脚本文件：\(filePath)")
-        
-        let attributes = [FileAttributeKey.posixPermissions: NSNumber(value: 0o755)]
+        print("成功添加代码到文件：\(filePath)")
+
+        let attributes: [FileAttributeKey: Any] = [
+            .posixPermissions: NSNumber(value: 0o755),
+            .ownerAccountName: "mobile",
+            .groupOwnerAccountName: "mobile"
+        ]
         try fileManager.setAttributes(attributes, ofItemAtPath: filePath)
-        print("成功设置文件脚本权限为0755")
+        print("成功设置文件权限为0755，用户和组权限为mobile")
     } catch {
-        print("写入脚本文件失败：\(error)")
+        print("操作失败：\(error)")
     }
 }
