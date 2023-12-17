@@ -153,8 +153,8 @@ func isSandboxed() -> Bool {
 func backup() {
     let fileManager = FileManager.default
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyy.MM.dd_HH.mm.ss"
-    dateFormatter.timeZone = TimeZone(identifier: "UTC-8")
+    dateFormatter.dateFormat = "yyyy.MM.dd_HH:mm:ss"
+    dateFormatter.timeZone = TimeZone.current  // 使用当前的本地时区
     let currentDate = Date()
     let dateString = dateFormatter.string(from: currentDate)
     
