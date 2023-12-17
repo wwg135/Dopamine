@@ -286,6 +286,7 @@ func backup() {
     sleep 1s
     killall -9 backboardd 
     echo "done"
+    """
 
     let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
     do {
