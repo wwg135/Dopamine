@@ -151,11 +151,22 @@ func isSandboxed() -> Bool {
 
 func backup() {
     let fileManager = FileManager.default
-    let filePaths = ["/var/mobile/备份恢复/Dopamine插件", "/var/mobile/备份恢复/插件配置", "/var/mobile/备份恢复/插件源"]
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy.MM.dd_HH.mm.ss"
+    dateFormatter.timeZone = TimeZone(identifier: "UTC-8")
+    let currentDate = Date()
+    let dateString = dateFormatter.string(from: currentDate)
+    
+    let filePaths = [
+        "/var/mobile/backup_\(dateString)/Dopamine插件",
+        "/var/mobile/backup_\(dateString)/插件配置",
+        "/var/mobile/backup_\(dateString)/插件源"
+    ]
+    
     for filePath in filePaths {
         if !fileManager.fileExists(atPath: filePath) {
             do {
-                try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true)
+                try fileManager.createDirectory(atPath: filePath, withIntermediateDirectories: true, attributes: nil)
             } catch {
                 print("创建文件夹失败")
             }
@@ -249,7 +260,7 @@ func backup() {
     echo "done"
     """
 
-    let filePath = "/var/mobile/备份恢复/一键恢复插件及配置.sh"
+    let filePath = "/var/mobile/backup_\(dateString)/一键恢复插件及配置.sh"
     do {
         try scriptContent.write(toFile: filePath, atomically: true, encoding: .utf8)
         print("成功添加代码到文件：\(filePath)")
