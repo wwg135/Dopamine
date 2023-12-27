@@ -15,6 +15,7 @@ struct SettingsView: View {
     @AppStorage("checkForUpdates", store: dopamineDefaults()) var checkForUpdates: Bool = false
     @AppStorage("tweakInjectionEnabled", store: dopamineDefaults()) var tweakInjection: Bool = true
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
+    @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
     @State var hiddenFunction = dopamineDefaults().bool(forKey: "hiddenFunction")
     @Binding var isPresented: Bool   
     @State var mobilePasswordChangeAlertShown = false
@@ -36,7 +37,13 @@ struct SettingsView: View {
                 VStack {
                     VStack(spacing: 20) {
                         VStack(spacing: 10) {
-                            (hiddenFunction ? Toggle("Check_For_Updates", isOn: $checkForUpdates) : nil)
+                            if hiddenFunction {
+                                Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                                if !isJailbroken() {
+                                    Toggle("Rebuild Environment", isOn: $rebuildEnvironment)
+                                }
+                            } else {
+                            } 
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
                                 .onChange(of: tweakInjection) { newValue in
                                     if isJailbroken() {
