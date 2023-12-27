@@ -17,6 +17,7 @@ struct SettingsView: View {
     @AppStorage("iDownloadEnabled", store: dopamineDefaults()) var enableiDownload: Bool = false
     @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
     @AppStorage("enableMount", store: dopamineDefaults()) var enableMount: Bool = true
+    @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
     @State var hiddenFunction = dopamineDefaults().bool(forKey: "hiddenFunction")
     @Binding var isPresented: Bool
     @State var mountPathAlertShown = false
@@ -44,6 +45,9 @@ struct SettingsView: View {
                         VStack(spacing: 10) {
                             if hiddenFunction {
                                 Toggle("Check_For_Updates", isOn: $checkForUpdates)
+                                if !isJailbroken() {
+                                    Toggle("Rebuild Environment", isOn: $rebuildEnvironment)
+                                }
                             } else {
                             }
                             Toggle("Settings_Tweak_Injection", isOn: $tweakInjection)
