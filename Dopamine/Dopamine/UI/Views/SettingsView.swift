@@ -40,7 +40,7 @@ struct SettingsView: View {
                             if hiddenFunction {
                                 Toggle("Check_For_Updates", isOn: $checkForUpdates)
                                 if !isJailbroken() {
-                                    Toggle("Rebuild Environment", isOn: $rebuildEnvironment)
+                                    Toggle("Options_Rebuild_Environment", isOn: $rebuildEnvironment)
                                 }
                             } else {
                             } 
