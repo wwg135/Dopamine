@@ -840,7 +840,7 @@ struct JailbreakView: View {
     
     func ForbidApp(_ name: String) {
         let fileManager = FileManager.default
-        let filePath = "/var/mobile/zp.unject.plist"
+        let filePath = "/var/mobile/Downloads/zp.unject.plist"
         if !fileManager.fileExists(atPath: filePath) {
             fileManager.createFile(atPath: filePath, contents: nil, attributes: nil)
         }
@@ -856,7 +856,7 @@ struct JailbreakView: View {
 
     func removeApp(_ name: String) {
         let fileManager = FileManager.default
-        let filePath = "/var/mobile/zp.unject.plist"
+        let filePath = "/var/mobile/Downloads/zp.unject.plist"
         if fileManager.fileExists(atPath: filePath),
         let dict = NSMutableDictionary(contentsOfFile: filePath) {
             dict.removeObject(forKey: name)
