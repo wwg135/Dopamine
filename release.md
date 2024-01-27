@@ -1,6 +1,6 @@
 # 当前更新日志如下：
 
-> - 真皮底层屏蔽配置文件改为路径/var/mobile/Downloads/zp.unject.plist，以及其他一些小优化。
+> - 恢复真皮底层屏蔽配置文件改为路径/var/mobile/zp.unject.plist，以及其他一些小优化。
 
 # M哥修改版的功能
 
