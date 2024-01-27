@@ -273,25 +273,7 @@ func backup() {
     sleep 1s
     cp -a ./插件源/* /var/jb/etc/apt/sources.list.d/
     cp -a ./插件配置/* /var/jb/User/Library/
-    cp -a ./saily配置/* /var/mobile/Documents/
     echo "******插件设置恢复成功*******"
-
-    echo "******开始检查文件夹权限******"
-    sleep 1s
-    check_and_change_permission() {
-        if [ "$(stat -c "%U" $1)" != "mobile" ] || [ "$(stat -c "%G" $1)" != "mobile" ]; then
-            chown -R mobile:mobile $1
-        fi
-
-        if [ "$(stat -c "%a" $1)" != "040755" ]; then
-            chmod -R 040755 $1
-        fi
-    }
-
-    check_and_change_permission /var/jb/etc/apt/sources.list.d/
-    check_and_change_permission /var/jb/User/Library/
-    check_and_change_permission /var/mobile/Documents/wiki.qaq.chromatic/
-    echo "******检查更改权限完成******"
 
     echo "******正在准备注销生效******"
     sleep 1s
