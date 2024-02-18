@@ -421,7 +421,17 @@
 {
     UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Back_Up_Title") message:DOLocalizedString(@"Alert_Back_U_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *backupAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-       [self performBackup];
+        NSString *debBackupPath = @"/var/mobile/Documents/DebBackup/";
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+        if ([fileManager fileExistsAtPath:debBackupPath]) {
+            [self performBackup];
+        } else {
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"备份失败" message:@"请先使用“DEB备份”app备份插件！！！" preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertAction *closeAction = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleDefault handler:nil];
+            [alertController addAction:closeAction];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
     }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
     [confirmationAlertController addAction:backupAction];
@@ -430,8 +440,7 @@
 }
 
 - (void)performBackup {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    
+    NSFileManager *fileManager = [NSFileManager defaultManager];   
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy.MM.dd_HH:mm:ss"];
     [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
