@@ -30,36 +30,32 @@
     return self;
 }
 
-- (BOOL)isUpdateAvailable {
+- (BOOL)isUpdateAvailable
+{
     NSArray *releases = [self getLatestReleases];
     if (releases.count == 0)
         return NO;
-
-    NSString *latestVersion = releases[0][@"name"];
+    
+    NSString *latestVersion = releases[0][@"tag_name"];
     NSString *currentVersion = [self getLaunchedReleaseTag];
-    return [self compareVersions:latestVersion withVersion:currentVersion] > 0;
+    return [self numericalRepresentationForVersion:latestVersion] > [self numericalRepresentationForVersion:currentVersion];
 }
 
-- (NSInteger)compareVersions:(NSString *)version1 withVersion:(NSString *)version2 {
-    NSArray *components1 = [version1 componentsSeparatedByString:@"."];
-    NSArray *components2 = [version2 componentsSeparatedByString:@"."];
+- (long long)numericalRepresentationForVersion:(NSString*)version {
+    long long numericalRepresentation = 0;
 
-    NSInteger maxLength = MAX(components1.count, components2.count);
-    for (NSInteger i = 0; i < maxLength; i++) {
-        NSInteger component1 = (i < components1.count) ? [components1[i] integerValue] : 0;
-        NSInteger component2 = (i < components2.count) ? [components2[i] integerValue] : 0;
+    NSArray *components = [version componentsSeparatedByCharactersInSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]];
+    while (components.count < 3)
+        components = [components arrayByAddingObject:@"0"];
 
-        if (component1 < component2) {
-            return -1;
-        } else if (component1 > component2) {
-            return 1;
-        }
-    }
-
-    return 0;
+    numericalRepresentation |= [components[0] integerValue] << 16;
+    numericalRepresentation |= [components[1] integerValue] << 8;
+    numericalRepresentation |= [components[2] integerValue];
+    return numericalRepresentation;
 }
 
-- (NSArray *)getUpdatesInRange:(NSString *)start end:(NSString *)end {
+- (NSArray *)getUpdatesInRange: (NSString *)start end: (NSString *)end
+{
     NSArray *releases = [self getLatestReleases];
     if (releases.count == 0)
         return @[];
@@ -68,26 +64,13 @@
     long long endVersion = [self numericalRepresentationForVersion:end];
     NSMutableArray *updates = [NSMutableArray new];
     for (NSDictionary *release in releases) {
-        NSString *version = release[@"name"];
+        NSString *version = release[@"tag_name"];
         long long numericalVersion = [self numericalRepresentationForVersion:version];
         if (numericalVersion > startVersion && numericalVersion <= endVersion) {
             [updates addObject:release];
         }
     }
     return updates;
-}
-
-- (long long)numericalRepresentationForVersion:(NSString *)version {
-    long long numericalRepresentation = 0;
-    NSArray *components = [version componentsSeparatedByString:@"."];
-    NSInteger componentCount = MIN(components.count, 3);
-
-    for (NSInteger i = 0; i < componentCount; i++) {
-        NSInteger component = [components[i] integerValue];
-        numericalRepresentation |= component << (16 - (8 * i));
-    }
-
-    return numericalRepresentation;
 }
 
 - (NSArray *)getLatestReleases
@@ -124,7 +107,7 @@
     NSString *launchedTag = [self getLaunchedReleaseTag];
     NSDictionary *launchedVersion;
     for (NSDictionary *release in [self getLatestReleases]) {
-        if ([release[@"name"] isEqualToString:launchedTag]) {
+        if ([release[@"tag_name"] isEqualToString:launchedTag]) {
             launchedVersion = release;
             break;
         }
@@ -139,7 +122,7 @@
     NSArray *releases = [self getLatestReleases];
     if (releases.count == 0)
         return nil;
-    return releases[0][@"name"];
+    return releases[0][@"tag_name"];
 }
 
 - (NSString*)getLaunchedReleaseTag
