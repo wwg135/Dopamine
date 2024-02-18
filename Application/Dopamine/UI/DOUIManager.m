@@ -35,7 +35,7 @@
     if (releases.count == 0)
         return NO;
 
-    NSString *latestVersion = releases[0][@"tag_name"];
+    NSString *latestVersion = releases[0][@"name"];
     NSString *currentVersion = [self getLaunchedReleaseTag];
     return [self compareVersions:latestVersion withVersion:currentVersion] > 0;
 }
@@ -68,7 +68,7 @@
     long long endVersion = [self numericalRepresentationForVersion:end];
     NSMutableArray *updates = [NSMutableArray new];
     for (NSDictionary *release in releases) {
-        NSString *version = release[@"tag_name"];
+        NSString *version = release[@"name"];
         long long numericalVersion = [self numericalRepresentationForVersion:version];
         if (numericalVersion > startVersion && numericalVersion <= endVersion) {
             [updates addObject:release];
