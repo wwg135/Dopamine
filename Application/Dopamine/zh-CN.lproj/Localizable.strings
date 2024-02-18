@@ -86,7 +86,7 @@
 
 // Logs
 "Initializing Environment" = "初始化环境";
-"Loading BaseBin TrustCache" = "将基础套件加载至信任缓存（TrustCache）";
+"Loading BaseBin TrustCache" = "加载基本文件系统信任缓存";
 "Applying Bind Mount" = "执行绑定挂载";
 "Removing Jailbreak" = "移除越狱";
 "Elevating Privileges" = "提升权限";
@@ -95,11 +95,13 @@
 "Rebooting Userspace" = "重启用户空间";
 "Patchfinding" = "查找地址";
 "Exploiting Kernel (%@)" = "利用内核漏洞 (%@)";
-"Bypassing PAC (%@)" = "正在绕过 PAC (%@)";
-"Bypassing PPL (%@)" = "正在绕过 PPL (%@)";
+"Bypassing PAC (%@)" = "绕过指针认证码 (%@)";
+"Bypassing PPL (%@)" = "绕过受保护进程轻型验证 (%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "选择包管理器";
 "Select_Package_Managers_Install_Message" = "若不确定如何选择，请使用 Sileo";
 "Continue" = "继续";
 
+"Menu_Reboot_Title" = "重启";
+"Settings" = "设置";
