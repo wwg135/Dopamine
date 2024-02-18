@@ -280,6 +280,16 @@
         [themeSpecifier setProperty:@"themeIdentifiers" forKey:@"valuesDataSource"];
         [themeSpecifier setProperty:@"themeNames" forKey:@"titlesDataSource"];
         [specifiers addObject:themeSpecifier];
+
+        if (envManager.isJailbroken) {
+            PSSpecifier *backupSpecifier = [PSSpecifier emptyGroupSpecifier];
+            backupSpecifier.target = self;
+            [backupSpecifier setProperty:@"Back_Up_Title" forKey:@"title"];
+            [backupSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [backupSpecifier setProperty:@"doc" forKey:@"image"];
+            [backupSpecifier setProperty:@"backupPressed" forKey:@"action"];
+            [specifiers addObject:backupSpecifier];
+        }
         
         _specifiers = specifiers;
     }
