@@ -419,7 +419,7 @@
 
 - (void)backupPressed
 {
-    UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Back_Up_Title") message:DOLocalizedString(@"Alert_Back_U_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Back_Up_Title") message:DOLocalizedString(@"Alert_Back_Up_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *backupAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         NSString *debBackupPath = @"/var/mobile/Documents/DebBackup/";
         NSFileManager *fileManager = [NSFileManager defaultManager];
