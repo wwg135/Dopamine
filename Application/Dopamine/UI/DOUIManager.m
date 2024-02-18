@@ -124,7 +124,7 @@
     NSString *launchedTag = [self getLaunchedReleaseTag];
     NSDictionary *launchedVersion;
     for (NSDictionary *release in [self getLatestReleases]) {
-        if ([release[@"tag_name"] isEqualToString:launchedTag]) {
+        if ([release[@"name"] isEqualToString:launchedTag]) {
             launchedVersion = release;
             break;
         }
@@ -139,7 +139,7 @@
     NSArray *releases = [self getLatestReleases];
     if (releases.count == 0)
         return nil;
-    return releases[0][@"tag_name"];
+    return releases[0][@"name"];
 }
 
 - (NSString*)getLaunchedReleaseTag
