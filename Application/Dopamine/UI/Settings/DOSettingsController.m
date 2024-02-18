@@ -419,24 +419,25 @@
 
 - (void)backupPressed
 {
-    UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Back_Up_Title") message:DOLocalizedString(@"Alert_Back_Up_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *backupAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-        NSString *debBackupPath = @"/var/mobile/Documents/DebBackup/";
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-    
-        if ([fileManager fileExistsAtPath:debBackupPath]) {
+    NSString *debBackupPath = @"/var/mobile/Documents/DebBackup/";
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:debBackupPath error:nil];
+
+    if (files.count == 0) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"备份失败" message:@"请先使用“DEB备份”app备份插件！！！" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *closeAction = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleDefault handler:nil];
+        [alertController addAction:closeAction];
+        [self presentViewController:alertController animated:YES completion:nil];
+    } else {   
+        UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Back_Up_Title") message:DOLocalizedString(@"Alert_Back_Up_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *backupAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
             [self performBackup];
-        } else {
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"备份失败" message:@"请先使用“DEB备份”app备份插件！！！" preferredStyle:UIAlertControllerStyleAlert];
-            UIAlertAction *closeAction = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleDefault handler:nil];
-            [alertController addAction:closeAction];
-            [self presentViewController:alertController animated:YES completion:nil];
-        }
-    }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
-    [confirmationAlertController addAction:backupAction];
-    [confirmationAlertController addAction:cancelAction];
-    [self presentViewController:confirmationAlertController animated:YES completion:nil];
+        }];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
+        [confirmationAlertController addAction:backupAction];
+        [confirmationAlertController addAction:cancelAction];
+        [self presentViewController:confirmationAlertController animated:YES completion:nil];
+    }
 }
 
 - (void)performBackup {
