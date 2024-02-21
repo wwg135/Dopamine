@@ -183,7 +183,7 @@
         [self.jailbreakBtn.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor],
         [self.jailbreakBtn.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor],
         [self.jailbreakBtn.heightAnchor constraintEqualToAnchor:buttonPlaceHolder.heightAnchor],
-        [self.jailbreakBtn.centerYAnchor constraintEqualToAnchor:buttonPlaceHolder.centerYAnchor]
+        [self.jailbreakBtn.centerYAnchor constraintEqualToAnchor:buttonPlaceHolder.centerYAnchor constant: -10]
     ])];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
