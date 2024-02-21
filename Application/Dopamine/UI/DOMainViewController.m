@@ -89,7 +89,7 @@
     // timer
     self.uptimeLabel = [[UILabel alloc] init];
     self.uptimeLabel.textColor = [UIColor whiteColor];
-    self.uptimeLabel.font = [UIFont systemFontOfSize:12];
+    self.uptimeLabel.font = [UIFont systemFontOfSize:15];
     self.uptimeLabel.textAlignment = NSTextAlignmentLeft;
     
     [stackView addArrangedSubview:self.uptimeLabel];
@@ -183,7 +183,7 @@
         [self.jailbreakBtn.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor],
         [self.jailbreakBtn.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor],
         [self.jailbreakBtn.heightAnchor constraintEqualToAnchor:buttonPlaceHolder.heightAnchor],
-        [self.jailbreakBtn.centerYAnchor constraintEqualToAnchor:buttonPlaceHolder.centerYAnchor constant: -15]
+        [self.jailbreakBtn.centerYAnchor constraintEqualToAnchor:buttonPlaceHolder.centerYAnchor constant: 20]
     ])];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
