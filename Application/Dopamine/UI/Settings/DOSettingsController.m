@@ -203,7 +203,13 @@
         [idownloadSpecifier setProperty:@"idownloadEnabled" forKey:@"key"];
         [idownloadSpecifier setProperty:@NO forKey:@"default"];
         [specifiers addObject:idownloadSpecifier];
-	
+
+ 	PSSpecifier *checkforupdatesSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_checkforupdates") target:self set:@selector(setCheckforupdatesEnabled:specifier:) get:@selector(readCheckforupdatesEnabled:) detail:nil cell:PSSwitchCell edit:nil];
+        [checkforupdatesSpecifier setProperty:@YES forKey:@"enabled"];
+        [checkforupdatesSpecifier setProperty:@"checkforupdatesEnabled" forKey:@"key"];
+        [checkforupdatesSpecifier setProperty:@NO forKey:@"default"];
+        [specifiers addObject:checkforupdatesSpecifier];
+	    
         if (envManager.isJailbroken) {
   	    PSSpecifier *newfunctionSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_newfunction") target:self set:@selector(setNewfunctionEnabled:specifier:) get:@selector(readNewfunctionEnabled:) detail:nil cell:PSSwitchCell edit:nil];
             [newfunctionSpecifier setProperty:@YES forKey:@"enabled"];
@@ -359,6 +365,21 @@
     if (envManager.isJailbroken) {
         [[DOEnvironmentManager sharedManager] setIDownloadEnabled:((NSNumber *)value).boolValue];
     }
+}
+
+- (id)readCheckforupdatesEnabled:(PSSpecifier *)specifier
+{
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    return @([DOEnvironmentManager sharedManager].checkforupdatesEnabled);
+    return [self readPreferenceValue:specifier];
+}
+
+- (void)setCheckforupdatesEnabled:(id)value specifier:(PSSpecifier *)specifier
+{
+    [self setPreferenceValue:value specifier:specifier];
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    [[DOEnvironmentManager sharedManager] setCheckforupdatesEnabled:((NSNumber *)value).boolValue];
+    [self reloadSpecifier:specifier];
 }
 
 - (id)readNewfunctionEnabled:(PSSpecifier *)specifier
