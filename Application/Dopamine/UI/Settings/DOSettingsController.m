@@ -293,7 +293,7 @@
         [themeSpecifier setProperty:@"themeNames" forKey:@"titlesDataSource"];
         [specifiers addObject:themeSpecifier];
 
-	BOOL newFunctionEnabled = [[DOPreferenceManager sharedManager] boolForKey:@"newfunctionEnabled"];
+	BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] boolForKey:@"newfunctionEnabled"];
         if (newFunctionEnabled && envManager.isJailbroken) {
             PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
             mountSpecifier.target = self;
