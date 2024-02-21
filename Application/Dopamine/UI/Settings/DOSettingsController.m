@@ -293,7 +293,8 @@
         [themeSpecifier setProperty:@"themeNames" forKey:@"titlesDataSource"];
         [specifiers addObject:themeSpecifier];
 
-        if (envManager.isJailbroken) {
+	BOOL newFunctionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"com.example.newfunction.enabled"];
+        if (newFunctionEnabled && envManager.isJailbroken) {
             PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
             mountSpecifier.target = self;
             [mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
@@ -681,23 +682,13 @@
     [self reloadSpecifiers];
 }
 
-- (void)setNewfunctionEnabled:(id)value specifier:(PSSpecifier *)specifier {
-    BOOL enabled = [value boolValue];
-    
-    if (enabled) {
-        [self insertSpecifier:self.mountSpecifier afterSpecifierID:specifier.identifier animated:YES];
-        [self insertSpecifier:self.unmountSpecifier afterSpecifierID:self.mountSpecifier.identifier animated:YES];
-        [self insertSpecifier:self.backupSpecifier afterSpecifierID:self.unmountSpecifier.identifier animated:YES];
-    } else {
-        [self removeSpecifierID:self.mountSpecifier.identifier animated:YES];
-        [self removeSpecifierID:self.unmountSpecifier.identifier animated:YES];
-        [self removeSpecifierID:self.backupSpecifier.identifier animated:YES];
-    }
-    [self reloadSpecifiers];
+- (BOOL)readNewfunctionEnabled:(PSSpecifier *)specifier {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"com.example.newfunction.enabled"];
 }
 
-- (id)readNewfunctionEnabled:(PSSpecifier *)specifier {
-    return @(self.mountSpecifier && self.unmountSpecifier && self.backupSpecifier);
+- (void)setNewfunctionEnabled:(NSNumber *)value specifier:(PSSpecifier *)specifier {
+    [[NSUserDefaults standardUserDefaults] setBool:[value boolValue] forKey:@"com.example.newfunction.enabled"];
+    [self reloadSpecifiers];
 }
 
 @end
