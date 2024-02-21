@@ -683,11 +683,11 @@
 }
 
 - (BOOL)readNewfunctionEnabled:(PSSpecifier *)specifier {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:@"com.example.newfunction.enabled"];
+    return [[DOPreferenceManager sharedManager] boolForKey:@"newfunctionEnabled"];
 }
 
 - (void)setNewfunctionEnabled:(NSNumber *)value specifier:(PSSpecifier *)specifier {
-    [[NSUserDefaults standardUserDefaults] setBool:[value boolValue] forKey:@"com.example.newfunction.enabled"];
+    [[DOPreferenceManager sharedManager] setBool:[value boolValue] forKey:@"newfunctionEnabled"];
     [self reloadSpecifiers];
 }
 
