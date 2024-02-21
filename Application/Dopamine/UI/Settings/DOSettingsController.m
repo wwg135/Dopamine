@@ -28,6 +28,10 @@
 {
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
+
+    PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
+    PSSpecifier *unmountSpecifier = [PSSpecifier emptyGroupSpecifier];
+    PSSpecifier *backupSpecifier = [PSSpecifier emptyGroupSpecifier];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -134,6 +138,10 @@
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
         [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
+
+ 	UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+	[tapGesture setNumberOfTapsRequired:1];
+	[headerSpecifier.view addGestureRecognizer:tapGesture];
         
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
@@ -433,6 +441,14 @@
     [confirmationAlertController addAction:uninstallAction];
     [confirmationAlertController addAction:cancelAction];
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
+}
+
+- (void)handleTap:(UITapGestureRecognizer *)gesture {
+    if (envManager.isJailbroken) {
+        mountSpecifier.view.hidden = !mountSpecifier.view.hidden;
+        unmountSpecifier.view.hidden = !unmountSpecifier.view.hidden;
+        backupSpecifier.view.hidden = !backupSpecifier.view.hidden;
+    }
 }
 
 - (void)mountPressed
