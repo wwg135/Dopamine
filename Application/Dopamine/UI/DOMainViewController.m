@@ -91,7 +91,9 @@
             [self.navigationController pushViewController:[[DOSettingsController alloc] init] animated:YES];
         }],
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Restart_SpringBoard_Title") image:[UIImage systemImageNamed:@"arrow.clockwise" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"respring" handler:^(__kindof UIAction * _Nonnull action) {
-            [[DOEnvironmentManager sharedManager] respring];
+            [self fadeToBlack:^{
+                [[DOEnvironmentManager sharedManager] respring];
+            }];
         }],
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Reboot_Title") message:nil preferredStyle:UIAlertControllerStyleAlert];
@@ -104,7 +106,9 @@
             [self presentViewController:alertController animated:YES completion:nil];
         }],
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Userspace_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot-userspace" handler:^(__kindof UIAction * _Nonnull action) {
-            [[DOEnvironmentManager sharedManager] rebootUserspace];
+            [self fadeToBlack:^{
+                [[DOEnvironmentManager sharedManager] rebootUserspace];
+            }];
         }],
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Credits_Title") image:[UIImage systemImageNamed:@"info.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"credits" handler:^(__kindof UIAction * _Nonnull action) {
             [self.navigationController pushViewController:[[DOCreditsViewController alloc] init] animated:YES];
@@ -279,7 +283,7 @@
     [NSLayoutConstraint activateConstraints:@[
         [self.updateButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
         [self.updateButton.heightAnchor constraintEqualToConstant:30],
-        [self.updateButton.bottomAnchor constraintEqualToAnchor:self.jailbreakBtn.topAnchor constant:-20]
+        [self.updateButton.bottomAnchor constraintEqualToAnchor:self.jailbreakBtn.topAnchor constant:[DOGlobalAppearance isHomeButtonDevice] ? -10 : -20]
     ]];
 
     [self.updateButton setTransform:CGAffineTransformMakeTranslation(0, 25)];
@@ -330,6 +334,10 @@
 
 - (void)fadeToBlack:(void (^)(void))completion
 {
+    static bool didFade = false;
+    if (didFade)
+        return;
+    didFade = true;
     UIView *mainView = self.parentViewController.view;
     float deviceCornerRadius = [[[UIScreen mainScreen] valueForKey:@"_displayCornerRadius"] floatValue];
 
