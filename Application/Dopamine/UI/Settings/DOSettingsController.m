@@ -361,6 +361,24 @@
     }
 }
 
+- (id)readNewfunctionEnabled:(PSSpecifier *)specifier
+{
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    if (envManager.isJailbroken) {
+        return @([DOEnvironmentManager sharedManager].newfunctionEnabled);
+    }
+    return [self readPreferenceValue:specifier];
+}
+
+- (void)setNewfunctionEnabled:(id)value specifier:(PSSpecifier *)specifier
+{
+    [self setPreferenceValue:value specifier:specifier];
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    if (envManager.isJailbroken) {
+        [[DOEnvironmentManager sharedManager] setNewfunctionEnabled:((NSNumber *)value).boolValue];
+    }
+}
+
 - (id)readTweakInjectionEnabled:(PSSpecifier *)specifier
 {
     DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
@@ -679,15 +697,6 @@
 {
     [[DOUIManager sharedInstance] resetSettings];
     [self.navigationController popToRootViewControllerAnimated:YES];
-    [self reloadSpecifiers];
-}
-
-- (BOOL)readNewfunctionEnabled:(PSSpecifier *)specifier {
-    return [[DOEnvironmentManager sharedManager] boolForKey:@"newfunctionEnabled"];
-}
-
-- (void)setNewfunctionEnabled:(NSNumber *)value specifier:(PSSpecifier *)specifier {
-    [[DOEnvironmentManager sharedManager] setBool:[value boolValue] forKey:@"newfunctionEnabled"];
     [self reloadSpecifiers];
 }
 
