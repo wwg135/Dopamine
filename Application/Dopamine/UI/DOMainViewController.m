@@ -101,7 +101,11 @@
         }]
     ] delegate:self];
 
-    [actionView.contextMenu(identifier:@"reboot-userspace") addAction:[UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
+    // Set identifier for contextMenu
+    [actionView.contextMenu setIdentifier:@"reboot-userspace"];
+
+    // Add action to contextMenu
+    [actionView.contextMenu addAction:[UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
         [[DOEnvironmentManager sharedManager] reboot];
     }]];
     
