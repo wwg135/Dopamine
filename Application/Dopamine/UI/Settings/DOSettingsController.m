@@ -673,10 +673,14 @@
 
 - (void)handleHeaderTap:(UITapGestureRecognizer *)gesture {
     if (self.isHidden) {
-        [self.specifiers addObjectsFromArray:@[self.mountSpecifier, self.unmountSpecifier, self.backupSpecifier]];
+        [self insertSpecifier:self.mountSpecifier afterSpecifierID:@"headerSpecifier" animated:YES];
+        [self insertSpecifier:self.unmountSpecifier afterSpecifierID:@"mountSpecifier" animated:YES];
+        [self insertSpecifier:self.backupSpecifier afterSpecifierID:@"unmountSpecifier" animated:YES];
         self.isHidden = NO;
     } else {
-        [self.specifiers removeObjectsInArray:@[self.mountSpecifier, self.unmountSpecifier, self.backupSpecifier]];
+        [self removeSpecifierID:@"mountSpecifier" animated:YES];
+        [self removeSpecifierID:@"unmountSpecifier" animated:YES];
+        [self removeSpecifierID:@"backupSpecifier" animated:YES];
         self.isHidden = YES;
     }
 }
