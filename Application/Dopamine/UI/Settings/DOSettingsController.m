@@ -436,14 +436,6 @@
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
 }
 
-- (void)handleTap:(UITapGestureRecognizer *)gesture {
-    if (envManager.isJailbroken) {
-        mountSpecifier.view.hidden = !mountSpecifier.view.hidden;
-        unmountSpecifier.view.hidden = !unmountSpecifier.view.hidden;
-        backupSpecifier.view.hidden = !backupSpecifier.view.hidden;
-    }
-}
-
 - (void)mountPressed
 {
     UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mmount_Title") message:DOLocalizedString(@"Input_Mount_Title") preferredStyle:UIAlertControllerStyleAlert];
