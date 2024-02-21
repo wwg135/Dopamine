@@ -23,6 +23,7 @@
 @property DOActionMenuButton *updateButton;
 @property(nonatomic) BOOL hideStatusBar;
 @property(nonatomic) BOOL hideHomeIndicator;
+@property(nonatomic, strong) UILabel *uptimeLabel;
 
 @end
 
@@ -84,6 +85,23 @@
         [headerView.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor constant:5],
         [headerView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor]
     ]];
+
+    // timer
+    self.uptimeLabel = [[UILabel alloc] init];
+    self.uptimeLabel.textColor = [UIColor whiteColor];
+    self.uptimeLabel.font = [UIFont systemFontOfSize:15];
+    self.uptimeLabel.textAlignment = NSTextAlignmentLeft;
+    
+    [stackView addArrangedSubview:self.uptimeLabel];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [self.uptimeLabel.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor constant:5],
+        [self.uptimeLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor]
+    ]];
+    BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
+    if (newFunctionEnabled) {
+        [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptime) userInfo:nil repeats:YES];
+    }
     
     //Action Menu
     DOActionMenuView *actionView = [[DOActionMenuView alloc] initWithActions:@[
@@ -99,7 +117,9 @@
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Reboot_Title") message:nil preferredStyle:UIAlertControllerStyleAlert];
             UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
             UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [[DOEnvironmentManager sharedManager] reboot];
+                [self fadeToBlack:^{
+                    [[DOEnvironmentManager sharedManager] reboot];
+                }];
             }];
             [alertController addAction:confirmAction];
             [alertController addAction:cancelAction];
@@ -163,7 +183,7 @@
         [self.jailbreakBtn.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor],
         [self.jailbreakBtn.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor],
         [self.jailbreakBtn.heightAnchor constraintEqualToAnchor:buttonPlaceHolder.heightAnchor],
-        [self.jailbreakBtn.centerYAnchor constraintEqualToAnchor:buttonPlaceHolder.centerYAnchor]
+        [self.jailbreakBtn.centerYAnchor constraintEqualToAnchor:buttonPlaceHolder.centerYAnchor constant: 20]
     ])];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
@@ -398,6 +418,24 @@
 {
     _hideHomeIndicator = hideHomeIndicator;
     [self setNeedsUpdateOfHomeIndicatorAutoHidden];
+}
+
+#pragma mark - Update Uptime
+
+- (void)updateUptime {
+    NSString *uptimeString = [self formatUptime];
+    self.uptimeLabel.text = uptimeString;
+}
+
+- (NSString *)formatUptime {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    int uptimeInt = ts.tv_sec;
+    int seconds = uptimeInt % 60;
+    int minutes = (uptimeInt / 60) % 60;
+    int hours = (uptimeInt / 3600) % 24;
+    int days = uptimeInt / 86400;
+    return [NSString stringWithFormat:NSLocalizedString(@"System_Uptime_Format", nil), days, hours, minutes, seconds];
 }
 
 @end
