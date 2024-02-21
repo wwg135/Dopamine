@@ -142,7 +142,7 @@
 
  	UIView *headerView = [[UIView alloc] initWithFrame:CGRectZero];
         [headerView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleHeaderTap:)]];
-        headerSpecifier->titleHeaderView = headerView;
+        [headerSpecifier setProperty:headerView forKey:@"cellHeaderView"];
 
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
