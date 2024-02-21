@@ -20,11 +20,6 @@
 
 @interface DOSettingsController ()
 
-@property (nonatomic, strong) PSSpecifier *mountSpecifier;
-@property (nonatomic, strong) PSSpecifier *unmountSpecifier;
-@property (nonatomic, strong) PSSpecifier *backupSpecifier;
-@property (nonatomic, assign) BOOL isHidden;
-
 @end
 
 @implementation DOSettingsController
@@ -140,10 +135,6 @@
         [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
 
- 	UIView *headerView = [[UIView alloc] initWithFrame:CGRectZero];
-        [headerView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleHeaderTap:)]];
-        [headerSpecifier setProperty:headerView forKey:@"cellHeaderView"];
-
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
             exploitGroupSpecifier.name = DOLocalizedString(@"Section_Exploits");
@@ -194,6 +185,14 @@
         [tweakInjectionSpecifier setProperty:@"tweakInjectionEnabled" forKey:@"key"];
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
+
+ 	if (envManager.isJailbroken) {
+  	    PSSpecifier *newfunctionSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_newfunction") target:self set:@selector(setNewfunctionEnabled:specifier:) get:@selector(readNewfunctionEnabled:) detail:nil cell:PSSwitchCell edit:nil];
+            [newfunctionSpecifier setProperty:@YES forKey:@"enabled"];
+            [newfunctionSpecifier setProperty:@"newfunctionEnabled" forKey:@"key"];
+            [newfunctionSpecifier setProperty:@NO forKey:@"default"];
+            [specifiers addObject:newfunctionSpecifier];
+	}
         
         if (!envManager.isJailbroken) {
             PSSpecifier *verboseLogSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Verbose_Logs") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
@@ -291,29 +290,29 @@
         [specifiers addObject:themeSpecifier];
 
         if (envManager.isJailbroken) {
-            self.mountSpecifier = [PSSpecifier emptyGroupSpecifier];
-            self.mountSpecifier.target = self;
-            [self.mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
-            [self.mountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-            [self.mountSpecifier setProperty:@"doc" forKey:@"image"];
-            [self.mountSpecifier setProperty:@"mountPressed" forKey:@"action"];
-            [specifiers addObject:self.mountSpecifier];
+            PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
+            mountSpecifier.target = self;
+            [mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
+            [mountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [mountSpecifier setProperty:@"doc" forKey:@"image"];
+            [mountSpecifier setProperty:@"mountPressed" forKey:@"action"];
+            [specifiers addObject:mountSpecifier];
 
-            self.unmountSpecifier = [PSSpecifier emptyGroupSpecifier];
-            self.unmountSpecifier.target = self;
-            [self.unmountSpecifier setProperty:@"Input_Unmount_Title" forKey:@"title"];
-            [self.unmountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-            [self.unmountSpecifier setProperty:@"trash" forKey:@"image"];
-            [self.unmountSpecifier setProperty:@"unmountPressed" forKey:@"action"];
-            [specifiers addObject:self.unmountSpecifier];
+            PSSpecifier *unmountSpecifier = [PSSpecifier emptyGroupSpecifier];
+            unmountSpecifier.target = self;
+            [unmountSpecifier setProperty:@"Input_Unmount_Title" forKey:@"title"];
+            [unmountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [unmountSpecifier setProperty:@"trash" forKey:@"image"];
+            [unmountSpecifier setProperty:@"unmountPressed" forKey:@"action"];
+            [specifiers addObject:unmountSpecifier];
 
-            self.backupSpecifier = [PSSpecifier emptyGroupSpecifier];
-            self.backupSpecifier.target = self;
-            [self.backupSpecifier setProperty:@"Alert_Back_Up_Title" forKey:@"title"];
-            [self.backupSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-            [self.backupSpecifier setProperty:@"doc" forKey:@"image"];
-            [self.backupSpecifier setProperty:@"backupPressed" forKey:@"action"];
-            [specifiers addObject:self.backupSpecifier];
+            PSSpecifier *backupSpecifier = [PSSpecifier emptyGroupSpecifier];
+            backupSpecifier.target = self;
+            [backupSpecifier setProperty:@"Alert_Back_Up_Title" forKey:@"title"];
+            [backupSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [backupSpecifier setProperty:@"doc" forKey:@"image"];
+            [backupSpecifier setProperty:@"backupPressed" forKey:@"action"];
+            [specifiers addObject:backupSpecifier];
         }
         
         _specifiers = specifiers;
@@ -671,25 +670,29 @@
     }
 }
 
-- (void)handleHeaderTap:(UITapGestureRecognizer *)gesture {
-    if (self.isHidden) {
-        [self insertSpecifier:self.mountSpecifier afterSpecifierID:@"headerSpecifier" animated:YES];
-        [self insertSpecifier:self.unmountSpecifier afterSpecifierID:@"mountSpecifier" animated:YES];
-        [self insertSpecifier:self.backupSpecifier afterSpecifierID:@"unmountSpecifier" animated:YES];
-        self.isHidden = NO;
-    } else {
-        [self removeSpecifierID:@"mountSpecifier" animated:YES];
-        [self removeSpecifierID:@"unmountSpecifier" animated:YES];
-        [self removeSpecifierID:@"backupSpecifier" animated:YES];
-        self.isHidden = YES;
-    }
-}
-
 - (void)resetSettingsPressed
 {
     [[DOUIManager sharedInstance] resetSettings];
     [self.navigationController popToRootViewControllerAnimated:YES];
     [self reloadSpecifiers];
+}
+
+- (void)setNewfunctionEnabled:(id)value specifier:(PSSpecifier *)specifier {
+    BOOL enabled = [value boolValue];
+    
+    if (enabled) {
+        [self insertSpecifier:self.mountSpecifier afterSpecifierID:specifier.identifier animated:YES];
+        [self insertSpecifier:self.unmountSpecifier afterSpecifierID:self.mountSpecifier.identifier animated:YES];
+        [self insertSpecifier:self.backupSpecifier afterSpecifierID:self.unmountSpecifier.identifier animated:YES];
+    } else {
+        [self removeSpecifierID:self.mountSpecifier.identifier animated:YES];
+        [self removeSpecifierID:self.unmountSpecifier.identifier animated:YES];
+        [self removeSpecifierID:self.backupSpecifier.identifier animated:YES];
+    }
+}
+
+- (id)readNewfunctionEnabled:(PSSpecifier *)specifier {
+    return @(self.mountSpecifier && self.unmountSpecifier && self.backupSpecifier);
 }
 
 @end
