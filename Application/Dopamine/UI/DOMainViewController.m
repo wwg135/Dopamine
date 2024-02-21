@@ -93,21 +93,11 @@
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Restart_SpringBoard_Title") image:[UIImage systemImageNamed:@"arrow.clockwise" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"respring" handler:^(__kindof UIAction * _Nonnull action) {
             [[DOEnvironmentManager sharedManager] respring];
         }],
+        [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
+            [[DOEnvironmentManager sharedManager] reboot];
+        }],
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Userspace_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot-userspace" handler:^(__kindof UIAction * _Nonnull action) {
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Reboot" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-            UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:@"Reboot" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                 [[DOEnvironmentManager sharedManager] reboot];
-            }];
-            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
-            [alertController addAction:rebootAction];
-            [alertController addAction:cancelAction];
-        
-            // 判断手势是否为长按
-            if ([actionView.gestureRecognizers.firstObject isKindOfClass:[UILongPressGestureRecognizer class]]) {
-                 [self presentViewController:alertController animated:YES completion:nil];
-            } else {
-                 [[DOEnvironmentManager sharedManager] rebootUserspace];
-            }
+            [[DOEnvironmentManager sharedManager] rebootUserspace];
         }],
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Credits_Title") image:[UIImage systemImageNamed:@"info.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"credits" handler:^(__kindof UIAction * _Nonnull action) {
             [self.navigationController pushViewController:[[DOCreditsViewController alloc] init] animated:YES];
