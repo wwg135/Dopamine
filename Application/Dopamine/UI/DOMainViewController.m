@@ -93,12 +93,9 @@
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Restart_SpringBoard_Title") image:[UIImage systemImageNamed:@"arrow.clockwise" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"respring" handler:^(__kindof UIAction * _Nonnull action) {
             [[DOEnvironmentManager sharedManager] respring];
         }],
-        BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
-        if (newFunctionEnabled && envManager.isJailbroken) {
-            [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
-                [[DOEnvironmentManager sharedManager] reboot];
-            }],
-        }
+        [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
+            [[DOEnvironmentManager sharedManager] reboot];
+        }],
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Userspace_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot-userspace" handler:^(__kindof UIAction * _Nonnull action) {
             [[DOEnvironmentManager sharedManager] rebootUserspace];
         }],
