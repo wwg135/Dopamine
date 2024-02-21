@@ -370,7 +370,9 @@
 - (id)readCheckforupdatesEnabled:(PSSpecifier *)specifier
 {
     DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-    return @([DOEnvironmentManager sharedManager].checkforupdatesEnabled);
+    if (envManager.isJailbroken) {
+    	return @([DOEnvironmentManager sharedManager].checkforupdatesEnabled);
+    }
     return [self readPreferenceValue:specifier];
 }
 
@@ -378,8 +380,10 @@
 {
     [self setPreferenceValue:value specifier:specifier];
     DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-    [[DOEnvironmentManager sharedManager] setCheckforupdatesEnabled:((NSNumber *)value).boolValue];
-    [self reloadSpecifier:specifier];
+    if (envManager.isJailbroken) {
+    	[[DOEnvironmentManager sharedManager] setCheckforupdatesEnabled:((NSNumber *)value).boolValue];
+    	[self reloadSpecifier:specifier];
+    }
 }
 
 - (id)readNewfunctionEnabled:(PSSpecifier *)specifier
