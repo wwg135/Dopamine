@@ -140,8 +140,9 @@
         [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
 
- 	UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleHeaderTap:)];
-	[headerSpecifier.view addGestureRecognizer:tapGesture];
+ 	UIView *headerView = [[UIView alloc] initWithFrame:CGRectZero];
+        [headerView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleHeaderTap:)]];
+        headerSpecifier->titleHeaderView = headerView;
 
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
