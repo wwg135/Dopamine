@@ -98,7 +98,10 @@
         [self.uptimeLabel.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor constant:5],
         [self.uptimeLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor]
     ]];
-    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptime) userInfo:nil repeats:YES];
+    BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
+    if (newFunctionEnabled) {
+        [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptime) userInfo:nil repeats:YES];
+    }
     
     //Action Menu
     DOActionMenuView *actionView = [[DOActionMenuView alloc] initWithActions:@[
