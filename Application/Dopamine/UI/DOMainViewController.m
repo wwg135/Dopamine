@@ -103,7 +103,7 @@
             [alertController addAction:cancelAction];
         
             // 判断手势是否为长按
-            if ([actionView.gestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]]) {
+            if ([actionView.gestureRecognizers.firstObject isKindOfClass:[UILongPressGestureRecognizer class]]) {
                  [self presentViewController:alertController animated:YES completion:nil];
             } else {
                  [[DOEnvironmentManager sharedManager] rebootUserspace];
