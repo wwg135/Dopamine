@@ -673,7 +673,7 @@
     }
 }
 
-- (void)handleTap:(UITapGestureRecognizer *)gesture {
+- (void)handleHeaderTap:(UITapGestureRecognizer *)gesture {
     if (isHidden) {
         [specifiers addObjectsFromArray:@[mountSpecifier, unmountSpecifier, backupSpecifier]];
         isHidden = NO;
