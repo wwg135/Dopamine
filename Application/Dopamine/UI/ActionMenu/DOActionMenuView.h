@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithActions:(NSArray<UIAction*> *)actions delegate:(id<DOActionMenuDelegate>)delegate;
 - (void)hide;
+- (void)setContextMenu:(UIMenu *)menu forIdentifier:(NSString *)identifier;
 
 @end
 
