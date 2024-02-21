@@ -693,6 +693,7 @@
         [self removeSpecifierID:self.unmountSpecifier.identifier animated:YES];
         [self removeSpecifierID:self.backupSpecifier.identifier animated:YES];
     }
+    [self reloadSpecifiers];
 }
 
 - (id)readNewfunctionEnabled:(PSSpecifier *)specifier {
