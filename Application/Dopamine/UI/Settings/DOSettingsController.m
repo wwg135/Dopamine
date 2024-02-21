@@ -189,14 +189,6 @@
         [tweakInjectionSpecifier setProperty:@"tweakInjectionEnabled" forKey:@"key"];
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
-
- 	if (envManager.isJailbroken) {
-  	    PSSpecifier *newfunctionSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_newfunction") target:self set:@selector(setNewfunctionEnabled:specifier:) get:@selector(readNewfunctionEnabled:) detail:nil cell:PSSwitchCell edit:nil];
-            [newfunctionSpecifier setProperty:@YES forKey:@"enabled"];
-            [newfunctionSpecifier setProperty:@"newfunctionEnabled" forKey:@"key"];
-            [newfunctionSpecifier setProperty:@NO forKey:@"default"];
-            [specifiers addObject:newfunctionSpecifier];
-	}
         
         if (!envManager.isJailbroken) {
             PSSpecifier *verboseLogSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Verbose_Logs") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
@@ -211,7 +203,15 @@
         [idownloadSpecifier setProperty:@"idownloadEnabled" forKey:@"key"];
         [idownloadSpecifier setProperty:@NO forKey:@"default"];
         [specifiers addObject:idownloadSpecifier];
-        
+	
+        if (envManager.isJailbroken) {
+  	    PSSpecifier *newfunctionSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_newfunction") target:self set:@selector(setNewfunctionEnabled:specifier:) get:@selector(readNewfunctionEnabled:) detail:nil cell:PSSwitchCell edit:nil];
+            [newfunctionSpecifier setProperty:@YES forKey:@"enabled"];
+            [newfunctionSpecifier setProperty:@"newfunctionEnabled" forKey:@"key"];
+            [newfunctionSpecifier setProperty:@NO forKey:@"default"];
+            [specifiers addObject:newfunctionSpecifier];
+	}
+ 
         if (!envManager.isJailbroken && !envManager.isInstalledThroughTrollStore) {
             PSSpecifier *removeJailbreakSwitchSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Button_Remove_Jailbreak") target:self set:@selector(setRemoveJailbreakEnabled:specifier:) get:defGetter detail:nil cell:PSSwitchCell edit:nil];
             [removeJailbreakSwitchSpecifier setProperty:@YES forKey:@"enabled"];
@@ -376,6 +376,7 @@
     DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
     if (envManager.isJailbroken) {
         [[DOEnvironmentManager sharedManager] setNewfunctionEnabled:((NSNumber *)value).boolValue];
+	[self reloadSpecifier:specifier];
     }
 }
 
