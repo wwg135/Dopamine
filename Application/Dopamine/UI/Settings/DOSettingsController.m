@@ -20,6 +20,11 @@
 
 @interface DOSettingsController ()
 
+@property (nonatomic, strong) PSSpecifier *mountSpecifier;
+@property (nonatomic, strong) PSSpecifier *unmountSpecifier;
+@property (nonatomic, strong) PSSpecifier *backupSpecifier;
+@property (nonatomic, assign) BOOL isHidden;
+
 @end
 
 @implementation DOSettingsController
@@ -285,29 +290,29 @@
         [specifiers addObject:themeSpecifier];
 
         if (envManager.isJailbroken) {
-            PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
-            mountSpecifier.target = self;
-            [mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
-            [mountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-            [mountSpecifier setProperty:@"doc" forKey:@"image"];
-            [mountSpecifier setProperty:@"mountPressed" forKey:@"action"];
-            [specifiers addObject:mountSpecifier];
+            self.mountSpecifier = [PSSpecifier emptyGroupSpecifier];
+            self.mountSpecifier.target = self;
+            [self.mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
+            [self.mountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [self.mountSpecifier setProperty:@"doc" forKey:@"image"];
+            [self.mountSpecifier setProperty:@"mountPressed" forKey:@"action"];
+            [specifiers addObject:self.mountSpecifier];
 
-            PSSpecifier *unmountSpecifier = [PSSpecifier emptyGroupSpecifier];
-            unmountSpecifier.target = self;
-            [unmountSpecifier setProperty:@"Input_Unmount_Title" forKey:@"title"];
-            [unmountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-            [unmountSpecifier setProperty:@"trash" forKey:@"image"];
-            [unmountSpecifier setProperty:@"unmountPressed" forKey:@"action"];
-            [specifiers addObject:unmountSpecifier];
+            self.unmountSpecifier = [PSSpecifier emptyGroupSpecifier];
+            self.unmountSpecifier.target = self;
+            [self.unmountSpecifier setProperty:@"Input_Unmount_Title" forKey:@"title"];
+            [self.unmountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [self.unmountSpecifier setProperty:@"trash" forKey:@"image"];
+            [self.unmountSpecifier setProperty:@"unmountPressed" forKey:@"action"];
+            [specifiers addObject:self.unmountSpecifier];
 
-            PSSpecifier *backupSpecifier = [PSSpecifier emptyGroupSpecifier];
-            backupSpecifier.target = self;
-            [backupSpecifier setProperty:@"Alert_Back_Up_Title" forKey:@"title"];
-            [backupSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-            [backupSpecifier setProperty:@"doc" forKey:@"image"];
-            [backupSpecifier setProperty:@"backupPressed" forKey:@"action"];
-            [specifiers addObject:backupSpecifier];
+            self.backupSpecifier = [PSSpecifier emptyGroupSpecifier];
+            self.backupSpecifier.target = self;
+            [self.backupSpecifier setProperty:@"Alert_Back_Up_Title" forKey:@"title"];
+            [self.backupSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [self.backupSpecifier setProperty:@"doc" forKey:@"image"];
+            [self.backupSpecifier setProperty:@"backupPressed" forKey:@"action"];
+            [specifiers addObject:self.backupSpecifier];
         }
         
         _specifiers = specifiers;
@@ -666,12 +671,12 @@
 }
 
 - (void)handleHeaderTap:(UITapGestureRecognizer *)gesture {
-    if (isHidden) {
-        [specifiers addObjectsFromArray:@[mountSpecifier, unmountSpecifier, backupSpecifier]];
-        isHidden = NO;
+    if (self.isHidden) {
+        [self.specifiers addObjectsFromArray:@[self.mountSpecifier, self.unmountSpecifier, self.backupSpecifier]];
+        self.isHidden = NO;
     } else {
-        [specifiers removeObjectsInArray:@[mountSpecifier, unmountSpecifier, backupSpecifier]];
-        isHidden = YES;
+        [self.specifiers removeObjectsInArray:@[self.mountSpecifier, self.unmountSpecifier, self.backupSpecifier]];
+        self.isHidden = YES;
     }
 }
 
