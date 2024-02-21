@@ -101,11 +101,15 @@
         }]
     ] delegate:self];
 
-    // Add sub-menu to "reboot-userspace" action
-    UIAction *rebootAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
-        [[DOEnvironmentManager sharedManager] reboot];
-    }];
-    [actionView addAction:rebootAction toSubmenuForIdentifier:@"reboot-userspace"];
+    // Create a sub-menu for "reboot-userspace"
+    UIMenu *rebootSubMenu = [UIMenu menuWithTitle:@"" children:@[
+        [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
+            [[DOEnvironmentManager sharedManager] reboot];
+        }]
+    ]];
+
+    // Set the sub-menu for "reboot-userspace"
+    [actionView setMenu:rebootSubMenu forIdentifier:@"reboot-userspace"];
     
     [stackView addArrangedSubview: actionView];
 
