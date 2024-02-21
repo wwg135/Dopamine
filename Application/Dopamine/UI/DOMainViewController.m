@@ -109,7 +109,7 @@
     ]];
 
     // Set the sub-menu for "reboot-userspace"
-    [actionView setMenu:rebootSubMenu forIdentifier:@"reboot-userspace"];
+    [actionView setContextMenu:rebootSubMenu forIdentifier:@"reboot-userspace"];
     
     [stackView addArrangedSubview: actionView];
 
