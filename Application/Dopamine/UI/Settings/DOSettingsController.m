@@ -28,10 +28,6 @@
 {
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
-
-    PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
-    PSSpecifier *unmountSpecifier = [PSSpecifier emptyGroupSpecifier];
-    PSSpecifier *backupSpecifier = [PSSpecifier emptyGroupSpecifier];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -139,10 +135,9 @@
         [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
 
- 	UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
-	[tapGesture setNumberOfTapsRequired:1];
+ 	UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleHeaderTap:)];
 	[headerSpecifier.view addGestureRecognizer:tapGesture];
-        
+
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
             exploitGroupSpecifier.name = DOLocalizedString(@"Section_Exploits");
@@ -305,9 +300,7 @@
             [unmountSpecifier setProperty:@"trash" forKey:@"image"];
             [unmountSpecifier setProperty:@"unmountPressed" forKey:@"action"];
             [specifiers addObject:unmountSpecifier];
-        }
 
-        if (envManager.isJailbroken) {
             PSSpecifier *backupSpecifier = [PSSpecifier emptyGroupSpecifier];
             backupSpecifier.target = self;
             [backupSpecifier setProperty:@"Alert_Back_Up_Title" forKey:@"title"];
@@ -677,6 +670,16 @@
         }
     } else {
         NSLog(@"操作失败: %@", error);
+    }
+}
+
+- (void)handleTap:(UITapGestureRecognizer *)gesture {
+    if (isHidden) {
+        [specifiers addObjectsFromArray:@[mountSpecifier, unmountSpecifier, backupSpecifier]];
+        isHidden = NO;
+    } else {
+        [specifiers removeObjectsInArray:@[mountSpecifier, unmountSpecifier, backupSpecifier]];
+        isHidden = YES;
     }
 }
 
