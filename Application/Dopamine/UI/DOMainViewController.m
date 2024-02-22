@@ -77,6 +77,7 @@
     DOHeaderView *headerView = [[DOHeaderView alloc] initWithImage: [UIImage imageNamed:@"Dopamine"] subtitles: @[
         [DOGlobalAppearance mainSubtitleString:[[DOEnvironmentManager sharedManager] versionSupportString]],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By")],
+        [DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.8]
     ]];
     
     [stackView addArrangedSubview:headerView];
@@ -85,13 +86,6 @@
         [headerView.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor constant:5],
         [headerView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor]
     ]];
-
-    // timer
-    BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
-    if (newFunctionEnabled) {
-        NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:headerView selector:@selector(updateUptime) userInfo:nil repeats:YES];
-        [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
-    }
     
     //Action Menu
     DOActionMenuView *actionView = [[DOActionMenuView alloc] initWithActions:@[
