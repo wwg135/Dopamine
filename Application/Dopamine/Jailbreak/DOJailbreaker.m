@@ -437,6 +437,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     BOOL removeJailbreakEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"removeJailbreakEnabled" fallback:NO];
     BOOL tweaksEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"tweakInjectionEnabled" fallback:YES];
     BOOL idownloadEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"idownloadEnabled" fallback:NO];
+    BOOL checkforupdatesEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"checkforupdatesEnabled" fallback:YES];
     
     *errOut = [self gatherSystemInformation];
     if (*errOut) return;
