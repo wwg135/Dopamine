@@ -53,31 +53,6 @@ int reboot3(uint64_t flags, ...);
     return self;
 }
 
-- (NSString *)nightlyHash
-{
-#ifdef NIGHTLY
-    return [NSString stringWithUTF8String:COMMIT_HASH];
-#else
-    return nil;
-#endif
-}
-
-- (NSString *)appVersion
-{
-    return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-}
-
-- (NSString *)appVersionDisplayString
-{
-    NSString *nightlyHash = [self nightlyHash];
-    if (nightlyHash) {
-        return [NSString stringWithFormat:@"%@~%@", self.appVersion, [nightlyHash substringToIndex:6]];
-    }
-    else {
-        return [self appVersion];
-    }
-}
-
 - (NSData *)bootManifestHash
 {
     if (!_bootManifestHash) {
@@ -461,7 +436,10 @@ int reboot3(uint64_t flags, ...);
 {
     if ([self isInstalledThroughTrollStore]) {
         NSString *kernelcachePath = [[self activePrebootPath] stringByAppendingPathComponent:@"System/Library/Caches/com.apple.kernelcaches/kernelcache"];
-        return kernelcachePath;
+        if ([[NSFileManager defaultManager] fileExistsAtPath:kernelcachePath]) {
+            return kernelcachePath;
+        }
+        return @"/System/Library/Caches/com.apple.kernelcaches/kernelcache";
     }
     else {
         NSString *kernelInApp = [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:@"kernelcache"];
