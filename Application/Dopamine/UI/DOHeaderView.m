@@ -54,9 +54,6 @@
             }
         }];
 
-        self.subtitles = [NSMutableArray arrayWithArray:subtitles];
-        [self setupSubtitles];
-
         self.translatesAutoresizingMaskIntoConstraints = NO;
 
         DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
@@ -70,22 +67,6 @@
         [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
     }
     return self;
-}
-
-- (void)setupSubtitles {
-    UIStackView *stackView = self.subviews.firstObject;
-    for (UILabel *label in stackView.arrangedSubviews) {
-        if ([label isKindOfClass:[UILabel class]]) {
-            [label removeFromSuperview];
-        }
-    }
-
-    for (NSAttributedString *subtitle in self.subtitles) {
-        UILabel *subtitleLabel = [[UILabel alloc] init];
-        subtitleLabel.attributedText = subtitle;
-        subtitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        [stackView addArrangedSubview:subtitleLabel];
-    }
 }
 
 - (void)updateLabel {
