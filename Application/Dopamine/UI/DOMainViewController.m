@@ -87,20 +87,10 @@
     ]];
 
     // timer
-    self.uptimeLabel = [[UILabel alloc] init];
-    self.uptimeLabel.textColor = [UIColor whiteColor];
-    self.uptimeLabel.font = [UIFont systemFontOfSize:15];
-    self.uptimeLabel.textAlignment = NSTextAlignmentLeft;
-    
-    [stackView addArrangedSubview:self.uptimeLabel];
-    
-    [NSLayoutConstraint activateConstraints:@[
-        [self.uptimeLabel.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor constant:5],
-        [self.uptimeLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor]
-    ]];
     BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
     if (newFunctionEnabled) {
-        [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptime) userInfo:nil repeats:YES];
+        NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:headerView selector:@selector(updateUptime) userInfo:nil repeats:YES];
+        [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
     }
     
     //Action Menu
