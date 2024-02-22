@@ -644,22 +644,16 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
         NSError *error = [self installPackageManagers];
         if (error) return error;
 
-        NSString *ellekitPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"ElleKit_1.1.2.deb"];
+        NSString *ellekitPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"ellekit_1.0_iphoneos-arm64.deb"];
         int ellekitResult = [self installPackage:ellekitPath];
         if (ellekitResult != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install ellekit: %d\n", ellekitResult]}];
         }
         
-        NSString *preferenceloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"PreferenceLoader_2.2.6-1.deb"];
+        NSString *preferenceloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"preferenceloader_2.2.6-1_iphoneos-arm64.deb"];
         int preferenceloaderResult = [self installPackage:preferenceloaderPath];
         if (preferenceloaderResult != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install preferenceloader: %d\n", preferenceloaderResult]}];
-        }
-
-        NSString *sailyPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"saily.deb"];
-        int sailyResult = [self installPackage:sailyPath];
-        if (sailyResult != 0) {
-            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install saily: %d\n", sailyResult]}];
         }
     }
     
