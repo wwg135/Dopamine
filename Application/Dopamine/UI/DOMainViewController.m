@@ -77,7 +77,7 @@
         [DOGlobalAppearance mainSubtitleString:[[DOEnvironmentManager sharedManager] versionSupportString]],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By") withAlpha:0.8],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"AAB") withAlpha:0.6],
-        [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"System_Uptime")@" " withAlpha:0.8]
+        [DOGlobalAppearance secondarySubtitleString:[NSString stringWithFormat:@"%@ %@", DOLocalizedString(@"System_Uptime"), @" "] withAlpha:0.8]
     ]];
     
     [stackView addArrangedSubview:headerView];
