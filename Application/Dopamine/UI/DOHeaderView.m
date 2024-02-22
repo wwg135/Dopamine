@@ -17,7 +17,7 @@
 
 @implementation DOHeaderView
 
--(id)initWithImage:(UIImage *)image subtitles:(NSArray<NSAttributedString *> *)subtitles {
+- (id)initWithImage:(UIImage *)image subtitles:(NSArray<NSAttributedString *> *)subtitles {
     if (self = [super init]) {
         UIStackView *stackView = [[UIStackView alloc] init];
         stackView.axis = UILayoutConstraintAxisVertical;
@@ -34,7 +34,6 @@
             [stackView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
         ]];
 
-        //1 - Add the logo to our stack
         self.logoView = [[UIImageView alloc] init];
         self.logoView.translatesAutoresizingMaskIntoConstraints = NO;
         self.logoView.image = [image imageWithAlignmentRectInsets:UIEdgeInsetsMake(7, 0, -7, 0)];
@@ -45,22 +44,23 @@
             [self.logoView.widthAnchor constraintEqualToAnchor:self.logoView.heightAnchor multiplier:image.size.width / image.size.height],
         ]];
 
-        //3 - Add our subtitles to our stack
         [subtitles enumerateObjectsUsingBlock:^(NSAttributedString *formatedText, NSUInteger idx, BOOL *stop) {
             UILabel *label = [[UILabel alloc] init];
             label.attributedText = formatedText;
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
             if (idx == 3) {
-		self.timerLabel = label;
+                self.timerLabel = label;
             }
         }];
+
+        self.subtitles = [NSMutableArray arrayWithArray:subtitles];
+        [self setupSubtitles];
 
         self.translatesAutoresizingMaskIntoConstraints = NO;
 
         DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
-        if (theme.titleShadow)
-        {
+        if (theme.titleShadow) {
             self.layer.shadowColor = [UIColor blackColor].CGColor;
             self.layer.shadowOffset = CGSizeZero;
             self.layer.shadowRadius = 30;
@@ -70,6 +70,22 @@
         [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
     }
     return self;
+}
+
+- (void)setupSubtitles {
+    UIStackView *stackView = self.subviews.firstObject;
+    for (UILabel *label in stackView.arrangedSubviews) {
+        if ([label isKindOfClass:[UILabel class]]) {
+            [label removeFromSuperview];
+        }
+    }
+
+    for (NSAttributedString *subtitle in self.subtitles) {
+        UILabel *subtitleLabel = [[UILabel alloc] init];
+        subtitleLabel.attributedText = subtitle;
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        [stackView addArrangedSubview:subtitleLabel];
+    }
 }
 
 - (void)updateLabel {
