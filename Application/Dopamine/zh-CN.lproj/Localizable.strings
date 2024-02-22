@@ -98,6 +98,12 @@
 "Bypassing PAC (%@)" = "正在绕过 PAC (%@)";
 "Bypassing PPL (%@)" = "正在绕过 PPL (%@)";
 "Checking For Duplicate Apps" = "检查重复应用程序";
+"Updating BaseBin" = "更新基础套件";
+"Extracting Bootstrap" = "提取引导";
+"Downloading Bootstrap" = "安装引导";
+"Finalizing Bootstrap" = "完成引导";
+"Updating Bundled Packages" = "更新捆绑包";
+"Downloading Bootstrap (%@/%@)" = "安装引导 (%@/%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "请选择包管理器";
@@ -108,9 +114,7 @@
 "Settings" = "设置";
 "Alert_Back_Up_Title" = "一键备份";
 "Alert_Back_Up_Pressed_Body" = "说明：1.请先使用“DEB备份”app一键备份插件；\n2.再点击这里的一键备份，确定即可; \n3.清除越狱后，重新越狱进去Filza文件管理器：/var/mobile/backup+日期时间/，点击“一键恢复插件及配置.sh”运行即可";
-"Settings_newfunction" = "额外功能";
 "Alert_Reboot_Title" = "确定重启设备吗？";
-"Settings_checkforupdates" = "检查更新";
 
 // mount 
 "Input_Mmount_Title" = "新增挂载";
