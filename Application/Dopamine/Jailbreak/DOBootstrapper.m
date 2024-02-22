@@ -379,7 +379,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
 
 - (void)prepareBootstrapWithCompletion:(void (^)(NSError *))completion
 {
-    [[DOUIManager sharedInstance] sendLog:@"Updating BaseBin" debug:NO];
+    [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Updating BaseBin") debug:NO];
 
     // Ensure /private/preboot is mounted writable (Not writable by default on iOS <=15)
     NSError *error = [self ensurePrivatePrebootIsWritable];
@@ -635,7 +635,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
 {
     // Initial setup on first jailbreak
     if ([[NSFileManager defaultManager] fileExistsAtPath:NSJBRootPath(@"/prep_bootstrap.sh")]) {
-        [[DOUIManager sharedInstance] sendLog:@"Finalizing Bootstrap" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Finalizing Bootstrap") debug:NO];
         int r = exec_cmd_trusted(JBRootPath("/bin/sh"), JBRootPath("/prep_bootstrap.sh"), NULL);
         if (r != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"prep_bootstrap.sh returned %d\n", r]}];
@@ -664,7 +664,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     if (!librootInstalledVersion || ![librootInstalledVersion isEqualToString:LIBROOT_DOPAMINE_BUNDLED_VERSION] ||
         !libkrwDopamineInstalledVersion || ![libkrwDopamineInstalledVersion isEqualToString:LIBKRW_DOPAMINE_BUNDLED_VERSION] ||
         !basebinLinkInstalledVersion || ![basebinLinkInstalledVersion isEqualToString:BASEBIN_LINK_BUNDLED_VERSION]) {
-        [[DOUIManager sharedInstance] sendLog:@"Updating Bundled Packages" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Updating Bundled Packages") debug:NO];
         if (!librootInstalledVersion || ![librootInstalledVersion isEqualToString:LIBROOT_DOPAMINE_BUNDLED_VERSION]) {
             NSString *librootPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"libroot.deb"];
             int r = [self installPackage:librootPath];
@@ -719,7 +719,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
         NSString *sizeString = [NSByteCountFormatter stringFromByteCount:totalBytesWritten countStyle:NSByteCountFormatterCountStyleFile];
         NSString *writtenBytesString = [NSByteCountFormatter stringFromByteCount:totalBytesExpectedToWrite countStyle:NSByteCountFormatterCountStyleFile];
         
-        [[DOUIManager sharedInstance] sendLog:[NSString stringWithFormat:@"Downloading Bootstrap (%@/%@)", sizeString, writtenBytesString] debug:NO update:YES];
+        [[DOUIManager sharedInstance] sendLog:[NSString stringWithFormat:DOLocalizedString(@"Downloading Bootstrap (%@/%@)"), sizeString, writtenBytesString] debug:NO update:YES];
     }
 }
 
