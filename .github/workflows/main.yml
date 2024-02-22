@@ -17,7 +17,7 @@ jobs:
             submodules: recursive
 
       - name: Pre Procursus
-        uses: w2599/procursus-action@main
+        uses: wwg135/procursus-action@main
         with:
           packages: ldid findutils coreutils make sed
 
@@ -48,9 +48,7 @@ jobs:
         run: |
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Application/Dopamine/Jailbreak/DOPreferenceManager.m
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Application/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./BaseBin/jbctl/src/main.m
-
-          
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./BaseBin/jbctl/src/main.m 
 
       - name: Pre Version
         run: |
