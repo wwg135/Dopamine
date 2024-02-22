@@ -49,8 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setIDownloadEnabled:(BOOL)enabled;
 - (BOOL)checkforupdatesEnabled;
 - (void)setCheckforupdatesEnabled:(BOOL)enabled;
-- (BOOL)newfunctionEnabled;
-- (void)setNewfunctionEnabled:(BOOL)enabled;
 - (BOOL)isJailbreakHidden;
 - (void)setJailbreakHidden:(BOOL)hidden;
 
