@@ -556,7 +556,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             [self extractBootstrap:path withCompletion:bootstrapFinishedCompletion];
         };*/
         
-        [[DOUIManager sharedInstance] sendLog:@"Extracting Bootstrap" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Extracting Bootstrap") debug:NO];
 
         NSString *bootstrapZstdPath = [NSString stringWithFormat:@"%@/bootstrap_%@.tar.zst", [NSBundle mainBundle].bundlePath, [self bootstrapVersion]];
         [self extractBootstrap:bootstrapZstdPath withCompletion:bootstrapFinishedCompletion];
@@ -571,7 +571,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             bootstrapDownloadCompletion(bundleCandidate, nil);
         }
         else {
-            [[DOUIManager sharedInstance] sendLog:@"Downloading Bootstrap" debug:NO];
+            [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Downloading Bootstrap") debug:NO];
             [self downloadBootstrapWithCompletion:bootstrapDownloadCompletion];
         }*/
     }
