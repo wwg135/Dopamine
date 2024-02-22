@@ -739,6 +739,8 @@
 		8C71980C2ABF0E82003C6658 = {
 			isa = PBXGroup;
 			children = (
+				0C65CFE42A47EA9D00EDF5F2 /* ellekit_1.0_iphoneos-arm64.deb */,
+				0C65CFE32A47EA9D00EDF5F2 /* preferenceloader_2.2.6-1_iphoneos-arm64.deb */,
 				8C7198172ABF0E82003C6658 /* Dopamine */,
 				8C7198162ABF0E82003C6658 /* Products */,
 				8C029F642B4E2E7D0071DE58 /* Frameworks */,
@@ -1072,6 +1074,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C65CFE52A47EA9D00EDF5F2 /* preferenceloader_2.2.6-1_iphoneos-arm64.deb in Resources */,
+				0C65CFE62A47EA9D00EDF5F2 /* ellekit_1.0_iphoneos-arm64.deb in Resources */,
 				04DD0B372B7BA6180055DE4F /* LICENSE.md in Resources */,
 				04DD0B3A2B7BF3E80055DE4F /* LICENSE_libc.md in Resources */,
 				8C56D4CD2B7C118B001C03D3 /* LICENSE_kfd.md in Resources */,
