@@ -291,8 +291,7 @@
         [themeSpecifier setProperty:@"themeNames" forKey:@"titlesDataSource"];
         [specifiers addObject:themeSpecifier];
 
-	BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
-        if (newFunctionEnabled && envManager.isJailbroken) {
+        if (envManager.isJailbroken) {
             PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
             mountSpecifier.target = self;
             [mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
