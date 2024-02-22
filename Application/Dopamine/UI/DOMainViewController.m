@@ -77,7 +77,10 @@
         [DOGlobalAppearance mainSubtitleString:[[DOEnvironmentManager sharedManager] versionSupportString]],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By") withAlpha:0.8],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"AAB") withAlpha:0.6],
-        [DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.8]
+        BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
+        if (newFunctionEnabled) {
+            [DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.8]
+        }
     ]];
     
     [stackView addArrangedSubview:headerView];
