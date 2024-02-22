@@ -98,6 +98,12 @@
 "Bypassing PAC (%@)" = "正在绕过 PAC (%@)";
 "Bypassing PPL (%@)" = "正在绕过 PPL (%@)";
 "Checking For Duplicate Apps" = "检查重复应用程序";
+"Updating BaseBin" = "更新基础套件";
+"Extracting Bootstrap" = "提取引导";
+"Downloading Bootstrap" = "安装引导";
+"Finalizing Bootstrap" = "完成引导";
+"Updating Bundled Packages" = "更新捆绑包";
+"Downloading Bootstrap (%@/%@)" = "安装引导 (%@/%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "请选择包管理器";
