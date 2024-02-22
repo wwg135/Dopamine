@@ -73,14 +73,12 @@
     }
 
     //Header
+    BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
     DOHeaderView *headerView = [[DOHeaderView alloc] initWithImage: [UIImage imageNamed:@"Dopamine"] subtitles: @[
         [DOGlobalAppearance mainSubtitleString:[[DOEnvironmentManager sharedManager] versionSupportString]],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By") withAlpha:0.8],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"AAB") withAlpha:0.6],
-        BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
-        if (newFunctionEnabled) {
-            [DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.8]
-        }
+        (newFunctionEnabled ? [DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.8] : nil)
     ]];
     
     [stackView addArrangedSubview:headerView];
