@@ -76,7 +76,9 @@
     //Header
     DOHeaderView *headerView = [[DOHeaderView alloc] initWithImage: [UIImage imageNamed:@"Dopamine"] subtitles: @[
         [DOGlobalAppearance mainSubtitleString:[[DOEnvironmentManager sharedManager] versionSupportString]],
-        [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By")],
+        [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By") withAlpha:0.8],
+        [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"AAB") withAlpha:0.6],
+        [DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.8]
     ]];
     
     [stackView addArrangedSubview:headerView];
@@ -85,23 +87,6 @@
         [headerView.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor constant:5],
         [headerView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor]
     ]];
-
-    // timer
-    self.uptimeLabel = [[UILabel alloc] init];
-    self.uptimeLabel.textColor = [UIColor whiteColor];
-    self.uptimeLabel.font = [UIFont systemFontOfSize:15];
-    self.uptimeLabel.textAlignment = NSTextAlignmentLeft;
-    
-    [stackView addArrangedSubview:self.uptimeLabel];
-    
-    [NSLayoutConstraint activateConstraints:@[
-        [self.uptimeLabel.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor constant:5],
-        [self.uptimeLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor]
-    ]];
-    BOOL newFunctionEnabled = [[DOEnvironmentManager sharedManager] newfunctionEnabled];
-    if (newFunctionEnabled) {
-        [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptime) userInfo:nil repeats:YES];
-    }
     
     //Action Menu
     DOActionMenuView *actionView = [[DOActionMenuView alloc] initWithActions:@[

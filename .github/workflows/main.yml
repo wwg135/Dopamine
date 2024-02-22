@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - 2.0.6
+      - test
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - 2.0.6
+      - test
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -20,7 +20,7 @@ permissions:
   contents: write
 
 env:
-  VERSION: '2.0.6'
+  VERSION: '2.0.5'
   BUNDLEID: 'com.wwg135.Dopamine'
  
 jobs:
@@ -77,6 +77,7 @@ jobs:
         run: |
           echo "${{ env.VERSION }}" >./BaseBin/_external/basebin/.version
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/AAB/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/DOMainViewController.m
 
       - name: Set env
         run: |
