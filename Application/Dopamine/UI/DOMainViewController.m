@@ -23,7 +23,6 @@
 @property DOActionMenuButton *updateButton;
 @property(nonatomic) BOOL hideStatusBar;
 @property(nonatomic) BOOL hideHomeIndicator;
-@property(nonatomic, strong) UILabel *uptimeLabel;
 
 @end
 
@@ -403,24 +402,6 @@
 {
     _hideHomeIndicator = hideHomeIndicator;
     [self setNeedsUpdateOfHomeIndicatorAutoHidden];
-}
-
-#pragma mark - Update Uptime
-
-- (void)updateUptime {
-    NSString *uptimeString = [self formatUptime];
-    self.uptimeLabel.text = uptimeString;
-}
-
-- (NSString *)formatUptime {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-    int uptimeInt = ts.tv_sec;
-    int seconds = uptimeInt % 60;
-    int minutes = (uptimeInt / 60) % 60;
-    int hours = (uptimeInt / 3600) % 24;
-    int days = uptimeInt / 86400;
-    return [NSString stringWithFormat:NSLocalizedString(@"System_Uptime_Format", nil), days, hours, minutes, seconds];
 }
 
 @end
