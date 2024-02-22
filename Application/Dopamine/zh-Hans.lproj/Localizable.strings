@@ -97,6 +97,7 @@
 "Exploiting Kernel (%@)" = "正在利用内核 (%@)";
 "Bypassing PAC (%@)" = "正在绕过 PAC (%@)";
 "Bypassing PPL (%@)" = "正在绕过 PPL (%@)";
+"Checking For Duplicate Apps" = "检查重复应用程序";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "请选择包管理器";
