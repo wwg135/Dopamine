@@ -72,8 +72,8 @@
     return self;
 }
 
-(void)updateLabel {
-        self.timerLabel.text = [self formatUptime];
+- (void)updateLabel {
+    self.timerLabel.text = [self formatUptime];
 }
 
 - (NSString *)formatUptime {
@@ -84,7 +84,17 @@
     int minutes = (uptimeInt / 60) % 60;
     int hours = (uptimeInt / 3600) % 24;
     int days = uptimeInt / 86400;
-    return [NSString stringWithFormat:NSLocalizedString(@"System_Uptime_Format", nil), days, hours, minutes, seconds];
+    NSString *formattedUptime;
+    if (days > 0) {
+        formattedUptime = [NSString stringWithFormat:NSLocalizedString(@"System_Uptime_Format", nil), days, hours, minutes, seconds];
+    } else if (hours > 0) {
+        formattedUptime = [NSString stringWithFormat:NSLocalizedString(@"System_Uptime_Format", nil), hours, minutes, seconds];
+    } else if (minutes > 0) {
+        formattedUptime = [NSString stringWithFormat:NSLocalizedString(@"System_Uptime_Format", nil), minutes, seconds];
+    } else {
+        formattedUptime = [NSString stringWithFormat:NSLocalizedString(@"System_Uptime_Format", nil), seconds];
+    }
+    return formattedUptime;
 }
 
 @end
