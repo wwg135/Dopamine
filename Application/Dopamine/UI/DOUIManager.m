@@ -38,9 +38,8 @@
         return NO;
     
     NSString *latestVersion = releases[0][@"tag_name"];
-    NSString *currentVersion = [self getLaunchedReleaseTag];
-    BOOL checkForUpdatesEnabled = [[DOEnvironmentManager sharedManager] checkforupdatesEnabled];   
-    return (checkForUpdatesEnabled && [self numericalRepresentationForVersion:latestVersion] > [self numericalRepresentationForVersion:currentVersion]);
+    NSString *currentVersion = [self getLaunchedReleaseTag];  
+    return [self numericalRepresentationForVersion:latestVersion] > [self numericalRepresentationForVersion:currentVersion];
 }
 
 - (long long)numericalRepresentationForVersion:(NSString*)version {
