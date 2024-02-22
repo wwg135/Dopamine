@@ -564,26 +564,4 @@ int reboot3(uint64_t flags, ...);
     }
 }
 
-- (BOOL)newfunctionEnabled {
-    NSString *newfunctionEnabledPath = NSJBRootPath(@"/basebin/.newfunction_enabled");
-    return [[NSFileManager defaultManager] fileExistsAtPath:newfunctionEnabledPath];
-}
-
-- (void)setNewfunctionEnabled:(BOOL)enabled {
-    NSString *newfunctionEnabledPath = NSJBRootPath(@"/basebin/.newfunction_enabled");
-    if ([self isJailbroken]) {
-        [self runAsRoot:^{
-            [self runUnsandboxed:^{
-                if (enabled) {
-                    [[NSData data] writeToFile:newfunctionEnabledPath atomically:YES];
-                    exec_cmd(JBRootPath("/usr/bin/launchctl"), "load", JBRootPath("/basebin/LaunchDaemons/com.opa334.Dopamine.newfunction.plist"), NULL);
-                } else {
-                    [[NSFileManager defaultManager] removeItemAtPath:newfunctionEnabledPath error:nil];
-                    exec_cmd(JBRootPath("/usr/bin/launchctl"), "unload", JBRootPath("/basebin/LaunchDaemons/com.opa334.Dopamine.newfunction"), NULL);
-                }
-            }];
-        }];
-    }
-}
-
 @end
