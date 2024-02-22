@@ -1,7 +1,23 @@
 name: build_Release
-
 on:
+  push:
+    branches:
+      - test
+    paths-ignore:
+      - ".gitignore"
+  pull_request:
+    branches:
+      - test
+    paths-ignore:
+      - ".gitignore"
   workflow_dispatch:
+  
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
 
 env:
   VERSION: '2.0.5'
@@ -10,6 +26,7 @@ env:
 jobs:
   build:
     runs-on: macos-13
+    environment: Auto Build And Release
     steps:
       - name: Checkout
         uses: actions/checkout@main
@@ -17,7 +34,7 @@ jobs:
             submodules: recursive
 
       - name: Pre Procursus
-        uses: w2599/procursus-action@main
+        uses: wwg135/procursus-action@main
         with:
           packages: ldid findutils coreutils make sed
 
