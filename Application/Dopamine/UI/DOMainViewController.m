@@ -77,6 +77,7 @@
     DOHeaderView *headerView = [[DOHeaderView alloc] initWithImage: [UIImage imageNamed:@"Dopamine"] subtitles: @[
         [DOGlobalAppearance mainSubtitleString:[[DOEnvironmentManager sharedManager] versionSupportString]],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By")],
+        [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"AAB") withAlpha:0.6],
         [DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.8]
     ]];
     
