@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) NSMutableArray<NSAttributedString *> *subtitles;
 
--(instancetype)initWithImage:(UIImage *)image subtitles:(NSArray<NSAttributedString *> *)subtitles;
+-(id)initWithImage:(UIImage *)image subtitles:(NSArray<NSAttributedString *> *)subtitles;
 
 @end
 
