@@ -46,7 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isTweakInjectionEnabled;
 - (void)setTweakInjectionEnabled:(BOOL)enabled;
 - (BOOL)isIDownloadEnabled;
-- (void)setIDownloadEnabled:(BOOL)enabled;
+- (void)setIDownloadEnabled:(BOOL)enabled needsUnsandbox:(BOOL)needsUnsandbox;
+- (void)setIDownloadLoaded:(BOOL)loaded needsUnsandbox:(BOOL)needsUnsandbox;
 - (BOOL)isJailbreakHidden;
 - (void)setJailbreakHidden:(BOOL)hidden;
 
