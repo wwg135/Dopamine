@@ -11,7 +11,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DOHeaderView : UIView
 
--(id)initWithImage:(UIImage *)image subtitles:(NSArray<NSAttributedString *> *)subtitles;
+@property (nonatomic, strong) NSMutableArray<NSAttributedString *> *subtitles;
+
+-(instancetype)initWithImage:(UIImage *)image subtitles:(NSArray<NSAttributedString *> *)subtitles;
 
 @end
 
