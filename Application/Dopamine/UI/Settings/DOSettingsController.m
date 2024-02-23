@@ -286,6 +286,14 @@
         [specifiers addObject:themeSpecifier];
 
         if (envManager.isJailbroken) {
+	    PSSpecifier *maskSpecifier = [PSSpecifier emptyGroupSpecifier];
+            maskSpecifier.target = self;
+            [maskSpecifier setProperty:@"Input_Mask_Title" forKey:@"title"];
+            [maskSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [maskSpecifier setProperty:@"x" forKey:@"image"];
+            [maskSpecifier setProperty:@"maskPressed" forKey:@"action"];
+            [specifiers addObject:maskSpecifier];
+	    
             PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
             mountSpecifier.target = self;
             [mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
