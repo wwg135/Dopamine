@@ -33,7 +33,7 @@
 
 - (BOOL)isUpdateAvailable
 {
-    NSNumber *checkforUpdate = [_preferenceManager preferenceValueForKey:@"checkforUpdateEnabled"];
+    NSNumber *checkforUpdate = [_preferenceManager preferenceValueForKey:@"checkForUpdateEnabled"];
     if ([checkforUpdate boolValue] == YES)
         return NO;
         
