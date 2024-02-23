@@ -297,7 +297,7 @@
             maskSpecifier.target = self;
             [maskSpecifier setProperty:@"Input_Mask_Title" forKey:@"title"];
             [maskSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-            [maskSpecifier setProperty:@"x" forKey:@"image"];
+            [maskSpecifier setProperty:@"book" forKey:@"image"];
             [maskSpecifier setProperty:@"maskPressed" forKey:@"action"];
             [specifiers addObject:maskSpecifier];
 	    
@@ -454,13 +454,13 @@
 
 - (void)maskPressed
 {
-    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mask_Title") message:DOLocalizedString(@"Input_Mask_Title") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mask_Title") message:DOLocalizedString(@"Alert_Input_Mask_Title") preferredStyle:UIAlertControllerStyleAlert];
 
     [inputAlertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.placeholder = DOLocalizedString(@"Input_Mask_Title");
     }];
     
-    UIAlertAction *maskAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Mask") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *maskAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         // 获取用户输入的文本
         UITextField *inputTextField = inputAlertController.textFields.firstObject;
         NSString *maskName = inputTextField.text;
