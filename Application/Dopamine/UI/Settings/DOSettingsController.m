@@ -20,6 +20,7 @@
 
 @interface DOSettingsController ()
 
+@property (strong, nonatomic) PSSpecifier *maskSpecifier;
 @property (strong, nonatomic) PSSpecifier *mountSpecifier;
 @property (strong, nonatomic) PSSpecifier *unmountSpecifier;
 @property (strong, nonatomic) PSSpecifier *backupSpecifier;
