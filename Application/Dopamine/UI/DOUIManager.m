@@ -34,7 +34,7 @@
 - (BOOL)isUpdateAvailable
 {
     NSNumber *checkforUpdate = [_preferenceManager preferenceValueForKey:@"checkForUpdateEnabled"];
-    if ([checkforUpdate boolValue] == YES)
+    if ([checkforUpdate boolValue] == NO)
         return NO;
         
     NSArray *releases = [self getLatestReleases];
