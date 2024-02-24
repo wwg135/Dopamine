@@ -55,6 +55,7 @@
             [stackView addArrangedSubview:label];
 	    if ([[DOUIManager sharedInstance] isextrafeatures] && idx == 2) {
 		self.developLabel.text = @"AAA";
+  		self.developLabel = label;
             }
     	    if ([[DOUIManager sharedInstance] isextrafeatures] && idx == 3) {
 		self.timerLabel = label;
