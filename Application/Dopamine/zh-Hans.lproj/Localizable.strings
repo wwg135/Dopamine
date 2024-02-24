@@ -118,7 +118,7 @@
 "Settings_Check_For_Update" = "检查更新";
 "Input_Mask_Title" = "屏蔽检测";
 "Alert_Mask_Title" = "自定义要屏蔽越狱检测的App";
-"Alert_Mask_Pressed_Body" = "输入说明：1.先安装越狱插件“AppData”后，在手机主屏幕上划应用，点击“应用安装目录”，就看到“XXXXX.app”；\n2.复制其中的“XXXXX”，不要复制“.app”，然后粘贴在这里确定即可；\n3.若要解除屏蔽，同样复制到这里确定即可";
+"Alert_Mask_Pressed_Body" = "输入说明：\n1.先安装越狱插件“AppData”后，在手机主屏幕上划应用，点击“应用安装目录”，就看到“XXXXX.app”；\n2.复制其中的“XXXXX”，不要复制“.app”，然后粘贴在这里确定即可；\n3.若要解除屏蔽，同样复制到这里确定即可";
 
 // mount 
 "Input_Mmount_Title" = "新增挂载";
