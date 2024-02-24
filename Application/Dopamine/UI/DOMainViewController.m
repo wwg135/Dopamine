@@ -100,18 +100,6 @@
                 [[DOEnvironmentManager sharedManager] respring];
             }];
         }],
-        [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Reboot_Title") message:nil preferredStyle:UIAlertControllerStyleAlert];
-            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
-            UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [self fadeToBlack:^{
-                    [[DOEnvironmentManager sharedManager] reboot];
-                }];
-            }];
-            [alertController addAction:confirmAction];
-            [alertController addAction:cancelAction];
-            [self presentViewController:alertController animated:YES completion:nil];
-        }],
         [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Userspace_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot-userspace" handler:^(__kindof UIAction * _Nonnull action) {
             [self fadeToBlack:^{
                 [[DOEnvironmentManager sharedManager] rebootUserspace];
@@ -424,13 +412,13 @@
 - (void)handleRebootUserspaceAction {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
-    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] handler:^(UIAlertAction * _Nonnull action) {
         [self fadeToBlack:^{
             [[DOEnvironmentManager sharedManager] reboot];
         }];
     }];
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Cancel") style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
     
     [alertController addAction:rebootAction];
     [alertController addAction:cancelAction];
