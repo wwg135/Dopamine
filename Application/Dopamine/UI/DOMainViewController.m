@@ -15,7 +15,6 @@
 #import "DOLogCrashViewController.h"
 #import <pthread.h>
 #import <libjailbreak/libjailbreak.h>
-#import "DOHeaderView.h"
 
 @interface DOMainViewController ()
 
@@ -80,12 +79,9 @@
     DOHeaderView *headerView = [[DOHeaderView alloc] initWithImage: [UIImage imageNamed:@"Dopamine"] subtitles: @[
         [DOGlobalAppearance mainSubtitleString:[[DOEnvironmentManager sharedManager] versionSupportString]],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By") withAlpha:0.8],
+        [DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.6],
+        [DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.8]
     ]];
-
-    if ([[DOUIManager sharedInstance] isextrafeatures]) {
-        [headerView addSubTitle:[DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.6]];
-        [headerView addSubTitle:[DOGlobalAppearance secondarySubtitleString:@" " withAlpha:0.8]];
-    }
 
     [stackView addArrangedSubview:headerView];
 
