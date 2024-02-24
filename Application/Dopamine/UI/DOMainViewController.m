@@ -412,7 +412,7 @@
 - (void)handleRebootUserspaceAction {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
-    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self fadeToBlack:^{
             [[DOEnvironmentManager sharedManager] reboot];
         }];
