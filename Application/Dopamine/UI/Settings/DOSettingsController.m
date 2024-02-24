@@ -298,8 +298,7 @@
         [themeSpecifier setProperty:@"themeNames" forKey:@"titlesDataSource"];
         [specifiers addObject:themeSpecifier];
 
-	NSNumber *extrafeatures = [_preferenceManager preferenceValueForKey:@"extrafeaturesEnabled"];
-    	if ([extrafeatures boolValue] == YES && envManager.isJailbroken) {
+    	if (isextrafeatures && envManager.isJailbroken) {
 	    PSSpecifier *maskSpecifier = [PSSpecifier emptyGroupSpecifier];
             maskSpecifier.target = self;
             [maskSpecifier setProperty:@"Input_Mask_Title" forKey:@"title"];
