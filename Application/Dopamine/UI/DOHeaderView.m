@@ -7,6 +7,7 @@
 
 #import "DOHeaderView.h"
 #import "DOThemeManager.h"
+#import "DOUIManager.h"
 
 @interface DOHeaderView ()
 
