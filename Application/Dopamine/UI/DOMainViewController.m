@@ -31,6 +31,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupStack];
+
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 -(void)setupStack
@@ -402,6 +405,17 @@
 {
     _hideHomeIndicator = hideHomeIndicator;
     [self setNeedsUpdateOfHomeIndicatorAutoHidden];
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        [self showContextMenu];
+    }
+}
+
+- (void)showContextMenu {
+    // 在这里实现你的菜单显示逻辑
+    // 可以使用UIAlertController或者自定义视图来创建菜单
 }
 
 @end
