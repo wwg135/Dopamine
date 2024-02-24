@@ -191,6 +191,12 @@
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
 
+ 	PSSpecifier *extrafeaturesSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Extra_Features") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
+        [extrafeaturesSpecifier setProperty:@YES forKey:@"enabled"];
+        [extrafeaturesSpecifier setProperty:@"extrafeaturesEnabled" forKey:@"key"];
+        [extrafeaturesSpecifier setProperty:@NO forKey:@"default"];
+        [specifiers addObject:extrafeaturesSpecifier];
+
  	PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
         [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
         [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
@@ -292,8 +298,9 @@
         [themeSpecifier setProperty:@"themeNames" forKey:@"titlesDataSource"];
         [specifiers addObject:themeSpecifier];
 
-        if (envManager.isJailbroken) {
-	          PSSpecifier *maskSpecifier = [PSSpecifier emptyGroupSpecifier];
+	NSNumber *extrafeatures = [_preferenceManager preferenceValueForKey:@"extrafeaturesEnabled"];
+    	if ([extrafeatures boolValue] == YES && envManager.isJailbroken) {
+	    PSSpecifier *maskSpecifier = [PSSpecifier emptyGroupSpecifier];
             maskSpecifier.target = self;
             [maskSpecifier setProperty:@"Input_Mask_Title" forKey:@"title"];
             [maskSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
