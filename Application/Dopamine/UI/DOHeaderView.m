@@ -53,7 +53,7 @@
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
 	    NSNumber *extrafeatures = [_preferenceManager preferenceValueForKey:@"extrafeaturesEnabled"];
-    	    if (isextrafeatures && idx == 3) {
+    	    if (idx == 3) {
 		self.timerLabel = label;
             }
         }];
