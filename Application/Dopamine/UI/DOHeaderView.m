@@ -52,7 +52,7 @@
             label.attributedText = formatedText;
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
-    	    if (idx == 3) {
+    	    if ([[DOUIManager sharedInstance] isextrafeatures] && idx == 3) {
 		self.timerLabel = label;
             }
         }];
