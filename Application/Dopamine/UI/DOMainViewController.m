@@ -412,7 +412,7 @@
         CGPoint pressLocation = [gesture locationInView:self.view];
 
         UIAction *rebootUserspaceAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Userspace_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot-userspace" handler:^(__kindof UIAction * _Nonnull action) {
-            [self showRestartMenuAtLocation:pressLocation];
+            [[DOEnvironmentManager sharedManager] rebootUserspace];
         }];
 
         if ([rebootUserspaceAction.identifier isEqualToString:@"reboot-userspace"]) {
