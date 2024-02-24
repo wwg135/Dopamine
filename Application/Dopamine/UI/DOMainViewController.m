@@ -411,20 +411,26 @@
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint pressLocation = [gesture locationInView:self.view];
         
-        if ([action.identifier isEqualToString:@"reboot-userspace"]) {
+        UIAction *rebootUserspaceAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Userspace_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot-userspace" handler:^(__kindof UIAction * _Nonnull action) {
+            [self fadeToBlack:^{
+                [[DOEnvironmentManager sharedManager] rebootUserspace];
+            }];
+        }];
+        
+        if ([rebootUserspaceAction.identifier isEqualToString:@"reboot-userspace"]) {
             [self showContextMenuAtLocation:pressLocation];
         }
     }
 }
 
 - (void)showContextMenuAtLocation:(CGPoint)location {
-    UIAction *rebootAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
+    UIAction *rebootUserspaceAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
         [self fadeToBlack:^{
             [[DOEnvironmentManager sharedManager] reboot];
         }];
     }];
     
-    UIMenu *menu = [UIMenu menuWithTitle:@"" children:@[rebootAction]];
+    UIMenu *menu = [UIMenu menuWithTitle:@"" children:@[rebootUserspaceAction]];
     [menu showMenuFromView:self.view atPoint:location];
 }
 
