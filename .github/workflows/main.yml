@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - dev
+      - 2.0.6
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - dev
+      - 2.0.6
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
