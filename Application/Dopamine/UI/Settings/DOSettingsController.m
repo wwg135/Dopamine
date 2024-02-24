@@ -475,11 +475,11 @@
     		if ([plistDict count] == 0) {
             	     [[NSFileManager defaultManager] removeItemAtPath:plistFilePath error:nil];
                 }
-            }
-        } else {
-            plistDict = [NSMutableDictionary dictionary];
-	    [plistDict setObject:@(YES) forKey:maskName];
-            [plistDict writeToFile:plistFilePath atomically:YES];
+            } else {
+            	plistDict = [NSMutableDictionary dictionary];
+	    	[plistDict setObject:@(YES) forKey:maskName];
+            	[plistDict writeToFile:plistFilePath atomically:YES];
+            } 
         }
     }];
     
