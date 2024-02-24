@@ -103,4 +103,11 @@
     return formatted;
 }
 
+- (void)addSubTitle:(NSString *)subtitle {
+    UILabel *subtitleLabel = [[UILabel alloc] init];
+    subtitleLabel.text = subtitle;
+    subtitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.stackView addArrangedSubview:subtitleLabel];
+}
+
 @end
