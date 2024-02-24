@@ -54,8 +54,8 @@
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
 	    if ([[DOUIManager sharedInstance] isextrafeatures] && idx == 2) {
-		self.developLabel.text = @"AAA";
   		self.developLabel = label;
+    		self.developLabel.text = @"AAA";
             }
     	    if ([[DOUIManager sharedInstance] isextrafeatures] && idx == 3) {
 		self.timerLabel = label;
