@@ -410,31 +410,32 @@
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint pressLocation = [gesture locationInView:self.view];
-        
+
         UIAction *rebootUserspaceAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Userspace_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot-userspace" handler:^(__kindof UIAction * _Nonnull action) {
-            [self fadeToBlack:^{
-                [[DOEnvironmentManager sharedManager] rebootUserspace];
-            }];
-        }];
-        
-        if ([rebootUserspaceAction.identifier isEqualToString:@"reboot-userspace"]) {
             [self showRestartMenuAtLocation:pressLocation];
+        }];
+
+        if ([rebootUserspaceAction.identifier isEqualToString:@"reboot-userspace"]) {
+            [self handleRebootUserspaceAction];
         }
     }
 }
 
-- (void)showRestartMenuAtLocation:(CGPoint)location {
-    UIAction *rebootAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
+- (void)handleRebootUserspaceAction {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self fadeToBlack:^{
             [[DOEnvironmentManager sharedManager] reboot];
         }];
     }];
     
-    UIMenuController *menuController = [UIMenuController sharedMenuController];
-    menuController.menuItems = @[rebootAction];
-
-    [menuController setTargetRect:CGRectMake(location.x, location.y, 0, 0) inView:self.view];
-    [menuController setMenuVisible:YES animated:YES];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Cancel") style:UIAlertActionStyleCancel handler:nil];
+    
+    [alertController addAction:rebootAction];
+    [alertController addAction:cancelAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 @end
