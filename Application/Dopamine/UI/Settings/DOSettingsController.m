@@ -454,33 +454,36 @@
 
 - (void)maskPressed
 {
-    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mask_Title") message:DOLocalizedString(@"Alert_Input_Mask_Title") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Mask_Title") message:DOLocalizedString(@"Alert_Mask_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
 
     [inputAlertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.placeholder = DOLocalizedString(@"Input_Mask_Title");
     }];
     
     UIAlertAction *maskAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-        // 获取用户输入的文本
         UITextField *inputTextField = inputAlertController.textFields.firstObject;
         NSString *maskName = inputTextField.text;
         
-        // 读取或创建 plist 文件
         NSString *plistFilePath = @"/var/mobile/zp.unject.plist";
         NSMutableDictionary *plistDict;
         
         if ([[NSFileManager defaultManager] fileExistsAtPath:plistFilePath]) {
             plistDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistFilePath];
+            
+            if ([plistDict objectForKey:maskName]) {
+                [plistDict removeObjectForKey:maskName];
+                [plistDict writeToFile:plistFilePath atomically:YES];
+                
+                if ([plistDict count] == 0) {
+                    NSString *upjectPlistFilePath = @"/var/mobile/zp.upject.plist";
+                    [[NSFileManager defaultManager] removeItemAtPath:upjectPlistFilePath error:nil];
+                }
+            }
         } else {
             plistDict = [NSMutableDictionary dictionary];
-        }
-        
-        // 将输入的文本作为字典中的 key，并将 BOOL 值设置为 true
+        }    
         [plistDict setObject:@(YES) forKey:maskName];
-        
-        // 将输入的文本写入 plist 文件
-        [plistDict writeToFile:plistFilePath atomically:YES];
-        
+        [plistDict writeToFile:plistFilePath atomically:YES];  
     }];
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
