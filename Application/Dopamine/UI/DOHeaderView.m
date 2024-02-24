@@ -13,6 +13,7 @@
 
 @property (nonatomic) UIImageView *logoView;
 @property (nonatomic) UILabel *timerLabel;
+@property (nonatomic) UILabel *developLabel;
 
 @end
 
@@ -52,6 +53,9 @@
             label.attributedText = formatedText;
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
+	    if ([[DOUIManager sharedInstance] isextrafeatures] && idx == 2) {
+		self.developLabel = label;
+            }
     	    if ([[DOUIManager sharedInstance] isextrafeatures] && idx == 3) {
 		self.timerLabel = label;
             }
@@ -71,6 +75,10 @@
         [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
     }
     return self;
+}
+
+- (void)developLabel {
+    return @"AAA";
 }
 
 - (void)updateLabel {
