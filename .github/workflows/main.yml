@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - dev
+      - 2.0.6
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - dev
+      - 2.0.6
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -20,7 +20,7 @@ permissions:
   contents: write
 
 env:
-  VERSION: '2.0.6'
+  VERSION: '2.0.6.6'
   BUNDLEID: 'com.wwg135.Dopamine'
 
 jobs:
@@ -85,7 +85,7 @@ jobs:
         run: |
           echo "${{ env.VERSION }}" >./BaseBin/_external/basebin/.version
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/DOHeaderView.m
+          sed -i '' "s/AAB/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/DOMainViewController.m
 
       - name: Pre Bootstraps
         run: |
@@ -110,22 +110,14 @@ jobs:
           echo "" >> release.txt
           cat ./release.md >> release.txt
           
-      #- name: Release ipa
-        #uses: softprops/action-gh-release@v1
-        #with:
-          #name: ${{ env.VERSION }}
-          #tag_name: ${{ env.VERSION }}
-          #target_commitish: 2.x
-          #body_path: release.txt
-          #latest: true
-          #token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          #files: |
-           #*.ipa
-
-      - name: Upload Artifact
-        id: dopamine-latest-upload
-        uses: actions/upload-artifact@v3
+      - name: Release ipa
+        uses: softprops/action-gh-release@v1
         with:
-          name: Dopamine
-          path: |
-            ${{ github.workspace }}/Application/Dopamine.ipa
+          name: ${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}
+          target_commitish: 2.x
+          body_path: release.txt
+          latest: true
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          files: |
+           *.ipa
