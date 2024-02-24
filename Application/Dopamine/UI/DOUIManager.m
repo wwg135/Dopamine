@@ -320,12 +320,6 @@
     return candidate;
 }
 
-- (BOOL)isextrafeatures
-{
-    NSNumber *extrafeatures = [_preferenceManager preferenceValueForKey:@"extrafeaturesEnabled"];
-    return [extrafeatures boolValue];
-}
-
 @end
 
 NSString *DOLocalizedString(NSString *key)
