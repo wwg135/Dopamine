@@ -298,7 +298,7 @@
         [themeSpecifier setProperty:@"themeNames" forKey:@"titlesDataSource"];
         [specifiers addObject:themeSpecifier];
 
-    	if (isextrafeatures && envManager.isJailbroken) {
+    	if (envManager.isJailbroken) {
 	    PSSpecifier *maskSpecifier = [PSSpecifier emptyGroupSpecifier];
             maskSpecifier.target = self;
             [maskSpecifier setProperty:@"Input_Mask_Title" forKey:@"title"];
