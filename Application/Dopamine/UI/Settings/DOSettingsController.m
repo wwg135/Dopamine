@@ -20,6 +20,7 @@
 
 @interface DOSettingsController ()
 
+@property (strong, nonatomic) PSSpecifier *maskSpecifier;
 @property (strong, nonatomic) PSSpecifier *mountSpecifier;
 @property (strong, nonatomic) PSSpecifier *unmountSpecifier;
 @property (strong, nonatomic) PSSpecifier *backupSpecifier;
@@ -189,6 +190,12 @@
         [tweakInjectionSpecifier setProperty:@"tweakInjectionEnabled" forKey:@"key"];
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
+
+ 	PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
+        [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
+        [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
+        [checkForUpdateSpecifier setProperty:@NO forKey:@"default"];
+        [specifiers addObject:checkForUpdateSpecifier];
         
         if (!envManager.isJailbroken) {
             PSSpecifier *verboseLogSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Verbose_Logs") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
@@ -286,6 +293,14 @@
         [specifiers addObject:themeSpecifier];
 
         if (envManager.isJailbroken) {
+	          PSSpecifier *maskSpecifier = [PSSpecifier emptyGroupSpecifier];
+            maskSpecifier.target = self;
+            [maskSpecifier setProperty:@"Input_Mask_Title" forKey:@"title"];
+            [maskSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [maskSpecifier setProperty:@"book" forKey:@"image"];
+            [maskSpecifier setProperty:@"maskPressed" forKey:@"action"];
+            [specifiers addObject:maskSpecifier];
+	    
             PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
             mountSpecifier.target = self;
             [mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
@@ -348,7 +363,7 @@
     [self setPreferenceValue:value specifier:specifier];
     DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
     if (envManager.isJailbroken) {
-        [[DOEnvironmentManager sharedManager] setIDownloadEnabled:((NSNumber *)value).boolValue];
+        [[DOEnvironmentManager sharedManager] setIDownloadLoaded:((NSNumber *)value).boolValue needsUnsandbox:YES];
     }
 }
 
@@ -435,6 +450,48 @@
     [confirmationAlertController addAction:uninstallAction];
     [confirmationAlertController addAction:cancelAction];
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
+}
+
+- (void)maskPressed
+{
+    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Mask_Title") message:DOLocalizedString(@"Alert_Mask_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
+
+    [inputAlertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.placeholder = DOLocalizedString(@"Input_Mask_Title");
+    }];
+    
+    UIAlertAction *maskAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        UITextField *inputTextField = inputAlertController.textFields.firstObject;
+        NSString *maskName = inputTextField.text;
+        
+        NSString *plistFilePath = @"/var/mobile/zp.unject.plist";
+        NSMutableDictionary *plistDict;
+        
+        if ([[NSFileManager defaultManager] fileExistsAtPath:plistFilePath]) {
+            plistDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistFilePath];
+            
+            if ([plistDict objectForKey:maskName]) {
+                [plistDict removeObjectForKey:maskName];
+                [plistDict writeToFile:plistFilePath atomically:YES];
+                
+                if ([plistDict count] == 0) {
+                    NSString *upjectPlistFilePath = @"/var/mobile/zp.upject.plist";
+                    [[NSFileManager defaultManager] removeItemAtPath:upjectPlistFilePath error:nil];
+                }
+            }
+        } else {
+            plistDict = [NSMutableDictionary dictionary];
+        }    
+        [plistDict setObject:@(YES) forKey:maskName];
+        [plistDict writeToFile:plistFilePath atomically:YES];  
+    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
+
+    [inputAlertController addAction:maskAction];
+    [inputAlertController addAction:cancelAction];
+    
+    [self presentViewController:inputAlertController animated:YES completion:nil];
 }
 
 - (void)mountPressed
