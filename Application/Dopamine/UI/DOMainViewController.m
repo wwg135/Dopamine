@@ -418,20 +418,23 @@
         }];
         
         if ([rebootUserspaceAction.identifier isEqualToString:@"reboot-userspace"]) {
-            [self showContextMenuAtLocation:pressLocation];
+            [self showRestartMenuAtLocation:pressLocation];
         }
     }
 }
 
-- (void)showContextMenuAtLocation:(CGPoint)location {
-    UIAction *rebootUserspaceAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
+- (void)showRestartMenuAtLocation:(CGPoint)location {
+    UIAction *rebootAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
         [self fadeToBlack:^{
             [[DOEnvironmentManager sharedManager] reboot];
         }];
     }];
     
-    UIMenu *menu = [UIMenu menuWithTitle:@"" children:@[rebootUserspaceAction]];
-    [menu showMenuFromView:self.view atPoint:location];
+    UIMenuController *menuController = [UIMenuController sharedMenuController];
+    menuController.menuItems = @[rebootAction];
+
+    [menuController setTargetRect:CGRectMake(location.x, location.y, 0, 0) inView:self.view];
+    [menuController setMenuVisible:YES animated:YES];
 }
 
 @end
