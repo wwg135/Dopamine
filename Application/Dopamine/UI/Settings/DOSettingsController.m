@@ -473,8 +473,7 @@
 		[plistDict writeToFile:plistFilePath atomically:YES];
 
     		if ([plistDict count] == 0) {
-            	     NSString *upjectPlistFilePath = @"/var/mobile/zp.upject.plist";
-            	     [[NSFileManager defaultManager] removeItemAtPath:upjectPlistFilePath error:nil];
+            	     [[NSFileManager defaultManager] removeItemAtPath:plistFilePath error:nil];
                 }
             }
         } else {
