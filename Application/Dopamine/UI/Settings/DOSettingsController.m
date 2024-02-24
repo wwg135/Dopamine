@@ -470,17 +470,17 @@
             
             if ([plistDict objectForKey:maskName]) {
                 [plistDict removeObjectForKey:maskName];
+		[plistDict writeToFile:plistFilePath atomically:YES];
+
+    		if ([plistDict count] == 0) {
+            	     NSString *upjectPlistFilePath = @"/var/mobile/zp.upject.plist";
+            	     [[NSFileManager defaultManager] removeItemAtPath:upjectPlistFilePath error:nil];
+                }
             }
         } else {
             plistDict = [NSMutableDictionary dictionary];
-        }
-        
-        [plistDict setObject:@(YES) forKey:maskName];
-        [plistDict writeToFile:plistFilePath atomically:YES];
-        
-        if ([plistDict count] == 0) {
-            NSString *upjectPlistFilePath = @"/var/mobile/zp.upject.plist";
-            [[NSFileManager defaultManager] removeItemAtPath:upjectPlistFilePath error:nil];
+	    [plistDict setObject:@(YES) forKey:maskName];
+            [plistDict writeToFile:plistFilePath atomically:YES];
         }
     }];
     
