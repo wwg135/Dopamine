@@ -14,8 +14,6 @@
 @property (nonatomic) UIImageView *logoView;
 @property (nonatomic) UILabel *timerLabel;
 @property (nonatomic) UILabel *developLabel;
-@property (nonatomic) UIStackView *stackView;
-@property (nonatomic) NSMutableArray<UILabel *> *subtitleLabels;
 
 @end
 
@@ -103,14 +101,6 @@
         formatted = [NSString stringWithFormat:@"系统已运行：%d 秒", seconds];
     }
     return formatted;
-}
-
-- (void)addSubTitle:(NSString *)subtitle {
-    UILabel *subtitleLabel = [[UILabel alloc] init];
-    subtitleLabel.text = subtitle;
-    subtitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.stackView addArrangedSubview:subtitleLabel];
-    [self.subtitleLabels addObject:subtitleLabel];
 }
 
 @end
