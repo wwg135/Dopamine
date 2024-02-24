@@ -14,6 +14,7 @@
 @property (nonatomic) UIImageView *logoView;
 @property (nonatomic) UILabel *timerLabel;
 @property (nonatomic) UILabel *developLabel;
+@property (nonatomic) UIStackView *stackView;
 
 @end
 
