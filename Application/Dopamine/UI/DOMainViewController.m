@@ -409,13 +409,23 @@
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        [self showContextMenu];
+        CGPoint pressLocation = [gesture locationInView:self.view];
+        
+        if ([action.identifier isEqualToString:@"reboot-userspace"]) {
+            [self showContextMenuAtLocation:pressLocation];
+        }
     }
 }
 
-- (void)showContextMenu {
-    // 在这里实现你的菜单显示逻辑
-    // 可以使用UIAlertController或者自定义视图来创建菜单
+- (void)showContextMenuAtLocation:(CGPoint)location {
+    UIAction *rebootAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(__kindof UIAction * _Nonnull action) {
+        [self fadeToBlack:^{
+            [[DOEnvironmentManager sharedManager] reboot];
+        }];
+    }];
+    
+    UIMenu *menu = [UIMenu menuWithTitle:@"" children:@[rebootAction]];
+    [menu showMenuFromView:self.view atPoint:location];
 }
 
 @end
