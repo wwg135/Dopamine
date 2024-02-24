@@ -464,23 +464,24 @@
         NSString *maskName = inputTextField.text;      
         NSString *plistFilePath = @"/var/mobile/zp.unject.plist";
         NSMutableDictionary *plistDict;
-        
-        if ([[NSFileManager defaultManager] fileExistsAtPath:plistFilePath]) {
-            plistDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistFilePath];
-            
-            if ([plistDict objectForKey:maskName]) {
-                [plistDict removeObjectForKey:maskName];
-		[plistDict writeToFile:plistFilePath atomically:YES];
 
-    		if ([plistDict count] == 0) {
-            	     [[NSFileManager defaultManager] removeItemAtPath:plistFilePath error:nil];
-                }
-            } else {
-            	plistDict = [NSMutableDictionary dictionary];
-	    	[plistDict setObject:@(YES) forKey:maskName];
-            	[plistDict writeToFile:plistFilePath atomically:YES];
-            } 
+	if ([[NSFileManager defaultManager] fileExistsAtPath:plistFilePath]) {
+            plistDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistFilePath];
+        } else {
+            plistDict = [NSMutableDictionary dictionary];
         }
+	
+        if ([plistDict objectForKey:maskName]) {
+            [plistDict removeObjectForKey:maskName];
+	    [plistDict writeToFile:plistFilePath atomically:YES];
+
+    	    if ([plistDict count] == 0) {
+            	[[NSFileManager defaultManager] removeItemAtPath:plistFilePath error:nil];
+            }
+        } else {
+	    [plistDict setObject:@(YES) forKey:maskName];
+            [plistDict writeToFile:plistFilePath atomically:YES];
+        } 
     }];
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
