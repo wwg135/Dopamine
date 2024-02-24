@@ -15,6 +15,7 @@
 #import "DOLogCrashViewController.h"
 #import <pthread.h>
 #import <libjailbreak/libjailbreak.h>
+#import "DOHeaderView.h"
 
 @interface DOMainViewController ()
 
