@@ -410,9 +410,9 @@
 }
 
 - (void)handleRebootUserspaceAction {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Menu_Reboot_Title") message:DOLocalizedString(@"Alert_Reboot_Title") preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:DOLocalizedString(@"Alert_Reboot_Title") preferredStyle:UIAlertControllerStyleActionSheet];
     
-    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self fadeToBlack:^{
             [[DOEnvironmentManager sharedManager] reboot];
         }];
