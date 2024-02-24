@@ -15,6 +15,7 @@
 @property (nonatomic) UILabel *timerLabel;
 @property (nonatomic) UILabel *developLabel;
 @property (nonatomic) UIStackView *stackView;
+@property (nonatomic) NSMutableArray<UILabel *> *subtitleLabels;
 
 @end
 
@@ -109,6 +110,7 @@
     subtitleLabel.text = subtitle;
     subtitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.stackView addArrangedSubview:subtitleLabel];
+    [self.subtitleLabels addObject:subtitleLabel];
 }
 
 @end
