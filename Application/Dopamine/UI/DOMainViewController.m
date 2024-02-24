@@ -31,6 +31,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupStack];
+
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 -(void)setupStack
@@ -402,6 +405,37 @@
 {
     _hideHomeIndicator = hideHomeIndicator;
     [self setNeedsUpdateOfHomeIndicatorAutoHidden];
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        CGPoint pressLocation = [gesture locationInView:self.view];
+
+        UIAction *rebootUserspaceAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Userspace_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot-userspace" handler:^(__kindof UIAction * _Nonnull action) {
+            [[DOEnvironmentManager sharedManager] rebootUserspace];
+        }];
+
+        if ([rebootUserspaceAction.identifier isEqualToString:@"reboot-userspace"]) {
+            [self handleRebootUserspaceAction];
+        }
+    }
+}
+
+- (void)handleRebootUserspaceAction {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Menu_Reboot_Title") message:DOLocalizedString(@"Alert_Reboot_Title") preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self fadeToBlack:^{
+            [[DOEnvironmentManager sharedManager] reboot];
+        }];
+    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
+    
+    [alertController addAction:rebootAction];
+    [alertController addAction:cancelAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 @end
