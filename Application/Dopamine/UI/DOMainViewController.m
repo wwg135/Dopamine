@@ -398,14 +398,7 @@
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint pressLocation = [gesture locationInView:self.view];
-
-        UIAction *rebootUserspaceAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Userspace_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot-userspace" handler:^(__kindof UIAction * _Nonnull action) {
-            [[DOEnvironmentManager sharedManager] rebootUserspace];
-        }];
-
-        if ([rebootUserspaceAction.identifier isEqualToString:@"reboot-userspace"]) {
-            [self handleRebootUserspaceAction];
-        }
+        [self handleRebootUserspaceAction];
     }
 }
 
@@ -416,13 +409,10 @@
         [self fadeToBlack:^{
             [[DOEnvironmentManager sharedManager] reboot];
         }];
-    }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
-    
+    }];    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];   
     [alertController addAction:rebootAction];
-    [alertController addAction:cancelAction];
-    
+    [alertController addAction:cancelAction];  
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
