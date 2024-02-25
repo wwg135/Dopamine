@@ -202,10 +202,13 @@
         [extrafeaturesSpecifier setProperty:@"extrafeaturesEnabled" forKey:@"key"];
         [extrafeaturesSpecifier setProperty:@NO forKey:@"default"];
 	[extrafeaturesSpecifier setProperty:^(id value){
-    	    if ([self respondsToSelector:NSSelectorFromString(defSetter)]) {
-        	[self performSelector:NSSelectorFromString(defSetter) withObject:value];
-            }
-            [self extrafeaturesPressed];
+    	     SEL setter = NSSelectorFromString(defSetter);
+    		if ([self respondsToSelector:setter]) {
+        	     IMP imp = [self methodForSelector:setter];
+        	     void (*func)(id, SEL, id) = (void *)imp;
+        	     func(self, setter, value);
+    		}
+    	        [self extrafeaturesPressed];
 	} forKey:@"PostNotification"];
         [specifiers addObject:extrafeaturesSpecifier];
         
