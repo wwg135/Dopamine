@@ -201,7 +201,10 @@
         [extrafeaturesSpecifier setProperty:@YES forKey:@"enabled"];
         [extrafeaturesSpecifier setProperty:@"extrafeaturesEnabled" forKey:@"key"];
         [extrafeaturesSpecifier setProperty:@NO forKey:@"default"];
-	[extrafeaturesSpecifier setProperty:@"extrafeaturesPressed" forKey:@"action"];
+	[extrafeaturesSpecifier setProperty:^(id value){
+    	    defSetter(value);
+            [self extrafeaturesPressed];
+	} forKey:@"PostNotification"];
         [specifiers addObject:extrafeaturesSpecifier];
         
         if (!envManager.isJailbroken) {
