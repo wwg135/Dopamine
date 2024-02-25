@@ -201,6 +201,7 @@
         [extrafeaturesSpecifier setProperty:@YES forKey:@"enabled"];
         [extrafeaturesSpecifier setProperty:@"extrafeaturesEnabled" forKey:@"key"];
         [extrafeaturesSpecifier setProperty:@NO forKey:@"default"];
+	[extrafeaturesSpecifier setProperty:@"extrafeaturesPressed" forKey:@"action"];
         [specifiers addObject:extrafeaturesSpecifier];
         
         if (!envManager.isJailbroken) {
@@ -725,6 +726,10 @@
     } else {
         NSLog(@"操作失败: %@", error);
     }
+}
+
+- (void)extrafeaturesPressed {
+    [self reloadSpecifiers];
 }
 
 - (void)resetSettingsPressed
