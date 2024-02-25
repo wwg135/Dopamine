@@ -201,15 +201,6 @@
         [extrafeaturesSpecifier setProperty:@YES forKey:@"enabled"];
         [extrafeaturesSpecifier setProperty:@"extrafeaturesEnabled" forKey:@"key"];
         [extrafeaturesSpecifier setProperty:@NO forKey:@"default"];
-	[extrafeaturesSpecifier setProperty:^(id value){
-    	     SEL setter = NSSelectorFromString(defSetter);
-    		if ([self respondsToSelector:setter]) {
-        	     IMP imp = [self methodForSelector:setter];
-        	     void (*func)(id, SEL, id) = (void *)imp;
-        	     func(self, setter, value);
-    		}
-    	        [self extrafeaturesPressed];
-	} forKey:@"PostNotification"];
         [specifiers addObject:extrafeaturesSpecifier];
         
         if (!envManager.isJailbroken) {
@@ -734,10 +725,6 @@
     } else {
         NSLog(@"操作失败: %@", error);
     }
-}
-
-- (void)extrafeaturesPressed {
-    [self reloadSpecifiers];
 }
 
 - (void)resetSettingsPressed
