@@ -83,7 +83,7 @@
         [DOGlobalAppearance mainSubtitleString:[[DOEnvironmentManager sharedManager] versionSupportString]],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By")],
     ]];
-
+    
     [stackView addArrangedSubview:headerView];
 
     [NSLayoutConstraint activateConstraints:@[
