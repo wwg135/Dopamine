@@ -196,11 +196,13 @@
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
 
- 	PSSpecifier *extrafeaturesSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Extra_Features") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
-        [extrafeaturesSpecifier setProperty:@YES forKey:@"enabled"];
-        [extrafeaturesSpecifier setProperty:@"extrafeaturesEnabled" forKey:@"key"];
-        [extrafeaturesSpecifier setProperty:@NO forKey:@"default"];
-        [specifiers addObject:extrafeaturesSpecifier];
+	if ([[DOUIManager sharedInstance] isextrafeatures]) {
+ 	    PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
+            [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
+            [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
+            [checkForUpdateSpecifier setProperty:@NO forKey:@"default"];
+            [specifiers addObject:checkForUpdateSpecifier];
+	}
         
         if (!envManager.isJailbroken) {
             PSSpecifier *verboseLogSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Verbose_Logs") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
