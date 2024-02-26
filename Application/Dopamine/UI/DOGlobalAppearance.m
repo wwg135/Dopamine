@@ -86,11 +86,11 @@
     }];
 }
 
-+ (NSAttributedString*)secondarySubtitleString:(NSString*)string withAlpha:(CGFloat)alpha
++ (NSAttributedString*)secondarySubtitleString:(NSString*)string
 {
     return [[NSAttributedString alloc] initWithString:string attributes:@{
         NSFontAttributeName: [UIFont systemFontOfSize:14 weight:UIFontWeightRegular],
-        NSForegroundColorAttributeName: [UIColor colorWithWhite:1 alpha:alpha],
+        NSForegroundColorAttributeName: [UIColor colorWithWhite:1 alpha:0.60],
     }];
 }
 
