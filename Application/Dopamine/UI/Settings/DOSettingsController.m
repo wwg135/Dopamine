@@ -34,6 +34,7 @@
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
 
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
     if (envManager.isJailbroken) {
     	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     	[self.view addGestureRecognizer:longPressGesture];
