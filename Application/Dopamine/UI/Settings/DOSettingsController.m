@@ -145,7 +145,7 @@
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
         [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
-
+        
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
             exploitGroupSpecifier.name = DOLocalizedString(@"Section_Exploits");
@@ -218,7 +218,7 @@
         [idownloadSpecifier setProperty:@"idownloadEnabled" forKey:@"key"];
         [idownloadSpecifier setProperty:@NO forKey:@"default"];
         [specifiers addObject:idownloadSpecifier];
- 
+         
         if (!envManager.isJailbroken && !envManager.isInstalledThroughTrollStore) {
             PSSpecifier *removeJailbreakSwitchSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Button_Remove_Jailbreak") target:self set:@selector(setRemoveJailbreakEnabled:specifier:) get:defGetter detail:nil cell:PSSwitchCell edit:nil];
             [removeJailbreakSwitchSpecifier setProperty:@YES forKey:@"enabled"];
