@@ -743,23 +743,37 @@
         
         id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
         if (value == nil) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-            [self showPopupWithMessage:@"额外功能已显示，请在设置里面查看。"];
+            [self showConfirmationPopupWithMessage:@"是否开启额外功能" confirmAction:^{
+                [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+                [self showPopupWithMessage:@"额外功能已显示，请在设置里面查看。"];
+                [self reloadSpecifiers];
+            }];
         } else if ([value boolValue]) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-            [self showPopupWithMessage:@"额外功能已隐藏，请在设置里面查看。"];
+            [self showConfirmationPopupWithMessage:@"是否关闭额外功能" confirmAction:^{
+                [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+                [self showPopupWithMessage:@"额外功能已隐藏，请在设置里面查看。"];
+                [self reloadSpecifiers];
+            }];
         } else {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-            [self showPopupWithMessage:@"额外功能已显示，请在设置里面查看。"];
-        } 
-        [self reloadSpecifiers];
+            [self showConfirmationPopupWithMessage:@"是否开启额外功能" confirmAction:^{
+                [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+                [self showPopupWithMessage:@"额外功能已显示，请在设置里面查看。"];
+                [self reloadSpecifiers];
+            }];
+        }
     }
 }
 
-- (void)showPopupWithMessage:(NSString *)message {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:message preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleDefault handler:nil];
-    [alertController addAction:okAction];
+- (void)showConfirmationPopupWithMessage:(NSString *)message confirmAction:(void (^)(void))confirmAction {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:message preferredStyle:UIAlertControllerStyleAlert];  
+    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        if (confirmAction) {
+            confirmAction();
+        }
+    }];
+    [alertController addAction:confirmAction];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+    [alertController addAction:cancelAction];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
