@@ -738,19 +738,29 @@
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
-    	CGPoint pressLocation = [gesture locationInView:self.view];
+        CGPoint pressLocation = [gesture locationInView:self.view];
         NSString *key = @"extrafeaturesEnabled";
         
         id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
         if (value == nil) {
             [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+            [self showPopupWithMessage:@"额外功能已显示，请在设置里面查看。"];
         } else if ([value boolValue]) {
             [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+            [self showPopupWithMessage:@"额外功能已隐藏，请在设置里面查看。"];
         } else {
             [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        }    
+            [self showPopupWithMessage:@"额外功能已显示，请在设置里面查看。"];
+        } 
         [self reloadSpecifiers];
     }
+}
+
+- (void)showPopupWithMessage:(NSString *)message {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:message preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleDefault handler:nil];
+    [alertController addAction:okAction];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 @end
