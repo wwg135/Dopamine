@@ -67,8 +67,4 @@
     return self;
 }
 
-- (void)updateLabel {
-    self.timerLabel.text = [self formatUptime];
-}
-
 @end
