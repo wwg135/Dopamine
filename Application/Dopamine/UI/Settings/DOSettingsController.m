@@ -194,14 +194,6 @@
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
 
-	if ([[DOUIManager sharedInstance] isextrafeatures]) {
- 	    PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
-            [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
-            [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
-            [checkForUpdateSpecifier setProperty:@YES forKey:@"default"];
-            [specifiers addObject:checkForUpdateSpecifier];
-	}
-
  	PSSpecifier *extrafeaturesSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Extra_Features") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
         [extrafeaturesSpecifier setProperty:@YES forKey:@"enabled"];
         [extrafeaturesSpecifier setProperty:@"extrafeaturesEnabled" forKey:@"key"];
@@ -741,7 +733,17 @@
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        CGPoint pressLocation = [gesture locationInView:self.view];
+    	CGPoint pressLocation = [gesture locationInView:self.view];
+        NSString *key = @"extrafeaturesEnabled";
+        
+        id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
+        if (value == nil) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        } else if ([value boolValue]) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+        } else {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        }    
         [self reloadSpecifiers];
     }
 }
