@@ -37,9 +37,6 @@
     	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     	[self.view addGestureRecognizer:longPressGesture];
     }
-    if ([[DOUIManager sharedInstance] isextrafeatures]) {
-        [self refreshView];
-    }
 }
 
 -(void)setupStack
@@ -419,10 +416,6 @@
     [alertController addAction:rebootAction];
     [alertController addAction:cancelAction];   
     [self presentViewController:alertController animated:YES completion:nil];
-}
-
-- (void)refreshView {
-    [self setupStack];
 }
 
 @end
