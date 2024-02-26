@@ -42,7 +42,7 @@
         return NO;
     
     NSString *latestVersion = releases[0][@"tag_name"];
-    NSString *currentVersion = [self getLaunchedReleaseTag];  
+    NSString *currentVersion = [self getLaunchedReleaseTag];
     return [self numericalRepresentationForVersion:latestVersion] > [self numericalRepresentationForVersion:currentVersion];
 }
 
