@@ -88,10 +88,6 @@
 
     [stackView addArrangedSubview:headerView];
 
-    if ([[DOUIManager sharedInstance] isextrafeatures]) {
-        [self reloadheaderView];
-    }
-
     [NSLayoutConstraint activateConstraints:@[
         [headerView.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor constant:5],
         [headerView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor]
