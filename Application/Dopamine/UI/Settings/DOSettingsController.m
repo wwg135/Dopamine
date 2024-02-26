@@ -739,27 +739,30 @@
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint pressLocation = [gesture locationInView:self.view];
-        NSString *key = @"extrafeaturesEnabled";
-        
-        id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
-        if (value == nil) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-            [self showPopupWithMessage:@"额外功能已显示，请在设置里面查看。"];
-        } else if ([value boolValue]) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-            [self showPopupWithMessage:@"额外功能已隐藏，请在设置里面查看。"];
-        } else {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-            [self showPopupWithMessage:@"额外功能已显示，请在设置里面查看。"];
-        }
-        [self reloadSpecifiers];
+        [self extrafeaturesEnabledPressed];
     }
 }
 
-- (void)showPopupWithMessage:(NSString *)message {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:message preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"好的" style:UIAlertActionStyleDefault handler:nil];
-    [alertController addAction:okAction];
+- (void)extrafeaturesEnabledPressed {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Reboot_Title") message:nil preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSString *key = @"extrafeaturesEnabled";
+        id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
+        
+        if (value == nil) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        } else if ([value boolValue]) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+        } else {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        }
+        
+        [self reloadSpecifiers];
+    }];
+    
+    [alertController addAction:confirmAction];
+    [alertController addAction:cancelAction];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
