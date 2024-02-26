@@ -32,8 +32,10 @@
     [super viewDidLoad];
     [self setupStack];
 
-    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    [self.view addGestureRecognizer:longPressGesture];
+    if (envManager.isJailbroken) {
+    	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    	[self.view addGestureRecognizer:longPressGesture];
+    }
 }
 
 -(void)setupStack
@@ -403,20 +405,16 @@
 }
 
 - (void)handleRebootUserspaceAction {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:DOLocalizedString(@"Alert_Reboot_Title") preferredStyle:UIAlertControllerStyleActionSheet];
-    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:DOLocalizedString(@"Alert_Reboot_Title") preferredStyle:UIAlertControllerStyleActionSheet];   
     UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self rebootPressed];
+        [self fadeToBlack:^{
+            [[DOEnvironmentManager sharedManager] reboot];
+        }];
     }];    
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
     [alertController addAction:rebootAction];
     [alertController addAction:cancelAction];   
     [self presentViewController:alertController animated:YES completion:nil];
-}
-
-- (void)rebootPressed
-{
-	exec_cmd_root(JBRootPath("/sbin/reboot"), NULL);
 }
 
 @end
