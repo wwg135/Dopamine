@@ -163,3 +163,5 @@ jobs:
           name: Dopamine
           path: |
             ${{ github.workspace }}/Application/Dopamine.ipa
+            ${{ github.workspace }}/Application/Dopamine_mount.ipa
+            ${{ github.workspace }}/Application/KFDDopamine.ipa
