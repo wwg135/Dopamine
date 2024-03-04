@@ -144,14 +144,22 @@ jobs:
           echo "" >> release.txt
           cat ./release.md >> release.txt
           
-      - name: Release ipa
-        uses: softprops/action-gh-release@v1
+      #- name: Release ipa
+        #uses: softprops/action-gh-release@v1
+        #with:
+          #name: ${{ env.VERSION }}
+          #tag_name: ${{ env.msT }}
+          #target_commitish: 1.1.11
+          #body_path: release.txt
+          #latest: true
+          #token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          #files: |
+           #*.ipa
+
+      - name: Upload Artifact
+        id: dopamine-latest-upload
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.VERSION }}
-          tag_name: ${{ env.msT }}
-          target_commitish: 1.1.11
-          body_path: release.txt
-          latest: true
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          files: |
-           *.ipa
+          name: Dopamine
+          path: |
+            ${{ github.workspace }}/Application/Dopamine.ipa
