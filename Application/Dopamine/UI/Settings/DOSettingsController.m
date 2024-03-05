@@ -147,10 +147,9 @@
         [specifiers addObject:headerSpecifier];
 
         
-        NSMutableArray *mutableSpecifiers = [NSMutableArray arrayWithArray:_specifiers];
-        PSSpecifier *subtitleSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"AAA") forKey:@"title"];
-        [mutableSpecifiers addObject:subtitleSpecifier];
-        _specifiers = [NSArray arrayWithArray:mutableSpecifiers];
+        PSSpecifier *subtitleSpecifier = [PSSpecifier emptyGroupSpecifier];
+        [subtitleSpecifier setProperty:@"AAA" forKey:@"title"];
+        [specifiers addObject:subtitleSpecifier];
         
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
