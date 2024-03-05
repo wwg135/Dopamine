@@ -157,10 +157,9 @@
             updatetimeSpecifier.name = DOLocalizedString(@"AAA");
             [specifiers addObject:updatetimeSpecifier];
 
-            PSSpecifier *specifier = [PSSpecifier emptyGroupSpecifier];
-	    specifier.footerText = [self.uptimeLabel text];
-	    [specifier setProperty:self.uptimeLabel forKey:@"footerText"];
-	    [self.specifiers addObject:specifier];
+            PSSpecifier *uptimeSpecifier = [PSSpecifier emptyGroupSpecifier];
+            [uptimeSpecifier setProperty:self.uptimeLabel.text forKey:@"footerText"];
+            [specifier addObject:uptimeSpecifier];
 	}
         
         if (!envManager.isJailbroken) {
@@ -352,7 +351,7 @@
         }
 
         self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptimeLabel) userInfo:nil repeats:YES];
-	[[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+        [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
         _specifiers = specifiers;
     }
     return _specifiers;
@@ -791,7 +790,7 @@
         self.uptimeLabel.text = formattedUptime;
         [self.uptimeLabel sizeToFit];
         PSSpecifier *specifier = [self specifierAtIndex:0];
-        [specifier setProperty:self.uptimeLabel forKey:@"footerText"];
+        [specifier setProperty:self.uptimeLabel.text forKey:@"footerText"];
         [self reloadSpecifier:specifier];
     });
 }
