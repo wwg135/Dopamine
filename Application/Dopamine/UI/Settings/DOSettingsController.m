@@ -148,7 +148,7 @@
 
         
         NSMutableArray *mutableSpecifiers = [NSMutableArray arrayWithArray:_specifiers];
-        PSSpecifier *subtitleSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"AAA") target:self set:nil get:nil detail:nil cell:PSGroupCell edit:nil];
+        PSSpecifier *subtitleSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"AAA") forKey:@"title"];
         [mutableSpecifiers addObject:subtitleSpecifier];
         _specifiers = [NSArray arrayWithArray:mutableSpecifiers];
         
