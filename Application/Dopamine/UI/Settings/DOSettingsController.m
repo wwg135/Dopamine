@@ -25,6 +25,7 @@
 @property (strong, nonatomic) PSSpecifier *unmountSpecifier;
 @property (strong, nonatomic) PSSpecifier *backupSpecifier;
 @property (nonatomic, strong) UILabel *uptimeLabel;
+@property (nonatomic, strong) NSTimer *timer;
 
 @end
 
@@ -350,8 +351,7 @@
             [specifiers addObject:backupSpecifier];
         }
 
-        NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptimeLabel) userInfo:nil repeats:YES];
-        [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptimeLabel) userInfo:nil repeats:YES];
         _specifiers = specifiers;
     }
     return _specifiers;
