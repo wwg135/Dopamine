@@ -144,8 +144,11 @@
         PSSpecifier *headerSpecifier = [PSSpecifier emptyGroupSpecifier];
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
         [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
-	[headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"AAA")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
+
+        PSSpecifier *updatetimeSpecifier = [PSSpecifier emptyGroupSpecifier];
+        [updatetimeSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"AAA")] forKey:@"title"];
+        [specifiers addObject:updatetimeSpecifier];
         
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
