@@ -536,7 +536,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     // Note: This causes the app to freeze in some instances due to launchd only having physrw_pte, we might want to only do it when neccessary
     // It's only neccessary when we don't immediately userspace reboot
     
-    printf("越狱成功!\n");
+    printf("Done!\n");
 }
 
 - (void)finalize
