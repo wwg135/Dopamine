@@ -41,11 +41,6 @@
     	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     	[self.view addGestureRecognizer:longPressGesture];
     }
-
-    self.uptimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
-    self.uptimeLabel.textAlignment = NSTextAlignmentCenter;
-    self.uptimeLabel.text = [self formatUptime];
-    [self.uptimeLabel sizeToFit];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -788,8 +783,6 @@
     NSString *formattedUptime = [self formatUptime];
     dispatch_async(dispatch_get_main_queue(), ^{
         self.uptimeLabel.text = formattedUptime;
-        [self.uptimeLabel sizeToFit];
-        PSSpecifier *specifier = [self specifierAtIndex:0];
         [specifier setProperty:self.uptimeLabel.text forKey:@"footerText"];
     });
 }
