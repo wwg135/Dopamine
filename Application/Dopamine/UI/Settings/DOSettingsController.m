@@ -41,11 +41,10 @@
     	[self.view addGestureRecognizer:longPressGesture];
     }
 
-    UIView *uptimeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
-    UILabel *uptimeLabel = [[UILabel alloc] initWithFrame:uptimeView.bounds];
-    uptimeLabel.textAlignment = NSTextAlignmentCenter;
-    [uptimeView addSubview:uptimeLabel];
-    [self.view addSubview:uptimeView];
+    self.uptimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
+    self.uptimeLabel.textAlignment = NSTextAlignmentCenter;
+    self.uptimeLabel.text = [self formatUptime];
+    [self.uptimeLabel sizeToFit];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -158,9 +157,10 @@
             updatetimeSpecifier.name = DOLocalizedString(@"AAA");
             [specifiers addObject:updatetimeSpecifier];
 
-            PSGroupSpecifier *groupSpecifier = [PSGroupSpecifier preferenceSpecifierNamed:@"系统信息" target:self set:nil get:nil detail:nil cell:PSGroupCell edit:nil];
-	    groupSpecifier.footerText = @" ";
-   	    [specifiers addObject:groupSpecifier];
+            PSSpecifier *specifier = [PSSpecifier emptyGroupSpecifier];
+	    specifier.footerText = [self.uptimeLabel text];
+	    [specifier setProperty:self.uptimeLabel forKey:@"footerText"];
+	    [self.specifiers addObject:specifier];
 	}
         
         if (!envManager.isJailbroken) {
@@ -351,7 +351,8 @@
             [specifiers addObject:backupSpecifier];
         }
 
-        [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptimeLabel) userInfo:nil repeats:YES];
+	[[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
         _specifiers = specifiers;
     }
     return _specifiers;
@@ -786,7 +787,13 @@
 
 - (void)updateUptimeLabel {
     NSString *formattedUptime = [self formatUptime];
-    uptimeLabel.text = formattedUptime;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.uptimeLabel.text = formattedUptime;
+        [self.uptimeLabel sizeToFit];
+        PSSpecifier *specifier = [self specifierAtIndex:0];
+        [specifier setProperty:self.uptimeLabel forKey:@"footerText"];
+        [self reloadSpecifier:specifier];
+    });
 }
 
 - (NSString *)formatUptime {
