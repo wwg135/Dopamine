@@ -149,7 +149,7 @@
 
         PSSpecifier *updatetimeSpecifier = [PSSpecifier emptyGroupSpecifier];
         updatetimeSpecifier.name = DOLocalizedString(@"AAA");
-	updatetimeSpecifier.name = [self formatUptime];
+	updatetimeSpecifier.name = self.timerLabel.text;
         [specifiers addObject:updatetimeSpecifier];
         
         if (!envManager.isJailbroken) {
@@ -774,11 +774,7 @@
 }
 
 - (void)updateLabel {
-    NSString *formatted = [self formatUptime];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        updatetimeSpecifier.name = formatted;
-        [self reloadSpecifierID:@"updatetimeSpecifier"];
-    });
+    self.timerLabel.text = [self formatUptime];
 }
 
 - (NSString *)formatUptime {
