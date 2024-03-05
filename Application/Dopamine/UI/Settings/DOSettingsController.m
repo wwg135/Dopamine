@@ -791,7 +791,6 @@
         [self.uptimeLabel sizeToFit];
         PSSpecifier *specifier = [self specifierAtIndex:0];
         [specifier setProperty:self.uptimeLabel.text forKey:@"footerText"];
-        [self reloadSpecifier:specifier];
     });
 }
 
