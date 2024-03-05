@@ -148,7 +148,7 @@
 
         
         PSSpecifier *subtitleSpecifier = [PSSpecifier emptyGroupSpecifier];
-        [subtitleSpecifier setProperty:@"AAA" forKey:@"title"];
+        [subtitleSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"AAA")] forKey:@"title"];
         [specifiers addObject:subtitleSpecifier];
         
         if (!envManager.isJailbroken) {
