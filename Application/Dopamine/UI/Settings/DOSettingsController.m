@@ -24,6 +24,7 @@
 @property (strong, nonatomic) PSSpecifier *mountSpecifier;
 @property (strong, nonatomic) PSSpecifier *unmountSpecifier;
 @property (strong, nonatomic) PSSpecifier *backupSpecifier;
+@property (nonatomic) UILabel *timerLabel;
 
 @end
 
@@ -148,6 +149,7 @@
 
         PSSpecifier *updatetimeSpecifier = [PSSpecifier emptyGroupSpecifier];
         updatetimeSpecifier.name = DOLocalizedString(@"AAA");
+	updatetimeSpecifier.name = [self formatUptime];
         [specifiers addObject:updatetimeSpecifier];
         
         if (!envManager.isJailbroken) {
@@ -338,6 +340,7 @@
             [specifiers addObject:backupSpecifier];
         }
 
+        [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
         _specifiers = specifiers;
     }
     return _specifiers;
@@ -768,6 +771,35 @@
     [alertController addAction:confirmAction];
     [alertController addAction:cancelAction];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)updateLabel {
+    NSString *formatted = [self formatUptime];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        updatetimeSpecifier.name = formatted;
+        [self reloadSpecifierID:@"updatetimeSpecifier"];
+    });
+}
+
+- (NSString *)formatUptime {
+    NSString *formatted;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    int uptimeInt = ts.tv_sec;
+    int seconds = uptimeInt % 60;
+    int minutes = (uptimeInt / 60) % 60;
+    int hours = (uptimeInt / 3600) % 24;
+    int days = uptimeInt / 86400;
+    if (days > 0) {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 天 %d 时 %d 分 %d 秒", days, hours, minutes, seconds];
+    } else if (hours > 0) {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 时 %d 分 %d 秒", hours, minutes, seconds];
+    } else if (minutes > 0) {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 分 %d 秒", minutes, seconds];
+    } else {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 秒", seconds];
+    }
+    return formatted;
 }
 
 @end
