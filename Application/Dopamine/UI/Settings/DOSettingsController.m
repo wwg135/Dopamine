@@ -145,6 +145,12 @@
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
         [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
+
+        
+        NSMutableArray *mutableSpecifiers = [NSMutableArray arrayWithArray:_specifiers];
+        PSSpecifier *subtitleSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"AAA") target:self set:nil get:nil detail:nil cell:PSGroupCell edit:nil];
+        [mutableSpecifiers addObject:subtitleSpecifier];
+        _specifiers = [NSArray arrayWithArray:mutableSpecifiers];
         
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
@@ -333,7 +339,7 @@
             [backupSpecifier setProperty:@"backupPressed" forKey:@"action"];
             [specifiers addObject:backupSpecifier];
         }
-        
+
         _specifiers = specifiers;
     }
     return _specifiers;
