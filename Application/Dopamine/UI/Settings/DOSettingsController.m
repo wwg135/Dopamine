@@ -24,7 +24,7 @@
 @property (strong, nonatomic) PSSpecifier *mountSpecifier;
 @property (strong, nonatomic) PSSpecifier *unmountSpecifier;
 @property (strong, nonatomic) PSSpecifier *backupSpecifier;
-@property (nonatomic) UILabel *timerLabel;
+@property (nonatomic, strong) UILabel *uptimeLabel;
 
 @end
 
