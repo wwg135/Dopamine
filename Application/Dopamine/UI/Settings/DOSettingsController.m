@@ -147,7 +147,7 @@
         [specifiers addObject:headerSpecifier];
 
         PSSpecifier *updatetimeSpecifier = [PSSpecifier emptyGroupSpecifier];
-        [updatetimeSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"AAA")] forKey:@"title"];
+        updatetimeSpecifier.name = DOLocalizedString(@"AAA");
         [specifiers addObject:updatetimeSpecifier];
         
         if (!envManager.isJailbroken) {
