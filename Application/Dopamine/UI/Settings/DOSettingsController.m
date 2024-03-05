@@ -159,7 +159,7 @@
 
             PSSpecifier *uptimeSpecifier = [PSSpecifier emptyGroupSpecifier];
             [uptimeSpecifier setProperty:self.uptimeLabel.text forKey:@"footerText"];
-            [specifier addObject:uptimeSpecifier];
+            [specifiers addObject:uptimeSpecifier];
 	}
         
         if (!envManager.isJailbroken) {
@@ -350,8 +350,8 @@
             [specifiers addObject:backupSpecifier];
         }
 
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptimeLabel) userInfo:nil repeats:YES];
-        [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+        NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptimeLabel) userInfo:nil repeats:YES];
+        [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
         _specifiers = specifiers;
     }
     return _specifiers;
