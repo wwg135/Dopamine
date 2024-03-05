@@ -41,8 +41,11 @@
     	[self.view addGestureRecognizer:longPressGesture];
     }
 
-    self.uptimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
-    [self.view addSubview:self.uptimeLabel];
+    UIView *uptimeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
+    UILabel *uptimeLabel = [[UILabel alloc] initWithFrame:uptimeView.bounds];
+    uptimeLabel.textAlignment = NSTextAlignmentCenter;
+    [uptimeView addSubview:uptimeLabel];
+    [self.view addSubview:uptimeView];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -155,12 +158,9 @@
             updatetimeSpecifier.name = DOLocalizedString(@"AAA");
             [specifiers addObject:updatetimeSpecifier];
 
-            PSSpecifier *uptimeSpecifier = [PSSpecifier emptyGroupSpecifier];
-	    uptimeSpecifier.target = self;
-	    uptimeSpecifier.action = @selector(updateUptimeLabel);
-	    uptimeSpecifier.title = @"系统已运行时间";
-	    uptimeSpecifier.footerView = self.uptimeLabel;
-     	    [specifiers addObject:uptimeSpecifier];
+            PSGroupSpecifier *groupSpecifier = [PSGroupSpecifier preferenceSpecifierNamed:@"系统信息" target:self set:nil get:nil detail:nil cell:PSGroupCell edit:nil];
+	    groupSpecifier.footerText = @" ";
+   	    [specifiers addObject:groupSpecifier];
 	}
         
         if (!envManager.isJailbroken) {
@@ -786,9 +786,7 @@
 
 - (void)updateUptimeLabel {
     NSString *formattedUptime = [self formatUptime];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.uptimeLabel.text = formattedUptime;
-    });
+    uptimeLabel.text = formattedUptime;
 }
 
 - (NSString *)formatUptime {
