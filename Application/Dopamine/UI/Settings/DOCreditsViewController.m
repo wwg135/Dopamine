@@ -24,16 +24,11 @@
 
 - (id)specifiers
 {
-    if (_specifiers == nil) {
+    if(_specifiers == nil) {
         _specifiers = [self loadSpecifiersFromPlistName:@"Credits" target:self];
 
         PSSpecifier *headerSpecifier = _specifiers[0];
         [headerSpecifier setProperty:[NSString stringWithFormat:@"Dopamine %@ - %@", [DOEnvironmentManager sharedManager].appVersionDisplayString, DOLocalizedString(@"Menu_Credits_Title")] forKey:@"title"];
-
-        NSMutableArray *mutableSpecifiers = [NSMutableArray arrayWithArray:_specifiers];
-        PSSpecifier *subtitleSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"AAA") target:self set:nil get:nil detail:nil cell:PSGroupCell edit:nil];
-        [mutableSpecifiers addObject:subtitleSpecifier];
-        _specifiers = [NSArray arrayWithArray:mutableSpecifiers];
     }
     return _specifiers;
 }
