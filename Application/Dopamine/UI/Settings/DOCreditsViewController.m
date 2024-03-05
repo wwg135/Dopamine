@@ -29,6 +29,9 @@
 
         PSSpecifier *headerSpecifier = _specifiers[0];
         [headerSpecifier setProperty:[NSString stringWithFormat:@"Dopamine %@ - %@", [DOEnvironmentManager sharedManager].appVersionDisplayString, DOLocalizedString(@"Menu_Credits_Title")] forKey:@"title"];
+
+        PSSpecifier *subtitleSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"AAA") target:self set:nil get:nil detail:nil cell:PSGroupCell edit:nil];
+        [_specifiers addObject:subtitleSpecifier];
     }
     return _specifiers;
 }
