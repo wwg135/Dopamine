@@ -783,7 +783,7 @@
     NSString *formattedUptime = [self formatUptime];
     dispatch_async(dispatch_get_main_queue(), ^{
         self.uptimeLabel.text = formattedUptime;
-        [specifier setProperty:self.uptimeLabel.text forKey:@"footerText"];
+        [PSSpecifier setProperty:self.uptimeLabel.text forKey:@"footerText"];
     });
 }
 
