@@ -40,6 +40,9 @@
     	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     	[self.view addGestureRecognizer:longPressGesture];
     }
+
+    self.timerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
+    [self.view addSubview:self.timerLabel];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -153,7 +156,13 @@
             [specifiers addObject:updatetimeSpecifier];
 
             PSSpecifier *uptimeSpecifier = [PSSpecifier emptyGroupSpecifier];
-	    uptimeSpecifier.name = self.timerLabel.text;
+            uptimeSpecifier.viewController = self;
+            uptimeSpecifier.target = self;
+            uptimeSpecifier.action = @selector(updateLabel);
+            uptimeSpecifier.cellType = PSTitleValueCell;
+            uptimeSpecifier.title = @"系统已运行时间";
+            uptimeSpecifier.showIcon = NO;
+            uptimeSpecifier.name = self.timerLabel;
             [specifiers addObject:uptimeSpecifier];
 	}
         
@@ -779,7 +788,10 @@
 }
 
 - (void)updateLabel {
-    self.timerLabel.text = [self formatUptime];
+    NSString *formatted = [self formatUptime];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.timerLabel.text = formatted;
+    });
 }
 
 - (NSString *)formatUptime {
