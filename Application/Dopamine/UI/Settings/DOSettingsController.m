@@ -40,6 +40,9 @@
     	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     	[self.view addGestureRecognizer:longPressGesture];
     }
+
+    self.uptimeLabel = [[UILabel alloc] init];
+    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -155,7 +158,6 @@
             PSSpecifier *uptimeSpecifier = [PSSpecifier emptyGroupSpecifier];
             uptimeSpecifier.name = self.uptimeLabel.text;
             [specifiers addObject:uptimeSpecifier];
-	    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
 	}
         
         if (!envManager.isJailbroken) {
@@ -779,7 +781,9 @@
 }
 
 - (void)updateLabel {
-    self.uptimeLabel.text = [self formatUptime];
+    NSString *uptimeText = [self formatUptime];
+    self.uptimeLabel.text = uptimeText;
+    [self preferencesControllerWillAppear];
 }
 
 - (NSString *)formatUptime {
