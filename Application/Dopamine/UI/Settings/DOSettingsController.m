@@ -153,7 +153,7 @@
             [specifiers addObject:updatetimeSpecifier];
 
             PSSpecifier *uptimeSpecifier = [PSSpecifier emptyGroupSpecifier];
-            [uptimeSpecifier setProperty:self.uptimeLabel.text forKey:@"footerText"];
+            uptimeSpecifier.name = self.uptimeLabel.text;
             [specifiers addObject:uptimeSpecifier];
 	    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
 	}
@@ -780,8 +780,6 @@
 
 - (void)updateLabel {
     self.uptimeLabel.text = [self formatUptime];
-    PSSpecifier *uptimeSpecifier = [self specifierForID:@"uptimeSpecifier"];
-    uptimeSpecifier.properties[@"footerText"] = [self formatUptime];
 }
 
 - (NSString *)formatUptime {
