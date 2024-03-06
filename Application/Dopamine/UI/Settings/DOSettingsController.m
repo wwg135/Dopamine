@@ -780,13 +780,9 @@
 
 - (void)updateLabel {
     NSString *formattedUptime = [self formatUptime];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        PSSpecifier *uptimeSpecifier = [self specifierForID:@"uptimeSpecifier"];
-        if (uptimeSpecifier != nil) {
-            uptimeSpecifier.properties[@"footerText"] = formattedUptime;
-            [self reloadSpecifierID:@"uptimeSpecifier" animated:YES];
-        }
-    });
+    self.uptimeLabel.text = formattedUptime;
+    PSSpecifier *uptimeSpecifier = [self specifierForID:@"uptimeSpecifier"];
+    uptimeSpecifier.properties[@"footerText"] = formattedUptime;
 }
 
 - (NSString *)formatUptime {
