@@ -25,7 +25,6 @@
 @property (strong, nonatomic) PSSpecifier *unmountSpecifier;
 @property (strong, nonatomic) PSSpecifier *backupSpecifier;
 @property (nonatomic, strong) UILabel *uptimeLabel;
-@property (nonatomic, strong) NSTimer *timer;
 
 @end
 
@@ -156,6 +155,7 @@
             PSSpecifier *uptimeSpecifier = [PSSpecifier emptyGroupSpecifier];
             [uptimeSpecifier setProperty:self.uptimeLabel.text forKey:@"footerText"];
             [specifiers addObject:uptimeSpecifier];
+	    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
 	}
         
         if (!envManager.isJailbroken) {
@@ -346,7 +346,6 @@
             [specifiers addObject:backupSpecifier];
         }
 
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUptimeLabel) userInfo:nil repeats:YES];
         _specifiers = specifiers;
     }
     return _specifiers;
@@ -779,10 +778,9 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)updateUptimeLabel {
+- (void)updateLabel {
     NSString *formattedUptime = [self formatUptime];
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.uptimeLabel.text = formattedUptime;
         PSSpecifier *uptimeSpecifier = [self specifierForID:@"uptimeSpecifier"];
         if (uptimeSpecifier != nil) {
             uptimeSpecifier.properties[@"footerText"] = formattedUptime;
