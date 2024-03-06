@@ -779,10 +779,9 @@
 }
 
 - (void)updateLabel {
-    NSString *formattedUptime = [self formatUptime];
-    self.uptimeLabel.text = formattedUptime;
+    self.uptimeLabel.text = [self formatUptime];
     PSSpecifier *uptimeSpecifier = [self specifierForID:@"uptimeSpecifier"];
-    uptimeSpecifier.properties[@"footerText"] = formattedUptime;
+    uptimeSpecifier.properties[@"footerText"] = [self formatUptime];
 }
 
 - (NSString *)formatUptime {
