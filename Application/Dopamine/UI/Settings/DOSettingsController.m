@@ -783,7 +783,6 @@
 - (void)updateLabel {
     NSString *uptimeText = [self formatUptime];
     self.uptimeLabel.text = uptimeText;
-    [self preferencesControllerWillAppear];
 }
 
 - (NSString *)formatUptime {
