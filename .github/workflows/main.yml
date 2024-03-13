@@ -89,6 +89,8 @@ jobs:
 
       - name: Pre Bootstraps
         run: |
+          brew install libarchive
+          
           set -x
           cd Application/Dopamine/Resources
           ./download_bootstraps.sh
