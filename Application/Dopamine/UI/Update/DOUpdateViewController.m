@@ -152,7 +152,7 @@
     paragraphStyle.alignment = NSTextAlignmentCenter;
     NSMutableAttributedString *changelogText = [[NSMutableAttributedString alloc] initWithString:@""];
 
-     if (releases.count == 0)
+    if (releases.count == 0)
     {
         BOOL envUpdate = [[DOUIManager sharedInstance] environmentUpdateAvailable];
         [changelogText appendAttributedString:[[NSAttributedString alloc] initWithString:DOLocalizedString(envUpdate ? @"Mismatching_Environment_Version_Update_Body" : @"Changelog_Unavailable_Text") attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor], NSParagraphStyleAttributeName:paragraphStyle}]];
