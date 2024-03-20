@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - dev
+      - dev-2
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - dev
+      - dev-2
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -85,7 +85,7 @@ jobs:
         run: |
           echo "${{ env.VERSION }}" >./BaseBin/_external/basebin/.version
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/Settings/DOSettingsController.m
+          #sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/Settings/DOSettingsController.m
 
       - name: Pre Bootstraps
         run: |
@@ -101,14 +101,14 @@ jobs:
           gmake -j$(sysctl -n hw.physicalcpu) NIGHTLY=1
           mv Application/Dopamine.tipa Dopamine.ipa
 
-      - name: Release Logs
-        run: |
-          set -x
-          echo -e "更新时间：${{ env.logT }}" >> body.txt
-          echo "" >> ./release.md
-          cat body.txt > release.txt
-          echo "" >> release.txt
-          cat ./release.md >> release.txt
+      #- name: Release Logs
+        #run: |
+          #set -x
+          #echo -e "更新时间：${{ env.logT }}" >> body.txt
+          #echo "" >> ./release.md
+          #cat body.txt > release.txt
+          #echo "" >> release.txt
+          #cat ./release.md >> release.txt
           
       #- name: Release ipa
         #uses: softprops/action-gh-release@v1
