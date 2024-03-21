@@ -426,24 +426,39 @@
 }
 
 - (void)checkForUpdateEnabledPressed {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_checkForUpdate_Title") message:nil preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
-    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSString *key = @"checkForUpdateEnabled";
-        id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
-        
-        if (value == nil) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        } else if ([value boolValue]) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-        } else {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        }
-    }];
+    NSString *key = @"checkForUpdateEnabled";
+    id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
     
-    [alertController addAction:confirmAction];
-    [alertController addAction:cancelAction];
-    [self presentViewController:alertController animated:YES completion:nil];
+    if (value == nil) {
+        UIAlertController *alertView = [UIAlertController alertControllerWithTitle:@"提示" message:@"是否开启版本更新提示" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"是" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        }];
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"否" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+        }];
+        [alertView addAction:yesAction];
+        [alertView addAction:noAction];
+        [self presentViewController:alertView animated:YES completion:nil];
+    } else if ([value boolValue]) {
+        UIAlertController *alertView = [UIAlertController alertControllerWithTitle:@"提示" message:@"是否关闭版本更新提示" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"是" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+        }];
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"否" style:UIAlertActionStyleDefault handler:nil];
+        [alertView addAction:yesAction];
+        [alertView addAction:noAction];
+        [self presentViewController:alertView animated:YES completion:nil];
+    } else {
+        UIAlertController *alertView = [UIAlertController alertControllerWithTitle:@"提示" message:@"是否开启版本更新提示" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"是" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        }];
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"否" style:UIAlertActionStyleDefault handler:nil];
+        [alertView addAction:yesAction];
+        [alertView addAction:noAction];
+        [self presentViewController:alertView animated:YES completion:nil];
+    }
 }
 
 @end
