@@ -28,6 +28,10 @@
 {
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
+
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
+    longPressGesture.cancelsTouchesInView = NO; // 添加这行代码以确保触觉反馈正常工作
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -185,12 +189,6 @@
         [tweakInjectionSpecifier setProperty:@"tweakInjectionEnabled" forKey:@"key"];
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
-
-        PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
-        [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
-        [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
-        [checkForUpdateSpecifier setProperty:@NO forKey:@"default"];
-        [specifiers addObject:checkForUpdateSpecifier];
         
         if (!envManager.isJailbroken) {
             PSSpecifier *verboseLogSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Verbose_Logs") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
@@ -420,5 +418,32 @@
     [self reloadSpecifiers];
 }
 
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        CGPoint pressLocation = [gesture locationInView:self.view];
+        [self checkForUpdateEnabledPressed];
+    }
+}
+
+- (void)checkForUpdateEnabledPressed {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_checkForUpdate_Title") message:nil preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        NSString *key = @"checkForUpdateEnabled";
+        id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
+        
+        if (value == nil) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        } else if ([value boolValue]) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+        } else {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        }
+    }];
+    
+    [alertController addAction:confirmAction];
+    [alertController addAction:cancelAction];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
 
 @end
