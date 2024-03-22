@@ -31,12 +31,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupStack];
-
-    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-    if (envManager.isJailbroken) {
-    	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    	[self.view addGestureRecognizer:longPressGesture];
-    }
 }
 
 -(void)setupStack
@@ -394,26 +388,6 @@
 {
     _hideHomeIndicator = hideHomeIndicator;
     [self setNeedsUpdateOfHomeIndicatorAutoHidden];
-}
-
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
-    if (gesture.state == UIGestureRecognizerStateBegan) {
-        CGPoint pressLocation = [gesture locationInView:self.view];
-        [self handleRebootUserspaceAction];
-    }
-}
-
-- (void)handleRebootUserspaceAction {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Reboot_Title") message:nil preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
-    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self fadeToBlack:^{
-            [[DOEnvironmentManager sharedManager] reboot];
-        }];
-    }];
-    [alertController addAction:confirmAction];
-    [alertController addAction:cancelAction];
-    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 @end
