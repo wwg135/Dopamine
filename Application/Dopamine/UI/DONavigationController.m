@@ -189,16 +189,11 @@
     NSString *tmpDirectory = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp/"];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *error = nil;
-    NSArray *fileList = [fileManager contentsOfDirectoryAtPath:tmpDirectory error:&error];
-    if (error) {
-        NSLog(@"Error deleting files: %@", error.localizedDescription);
-    } else {
-        for (NSString *fileName in fileList) {
-            NSString *filePath = [tmpDirectory stringByAppendingPathComponent:fileName];
-            [fileManager removeItemAtPath:filePath error:&error];
-            if (error) {
-                NSLog(@"Error deleting file: %@", error.localizedDescription);
-            }
+    
+    if ([fileManager fileExistsAtPath:tmpDirectory]) {
+        [fileManager removeItemAtPath:tmpDirectory error:&error];
+        if (error) {
+            NSLog(@"Error deleting files: %@", error.localizedDescription);
         }
     }
 }
