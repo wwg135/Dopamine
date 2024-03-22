@@ -155,10 +155,11 @@
         }]];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"恢复默认主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self deleteCache];
+            
             DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
             self.selectedBackgroundImage = nil;
             [self.backgroundImageView setImage:theme.image];
-            [self deleteCache];
         }]];
         
         [alertController addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];       
