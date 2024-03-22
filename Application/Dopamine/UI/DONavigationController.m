@@ -154,9 +154,7 @@
             [viewController presentViewController:imagePicker animated:YES completion:nil];
         }]];
 
-        [alertController addAction:[UIAlertAction actionWithTitle:@"恢复默认主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self deleteCache];
-            
+        [alertController addAction:[UIAlertAction actionWithTitle:@"恢复默认主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {          
             DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
             self.selectedBackgroundImage = nil;
             [self.backgroundImageView setImage:theme.image];
@@ -168,8 +166,8 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
-      UIImage *selectedImage = info[UIImagePickerControllerOriginalImage];
-      if (selectedImage) {
+    UIImage *selectedImage = info[UIImagePickerControllerOriginalImage];
+    if (selectedImage) {
         self.selectedBackgroundImage = selectedImage;
         [self.backgroundImageView setImage:selectedImage];
 
@@ -177,25 +175,12 @@
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:imageData forKey:@"SelectedBackgroundImage"];
         [defaults synchronize];
-      }
-      [picker dismissViewControllerAnimated:YES completion:nil];
     }
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
   [picker dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)deleteCache {
-    NSString *tmpDirectory = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp/"];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *error = nil;
-    
-    if ([fileManager fileExistsAtPath:tmpDirectory]) {
-        [fileManager removeItemAtPath:tmpDirectory error:&error];
-        if (error) {
-            NSLog(@"Error deleting files: %@", error.localizedDescription);
-        }
-    }
 }
 
 @end
