@@ -157,7 +157,7 @@
         [alertController addAction:[UIAlertAction actionWithTitle:@"恢复默认主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
             self.selectedBackgroundImage = nil;
-            [self.backgroundImageView setImage:theme image];
+            [self.backgroundImageView setImage:theme.image];
 
             NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
             [defaults removeObjectForKey:@"SelectedBackgroundImage"];
