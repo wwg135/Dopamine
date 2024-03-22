@@ -133,9 +133,7 @@
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
         if (envManager.isJailbroken) {
             [alertController addAction:[UIAlertAction actionWithTitle:@"重启设备" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [self fadeToBlack:^{
-                    [[DOEnvironmentManager sharedManager] reboot];
-                }];
+                [[DOEnvironmentManager sharedManager] reboot];
             }];
         }
         
