@@ -89,7 +89,7 @@
 - (void)setBackgroundDimmed:(BOOL)dimmed
 {
     [UIView animateWithDuration:0.3 animations:^{
-        self.backgroundImageView.alpha = dimmed ? 0.4 : 1;
+        self.backgroundImageView.alpha = dimmed ? 1 : 1;
     }];
     self.backgroundImageView.userInteractionEnabled = dimmed;
     self.backAction.hidden = !dimmed;
