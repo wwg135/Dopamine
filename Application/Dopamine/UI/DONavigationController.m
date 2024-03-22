@@ -145,13 +145,23 @@
             }]];
         }
         
-        [alertController addAction:[UIAlertAction actionWithTitle:@"从相册选择图片" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [alertController addAction:[UIAlertAction actionWithTitle:@"自定义主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
             imagePicker.delegate = self;
             imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     
             UIViewController *viewController = [UIApplication sharedApplication].windows.firstObject.rootViewController;
             [viewController presentViewController:imagePicker animated:YES completion:nil];
+        }]];
+
+        [alertController addAction:[UIAlertAction actionWithTitle:@"恢复默认主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
+            self.selectedBackgroundImage = nil;
+            [self.backgroundImageView setImage:theme image];
+
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            [defaults removeObjectForKey:@"SelectedBackgroundImage"];
+            [defaults synchronize];
         }]];
         
         [alertController addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];       
