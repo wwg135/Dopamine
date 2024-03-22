@@ -459,7 +459,6 @@
 - (void)mountPressed
 {
     UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mmount_Title") message:DOLocalizedString(@"Input_Mount_Title") preferredStyle:UIAlertControllerStyleAlert];
-
     [inputAlertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.placeholder = DOLocalizedString(@"Input_Mount_Title");
     }];
@@ -467,7 +466,6 @@
     UIAlertAction *mountAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Mount") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {        // 获取用户输入的Jailbreak路径
         UITextField *inputTextField = inputAlertController.textFields.firstObject;
         NSString *mountPath = inputTextField.text;
-        
         if (mountPath.length > 1) {
             NSString *plistFilePath = @"/var/mobile/newFakePath.plist";
             NSMutableDictionary *plistDictionary = [NSMutableDictionary dictionaryWithContentsOfFile:plistFilePath];
@@ -479,39 +477,31 @@
                 pathArray = [NSMutableArray array];
             }
             if (![pathArray containsObject:mountPath]) {
-			          [pathArray addObject:mountPath];
-								[plistDictionary setObject:pathArray forKey:@"path"];
-						 
+		[pathArray addObject:mountPath];
+		[plistDictionary setObject:pathArray forKey:@"path"];				 
                 [plistDictionary writeToFile:plistFilePath atomically:YES];
             } 
-
             exec_cmd_root(JBRootPath("/basebin/jbctl"), "internal", "mount", [NSURL fileURLWithPath:mountPath].fileSystemRepresentation, NULL);
 
         }
     }];
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
-
     [inputAlertController addAction:mountAction];
-    [inputAlertController addAction:cancelAction];
-    
+    [inputAlertController addAction:cancelAction]; 
     [self presentViewController:inputAlertController animated:YES completion:nil];
 }
 
 - (void)unmountPressed
 {
-    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mount_Title") message:DOLocalizedString(@"Input_Mount_Title") preferredStyle:UIAlertControllerStyleAlert];
-    
+    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mount_Title") message:DOLocalizedString(@"Input_Mount_Title") preferredStyle:UIAlertControllerStyleAlert]; 
     [inputAlertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.placeholder = DOLocalizedString(@"Input_Mount_Title");
     }];
     
     UIAlertAction *mountAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Mount") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-
         UITextField *inputTextField = inputAlertController.textFields.firstObject;
-        NSString *mountPath = inputTextField.text;
-        
-	
+        NSString *mountPath = inputTextField.text;	
         if (mountPath.length > 1) {
             exec_cmd_root(JBRootPath("/usr/bin/rm"), "-rf", JBRootPath([NSURL fileURLWithPath:mountPath].fileSystemRepresentation), NULL);
             exec_cmd_root(JBRootPath("/basebin/jbctl"), "internal", "unmount", [NSURL fileURLWithPath:mountPath].fileSystemRepresentation, NULL);
@@ -532,10 +522,8 @@
     }];
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
-    
     [inputAlertController addAction:mountAction];
     [inputAlertController addAction:cancelAction];
-    
     [self presentViewController:inputAlertController animated:YES completion:nil];
 }
 
