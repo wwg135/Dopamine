@@ -37,8 +37,6 @@
 
     UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     [self.view addGestureRecognizer:longPressGesture];
-    longPressGesture.cancelsTouchesInView = NO;
-    [longPressGesture release];
 }
 
 - (void)setupBackground
@@ -128,16 +126,20 @@
 }
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
-    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) { 
-        UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
-        imagePicker.delegate = self;
-        imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];        
+        [alertController addAction:[UIAlertAction actionWithTitle:@"从相册选择图片" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+            imagePicker.delegate = self;
+            imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     
-        UIViewController *viewController = [UIApplication sharedApplication].windows.firstObject.rootViewController;
-        [viewController presentViewController:imagePicker animated:YES completion:^{
-          [imagePicker dismissViewControllerAnimated:YES completion:nil];
-        }];
-      }
+            UIViewController *viewController = [UIApplication sharedApplication].windows.firstObject.rootViewController;
+            [viewController presentViewController:imagePicker animated:YES completion:nil];
+        }]];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];       
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
