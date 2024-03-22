@@ -134,7 +134,7 @@
         if (envManager.isJailbroken) {
             [alertController addAction:[UIAlertAction actionWithTitle:@"重启设备" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [[DOEnvironmentManager sharedManager] reboot];
-            }];
+            }]];
         }
         
         [alertController addAction:[UIAlertAction actionWithTitle:@"从相册选择图片" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
