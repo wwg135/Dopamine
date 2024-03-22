@@ -142,15 +142,13 @@
         [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
 
-        if ([[DOUIManager sharedInstance] isextrafeatures]) {
-            PSSpecifier *updatetimeSpecifier = [PSSpecifier emptyGroupSpecifier];
-            updatetimeSpecifier.name = DOLocalizedString(@"AAA");
-            [specifiers addObject:updatetimeSpecifier];
+        PSSpecifier *updatetimeSpecifier = [PSSpecifier emptyGroupSpecifier];
+        updatetimeSpecifier.name = DOLocalizedString(@"AAA");
+        [specifiers addObject:updatetimeSpecifier];
 
-            PSSpecifier *uptimeSpecifier = [PSSpecifier emptyGroupSpecifier];
-            uptimeSpecifier.name = self.uptimeLabel.text;
-            [specifiers addObject:uptimeSpecifier];
-	}
+        PSSpecifier *uptimeSpecifier = [PSSpecifier emptyGroupSpecifier];
+        uptimeSpecifier.name = self.uptimeLabel.text;
+        [specifiers addObject:uptimeSpecifier];
         
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
