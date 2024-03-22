@@ -32,11 +32,11 @@
     [super viewDidLoad];
     [self setupStack];
 
-    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-    if (envManager.isJailbroken) {
-    	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    	[self.view addGestureRecognizer:longPressGesture];
-    }
+    //DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    //if (envManager.isJailbroken) {
+    	//UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    	//[self.view addGestureRecognizer:longPressGesture];
+    //}
 }
 
 -(void)setupStack
