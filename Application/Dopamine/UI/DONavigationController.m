@@ -10,6 +10,7 @@
 #import "DOModalBackAction.h"
 #import "DOGlobalAppearance.h"
 #import "DOThemeManager.h"
+#import "DOEnvironmentManager.h"
 
 @interface DONavigationController ()
 
