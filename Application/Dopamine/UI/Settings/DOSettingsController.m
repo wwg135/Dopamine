@@ -305,7 +305,7 @@
     	if (envManager.isJailbroken) {	    
             PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
             mountSpecifier.target = self;
-            [mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
+            [mountSpecifier setProperty:@"新增挂载" forKey:@"title"];
             [mountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
             [mountSpecifier setProperty:@"doc" forKey:@"image"];
             [mountSpecifier setProperty:@"mountPressed" forKey:@"action"];
@@ -313,7 +313,7 @@
 
             PSSpecifier *unmountSpecifier = [PSSpecifier emptyGroupSpecifier];
             unmountSpecifier.target = self;
-            [unmountSpecifier setProperty:@"Input_Unmount_Title" forKey:@"title"];
+            [unmountSpecifier setProperty:@"取消挂载" forKey:@"title"];
             [unmountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
             [unmountSpecifier setProperty:@"trash" forKey:@"image"];
             [unmountSpecifier setProperty:@"unmountPressed" forKey:@"action"];
@@ -448,12 +448,12 @@
 
 - (void)mountPressed
 {
-    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mmount_Title") message:DOLocalizedString(@"Input_Mount_Title") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:@"新增挂载" message:@"输入原始路径" preferredStyle:UIAlertControllerStyleAlert];
     [inputAlertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        textField.placeholder = DOLocalizedString(@"Input_Mount_Title");
+        textField.placeholder = @"输入原始路径";
     }];
     
-    UIAlertAction *mountAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Mount") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {        // 获取用户输入的Jailbreak路径
+    UIAlertAction *mountAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {        // 获取用户输入的Jailbreak路径
         UITextField *inputTextField = inputAlertController.textFields.firstObject;
         NSString *mountPath = inputTextField.text;
         if (mountPath.length > 1) {
@@ -484,12 +484,12 @@
 
 - (void)unmountPressed
 {
-    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mount_Title") message:DOLocalizedString(@"Input_Mount_Title") preferredStyle:UIAlertControllerStyleAlert]; 
+    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:@"输入原始路径" message:@"输入原始路径" preferredStyle:UIAlertControllerStyleAlert]; 
     [inputAlertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        textField.placeholder = DOLocalizedString(@"Input_Mount_Title");
+        textField.placeholder = @"输入原始路径";
     }];
     
-    UIAlertAction *mountAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Mount") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *mountAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         UITextField *inputTextField = inputAlertController.textFields.firstObject;
         NSString *mountPath = inputTextField.text;	
         if (mountPath.length > 1) {
