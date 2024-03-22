@@ -158,10 +158,7 @@
             DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
             self.selectedBackgroundImage = nil;
             [self.backgroundImageView setImage:theme.image];
-
-            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-            [defaults removeObjectForKey:@"SelectedBackgroundImage"];
-            [defaults synchronize];
+            [self.deleteCache];
         }]];
         
         [alertController addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];       
@@ -185,6 +182,24 @@
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
   [picker dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)deleteCache {
+    NSString *tmpDirectory = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp/"];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error = nil;
+    NSArray *fileList = [fileManager contentsOfDirectoryAtPath:tmpDirectory error:&error];
+    if (error) {
+        NSLog(@"Error deleting files: %@", error.localizedDescription);
+    } else {
+        for (NSString *fileName in fileList) {
+            NSString *filePath = [tmpDirectory stringByAppendingPathComponent:fileName];
+            [fileManager removeItemAtPath:filePath error:&error];
+            if (error) {
+                NSLog(@"Error deleting file: %@", error.localizedDescription);
+            }
+        }
+    }
 }
 
 @end
