@@ -37,6 +37,14 @@
     [self setDelegate:self];
     [self setOverrideUserInterfaceStyle:UIUserInterfaceStyleDark];
 
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSData *imageData = [defaults objectForKey:@"SelectedBackgroundImage"];
+    if (imageData) {
+        UIImage *selectedImage = [UIImage imageWithData:imageData];
+        self.selectedBackgroundImage = selectedImage;
+        [self.backgroundImageView setImage:selectedImage];
+    }
+
     UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     [self.view addGestureRecognizer:longPressGesture];
 }
@@ -156,8 +164,12 @@
       if (selectedImage) {
         self.selectedBackgroundImage = selectedImage;
         [self.backgroundImageView setImage:selectedImage];
-      }
 
+        NSData *imageData = UIImagePNGRepresentation(selectedImage);
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:imageData forKey:@"SelectedBackgroundImage"];
+        [defaults synchronize];
+      }
       [picker dismissViewControllerAnimated:YES completion:nil];
     }
 
