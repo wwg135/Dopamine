@@ -33,6 +33,9 @@
     [self pushViewController:(self.mainView = [[DOMainViewController alloc] init]) animated:NO];
     [self setDelegate:self];
     [self setOverrideUserInterfaceStyle:UIUserInterfaceStyleDark];
+
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)setupBackground
@@ -41,7 +44,7 @@
     
     self.view.backgroundColor = [UIColor blackColor];
     self.backgroundImageView = [[UIImageView alloc] init];
-    self.backgroundImageView.image = [theme image];
+    self.backgroundImageView.image = customimage? [[[UIImage imageNamed:[NSString stringWithFormat:@"Background_%@.jpg", theme]] imageWithBlur:18.0] imageWithHue: M_PI * 2] : [theme image];
     self.backgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
     self.backgroundImageView.translatesAutoresizingMaskIntoConstraints = NO;
     self.backgroundImageView.userInteractionEnabled = NO;
@@ -117,5 +120,34 @@
 
 }
 
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        customimage = true;
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];        
+        [alertController addAction:[UIAlertAction actionWithTitle:@"从相册选择图片" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+            imagePicker.delegate = self;
+            imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+            
+            UIViewController *viewController = [UIApplication sharedApplication].windows.firstObject.rootViewController;
+            [viewController presentViewController:imagePicker animated:YES completion:nil];
+        }]];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];       
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> *)info {
+    UIImage *selectedImage = info[UIImagePickerControllerOriginalImage];
+    if (selectedImage) {
+        self.selectedBackgroundImage = selectedImage;
+    }    
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
 
 @end
