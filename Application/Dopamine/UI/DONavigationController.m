@@ -12,7 +12,6 @@
 #import "DOThemeManager.h"
 #import "DOUIManager.h"
 #import "DOEnvironmentManager.h"
-#import "DOJailbreaker.h"
 
 @interface DONavigationController ()
 
