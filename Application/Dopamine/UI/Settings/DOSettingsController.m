@@ -33,12 +33,6 @@
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
 
-    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-    if (envManager.isJailbroken) {
-    	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    	[self.view addGestureRecognizer:longPressGesture];
-    }
-
     self.uptimeLabel = [[UILabel alloc] init];
     [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
 }
@@ -312,7 +306,7 @@
         [themeSpecifier setProperty:@"themeNames" forKey:@"titlesDataSource"];
         [specifiers addObject:themeSpecifier];
 
-    	if ([[DOUIManager sharedInstance] isextrafeatures] && envManager.isJailbroken) {	    
+    	if (envManager.isJailbroken) {	    
             PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
             mountSpecifier.target = self;
             [mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
@@ -532,36 +526,6 @@
     [[DOUIManager sharedInstance] resetSettings];
     [self.navigationController popToRootViewControllerAnimated:YES];
     [self reloadSpecifiers];
-}
-
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
-    if (gesture.state == UIGestureRecognizerStateBegan) {
-        CGPoint pressLocation = [gesture locationInView:self.view];
-        [self extrafeaturesEnabledPressed];
-    }
-}
-
-- (void)extrafeaturesEnabledPressed {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Extrafeatures_Title") message:nil preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
-    UIAlertAction *confirmAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSString *key = @"extrafeaturesEnabled";
-        id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
-        
-        if (value == nil) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        } else if ([value boolValue]) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-        } else {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        }
-        
-        [self reloadSpecifiers];
-    }];
-    
-    [alertController addAction:confirmAction];
-    [alertController addAction:cancelAction];
-    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)updateLabel {
