@@ -158,7 +158,7 @@
             DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
             self.selectedBackgroundImage = nil;
             [self.backgroundImageView setImage:theme.image];
-            [self.deleteCache];
+            [self deleteCache];
         }]];
         
         [alertController addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];       
