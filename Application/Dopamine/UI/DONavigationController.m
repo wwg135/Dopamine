@@ -127,7 +127,16 @@
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
     if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];        
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet]; 
+        DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+        if (envManager.isJailbroken) {
+            [alertController addAction:[UIAlertAction actionWithTitle:@"重启设备" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [self fadeToBlack:^{
+                    [[DOEnvironmentManager sharedManager] reboot];
+                }];
+            }];
+        }
+        
         [alertController addAction:[UIAlertAction actionWithTitle:@"从相册选择图片" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
             imagePicker.delegate = self;
