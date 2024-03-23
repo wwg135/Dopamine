@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setPreferenceValue:(NSObject *)obj forKey:(NSString *)key;
 - (void)removePreferenceValueForKey:(NSString *)key;
+- (void)deleteCache;
 
 @end
 
