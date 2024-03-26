@@ -65,11 +65,4 @@
     [self savePreferences];
 }
 
-- (void)deleteCache
-{
-    NSString *filePath = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp/"];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [fileManager removeItemAtPath:filePath error:nil];
-}
-
 @end
