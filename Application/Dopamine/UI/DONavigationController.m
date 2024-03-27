@@ -12,7 +12,6 @@
 #import "DOThemeManager.h"
 #import "DOUIManager.h"
 #import "DOEnvironmentManager.h"
-#import "DOMainViewController.h"
 
 @interface DONavigationController ()
 
