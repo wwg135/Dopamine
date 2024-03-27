@@ -141,7 +141,7 @@
       return [[[UIImage imageNamed:image] imageWithBlur:18.0] imageWithHue: M_PI * 2];  
 }
 
-- (void)handleSingleTap:(UITapGestureRecognizer *)tap {
+- (void)handleSingleTap:(UITapGestureRecognizer *)gestureRecognizer {
     if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet]; 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
