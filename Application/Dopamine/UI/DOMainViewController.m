@@ -15,7 +15,6 @@
 #import "DOLogCrashViewController.h"
 #import <pthread.h>
 #import <libjailbreak/libjailbreak.h>
-#import "DONavigationController.h"
 
 @interface DOMainViewController ()
 
@@ -78,10 +77,6 @@
         [DOGlobalAppearance mainSubtitleString:[[DOEnvironmentManager sharedManager] versionSupportString]],
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By")],
     ]];
-
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:[DONavigationController sharedInstance] action:@selector(handleSingleTap)];
-    tap.numberOfTapsRequired = 1;
-    [headerView addGestureRecognizer:tap];
     
     [stackView addArrangedSubview:headerView];
 
