@@ -24,7 +24,6 @@
 
 @interface UINavigationController (Private)
 -(CGRect)_frameForViewController:(id)arg1;
-+ (instancetype)sharedInstance;
 @end
 
 @implementation DONavigationController
