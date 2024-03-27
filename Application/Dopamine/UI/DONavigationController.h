@@ -15,9 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DONavigationController : UINavigationController <UINavigationControllerDelegate>
 
-+ (instancetype)sharedInstance;
-- (void)handleSingleTap;
-
 @end
 
 NS_ASSUME_NONNULL_END
