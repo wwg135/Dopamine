@@ -12,6 +12,7 @@
 #import "DOThemeManager.h"
 #import "DOUIManager.h"
 #import "DOEnvironmentManager.h"
+#import "DOMainViewController.h"
 
 @interface DONavigationController ()
 
@@ -35,11 +36,6 @@
         sharedInstance = [[self alloc] init];
     });
     return sharedInstance;
-}
-
-- (void)handleSingleTap {
-    UIViewController *rootVC = self.viewControllers.firstObject;
-    [rootVC handleRootViewSingleTap];
 }
 
 - (void)viewDidLoad
