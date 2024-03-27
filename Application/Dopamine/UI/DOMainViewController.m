@@ -79,7 +79,7 @@
         [DOGlobalAppearance secondarySubtitleString:DOLocalizedString(@"Credits_Made_By")],
     ]];
 
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:[DONavigationController sharedInstance] action:@selector(handleSingleTap:)];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:[DONavigationController sharedInstance] action:@selector(handleSingleTap)];
     tap.numberOfTapsRequired = 1;
     [headerView addGestureRecognizer:tap];
     
