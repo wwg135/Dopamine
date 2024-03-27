@@ -81,7 +81,7 @@
 
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:[DONavigationController sharedInstance] action:@selector(handleSingleTap:)];
     tap.numberOfTapsRequired = 1;
-    [headerView addGestureRecognizer:singleTapGesture];
+    [headerView addGestureRecognizer:tap];
     
     [stackView addArrangedSubview:headerView];
 
