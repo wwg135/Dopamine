@@ -137,6 +137,10 @@
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
         [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
+
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(checkForUpdateEnabledPressed)];
+        tap.numberOfTapsRequired = 1;
+        [headerSpecifier addGestureRecognizer:tap];
         
         if (!envManager.isJailbroken) {
             PSSpecifier *exploitGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
