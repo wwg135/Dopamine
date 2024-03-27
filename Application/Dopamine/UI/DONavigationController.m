@@ -53,9 +53,6 @@
         self.selectedBackgroundImage = selectedImage;
         [self.backgroundImageView setImage:selectedImage];
     }
-
-    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    [self.view addGestureRecognizer:longPressGesture]; 
 }
 
 - (void)setupBackground
@@ -144,7 +141,7 @@
       return [[[UIImage imageNamed:image] imageWithBlur:18.0] imageWithHue: M_PI * 2];  
 }
 
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+- (void)handleSingleTap:(UILongPressGestureRecognizer *)gestureRecognizer {
     if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet]; 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
