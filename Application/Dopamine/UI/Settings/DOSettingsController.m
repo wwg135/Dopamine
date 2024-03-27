@@ -31,7 +31,6 @@
 
     UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     [self.view addGestureRecognizer:longPressGesture];
-    longPressGesture.cancelsTouchesInView = NO; // 添加这行代码以确保触觉反馈正常工作
 }
 
 - (void)viewWillAppear:(BOOL)arg1
