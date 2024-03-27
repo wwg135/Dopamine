@@ -45,8 +45,9 @@
         [self.backgroundImageView setImage:selectedImage];
     }
 
-    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    [self.view addGestureRecognizer:longPressGesture];
+    UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
+    doubleTapGesture.numberOfTapsRequired = 2;
+    [self.view addGestureRecognizer:doubleTapGesture];
 }
 
 - (void)setupBackground
@@ -135,8 +136,8 @@
       return [[[UIImage imageNamed:image] imageWithBlur:18.0] imageWithHue: M_PI * 2];  
 }
 
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
-    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+- (void)handleDoubleTap:(UITapGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet]; 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
         if (envManager.isJailbroken) {
