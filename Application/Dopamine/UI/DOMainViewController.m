@@ -25,11 +25,6 @@
 @property(nonatomic) BOOL hideStatusBar;
 @property(nonatomic) BOOL hideHomeIndicator;
 
-- (void)handleRootViewSingleTap {
-    UIAlertController *alert = // alert creation
-    [self presentViewController:alert animated:YES]; 
-}
-
 @end
 
 @implementation DOMainViewController
