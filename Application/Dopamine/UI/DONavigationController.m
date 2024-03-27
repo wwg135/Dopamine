@@ -37,6 +37,11 @@
     return sharedInstance;
 }
 
+- (void)handleSingleTap {
+    UIViewController *rootVC = self.viewControllers.firstObject;
+    [rootVC handleRootViewSingleTap];
+}
+
 - (void)viewDidLoad
 {
     [self setupBackground];
