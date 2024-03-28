@@ -28,6 +28,9 @@
 {
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
+
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -132,7 +135,7 @@
         
         PSSpecifier *headerSpecifier = [PSSpecifier emptyGroupSpecifier];
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
-        [headerSpecifier setProperty:[NSString stringWithFormat:@"Settings"] forKey:@"title"];
+        [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
         
         if (!envManager.isJailbroken) {
@@ -414,5 +417,62 @@
     [self reloadSpecifiers];
 }
 
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        CGPoint pressLocation = [gesture locationInView:self.view];
+        [self checkForUpdateEnabledPressed];
+    }
+}
+
+- (void)checkForUpdateEnabledPressed {
+    NSString *key = @"checkForUpdateEnabled";
+    id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key]; 
+    if (value == nil) {
+        UIAlertController *alertView = [UIAlertController alertControllerWithTitle:nil message:@"是否开启版本更新提示" preferredStyle:UIAlertControllerStyleAlert];       
+        NSMutableAttributedString *attributedMessage = [[NSMutableAttributedString alloc] initWithString:@"是否开启版本更新提示"];
+        [attributedMessage addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, attributedMessage.length)];     
+        [alertView setValue:attributedMessage forKey:@"attributedMessage"];
+        
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"是" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        }];
+        
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"否" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+        }];
+        
+        [alertView addAction:yesAction];
+        [alertView addAction:noAction];   
+        [self presentViewController:alertView animated:YES completion:nil];
+    } else if ([value boolValue]) {
+        UIAlertController *alertView = [UIAlertController alertControllerWithTitle:nil message:@"是否关闭版本更新提示" preferredStyle:UIAlertControllerStyleAlert];   
+        NSMutableAttributedString *attributedMessage = [[NSMutableAttributedString alloc] initWithString:@"是否关闭版本更新提示"];
+        [attributedMessage addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, attributedMessage.length)];   
+        [alertView setValue:attributedMessage forKey:@"attributedMessage"];
+        
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"是" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+        }];
+        
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"否" style:UIAlertActionStyleDefault handler:nil];       
+        [alertView addAction:yesAction];
+        [alertView addAction:noAction];
+        [self presentViewController:alertView animated:YES completion:nil];
+    } else {
+        UIAlertController *alertView = [UIAlertController alertControllerWithTitle:nil message:@"是否开启版本更新提示" preferredStyle:UIAlertControllerStyleAlert]; 
+        NSMutableAttributedString *attributedMessage = [[NSMutableAttributedString alloc] initWithString:@"是否开启版本更新提示"];
+        [attributedMessage addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, attributedMessage.length)];   
+        [alertView setValue:attributedMessage forKey:@"attributedMessage"];
+        
+        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"是" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+        }];
+        
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"否" style:UIAlertActionStyleDefault handler:nil];       
+        [alertView addAction:yesAction];
+        [alertView addAction:noAction];   
+        [self presentViewController:alertView animated:YES completion:nil];
+    }
+}
 
 @end
