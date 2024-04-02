@@ -95,4 +95,4 @@ jobs:
         with:
           name: Dopamine
           path: |
-            ${{ github.workspace }}/Application/Dopamine.ipa
+            ${{ github.workspace }}/Dopamine.ipa
