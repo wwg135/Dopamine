@@ -113,7 +113,7 @@ uint64_t alloc_page_table_unassigned(void)
 
 		uint64_t pvh = pai_to_pvh(pa_index(allocatedPT));
 		uint64_t ptdp = pvh_ptd(pvh);
-		uint64_t pinfo = kread64(ptdp + koffsetof(pt_desc, ptd_info)); // TODO: Fake 16k devices (4 values)
+		uint64_t pinfo = kread64(ptdp + koffsetof(pt_desc, ptd_info));
 		pinfo_pa = kvtophys(pinfo);
 
 		uint16_t refCount = physread16(pinfo_pa);
@@ -205,8 +205,9 @@ uint64_t pmap_alloc_page_table(uint64_t pmap, uint64_t va)
 
 	// On A14+ PT_INDEX_MAX is 4, for whatever reason
 	// However in practice, only the first slot is used...
-	// TODO: On devices where kernel page size != userland page size, populate all 4 values
-	physwrite64(ptdp_pa + koffsetof(pt_desc, va), va);
+	for (uint64_t po = 0; po < vm_kernel_page_size; po += vm_page_size) {
+		physwrite64(ptdp_pa + koffsetof(pt_desc, va) + (po / vm_page_size), va + po);
+	}
 
 	return tt_p;
 }
