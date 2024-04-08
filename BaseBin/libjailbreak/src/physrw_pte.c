@@ -147,7 +147,6 @@ int physrw_pte_handoff(pid_t pid)
 		} while (leafLevel < PMAP_TT_L3_LEVEL);
 
 		// Map in the magic page table at MAGIC_PT_ADDRESS
-
 		leafLevel = PMAP_TT_L2_LEVEL;
 		uint64_t magicPT = vtophys_lvl(ttep, MAGIC_PT_ADDRESS, &leafLevel, NULL);
 		if (!magicPT) { ret = -6; break; }
