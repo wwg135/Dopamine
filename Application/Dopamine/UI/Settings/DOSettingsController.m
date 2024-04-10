@@ -276,7 +276,7 @@
                 rebootSpecifier.target = self;
                 [rebootSpecifier setProperty:@"Menu_Reboot_Title" forKey:@"title"];
                 [rebootSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-                [rebootSpecifier setProperty:@"arrow.triangle.1.circlepath.fill" forKey:@"image"];
+                [rebootSpecifier setProperty:@"arrow.triangle.2.circlepath" forKey:@"image"];
                 [rebootSpecifier setProperty:@"rebootPressed" forKey:@"action"];
                 [specifiers addObject:rebootSpecifier];
             }
