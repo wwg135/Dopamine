@@ -271,9 +271,17 @@
                     }
                 }
                 [specifiers addObject:removeJailbreakSpecifier];
+
+                PSSpecifier *rebootSpecifier = [PSSpecifier emptyGroupSpecifier];
+                rebootSpecifier.target = self;
+                [rebootSpecifier setProperty:@"Menu_Reboot_Title" forKey:@"title"];
+                [rebootSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+                [rebootSpecifier setProperty:@"arrow.triangle.1.circlepath.fill" forKey:@"image"];
+                [rebootSpecifier setProperty:@"rebootPressed" forKey:@"action"];
+                [specifiers addObject:rebootSpecifier];
             }
         }
-        
+            
         PSSpecifier *themingGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
         themingGroupSpecifier.name = DOLocalizedString(@"Section_Customization");
         [specifiers addObject:themingGroupSpecifier];
@@ -420,5 +428,16 @@
     [self reloadSpecifiers];
 }
 
+- (void)rebootPressed
+{
+    UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:nil message:DOLocalizedString(@"Alert_Reboot_Title") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        [[DOEnvironmentManager sharedManager] reboot];
+    }];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
+    [confirmationAlertController addAction:rebootAction];
+    [confirmationAlertController addAction:cancelAction];
+    [self presentViewController:confirmationAlertController animated:YES completion:nil];
+}
 
 @end
