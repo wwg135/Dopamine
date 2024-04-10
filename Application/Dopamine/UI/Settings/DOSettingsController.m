@@ -420,18 +420,4 @@
     [self reloadSpecifiers];
 }
 
-- (void)checkForUpdateEnabledPressed {
-    NSString *key = @"checkForUpdateEnabled";
-    id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key]; 
-    if (value == nil) {
-        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        
-        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-    } else if ([value boolValue]) {
-        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-    } else {
-        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-    }
-}
-
 @end
