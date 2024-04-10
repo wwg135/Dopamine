@@ -271,7 +271,8 @@
                     }
                 }
                 [specifiers addObject:removeJailbreakSpecifier];
-
+            }
+            if (envManager.isJailbroken) {
                 PSSpecifier *rebootSpecifier = [PSSpecifier emptyGroupSpecifier];
                 rebootSpecifier.target = self;
                 [rebootSpecifier setProperty:@"Menu_Reboot_Title" forKey:@"title"];
