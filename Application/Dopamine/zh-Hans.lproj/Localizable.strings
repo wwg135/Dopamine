@@ -110,7 +110,7 @@
 "Select_Package_Managers_Install_Message" = "如果你不确定选择哪一个比较好，请选择 Sileo";
 "Continue" = "继续";
 
-"Menu_Reboot_Title" = "重启";
+"Menu_Reboot_Title" = "重启设备";
 "Settings" = "设置";
 "Alert_Reboot_Title" = "确定重启设备吗？";
 "Settings_Check_For_Update" = "检查更新";
