@@ -272,7 +272,7 @@
                 }
                 [specifiers addObject:removeJailbreakSpecifier];
             }
-            if (envManager.isJailbroken && ischeckForUpdate) {
+            if (envManager.isJailbroken) {
                 PSSpecifier *rebootSpecifier = [PSSpecifier emptyGroupSpecifier];
                 rebootSpecifier.target = self;
                 [rebootSpecifier setProperty:@"Menu_Reboot_Title" forKey:@"title"];
@@ -439,14 +439,6 @@
     [confirmationAlertController addAction:rebootAction];
     [confirmationAlertController addAction:cancelAction];
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
-}
-
-- (BOOL)ischeckForUpdate
-{
-    NSNumber *checkforUpdate = [_preferenceManager preferenceValueForKey:@"checkForUpdateEnabled"];
-    if ([checkforUpdate boolValue] == YES)
-        return YES;
-    [self reloadSpecifiers];
 }
 
 @end
