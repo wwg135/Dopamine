@@ -28,9 +28,6 @@
 {
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
-
-    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -188,6 +185,12 @@
         [tweakInjectionSpecifier setProperty:@"tweakInjectionEnabled" forKey:@"key"];
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
+
+        PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
+        [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
+        [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
+        [checkForUpdateSpecifier setProperty:@NO forKey:@"default"];
+        [specifiers addObject:checkForUpdateSpecifier];
         
         if (!envManager.isJailbroken) {
             PSSpecifier *verboseLogSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Verbose_Logs") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
@@ -417,61 +420,17 @@
     [self reloadSpecifiers];
 }
 
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
-    if (gesture.state == UIGestureRecognizerStateBegan) {
-        CGPoint pressLocation = [gesture locationInView:self.view];
-        [self checkForUpdateEnabledPressed];
-    }
-}
-
 - (void)checkForUpdateEnabledPressed {
     NSString *key = @"checkForUpdateEnabled";
     id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key]; 
     if (value == nil) {
-        UIAlertController *alertView = [UIAlertController alertControllerWithTitle:nil message:@"是否开启版本更新提示" preferredStyle:UIAlertControllerStyleAlert];       
-        NSMutableAttributedString *attributedMessage = [[NSMutableAttributedString alloc] initWithString:@"是否开启版本更新提示"];
-        [attributedMessage addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, attributedMessage.length)];     
-        [alertView setValue:attributedMessage forKey:@"attributedMessage"];
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
         
-        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"是" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        }];
-        
-        UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"否" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-        }];
-        
-        [alertView addAction:yesAction];
-        [alertView addAction:noAction];   
-        [self presentViewController:alertView animated:YES completion:nil];
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
     } else if ([value boolValue]) {
-        UIAlertController *alertView = [UIAlertController alertControllerWithTitle:nil message:@"是否关闭版本更新提示" preferredStyle:UIAlertControllerStyleAlert];   
-        NSMutableAttributedString *attributedMessage = [[NSMutableAttributedString alloc] initWithString:@"是否关闭版本更新提示"];
-        [attributedMessage addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, attributedMessage.length)];   
-        [alertView setValue:attributedMessage forKey:@"attributedMessage"];
-        
-        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"是" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-        }];
-        
-        UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"否" style:UIAlertActionStyleDefault handler:nil];       
-        [alertView addAction:yesAction];
-        [alertView addAction:noAction];
-        [self presentViewController:alertView animated:YES completion:nil];
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
     } else {
-        UIAlertController *alertView = [UIAlertController alertControllerWithTitle:nil message:@"是否开启版本更新提示" preferredStyle:UIAlertControllerStyleAlert]; 
-        NSMutableAttributedString *attributedMessage = [[NSMutableAttributedString alloc] initWithString:@"是否开启版本更新提示"];
-        [attributedMessage addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, attributedMessage.length)];   
-        [alertView setValue:attributedMessage forKey:@"attributedMessage"];
-        
-        UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"是" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        }];
-        
-        UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"否" style:UIAlertActionStyleDefault handler:nil];       
-        [alertView addAction:yesAction];
-        [alertView addAction:noAction];   
-        [self presentViewController:alertView animated:YES completion:nil];
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
     }
 }
 
