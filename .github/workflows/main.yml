@@ -29,7 +29,7 @@ jobs:
     environment: Auto Build And Release
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@4.1.2
         with:
             submodules: recursive
 
@@ -128,7 +128,7 @@ jobs:
 
       - name: Upload Artifact
         id: dopamine-latest-upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.3.2
         with:
           name: Dopamine
           path: |
