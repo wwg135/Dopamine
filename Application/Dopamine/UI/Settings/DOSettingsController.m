@@ -29,11 +29,8 @@
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
 
-    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-    if (envManager.isJailbroken) {
-    	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    	[self.view addGestureRecognizer:longPressGesture];
-    }
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -192,7 +189,7 @@
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
 
-        if ([[DOUIManager sharedInstance] isextrafeatures]) {
+        if ([[DOUIManager sharedInstance] isUpdatesAndReboot]) {
             PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
             [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
             [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
@@ -280,7 +277,7 @@
                 }
                 [specifiers addObject:removeJailbreakSpecifier];
             }
-            if ([[DOUIManager sharedInstance] isextrafeatures] && envManager.isJailbroken) {
+            if ([[DOUIManager sharedInstance] isUpdatesAndReboot] && envManager.isJailbroken) {
                 PSSpecifier *rebootSpecifier = [PSSpecifier emptyGroupSpecifier];
                 rebootSpecifier.target = self;
                 [rebootSpecifier setProperty:@"Menu_Reboot_Title" forKey:@"title"];
@@ -449,8 +446,15 @@
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
 }
 
-- (void)extrafeaturesEnabledPressed {
-    NSString *key = @"extrafeaturesEnabled";
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        CGPoint pressLocation = [gesture locationInView:self.view];
+        [self UpdatesAndRebootEnabledPressed];
+    }
+}
+
+- (void)UpdatesAndRebootEnabledPressed {
+    NSString *key = @"UpdatesAndRebootEnabled";
     id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
     if (value == nil) {
         [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
