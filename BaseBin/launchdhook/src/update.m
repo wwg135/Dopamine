@@ -125,6 +125,7 @@ void jbupdate_update_system_info(void)
 				NULL,
 				NULL,
 				NULL,
+				NULL,	
 			};
 
 			uint32_t idx = 7;
@@ -133,6 +134,9 @@ void jbupdate_update_system_info(void)
 			}
 			if (xpf_set_is_supported("badRecovery")) {
 				sets[idx++] = "badRecovery"; 
+			}
+			if (xpf_set_is_supported("arm64kcall")) {
+				sets[idx++] = "arm64kcall"; 
 			}
 
 			systemInfoXdict = xpf_construct_offset_dictionary((const char **)sets);

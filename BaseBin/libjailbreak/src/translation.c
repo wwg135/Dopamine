@@ -110,7 +110,7 @@ uint64_t kvtophys(uint64_t va)
 void libjailbreak_translation_init(void)
 {
 	// A9+: Kernel uses 16K pages
-	if (vm_kernel_page_size == 0x4000) {
+	if (vm_real_kernel_page_size == 0x4000) {
 		arm_tt_level[0] = (struct tt_level){
 			.offMask = ARM_16K_TT_L0_OFFMASK,
 			.shift = ARM_16K_TT_L0_SHIFT,
@@ -145,7 +145,7 @@ void libjailbreak_translation_init(void)
 		};
 	}
 	// A8: Kernel uses 4k pages
-	else if (vm_kernel_page_size == 0x1000) {
+	else if (vm_real_kernel_page_size == 0x1000) {
 		arm_tt_level[0] = (struct tt_level){
 			.offMask = ARM_4K_TT_L0_OFFMASK,
 			.shift = ARM_4K_TT_L0_SHIFT,

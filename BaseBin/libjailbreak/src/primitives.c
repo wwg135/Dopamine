@@ -6,6 +6,7 @@
 #include "util.h"
 #include <errno.h>
 #include <string.h>
+#include <sys/sysctl.h>
 
 struct kernel_primitives gPrimitives = { 0 };
 
@@ -30,7 +31,7 @@ int _kreadbuf_phys(uint64_t kaddr, void* output, size_t size)
 	memset(output, 0, size);
 
 	__block int pr = 0;
-	enumerate_pages(kaddr, size, P_PAGE_SIZE, ^bool(uint64_t curKaddr, size_t curSize){
+	enumerate_pages(kaddr, size, vm_real_kernel_page_size, ^bool(uint64_t curKaddr, size_t curSize){
 		uint64_t curPhys = kvtophys(curKaddr);
 		if (curPhys == 0 && errno != 0) {
 			pr = errno;
@@ -48,7 +49,7 @@ int _kreadbuf_phys(uint64_t kaddr, void* output, size_t size)
 int _kwritebuf_phys(uint64_t kaddr, const void* input, size_t size)
 {
 	__block int pr = 0;
-	enumerate_pages(kaddr, size, P_PAGE_SIZE, ^bool(uint64_t curKaddr, size_t curSize){
+	enumerate_pages(kaddr, size, vm_real_kernel_page_size, ^bool(uint64_t curKaddr, size_t curSize){
 		uint64_t curPhys = kvtophys(curKaddr);
 		if (curPhys == 0 && errno != 0) {
 			pr = errno;
@@ -68,7 +69,7 @@ int _physreadbuf_virt(uint64_t physaddr, void* output, size_t size)
 	memset(output, 0, size);
 
 	__block int pr = 0;
-	enumerate_pages(physaddr, size, P_PAGE_SIZE, ^bool(uint64_t curPhys, size_t curSize){
+	enumerate_pages(physaddr, size, vm_real_kernel_page_size, ^bool(uint64_t curPhys, size_t curSize){
 		uint64_t curKaddr = phystokv(curPhys);
 		if (curKaddr == 0 && errno != 0) {
 			pr = errno;
@@ -86,7 +87,7 @@ int _physreadbuf_virt(uint64_t physaddr, void* output, size_t size)
 int _physwritebuf_virt(uint64_t physaddr, const void* input, size_t size)
 {
 	__block int pr = 0;
-	enumerate_pages(physaddr, size, P_PAGE_SIZE, ^bool(uint64_t curPhys, size_t curSize){
+	enumerate_pages(physaddr, size, vm_real_kernel_page_size, ^bool(uint64_t curPhys, size_t curSize){
 		uint64_t curKaddr = phystokv(curPhys);
 		if (curKaddr == 0 && errno != 0) {
 			pr = errno;
@@ -338,4 +339,22 @@ int kfree(uint64_t addr, uint64_t size)
 		return gPrimitives.kfree_global(addr, size);
 	}
 	return -1;
+}
+
+bool is_kcall_available(void)
+{
+	return (bool)gPrimitives.kcall;
+}
+
+bool device_prefers_physrw_pte(void)
+{
+	cpu_subtype_t cpuFamily = 0;
+	size_t cpuFamilySize = sizeof(cpuFamily);
+	sysctlbyname("hw.cpufamily", &cpuFamily, &cpuFamilySize, NULL, 0);
+	if (cpuFamily == CPUFAMILY_ARM_TYPHOON) {
+		// God fucking damn it, what is wrong with you A8
+		// They should have just let this chipset die in like iOS 12 or something...
+		return true;
+	}
+	return false;
 }

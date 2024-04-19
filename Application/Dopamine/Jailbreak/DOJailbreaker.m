@@ -27,6 +27,7 @@
 #import <libjailbreak/jbserver_boomerang.h>
 #import <libjailbreak/signatures.h>
 #import <libjailbreak/jbclient_xpc.h>
+#import <libjailbreak/kcall_arm64.h>
 #import <CoreServices/LSApplicationProxy.h>
 #import "spawn.h"
 int posix_spawnattr_set_registered_ports_np(posix_spawnattr_t * __restrict attr, mach_port_t portarray[], uint32_t count);
@@ -79,6 +80,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             NULL,
             NULL,
             NULL,
+            NULL,
         };
 
         uint32_t idx = 7;
@@ -87,6 +89,9 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
         }
         if (xpf_set_is_supported("badRecovery")) {
             sets[idx++] = "badRecovery"; 
+        }
+        if (xpf_set_is_supported("arm64kcall")) {
+            sets[idx++] = "arm64kcall"; 
         }
 
         _systemInfoXdict = xpf_construct_offset_dictionary((const char **)sets);
@@ -172,13 +177,17 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
         // IOSurface kallocs don't work on iOS 16+, use these instead
         libjailbreak_kalloc_pt_init();
     }
+    
+    if (![DOEnvironmentManager sharedManager].isArm64e) {
+        arm64_kcall_init();
+    }
 
     return nil;
 }
 
 - (NSError *)buildPhysRWPrimitive
 {
-    int r = libjailbreak_physrw_pte_init(false);
+    int r = libjailbreak_physrw_pte_init(false, 0);
     if (r != 0) {
         return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedBuildingPhysRW userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Failed to build phys r/w primitive: %d", r]}];
     }
@@ -358,8 +367,8 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
         return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedInitFakeLib userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Creating fakelib failed with error: %d", r]}];
     }
 
-    cdhash_t *cdhashes;
-    uint32_t cdhashesCount;
+    cdhash_t *cdhashes = NULL;
+    uint32_t cdhashesCount = 0;
     macho_collect_untrusted_cdhashes(JBRootPath("/basebin/.fakelib/dyld"), NULL, NULL, &cdhashes, &cdhashesCount);
     if (cdhashesCount != 1) return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedInitFakeLib userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Got unexpected number of cdhashes for dyld???: %d", cdhashesCount]}];
     
@@ -465,6 +474,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     if (*errOut) return;
     *errOut = [self doExploitation];
     if (*errOut) return;
+    
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Building Phys R/W Primitive") debug:NO];
     *errOut = [self buildPhysRWPrimitive];
     if (*errOut) return;

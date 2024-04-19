@@ -2,9 +2,11 @@
 #include <libjailbreak/primitives.h>
 #include <libjailbreak/libjailbreak.h>
 #include <libjailbreak/physrw.h>
+#include <libjailbreak/physrw_pte.h>
 #include <libjailbreak/primitives_IOSurface.h>
 #include <libjailbreak/kalloc_pt.h>
 #include <libjailbreak/kcall_Fugu14.h>
+#include <libjailbreak/kcall_arm64.h>
 #include <libjailbreak/jbserver_boomerang.h>
 
 int main(int argc, char* argv[])
@@ -54,8 +56,17 @@ int main(int argc, char* argv[])
 	SYSTEM_INFO_DESERIALIZE(xSystemInfoDict);
 
 	// Retrieve physrw
-	jbclient_root_get_physrw(false);
-	libjailbreak_physrw_init(true);
+	
+	bool usePhysrwPTE = device_prefers_physrw_pte();
+	uint64_t asidPtr = 0;
+	jbclient_root_get_physrw(usePhysrwPTE, &asidPtr);
+	if (usePhysrwPTE) {
+		libjailbreak_physrw_pte_init(true, asidPtr);
+	}
+	else {
+		libjailbreak_physrw_init(true);
+	}
+
 	libjailbreak_translation_init();
 
 	libjailbreak_IOSurface_primitives_init();
@@ -64,9 +75,13 @@ int main(int argc, char* argv[])
 	}
 
 	// Retrieve kcall if available
+#ifdef __arm64e__
 	if (jbinfo(usesPACBypass)) {
 		jbclient_get_fugu14_kcall();
 	}
+#else
+	arm64_kcall_init();
+#endif
 
 	// Send done message to launchd
 	jbclient_boomerang_done();

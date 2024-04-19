@@ -9,15 +9,15 @@
 #include "primitives.h"
 
 typedef struct {
-    bool inited;
+	bool inited;
 	pthread_mutex_t lock;
-    thread_t thread;
-    uint64_t actContext;
-    kRegisterState signedState;
-    uint64_t kernelStack;
-    kRegisterState *mappedState;
-    uint64_t scratchMemory;
-    uint64_t *scratchMemoryMapped;
+	thread_t thread;
+	uint64_t actContext;
+	kRegisterState signedState;
+	uint64_t kernelStack;
+	kRegisterState *mappedState;
+	uint64_t scratchMemory;
+	uint64_t *scratchMemoryMapped;
 } Fugu14KcallThread;
 
 int fugu14_kcall_init(int (^threadSigner)(mach_port_t threadPort));

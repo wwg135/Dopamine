@@ -181,3 +181,23 @@ int cs_allow_invalid(uint64_t proc, bool emulateFully)
 #endif
 	return 0;
 }
+
+kern_return_t pmap_enter_options_addr(uint64_t pmap, uint64_t pa, uint64_t va)
+{
+	uint64_t kr = -1;
+	if (!is_kcall_available()) return kr;
+	while (1) {
+		kcall(&kr, ksymbol(pmap_enter_options_addr), 8, (uint64_t[]){ pmap, va, pa, VM_PROT_READ | VM_PROT_WRITE, 0, 0, 1, 1 });
+		if (kr != KERN_RESOURCE_SHORTAGE) {
+			return kr;
+		}
+	}
+}
+
+uint64_t pmap_remove(uint64_t pmap, uint64_t start, uint64_t end)
+{
+	uint64_t kr = -1;
+	if (!is_kcall_available()) return kr;
+	kcall(&kr, ksymbol(pmap_remove_options), 4, (uint64_t[]){ pmap, start, end, 0x100 });
+	return kr;
+}

@@ -13,6 +13,8 @@
 #include <math.h>
 extern char **environ;
 
+#define FAKE_PHYSPAGE_TO_MAP 0x13370000
+
 #define POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE 1
 extern int posix_spawnattr_set_persona_np(const posix_spawnattr_t* __restrict, uid_t, uint32_t);
 extern int posix_spawnattr_set_persona_uid_np(const posix_spawnattr_t* __restrict, uid_t);
@@ -71,6 +73,26 @@ uint64_t pmap_self(void)
 	return gSelfPmap;
 }
 
+uint64_t ttep_self(void)
+{
+	static uint64_t gSelfTTEP = 0;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		gSelfTTEP = kread_ptr(pmap_self() + koffsetof(pmap, ttep));
+	});
+	return gSelfTTEP;
+}
+
+uint64_t tte_self(void)
+{
+	static uint64_t gSelfTTE = 0;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		gSelfTTE = kread_ptr(pmap_self() + koffsetof(pmap, tte));
+	});
+	return gSelfTTE;
+}
+
 uint64_t task_get_ipc_port_table_entry(uint64_t task, mach_port_t port)
 {
 	uint64_t itk_space = kread_ptr(task + koffsetof(task, itk_space));
@@ -122,7 +144,6 @@ uint64_t alloc_page_table_unassigned(void)
 			free(free_lvl2);
 			continue;
 		}
-
 		break;
 	}
 
@@ -205,11 +226,108 @@ uint64_t pmap_alloc_page_table(uint64_t pmap, uint64_t va)
 
 	// On A14+ PT_INDEX_MAX is 4, for whatever reason
 	// However in practice, only the first slot is used...
-	for (uint64_t po = 0; po < vm_kernel_page_size; po += vm_page_size) {
+	for (uint64_t po = 0; po < vm_page_size; po += vm_real_kernel_page_size) {
 		physwrite64(ptdp_pa + koffsetof(pt_desc, va) + (po / vm_page_size), va + po);
 	}
 
 	return tt_p;
+}
+
+int pmap_expand_range(uint64_t pmap, uint64_t vaStart, uint64_t size)
+{
+	uint64_t ttep = kread_ptr(pmap + koffsetof(pmap, ttep));
+
+	if (is_kcall_available()) {
+		uint64_t unmappedStart = 0, unmappedSize = 0;
+
+		uint64_t l2Start = vaStart & ~L2_BLOCK_MASK;
+		uint64_t l2End = (vaStart + (size - 1)) & ~L2_BLOCK_MASK;
+		uint64_t l2Count = ((l2End - l2Start) / L2_BLOCK_SIZE) + 1;
+
+		for (uint64_t i = 0; i <= l2Count; i++) {
+			uint64_t curL2 = l2Start + (i * L2_BLOCK_SIZE);
+
+			uint64_t leafLevel = PMAP_TT_L3_LEVEL;
+			uint64_t pt3 = 0;
+			vtophys_lvl(ttep, curL2, &leafLevel, &pt3);
+			if (leafLevel == PMAP_TT_L3_LEVEL || i == l2Count) {
+				// i == l2Count: one extra cycle that this for loop takes
+				// We hit this block either if there was a mapping or at the end
+				// Alloc page tables for the current area (unmappedStart, unmappedSize) by running pmap_enter_options on every page
+				// And then running pmap_remove on the entire area while nested is true
+				//printf("unmappedStart: %llx, unmappedSize: %llx\n", unmappedStart, unmappedSize);
+
+				for (uint64_t l2Off = 0; l2Off < unmappedSize; l2Off += L2_BLOCK_SIZE) {
+					//printf("pmap_enter_options_addr(%llx, %x, %llx)\n", pmap, FAKE_PHYSPAGE_TO_MAP, unmappedStart + l2Off); usleep(10000);
+					kern_return_t kr = pmap_enter_options_addr(pmap, FAKE_PHYSPAGE_TO_MAP, unmappedStart + l2Off);
+					//printf("pmap_enter_options_addr => %d\n", kr); usleep(10000);
+					if (kr != KERN_SUCCESS) {
+						return -7;
+					}
+				}
+
+				// Set type to nested
+				physwrite8(kvtophys(pmap + koffsetof(pmap, type)), 3);
+
+				// Remove mapping (table will stay cause nested is set)
+				if (vm_real_kernel_page_size == 0x1000) {
+					// 4k devices are fucked, don't ask me why
+					// If this isn't done, you get a panic with "%s: PTE range [%p, %p) in pmap %p crosses page table boundary"
+					for (uint64_t off = unmappedStart; off < (unmappedStart + unmappedSize); off += L2_BLOCK_SIZE) {
+						//printf("pmap_remove %llx-%llx\n", off, off + vm_real_kernel_page_size); usleep(10000);
+						pmap_remove(pmap, off, off + vm_real_kernel_page_size);
+					}
+				}
+				else {
+					//printf("pmap_remove %llx-%llx\n", unmappedStart, unmappedStart + unmappedSize); usleep(10000);
+					pmap_remove(pmap, unmappedStart, unmappedStart + unmappedSize);
+				}
+
+				// Change type back
+				physwrite8(kvtophys(pmap + koffsetof(pmap, type)), 0);
+				
+				unmappedStart = 0;
+				unmappedSize = 0;
+				continue;
+			}
+			else {
+				if (unmappedStart == 0) {
+					unmappedStart = curL2;
+				}
+				unmappedSize += L2_BLOCK_SIZE;
+			}
+		}
+	}
+	else {
+		uint64_t vaEnd = vaStart + size;
+		for (uint64_t va = vaStart; va < vaEnd; va += vm_real_kernel_page_size) {
+			uint64_t leafLevel;
+			do {
+				leafLevel = PMAP_TT_L3_LEVEL;
+				uint64_t pt = 0;
+				vtophys_lvl(ttep, va, &leafLevel, &pt);
+				if (leafLevel != PMAP_TT_L3_LEVEL) {
+					uint64_t pt_va = 0;
+					switch (leafLevel) {
+						case PMAP_TT_L1_LEVEL: {
+							pt_va = va & ~L1_BLOCK_MASK;
+							break;
+						}
+						case PMAP_TT_L2_LEVEL: {
+							pt_va = va & ~L2_BLOCK_MASK;
+							break;
+						}
+					}
+					uint64_t newTable = pmap_alloc_page_table(pmap, pt_va);
+					if (newTable) {
+						physwrite64(pt, newTable | ARM_TTE_VALID | ARM_TTE_TYPE_TABLE);
+					}
+					else { thread_caffeinate_stop(); return -2; }
+				}
+			} while (leafLevel < PMAP_TT_L3_LEVEL);
+		}
+	}
+	return 0;
 }
 
 int pmap_map_in(uint64_t pmap, uint64_t uaStart, uint64_t paStart, uint64_t size)
@@ -220,46 +338,28 @@ int pmap_map_in(uint64_t pmap, uint64_t uaStart, uint64_t paStart, uint64_t size
 	uint64_t ttep = kread64(pmap + koffsetof(pmap, ttep));
 
 	// Sanity check: Ensure the entire area to be mapped in is not mapped to anything yet
-	for(uint64_t ua = uaStart; ua < uaEnd; ua += PAGE_SIZE) {
+	for(uint64_t ua = uaStart; ua < uaEnd; ua += vm_real_kernel_page_size) {
 		if (vtophys(ttep, ua)) { thread_caffeinate_stop(); return -1; }
 		// TODO: If all mappings match 1:1, maybe return 0 instead of -1?
 	}
 
 	// Allocate all page tables that need to be allocated
-	for(uint64_t ua = uaStart; ua < uaEnd; ua += PAGE_SIZE) {
-		uint64_t leafLevel;
-		do {
-			leafLevel = PMAP_TT_L3_LEVEL;
-			uint64_t pt = 0;
-			vtophys_lvl(ttep, ua, &leafLevel, &pt);
-			if (leafLevel != PMAP_TT_L3_LEVEL) {
-				uint64_t pt_va = 0;
-				switch (leafLevel) {
-					case PMAP_TT_L1_LEVEL: {
-						pt_va = ua & ~L1_BLOCK_MASK;
-						break;
-					}
-					case PMAP_TT_L2_LEVEL: {
-						pt_va = ua & ~L2_BLOCK_MASK;
-						break;
-					}
-				}
-				uint64_t newTable = pmap_alloc_page_table(pmap, pt_va);
-				if (newTable) {
-					physwrite64(pt, newTable | ARM_TTE_VALID | ARM_TTE_TYPE_TABLE);
-				}
-				else { thread_caffeinate_stop(); return -2; }
-			}
-		} while (leafLevel < PMAP_TT_L3_LEVEL);
-	}
+	pmap_expand_range(pmap, uaStart, size);
+	int i = 0;
 
 	// Insert entries into L3 pages
-	for(uint64_t ua = uaStart; ua < uaEnd; ua += PAGE_SIZE) {
+	for(uint64_t ua = uaStart; ua < uaEnd; ua += vm_real_kernel_page_size) {
 		uint64_t pa = (ua - uaStart) + paStart;
 		uint64_t leafLevel = PMAP_TT_L3_LEVEL;
 		uint64_t pt = 0;
 
 		vtophys_lvl(ttep, ua, &leafLevel, &pt);
+		/*if (leafLevel != PMAP_TT_L3_LEVEL || !pt) {
+			printf("WTF\n");
+		}*/
+		/*if ((pt & vm_real_kernel_page_mask) == 0) {
+			printf("pte write %d %llx = %llx\n", i++, pt, pa | PERM_TO_PTE(PERM_KRW_URW) | PTE_NON_GLOBAL | PTE_OUTER_SHAREABLE | PTE_LEVEL3_ENTRY); usleep(1000);
+		}*/
 		physwrite64(pt, pa | PERM_TO_PTE(PERM_KRW_URW) | PTE_NON_GLOBAL | PTE_OUTER_SHAREABLE | PTE_LEVEL3_ENTRY);
 	}
 
