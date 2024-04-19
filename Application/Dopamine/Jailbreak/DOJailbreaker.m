@@ -188,11 +188,11 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
 - (NSError *)buildPhysRWPrimitive
 {
     int r = -1;
-    if (is_kcall_available()) {
-        r = libjailbreak_physrw_init(false);
+    if (device_supports_physrw_pte()) {
+        r = libjailbreak_physrw_pte_init(false, 0);
     }
     else {
-        r = libjailbreak_physrw_pte_init(false, 0);
+        r = libjailbreak_physrw_init(false);
     }
     if (r != 0) {
         return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedBuildingPhysRW userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Failed to build phys r/w primitive: %d", r]}];
