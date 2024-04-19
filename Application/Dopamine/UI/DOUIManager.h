@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (id)sharedInstance;
 
 - (BOOL)isDebug;
+- (BOOL)isUpdatesAndReboot;
 - (void)sendLog:(NSString*)log debug:(BOOL)debug update:(BOOL)update;
 - (void)sendLog:(NSString*)log debug:(BOOL)debug;
 - (void)completeJailbreak;
