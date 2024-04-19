@@ -56,16 +56,8 @@ int main(int argc, char* argv[])
 	SYSTEM_INFO_DESERIALIZE(xSystemInfoDict);
 
 	// Retrieve physrw
-	
-	bool usePhysrwPTE = device_prefers_physrw_pte();
-	uint64_t asidPtr = 0;
-	jbclient_root_get_physrw(usePhysrwPTE, &asidPtr);
-	if (usePhysrwPTE) {
-		libjailbreak_physrw_pte_init(true, asidPtr);
-	}
-	else {
-		libjailbreak_physrw_init(true);
-	}
+	jbclient_root_get_physrw(false, NULL);
+	libjailbreak_physrw_init(true);
 
 	libjailbreak_translation_init();
 

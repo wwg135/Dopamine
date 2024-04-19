@@ -343,18 +343,12 @@ int kfree(uint64_t addr, uint64_t size)
 
 bool is_kcall_available(void)
 {
-	return (bool)gPrimitives.kcall;
-}
-
-bool device_prefers_physrw_pte(void)
-{
-	cpu_subtype_t cpuFamily = 0;
-	size_t cpuFamilySize = sizeof(cpuFamily);
-	sysctlbyname("hw.cpufamily", &cpuFamily, &cpuFamilySize, NULL, 0);
-	if (cpuFamily == CPUFAMILY_ARM_TYPHOON) {
-		// God fucking damn it, what is wrong with you A8
-		// They should have just let this chipset die in like iOS 12 or something...
-		return true;
+#ifdef __arm64e__
+	return jbinfo(usesPACBypass);
+#else
+	if (__builtin_available(iOS 16.0, *)) {
+		return false;
 	}
-	return false;
+	return true;
+#endif
 }

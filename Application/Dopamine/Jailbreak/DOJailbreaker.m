@@ -187,7 +187,13 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
 
 - (NSError *)buildPhysRWPrimitive
 {
-    int r = libjailbreak_physrw_pte_init(false, 0);
+    int r = -1;
+    if (is_kcall_available()) {
+        r = libjailbreak_physrw_init(false);
+    }
+    else {
+        r = libjailbreak_physrw_pte_init(false, 0);
+    }
     if (r != 0) {
         return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedBuildingPhysRW userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Failed to build phys r/w primitive: %d", r]}];
     }
@@ -317,9 +323,12 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     dispatch_source_set_event_handler(serverSource, ^{
         xpc_object_t xdict = nil;
         if (!xpc_pipe_receive(serverPort, &xdict)) {
+            // For some reason this server is pretty slow so we need to caffeinate threads to speed it up
+            thread_caffeinate_start();
             if (jbserver_received_boomerang_xpc_message(&gBoomerangServer, xdict) == JBS_BOOMERANG_DONE) {
                 dispatch_semaphore_signal(boomerangDone);
             }
+            thread_caffeinate_stop();
         }
     });
     dispatch_resume(serverSource);

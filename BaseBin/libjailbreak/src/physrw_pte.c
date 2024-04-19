@@ -107,8 +107,6 @@ int physrw_pte_handoff(pid_t pid, uint64_t *swAsidPtr)
 	uint64_t proc = proc_find(pid);
 	if (!proc) return -2;
 
-	thread_caffeinate_start();
-
 	int ret = 0;
 	do {
 		uint64_t task = proc_task(proc);
@@ -145,7 +143,6 @@ int physrw_pte_handoff(pid_t pid, uint64_t *swAsidPtr)
 		}
 	} while (0);
 
-	thread_caffeinate_stop();
 	proc_rele(proc);
 	return ret;
 }

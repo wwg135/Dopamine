@@ -87,7 +87,7 @@ int boomerang_recoverPrimitives(bool firstRetrieval, bool shouldEndBoomerang)
 	SYSTEM_INFO_DESERIALIZE(xSystemInfoDict);
 
 	// Retrieve physrw
-	bool usePhysrwPTE = firstRetrieval || device_prefers_physrw_pte();
+	bool usePhysrwPTE = firstRetrieval && !is_kcall_available();
 	uint64_t asidPtr = 0;
 	int physrwRet = jbclient_root_get_physrw(usePhysrwPTE, &asidPtr);
 	if (physrwRet != 0) return -20 + physrwRet;

@@ -111,8 +111,6 @@ uint64_t task_get_ipc_port_kobject(uint64_t task, mach_port_t port)
 
 uint64_t alloc_page_table_unassigned(void)
 {
-	thread_caffeinate_start();
-
 	uint64_t pmap = pmap_self();
 	uint64_t ttep = kread64(pmap + koffsetof(pmap, ttep));
 
@@ -200,8 +198,6 @@ uint64_t alloc_page_table_unassigned(void)
 	//int page_table_ledger = physread32(ledger_pa + koffsetof(_task_ledger_indices, page_table));
 	//physwrite32(ledger_pa + koffsetof(_task_ledger_indices, page_table), page_table_ledger - 1);
 
-	thread_caffeinate_stop();
-
 	return allocatedPT;
 }
 
@@ -255,12 +251,9 @@ int pmap_expand_range(uint64_t pmap, uint64_t vaStart, uint64_t size)
 				// We hit this block either if there was a mapping or at the end
 				// Alloc page tables for the current area (unmappedStart, unmappedSize) by running pmap_enter_options on every page
 				// And then running pmap_remove on the entire area while nested is true
-				//printf("unmappedStart: %llx, unmappedSize: %llx\n", unmappedStart, unmappedSize);
 
 				for (uint64_t l2Off = 0; l2Off < unmappedSize; l2Off += L2_BLOCK_SIZE) {
-					//printf("pmap_enter_options_addr(%llx, %x, %llx)\n", pmap, FAKE_PHYSPAGE_TO_MAP, unmappedStart + l2Off); usleep(10000);
 					kern_return_t kr = pmap_enter_options_addr(pmap, FAKE_PHYSPAGE_TO_MAP, unmappedStart + l2Off);
-					//printf("pmap_enter_options_addr => %d\n", kr); usleep(10000);
 					if (kr != KERN_SUCCESS) {
 						return -7;
 					}
@@ -274,12 +267,10 @@ int pmap_expand_range(uint64_t pmap, uint64_t vaStart, uint64_t size)
 					// 4k devices are fucked, don't ask me why
 					// If this isn't done, you get a panic with "%s: PTE range [%p, %p) in pmap %p crosses page table boundary"
 					for (uint64_t off = unmappedStart; off < (unmappedStart + unmappedSize); off += L2_BLOCK_SIZE) {
-						//printf("pmap_remove %llx-%llx\n", off, off + vm_real_kernel_page_size); usleep(10000);
 						pmap_remove(pmap, off, off + vm_real_kernel_page_size);
 					}
 				}
 				else {
-					//printf("pmap_remove %llx-%llx\n", unmappedStart, unmappedStart + unmappedSize); usleep(10000);
 					pmap_remove(pmap, unmappedStart, unmappedStart + unmappedSize);
 				}
 
@@ -322,7 +313,9 @@ int pmap_expand_range(uint64_t pmap, uint64_t vaStart, uint64_t size)
 					if (newTable) {
 						physwrite64(pt, newTable | ARM_TTE_VALID | ARM_TTE_TYPE_TABLE);
 					}
-					else { thread_caffeinate_stop(); return -2; }
+					else {
+						return -2;
+					}
 				}
 			} while (leafLevel < PMAP_TT_L3_LEVEL);
 		}
@@ -332,38 +325,63 @@ int pmap_expand_range(uint64_t pmap, uint64_t vaStart, uint64_t size)
 
 int pmap_map_in(uint64_t pmap, uint64_t uaStart, uint64_t paStart, uint64_t size)
 {
-	thread_caffeinate_start();
-
-	uint64_t uaEnd = uaStart + size;
 	uint64_t ttep = kread64(pmap + koffsetof(pmap, ttep));
+
+	uint64_t paEnd = paStart + size;
+	uint64_t uaEnd = uaStart + size;
+
+	uint64_t uaL2Start = uaStart & ~L2_BLOCK_MASK;
+	uint64_t paL2Start = paStart & ~L2_BLOCK_MASK;
+	uint64_t l2Count = ((size - 1) / L2_BLOCK_SIZE) + 1;
 
 	// Sanity check: Ensure the entire area to be mapped in is not mapped to anything yet
 	for(uint64_t ua = uaStart; ua < uaEnd; ua += vm_real_kernel_page_size) {
-		if (vtophys(ttep, ua)) { thread_caffeinate_stop(); return -1; }
+		uint64_t leafLevel = PMAP_TT_L3_LEVEL;
+		if (vtophys_lvl(ttep, ua, &leafLevel, NULL) != 0) {
+			return -1;
+		}
+		else {
+			// Performance improvement
+			// If there is no L1 / L2 mapping we can skip a whole bunch of addresses
+			if (leafLevel == PMAP_TT_L1_LEVEL) {
+				ua = (((ua + L1_BLOCK_SIZE) & ~L1_BLOCK_MASK) - vm_real_kernel_page_size);
+			}
+			else if (leafLevel == PMAP_TT_L2_LEVEL) {
+				ua = (((ua + L2_BLOCK_SIZE) & ~L2_BLOCK_MASK) - vm_real_kernel_page_size);
+			}
+		}
+
+		if (vtophys(ttep, ua)) return -1;
 		// TODO: If all mappings match 1:1, maybe return 0 instead of -1?
 	}
 
 	// Allocate all page tables that need to be allocated
-	pmap_expand_range(pmap, uaStart, size);
-	int i = 0;
-
+	if (pmap_expand_range(pmap, uaStart, size) != 0) return -1;
+	
 	// Insert entries into L3 pages
-	for(uint64_t ua = uaStart; ua < uaEnd; ua += vm_real_kernel_page_size) {
-		uint64_t pa = (ua - uaStart) + paStart;
-		uint64_t leafLevel = PMAP_TT_L3_LEVEL;
-		uint64_t pt = 0;
+	for (uint64_t i = 0; i < l2Count; i++) {
+		uint64_t uaL2Cur = uaL2Start + (i * L2_BLOCK_SIZE);
+		uint64_t paL2Cur = paL2Start + (i * L2_BLOCK_SIZE);
 
-		vtophys_lvl(ttep, ua, &leafLevel, &pt);
-		/*if (leafLevel != PMAP_TT_L3_LEVEL || !pt) {
-			printf("WTF\n");
-		}*/
-		/*if ((pt & vm_real_kernel_page_mask) == 0) {
-			printf("pte write %d %llx = %llx\n", i++, pt, pa | PERM_TO_PTE(PERM_KRW_URW) | PTE_NON_GLOBAL | PTE_OUTER_SHAREABLE | PTE_LEVEL3_ENTRY); usleep(1000);
-		}*/
-		physwrite64(pt, pa | PERM_TO_PTE(PERM_KRW_URW) | PTE_NON_GLOBAL | PTE_OUTER_SHAREABLE | PTE_LEVEL3_ENTRY);
+		// Create full table for this mapping
+		uint64_t tableToWrite[L2_BLOCK_COUNT];
+		for (int k = 0; k < L2_BLOCK_COUNT; k++) {
+			uint64_t curMappingPage = paL2Cur + (k * vm_real_kernel_page_size);
+			if (curMappingPage >= paStart || curMappingPage < paEnd) {
+				tableToWrite[k] = curMappingPage | PERM_TO_PTE(PERM_KRW_URW) | PTE_NON_GLOBAL | PTE_OUTER_SHAREABLE | PTE_LEVEL3_ENTRY;
+			}
+			else {
+				tableToWrite[k] = 0;
+			}
+		}
+
+		// Replace table with the entries we generated
+		uint64_t leafLevel = PMAP_TT_L2_LEVEL;
+		uint64_t level2Table = vtophys_lvl(ttep, uaL2Cur, &leafLevel, NULL);
+		if (!level2Table) return -2;
+		physwritebuf(level2Table, tableToWrite, vm_real_kernel_page_size);
 	}
 
-	thread_caffeinate_stop();
 	return 0;
 }
 
