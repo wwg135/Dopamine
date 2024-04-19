@@ -28,6 +28,12 @@
 {
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
+
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    if (envManager.isJailbroken) {
+    	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    	[self.view addGestureRecognizer:longPressGesture];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -186,11 +192,13 @@
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
 
-        PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
-        [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
-        [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
-        [checkForUpdateSpecifier setProperty:@NO forKey:@"default"];
-        [specifiers addObject:checkForUpdateSpecifier];
+        if ([[DOUIManager sharedInstance] isextrafeatures]) {
+            PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
+            [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
+            [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
+            [checkForUpdateSpecifier setProperty:@NO forKey:@"default"];
+            [specifiers addObject:checkForUpdateSpecifier];
+        }
         
         if (!envManager.isJailbroken) {
             PSSpecifier *verboseLogSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Verbose_Logs") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
@@ -272,7 +280,7 @@
                 }
                 [specifiers addObject:removeJailbreakSpecifier];
             }
-            if (envManager.isJailbroken) {
+            if ([[DOUIManager sharedInstance] isextrafeatures] && envManager.isJailbroken) {
                 PSSpecifier *rebootSpecifier = [PSSpecifier emptyGroupSpecifier];
                 rebootSpecifier.target = self;
                 [rebootSpecifier setProperty:@"Menu_Reboot_Title" forKey:@"title"];
@@ -439,6 +447,19 @@
     [confirmationAlertController addAction:rebootAction];
     [confirmationAlertController addAction:cancelAction];
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
+}
+
+- (void)extrafeaturesEnabledPressed {
+    NSString *key = @"extrafeaturesEnabled";
+    id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
+    if (value == nil) {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+    } else if ([value boolValue]) {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+    } else {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+    }
+    [self reloadSpecifiers];
 }
 
 @end
