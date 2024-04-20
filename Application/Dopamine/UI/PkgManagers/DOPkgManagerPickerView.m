@@ -52,6 +52,7 @@
                 int index = row * numberOfColumns + column;
                 if (index < packageManagers.count) {
                     NSDictionary *manager = (NSDictionary *)packageManagers[index];
+                    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
                     if (!envManager.isJailbroken && ([manager[@"Display Name"] isEqualToString:@"Ellekit"] || [manager[@"Display Name"] isEqualToString:@"Preferenceloader"])) {
                         continue;
                     }
