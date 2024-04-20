@@ -632,6 +632,9 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     for (NSDictionary *packageManagerDict in enabledPackageManagers) {
         NSString *path = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:packageManagerDict[@"Package"]];
         NSString *name = packageManagerDict[@"Display Name"];
+        if ([name rangeOfString:@"Ellekit"].location != NSNotFound || [name rangeOfString:@"Preferenceloader"].location != NSNotFound) {
+            continue;
+        }
         int r = [self installPackage:path];
         if (r != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install %@: %d\n", name, r]}];
