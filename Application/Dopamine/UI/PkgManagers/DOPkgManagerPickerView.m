@@ -36,38 +36,34 @@
         ]];
 
         NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
-        UIStackView *firstRow = [[UIStackView alloc] init];
-        firstRow.axis = UILayoutConstraintAxisHorizontal;
-        UIStackView *secondRow = [[UIStackView alloc] init];
-        secondRow.axis = UILayoutConstraintAxisHorizontal;
-
-        [switchStack addArrangedSubview:firstRow];
-        [switchStack addArrangedSubview:secondRow];
-
-        [NSLayoutConstraint activateConstraints:@[
-            [firstRow.heightAnchor constraintEqualToConstant:110],
-            [secondRow.heightAnchor constraintEqualToConstant:110]
-        ]];
-        
-        [packageManagers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSDictionary *manager = (NSDictionary *)obj;
+        UIStackView *rowStack = nil;
+        for (int i = 0; i < packageManagers.count; i++) {
+            if (i % 2 == 0) {
+                rowStack = [[UIStackView alloc] init];
+                rowStack.axis = UILayoutConstraintAxisHorizontal;
+                rowStack.spacing = 10;
+                rowStack.distribution = UIStackViewDistributionFillEqually;
+                rowStack.translatesAutoresizingMaskIntoConstraints = NO;
+                [switchStack addArrangedSubview:rowStack];
+                [NSLayoutConstraint activateConstraints:@[
+                    [rowStack.heightAnchor constraintEqualToConstant:110]
+                ]];
+            }
+    
+            NSDictionary *manager = (NSDictionary *)packageManagers[i];
             DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
             appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
             appSwitch.onSwitch = ^(BOOL enabled) {
                 [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
                 [self updateButtonState];
             };
-        
-            if (idx < 2) {
-                [firstRow addArrangedSubview:appSwitch];
-            } else {
-                [secondRow addArrangedSubview:appSwitch];
-            }
-
+    
             appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
             [appSwitch.widthAnchor constraintEqualToConstant:110].active = YES;
             [appSwitch.heightAnchor constraintEqualToConstant:110].active = YES;
-        }];
+    
+            [rowStack addArrangedSubview:appSwitch];
+        }
 
         UILabel *title = [[UILabel alloc] init];
         title.text = DOLocalizedString(@"Status_Title_Select_Package_Managers");
