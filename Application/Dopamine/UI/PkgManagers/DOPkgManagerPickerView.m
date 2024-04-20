@@ -64,10 +64,12 @@
                     };
             
                     appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-                    [appSwitch.widthAnchor constraintEqualToConstant:110].active = YES;
-                    [appSwitch.heightAnchor constraintEqualToConstant:110].active = YES;
-            
                     [rowStack addArrangedSubview:appSwitch];
+
+                    [NSLayoutConstraint activateConstraints:@[
+                        [appSwitch.widthAnchor constraintEqualToConstant:110],
+                        [appSwitch.heightAnchor constraintEqualToConstant:110]
+                    ]];
                 }
             }
         }
