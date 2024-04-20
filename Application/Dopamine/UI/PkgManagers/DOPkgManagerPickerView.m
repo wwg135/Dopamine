@@ -37,9 +37,17 @@
 
         NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
         UIStackView *firstRow = [[UIStackView alloc] init];
-        firstRow.axis = UILayoutConstraintAxisHorizontal; 
+        firstRow.axis = UILayoutConstraintAxisHorizontal;
         UIStackView *secondRow = [[UIStackView alloc] init];
         secondRow.axis = UILayoutConstraintAxisHorizontal;
+
+        [switchStack addArrangedSubview:firstRow];
+        [switchStack addArrangedSubview:secondRow];
+
+        [NSLayoutConstraint activateConstraints:@[
+            [firstRow.heightAnchor constraintEqualToConstant:110],
+            [secondRow.heightAnchor constraintEqualToConstant:110]
+        ]];
         
         [packageManagers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             NSDictionary *manager = (NSDictionary *)obj;
@@ -49,7 +57,7 @@
                 [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
                 [self updateButtonState];
             };
-
+        
             if (idx < 2) {
                 [firstRow addArrangedSubview:appSwitch];
             } else {
@@ -57,24 +65,9 @@
             }
 
             appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-            [switchStack addArrangedSubview:appSwitch];
-
-            [NSLayoutConstraint activateConstraints:@[
-                [appSwitch.widthAnchor constraintEqualToConstant:110],
-                [appSwitch.heightAnchor constraintEqualToConstant:110]
-            ]];
+            [appSwitch.widthAnchor constraintEqualToConstant:110].active = YES;
+            [appSwitch.heightAnchor constraintEqualToConstant:110].active = YES;
         }];
-
-        [firstRow setTranslatesAutoresizingMaskIntoConstraints:NO];
-        [secondRow setTranslatesAutoresizingMaskIntoConstraints:NO];
-        [switchStack addArrangedSubview:firstRow];
-        [switchStack addArrangedSubview:secondRow];
-
-        [NSLayoutConstraint activateConstraints:@[
-            [firstRow.heightAnchor constraintEqualToConstant:110],
-            [secondRow.heightAnchor constraintEqualToConstant:110]
-        ]];
-        
 
         UILabel *title = [[UILabel alloc] init];
         title.text = DOLocalizedString(@"Status_Title_Select_Package_Managers");
