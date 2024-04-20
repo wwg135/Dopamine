@@ -36,6 +36,11 @@
         ]];
 
         NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
+        UIStackView *firstRow = [[UIStackView alloc] init];
+        firstRow.axis = UILayoutConstraintAxisHorizontal; 
+        UIStackView *secondRow = [[UIStackView alloc] init];
+        secondRow.axis = UILayoutConstraintAxisHorizontal;
+        
         [packageManagers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             NSDictionary *manager = (NSDictionary *)obj;
             DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
@@ -45,8 +50,16 @@
                 [self updateButtonState];
             };
 
-            appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-            [switchStack addArrangedSubview:appSwitch];
+            if (idx % 4 < 2) {
+                 [firstRow addArrangedSubview:appSwitch];
+            } else {   
+                 [secondRow addArrangedSubview:appSwitch];
+            }
+
+            [firstRow setTranslatesAutoresizingMaskIntoConstraints:NO];
+            [secondRow setTranslatesAutoresizingMaskIntoConstraints:NO];
+            [switchStack addArrangedSubview:firstRow];
+            [switchStack addArrangedSubview:secondRow];
 
             [NSLayoutConstraint activateConstraints:@[
                 [appSwitch.widthAnchor constraintEqualToConstant:110],
