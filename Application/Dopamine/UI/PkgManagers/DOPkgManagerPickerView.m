@@ -37,6 +37,7 @@
         ]];
 
         NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
+        NSMutableArray *usedIndexes = [NSMutableArray array];
         [packageManagers enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             NSDictionary *manager = (NSDictionary *)obj;
             DOAppSwitch *appSwitch1 = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
@@ -49,28 +50,38 @@
             appSwitch1.translatesAutoresizingMaskIntoConstraints = NO;
             [switchStack addArrangedSubview:appSwitch1];
 
-            if (idx % 2 == 1) {
+            if (![usedIndexes containsObject:@(idx)]) {
+                [usedIndexes addObject:@(idx)];
+    
+                if (idx < packageManagers.count - 1) {
+                    DOAppSwitch *appSwitch2;
+                    NSUInteger nextIndex = idx + 1;
+        
+                    while ([usedIndexes containsObject:@(nextIndex)]) {
+                        nextIndex++;
+                    }
+        
+                    if (nextIndex < packageManagers.count) {
+                        NSDictionary *nextManager = packageManagers[nextIndex];
+                        appSwitch2 = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:nextManager[@"Icon"]] title:nextManager[@"Display Name"]];
+                        appSwitch2.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:nextManager[@"Key"]];
+                        appSwitch2.onSwitch = ^(BOOL enabled) {
+                            [[DOUIManager sharedInstance] setPackageManager:nextManager[@"Key"] enabled:enabled];
+                            [self updateButtonState];
+                        };
+            
+                        appSwitch2.translatesAutoresizingMaskIntoConstraints = NO;
+                        [switchStack addArrangedSubview:appSwitch2];
+            
+                        [usedIndexes addObject:@(nextIndex)];
+                    }
+                }
+    
                 [NSLayoutConstraint activateConstraints:@[
                     [appSwitch1.widthAnchor constraintEqualToConstant:110],
-                    [appSwitch1.heightAnchor constraintEqualToConstant:110]
-                ]];
-            } else {
-                DOAppSwitch *appSwitch2 = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
-                appSwitch2.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
-                appSwitch2.onSwitch = ^(BOOL enabled) {
-                    [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
-                    [self updateButtonState];
-                };
-
-                appSwitch2.translatesAutoresizingMaskIntoConstraints = NO;
-                [switchStack addArrangedSubview:appSwitch2];
-
-                [NSLayoutConstraint activateConstraints:@[
-                      [appSwitch1.widthAnchor constraintEqualToConstant:110], 
-                      [appSwitch1.heightAnchor constraintEqualToConstant:110],
-
-                      [appSwitch2.widthAnchor constraintEqualToConstant:110],
-                      [appSwitch2.heightAnchor constraintEqualToConstant:110]
+                    [appSwitch1.heightAnchor constraintEqualToConstant:110],
+                    [appSwitch2.widthAnchor constraintEqualToConstant:110],
+                    [appSwitch2.heightAnchor constraintEqualToConstant:110]
                 ]];
             }
         }];
