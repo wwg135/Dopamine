@@ -50,22 +50,30 @@
                 [self updateButtonState];
             };
 
-            if (idx % 4 < 2) {
-                 [firstRow addArrangedSubview:appSwitch];
-            } else {   
-                 [secondRow addArrangedSubview:appSwitch];
+            if (idx < 2) {
+                [firstRow addArrangedSubview:appSwitch];
+            } else {
+                [secondRow addArrangedSubview:appSwitch];
             }
 
-            [firstRow setTranslatesAutoresizingMaskIntoConstraints:NO];
-            [secondRow setTranslatesAutoresizingMaskIntoConstraints:NO];
-            [switchStack addArrangedSubview:firstRow];
-            [switchStack addArrangedSubview:secondRow];
+            appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
+            [switchStack addArrangedSubview:appSwitch];
 
             [NSLayoutConstraint activateConstraints:@[
                 [appSwitch.widthAnchor constraintEqualToConstant:110],
                 [appSwitch.heightAnchor constraintEqualToConstant:110]
             ]];
         }];
+
+        [firstRow setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [secondRow setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [switchStack addArrangedSubview:firstRow];
+        [switchStack addArrangedSubview:secondRow];
+
+        [NSLayoutConstraint activateConstraints:@[
+            [firstRow.heightAnchor constraintEqualToConstant:110],
+            [secondRow.heightAnchor constraintEqualToConstant:110]
+        ]];
         
 
         UILabel *title = [[UILabel alloc] init];
