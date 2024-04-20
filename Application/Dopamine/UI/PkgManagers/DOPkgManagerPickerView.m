@@ -51,23 +51,21 @@
             for (int column = 0; column < numberOfColumns; column++) {
                 int index = row * numberOfColumns + column;
                 if (index < packageManagers.count) {
-                    [packageManagers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                        NSDictionary *manager = (NSDictionary *)obj;
-                        DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
-                        appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
-                        appSwitch.onSwitch = ^(BOOL enabled) {
-                            [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
-                            [self updateButtonState];
-                        };
+                    NSDictionary *manager = (NSDictionary *)packageManagers[index];
+                    DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
+                    appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
+                    appSwitch.onSwitch = ^(BOOL enabled) {
+                        [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
+                        [self updateButtonState];
+                    };
 
-                        appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-                        [rowStack addArrangedSubview:appSwitch];
+                    appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
+                    [rowStack addArrangedSubview:appSwitch];
 
-                        [NSLayoutConstraint activateConstraints:@[
-                            [appSwitch.widthAnchor constraintEqualToConstant:110],
-                            [appSwitch.heightAnchor constraintEqualToConstant:110]
-                        ]];
-                    }];
+                    [NSLayoutConstraint activateConstraints:@[
+                        [appSwitch.widthAnchor constraintEqualToConstant:110],
+                        [appSwitch.heightAnchor constraintEqualToConstant:110]
+                    ]];
                 }
             }
         }
