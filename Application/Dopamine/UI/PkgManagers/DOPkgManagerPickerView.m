@@ -36,33 +36,39 @@
         ]];
 
         NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
-        UIStackView *rowStack = nil;
-        for (int i = 0; i < packageManagers.count; i++) {
-            if (i % 2 == 0) {
-                rowStack = [[UIStackView alloc] init];
-                rowStack.axis = UILayoutConstraintAxisHorizontal;
-                rowStack.spacing = 10;
-                rowStack.distribution = UIStackViewDistributionFillEqually;
-                rowStack.translatesAutoresizingMaskIntoConstraints = NO;
-                [switchStack addArrangedSubview:rowStack];
-                [NSLayoutConstraint activateConstraints:@[
-                    [rowStack.heightAnchor constraintEqualToConstant:110]
-                ]];
+        int numberOfColumns = 2;
+        int numberOfRows = ceil(packageManagers.count / (float)numberOfColumns);
+
+        for (int row = 0; row < numberOfRows; row++) {
+            UIStackView *rowStack = [[UIStackView alloc] init];
+            rowStack.axis = UILayoutConstraintAxisHorizontal;
+            rowStack.spacing = 10;
+            rowStack.distribution = UIStackViewDistributionFillEqually;
+            rowStack.translatesAutoresizingMaskIntoConstraints = NO;
+            [switchStack addArrangedSubview:rowStack];
+    
+            [NSLayoutConstraint activateConstraints:@[
+                [rowStack.heightAnchor constraintEqualToConstant:110]
+            ]];
+    
+            for (int column = 0; column < numberOfColumns; column++) {
+                int index = row * numberOfColumns + column;
+                if (index < packageManagers.count) {
+                    NSDictionary *manager = (NSDictionary *)packageManagers[index];
+                    DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
+                    appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
+                    appSwitch.onSwitch = ^(BOOL enabled) {
+                        [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
+                        [self updateButtonState];
+                    };
+            
+                    appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
+                    [appSwitch.widthAnchor constraintEqualToConstant:110].active = YES;
+                    [appSwitch.heightAnchor constraintEqualToConstant:110].active = YES;
+            
+                    [rowStack addArrangedSubview:appSwitch];
+                }
             }
-    
-            NSDictionary *manager = (NSDictionary *)packageManagers[i];
-            DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
-            appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
-            appSwitch.onSwitch = ^(BOOL enabled) {
-                [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
-                [self updateButtonState];
-            };
-    
-            appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-            [appSwitch.widthAnchor constraintEqualToConstant:110].active = YES;
-            [appSwitch.heightAnchor constraintEqualToConstant:110].active = YES;
-    
-            [rowStack addArrangedSubview:appSwitch];
         }
 
         UILabel *title = [[UILabel alloc] init];
