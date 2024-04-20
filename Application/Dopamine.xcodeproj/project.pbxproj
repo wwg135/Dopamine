@@ -186,8 +186,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0C65CFE42A47EA9D00EDF5F2 /* ellekit.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "ellekit.deb"; path = "Dopamine/Resources/ellekit.deb"; sourceTree = "<group>"; };
-		0C65CFE32A47EA9D00EDF5F2 /* preferenceloader.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "preferenceloader.deb"; path = "Dopamine/Resources/preferenceloader.deb"; sourceTree = "<group>"; };
+		0C65CFE42A47EA9D00EDF5F2 /* ellekit.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = ellekit.deb; sourceTree = "<group>"; };
+		0C65CFE32A47EA9D00EDF5F2 /* preferenceloader.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = preferenceloader.deb; sourceTree = "<group>"; };
 		040622A82B77FE8E00393AAD /* DOPkgManagerPickerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DOPkgManagerPickerViewController.h; sourceTree = "<group>"; };
 		040622A92B77FE8E00393AAD /* DOPkgManagerPickerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DOPkgManagerPickerViewController.m; sourceTree = "<group>"; };
 		042479682B66916B0082581B /* DOJailbreakButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOJailbreakButton.h; sourceTree = "<group>"; };
@@ -741,8 +741,6 @@
 		8C71980C2ABF0E82003C6658 = {
 			isa = PBXGroup;
 			children = (
-				0C65CFE42A47EA9D00EDF5F2 /* ellekit.deb */,
-				0C65CFE32A47EA9D00EDF5F2 /* preferenceloader.deb */,
 				8C7198172ABF0E82003C6658 /* Dopamine */,
 				8C7198162ABF0E82003C6658 /* Products */,
 				8C029F642B4E2E7D0071DE58 /* Frameworks */,
@@ -818,6 +816,8 @@
 				8C05C59D2B759F8A0097A931 /* bootstrap_1900.tar.zst */,
 				8CB94F032B59E17A0098BAFD /* basebin.tar */,
 				8CB94F022B59E17A0098BAFD /* basebin.tc */,
+				0C65CFE62A47EA9D00EDF5F2 /* ellekit.deb */,
+				0C65CFE52A47EA9D00EDF5F2 /* preferenceloader.deb */,
 				8C512B8B2B5C9DE800C6F14A /* sileo.deb */,
 				8C512B8C2B5C9DE800C6F14A /* zebra.deb */,
 				8CCD8A852B6F1662004B72B0 /* libkrw-plugin.deb */,
