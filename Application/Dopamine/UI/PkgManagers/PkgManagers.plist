@@ -14,7 +14,7 @@
 	</dict>
 	<dict>
 		<key>Display Name</key>
-		<string>Prefer</string>
+		<string>Preferenceloader</string>
 		<key>Key</key>
 		<string>preferenceloader</string>
 		<key>Icon</key>
