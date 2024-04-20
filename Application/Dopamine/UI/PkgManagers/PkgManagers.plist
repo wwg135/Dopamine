@@ -2,26 +2,26 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array>
-	<dict>
-		<key>Display Name</key>
-		<string>Ellekit</string>
-		<key>Key</key>
-		<string>ellekit</string>
-		<key>Icon</key>
-		<string>Ellekit</string>
-		<key>Package</key>
-		<string>ellekit.deb</string>
-	</dict>
-	<dict>
-		<key>Display Name</key>
-		<string>Preferenceloader</string>
-		<key>Key</key>
-		<string>preferenceloader</string>
-		<key>Icon</key>
-		<string>Preferenceloader</string>
-		<key>Package</key>
-		<string>preferenceloader.deb</string>
-	</dict>
+//	<dict>
+//		<key>Display Name</key>
+//		<string>Ellekit</string>
+//		<key>Key</key>
+//		<string>ellekit</string>
+//		<key>Icon</key>
+//		<string>Ellekit</string>
+//		<key>Package</key>
+//		<string>ellekit.deb</string>
+//	</dict>
+//	<dict>
+//		<key>Display Name</key>
+//		<string>Preferenceloader</string>
+//		<key>Key</key>
+//		<string>preferenceloader</string>
+//		<key>Icon</key>
+//		<string>Preferenceloader</string>
+//		<key>Package</key>
+//		<string>preferenceloader.deb</string>
+//	</dict>
 	<dict>
 		<key>Display Name</key>
 		<string>Sileo</string>
