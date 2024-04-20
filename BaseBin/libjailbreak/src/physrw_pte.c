@@ -174,7 +174,7 @@ bool device_supports_physrw_pte(void)
 	if (cpuFamily == CPUFAMILY_ARM_TYPHOON) {
 		// On A8, phyrw_pte causes SUPER WEIRD UNEXPLAINABLE SYSTEM RESTARTS
 		// No seriously, there is no panic-full log, only a panic-base that says "Unexpected watchdog reset"
-		// This exact report also what you would get when you force reset your phone, super weird...
+		// This exact report also what you would get when you do a hard reset, super weird...
 		// Luckily physrw doesn't have that issue so we can just use that immediately on A8
 		// This makes jailbreaking a few seconds slower, but it's not the biggest deal in the world
 		return false;

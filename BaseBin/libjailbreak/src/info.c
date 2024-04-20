@@ -284,7 +284,7 @@ uint64_t get_vm_real_kernel_page_size(void)
 }
 
 
-uint64_t get_vm_real_kernel_page_shift()
+uint64_t get_vm_real_kernel_page_shift(void)
 {
 	static uint64_t real_kernel_page_shift = 0;
 	static dispatch_once_t onceToken;

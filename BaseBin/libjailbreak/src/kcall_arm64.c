@@ -116,16 +116,6 @@ int arm64_kcall_init(void)
 
 	pthread_mutex_init(&gArm64KcallThead.lock, NULL);
 
-	// TODO: Find dynamically
-	// XREF: "monotonic: PMI from IOCPU %p delivered to %p"
-	gSystemInfo.kernelStruct.thread.machine_CpuDatap = 0x188;
-
-	// XREF: "Invalid kernel stack pointer (probable overflow)."
-	gSystemInfo.kernelStruct.thread.machine_kstackptr = 0x130;
-
-	// XREF: "thread_deallocate: thread not properly terminated @%s:%d" -> machine_thread_destroy
-	gSystemInfo.kernelStruct.thread.machine_contextData = 0xF0;
-
 	// Kcall thread
 	// The thread that we make execute in kernelspace by ovewriting it's cpsr in kernel memory
 	thread_create(mach_task_self_, &gArm64KcallThead.thread);
