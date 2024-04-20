@@ -8,6 +8,7 @@
 #import "DOPkgManagerPickerView.h"
 #import "DOAppSwitch.h"
 #import "DOUIManager.h"
+#import "DOEnvironmentManager.h"
 #import "DOActionMenuButton.h"
 #import "DOGlobalAppearance.h"
 
@@ -51,6 +52,9 @@
                 int index = row * numberOfColumns + column;
                 if (index < packageManagers.count) {
                     NSDictionary *manager = (NSDictionary *)packageManagers[index];
+                    if (!envManager.isJailbroken && ([manager[@"Display Name"] isEqualToString:@"Ellekit"] || [manager[@"Display Name"] isEqualToString:@"Preferenceloader"])) {
+                        continue;
+                    }
                     DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
                     appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
                     appSwitch.onSwitch = ^(BOOL enabled) {
