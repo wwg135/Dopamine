@@ -25,7 +25,6 @@
 -(id)initWithCallback:(void (^)(BOOL))callback {
     self = [super init];
     if (self) {
-        NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
         UIStackView *switchStack = [[UIStackView alloc] init];
         switchStack.axis = UILayoutConstraintAxisVertical;
         switchStack.translatesAutoresizingMaskIntoConstraints = NO;
@@ -37,6 +36,7 @@
             [switchStack.centerYAnchor constraintEqualToAnchor:self.centerYAnchor]
         ]];
 
+        NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
         int numberOfColumns = 2;
         int numberOfRows = ceil(packageManagers.count / (float)numberOfColumns);
 
@@ -51,25 +51,23 @@
             for (int column = 0; column < numberOfColumns; column++) {
                 int index = row * numberOfColumns + column;
                 if (index < packageManagers.count) {
-                    NSDictionary *manager = (NSDictionary *)packageManagers[index];
-                    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-                    if (!envManager.isJailbroken && ([manager[@"Display Name"] isEqualToString:@"Ellekit"] || [manager[@"Display Name"] isEqualToString:@"Preferenceloader"])) {
-                        continue;
-                    }
-                    DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
-                    appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
-                    appSwitch.onSwitch = ^(BOOL enabled) {
-                        [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
-                        [self updateButtonState];
-                    };
+                    [packageManagers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                        NSDictionary *manager = (NSDictionary *)obj;
+                        DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
+                        appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
+                        appSwitch.onSwitch = ^(BOOL enabled) {
+                            [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
+                            [self updateButtonState];
+                        };
             
-                    appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-                    [rowStack addArrangedSubview:appSwitch];
+                        appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
+                        [rowStack addArrangedSubview:appSwitch];
 
-                    [NSLayoutConstraint activateConstraints:@[
-                        [appSwitch.widthAnchor constraintEqualToConstant:110],
-                        [appSwitch.heightAnchor constraintEqualToConstant:110]
-                    ]];
+                        [NSLayoutConstraint activateConstraints:@[
+                            [appSwitch.widthAnchor constraintEqualToConstant:110],
+                            [appSwitch.heightAnchor constraintEqualToConstant:110]
+                        ]];
+                    }];
                 }
             }
         }
