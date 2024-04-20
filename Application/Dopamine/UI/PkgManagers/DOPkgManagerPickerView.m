@@ -24,18 +24,18 @@
 -(id)initWithCallback:(void (^)(BOOL))callback {
     self = [super init];
     if (self) {
+        NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
         UIStackView *switchStack = [[UIStackView alloc] init];
-        switchStack.axis = UILayoutConstraintAxisHorizontal;
+        switchStack.axis = UILayoutConstraintAxisVertical;
         switchStack.translatesAutoresizingMaskIntoConstraints = NO;
 
         [self addSubview:switchStack];
 
         [NSLayoutConstraint activateConstraints:@[
             [switchStack.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
-            [switchStack.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant: -([DOGlobalAppearance isHomeButtonDevice] ? 0 : 10)]
+            [switchStack.centerYAnchor constraintEqualToAnchor:self.centerYAnchor]
         ]];
 
-        NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
         int numberOfColumns = 2;
         int numberOfRows = ceil(packageManagers.count / (float)numberOfColumns);
 
@@ -46,10 +46,6 @@
             rowStack.distribution = UIStackViewDistributionFillEqually;
             rowStack.translatesAutoresizingMaskIntoConstraints = NO;
             [switchStack addArrangedSubview:rowStack];
-    
-            [NSLayoutConstraint activateConstraints:@[
-                [rowStack.heightAnchor constraintEqualToConstant:110]
-            ]];
     
             for (int column = 0; column < numberOfColumns; column++) {
                 int index = row * numberOfColumns + column;
