@@ -111,9 +111,8 @@
    
         [NSLayoutConstraint activateConstraints:@[
             [self.continueAction.heightAnchor constraintEqualToConstant:50],
-            [self.continueAction.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-PADDING_BTN_CONTINUE - ([DOGlobalAppearance isHomeButtonDevice] ? 0 : 10)],
-            [self.continueAction.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:PADDING_BTN_CONTINUE],
-            [self.continueAction.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-PADDING_BTN_CONTINUE]
+            [self.continueAction.topAnchor constraintEqualToAnchor:tooltip.bottomAnchor constant:5],
+            [self.continueAction.centerXAnchor constraintEqualToAnchor:self.centerXAnchor]
         ]];
         
         [self updateButtonState];
