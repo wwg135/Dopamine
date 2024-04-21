@@ -322,8 +322,10 @@ int pmap_map_in(uint64_t pmap, uint64_t uaStart, uint64_t paStart, uint64_t size
 	uint64_t uaEnd = uaStart + size;
 
 	uint64_t uaL2Start = uaStart & ~L2_BLOCK_MASK;
+	uint64_t uaL2End   = ((uaStart + size - 1) + L2_BLOCK_SIZE) & ~L2_BLOCK_MASK;
+
 	uint64_t paL2Start = paStart & ~L2_BLOCK_MASK;
-	uint64_t l2Count = ((size - 1) / L2_BLOCK_SIZE) + 1;
+	uint64_t l2Count = (((uaL2End - uaL2Start) - 1) / L2_BLOCK_SIZE) + 1;
 
 	// Sanity check: Ensure the entire area to be mapped in is not mapped to anything yet
 	for(uint64_t ua = uaStart; ua < uaEnd; ua += vm_real_kernel_page_size) {
@@ -358,7 +360,7 @@ int pmap_map_in(uint64_t pmap, uint64_t uaStart, uint64_t paStart, uint64_t size
 		uint64_t tableToWrite[L2_BLOCK_COUNT];
 		for (int k = 0; k < L2_BLOCK_COUNT; k++) {
 			uint64_t curMappingPage = paL2Cur + (k * vm_real_kernel_page_size);
-			if (curMappingPage >= paStart || curMappingPage < paEnd) {
+			if (curMappingPage >= paStart && curMappingPage < paEnd) {
 				tableToWrite[k] = curMappingPage | PERM_TO_PTE(PERM_KRW_URW) | PTE_NON_GLOBAL | PTE_OUTER_SHAREABLE | PTE_LEVEL3_ENTRY;
 			}
 			else {
