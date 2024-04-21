@@ -8,7 +8,6 @@
 #import "DOPkgManagerPickerView.h"
 #import "DOAppSwitch.h"
 #import "DOUIManager.h"
-#import "DOEnvironmentManager.h"
 #import "DOActionMenuButton.h"
 #import "DOGlobalAppearance.h"
 
