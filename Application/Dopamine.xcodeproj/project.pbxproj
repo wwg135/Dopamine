@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0C65CFE62A47EA9D00EDF5F2 /* ellekit.deb in Resources */ = {isa = PBXBuildFile; fileRef = 0C65CFE42A47EA9D00EDF5F2 /* ellekit.deb */; };
-                0C65CFE52A47EA9D00EDF5F2 /* preferenceloader.deb in Resources */ = {isa = PBXBuildFile; fileRef = 0C65CFE32A47EA9D00EDF5F2 /* preferenceloader.deb */; };
+    0C65CFE52A47EA9D00EDF5F2 /* preferenceloader.deb in Resources */ = {isa = PBXBuildFile; fileRef = 0C65CFE32A47EA9D00EDF5F2 /* preferenceloader.deb */; };
 		0C65CFE52A47EA9D00EDF5F3 /* saily.deb in Resources */ = {isa = PBXBuildFile; fileRef = 0C65CFE32A47EA9D00EDF5F3 /* saily.deb */; };
 		040622AA2B77FE8E00393AAD /* DOPkgManagerPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 040622A92B77FE8E00393AAD /* DOPkgManagerPickerViewController.m */; };
 		042479A22B66916B0082581B /* DOCreditsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0424796B2B66916B0082581B /* DOCreditsViewController.m */; };
