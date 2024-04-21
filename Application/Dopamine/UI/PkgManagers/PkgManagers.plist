@@ -44,6 +44,16 @@
 	</dict>
 	<dict>
 		<key>Display Name</key>
+		<string>Flex 3 Beta92</string>
+		<key>Key</key>
+		<string>flex3beta</string>
+		<key>Icon</key>
+		<string>Flex3beta</string>
+		<key>Package</key>
+		<string>Flex 3 Beta92.deb</string>
+	</dict>
+	<dict>
+		<key>Display Name</key>
 		<string>Zebra</string>
 		<key>Key</key>
 		<string>xyz.willy.Zebra</string>
