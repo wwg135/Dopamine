@@ -95,7 +95,7 @@
 
         [NSLayoutConstraint activateConstraints:@[
             [tooltip.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
-            [tooltip.topAnchor constraintEqualToAnchor:switchStack.bottomAnchor constant:15],
+            [tooltip.topAnchor constraintEqualToAnchor:switchStack.bottomAnchor constant:5],
             [tooltip.widthAnchor constraintEqualToAnchor:switchStack.widthAnchor multiplier:1.25]
         ]];
         
