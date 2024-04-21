@@ -19,13 +19,19 @@ static bool boomerang_domain_allowed(audit_token_t clientToken)
 
 int boomerang_get_physrw(audit_token_t *clientToken, bool singlePTE, uint64_t *singlePTEAsidPtr)
 {
+	int r = -1;
 	pid_t pid = audit_token_to_pid(*clientToken);
+
+	thread_caffeinate_start();
 	if (singlePTE) {
-		return physrw_pte_handoff(pid, singlePTEAsidPtr);
+		r = physrw_pte_handoff(pid, singlePTEAsidPtr);
 	}
 	else {
-		return physrw_handoff(pid);
+		r = physrw_handoff(pid);
 	}
+	thread_caffeinate_stop();
+
+	return r;
 }
 
 int boomerang_sign_thread(audit_token_t *clientToken, mach_port_t threadPort)
