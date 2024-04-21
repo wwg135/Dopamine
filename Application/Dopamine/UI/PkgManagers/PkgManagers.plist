@@ -54,6 +54,16 @@
 	</dict>
 	<dict>
 		<key>Display Name</key>
+		<string>iCleaner Pro</string>
+		<key>Key</key>
+		<string>icleanerpro</string>
+		<key>Icon</key>
+		<string>icleanerpro</string>
+		<key>Package</key>
+		<string>icleanerpro.deb</string>
+	</dict>
+	<dict>
+		<key>Display Name</key>
 		<string>Zebra</string>
 		<key>Key</key>
 		<string>xyz.willy.Zebra</string>
