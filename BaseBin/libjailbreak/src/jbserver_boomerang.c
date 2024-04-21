@@ -22,14 +22,12 @@ int boomerang_get_physrw(audit_token_t *clientToken, bool singlePTE, uint64_t *s
 	int r = -1;
 	pid_t pid = audit_token_to_pid(*clientToken);
 
-	thread_caffeinate_start();
 	if (singlePTE) {
 		r = physrw_pte_handoff(pid, singlePTEAsidPtr);
 	}
 	else {
 		r = physrw_handoff(pid);
 	}
-	thread_caffeinate_stop();
 
 	return r;
 }

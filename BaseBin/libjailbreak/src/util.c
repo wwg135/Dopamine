@@ -263,16 +263,7 @@ int pmap_expand_range(uint64_t pmap, uint64_t vaStart, uint64_t size)
 				physwrite8(kvtophys(pmap + koffsetof(pmap, type)), 3);
 
 				// Remove mapping (table will stay cause nested is set)
-				if (vm_real_kernel_page_size == 0x1000) {
-					// 4k devices are fucked, don't ask me why
-					// If this isn't done, you get a panic with "%s: PTE range [%p, %p) in pmap %p crosses page table boundary"
-					for (uint64_t off = unmappedStart; off < (unmappedStart + unmappedSize); off += L2_BLOCK_SIZE) {
-						pmap_remove(pmap, off, off + vm_real_kernel_page_size);
-					}
-				}
-				else {
-					pmap_remove(pmap, unmappedStart, unmappedStart + unmappedSize);
-				}
+				pmap_remove(pmap, unmappedStart, unmappedStart + unmappedSize);
 
 				// Change type back
 				physwrite8(kvtophys(pmap + koffsetof(pmap, type)), 0);

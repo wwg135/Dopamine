@@ -1,4 +1,5 @@
 #include "jbserver.h"
+#include "util.h"
 
 int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xmsg)
 {
@@ -29,6 +30,8 @@ int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xms
 		action = &domain->actions[i];
 	}
 	if (!action->handler) return -1;
+
+	thread_caffeinate_start();
 
 	int (*handler)(void *a1, void *a2, void *a3, void *a4, void *a5, void *a6, void *a7, void *a8) = action->handler;
 	void *args[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
@@ -114,5 +117,7 @@ int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xms
 	xpc_dictionary_set_int64(xreply, "result", result);
 	xpc_pipe_routine_reply(xreply);
 	xpc_release(xreply);
+
+	thread_caffeinate_stop();
 	return 0;
 }

@@ -58,6 +58,7 @@ void mac_label_set(uint64_t label, int slot, uint64_t value);
 int pmap_cs_allow_invalid(uint64_t pmap);
 int cs_allow_invalid(uint64_t proc, bool emulateFully);
 kern_return_t pmap_enter_options_addr(uint64_t pmap, uint64_t pa, uint64_t va);
-uint64_t pmap_remove(uint64_t pmap, uint64_t start, uint64_t end);
+uint64_t pmap_remove_options(uint64_t pmap, uint64_t start, uint64_t end);
+void pmap_remove(uint64_t pmap, uint64_t start, uint64_t end);
 
 #endif
