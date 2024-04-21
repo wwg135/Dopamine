@@ -104,7 +104,7 @@ int boomerang_recoverPrimitives(bool firstRetrieval, bool shouldEndBoomerang)
 	libjailbreak_translation_init();
 
 	libjailbreak_IOSurface_primitives_init();
-	if (__builtin_available(iOS 16.0, *)) {
+	if (!gPrimitives.kalloc_global) {
 		libjailbreak_kalloc_pt_init();
 	}
 

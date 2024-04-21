@@ -21,7 +21,7 @@ typedef struct {
 } Fugu14KcallThread;
 
 int fugu14_kcall_init(int (^threadSigner)(mach_port_t threadPort));
-void jbclient_get_fugu14_kcall(void);
+int jbclient_get_fugu14_kcall(void);
 
 
 #endif

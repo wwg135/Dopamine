@@ -110,9 +110,7 @@ uint64_t arm64_kcall(uint64_t func, int argc, const uint64_t *argv)
 
 int arm64_kcall_init(void)
 {
-	if (!gPrimitives.kalloc_local) {
-		return -1;
-	} 
+	if (!gPrimitives.kalloc_local) return -1;
 
 	pthread_mutex_init(&gArm64KcallThead.lock, NULL);
 
