@@ -111,7 +111,7 @@
    
         [NSLayoutConstraint activateConstraints:@[
             [self.continueAction.heightAnchor constraintEqualToConstant:50],
-            [self.continueAction.topAnchor constraintEqualToAnchor:tooltip.bottomAnchor constant:5],
+            [self.continueAction.topAnchor constraintEqualToAnchor:tooltip.bottomAnchor constant:10],
             [self.continueAction.centerXAnchor constraintEqualToAnchor:self.centerXAnchor]
         ]];
         
