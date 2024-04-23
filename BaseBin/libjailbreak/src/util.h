@@ -39,6 +39,7 @@ void thread_caffeinate_stop(void);
 
 int cmd_wait_for_exit(pid_t pid);
 int exec_cmd(const char *binary, ...);
+int exec_cmd_nowait(pid_t *pidOut, const char *binary, ...);
 int exec_cmd_suspended(pid_t *pidOut, const char *binary, ...);
 int exec_cmd_root(const char *binary, ...);
 

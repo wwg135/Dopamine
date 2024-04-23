@@ -472,7 +472,7 @@ int cmd_wait_for_exit(pid_t pid)
 	return status;
 }
 
-int __exec_cmd_internal_va(bool suspended, bool root, pid_t *pidOut, const char *binary, int argc, va_list va_args)
+int __exec_cmd_internal_va(bool suspended, bool root, bool waitForExit, pid_t *pidOut, const char *binary, int argc, va_list va_args)
 {
 	const char *argv[argc+1];
 	argv[0] = binary;
@@ -497,7 +497,7 @@ int __exec_cmd_internal_va(bool suspended, bool root, pid_t *pidOut, const char 
 	if (attr) posix_spawnattr_destroy(&attr);
 	if (spawnError != 0) return spawnError;
 
-	if (!suspended) {
+	if (waitForExit && !suspended) {
 		return cmd_wait_for_exit(spawnedPid);
 	}
 	else if (pidOut) {
@@ -515,7 +515,21 @@ int exec_cmd(const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(false, false, NULL, binary, argc, args);
+	int r = __exec_cmd_internal_va(false, false, true, NULL, binary, argc, args);
+	va_end(args);
+	return r;
+}
+
+int exec_cmd_nowait(pid_t *pidOut, const char *binary, ...)
+{
+	int argc = 1;
+	va_list args;
+	va_start(args, binary);
+	while (va_arg(args, const char *)) argc++;
+	va_end(args);
+
+	va_start(args, binary);
+	int r = __exec_cmd_internal_va(false, false, false, pidOut, binary, argc, args);
 	va_end(args);
 	return r;
 }
@@ -529,7 +543,7 @@ int exec_cmd_suspended(pid_t *pidOut, const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(true, false, pidOut, binary, argc, args);
+	int r = __exec_cmd_internal_va(true, false, false, pidOut, binary, argc, args);
 	va_end(args);
 	return r;
 }
@@ -543,7 +557,7 @@ int exec_cmd_root(const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(false, true, NULL, binary, argc, args);
+	int r = __exec_cmd_internal_va(false, true, true, NULL, binary, argc, args);
 	va_end(args);
 	return r;
 }
