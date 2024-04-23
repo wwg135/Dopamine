@@ -562,10 +562,10 @@ int reboot3(uint64_t flags, ...);
 
 - (BOOL)isSupported
 {
-    cpu_subtype_t cpuFamily = 0;
-    size_t cpuFamilySize = sizeof(cpuFamily);
-    sysctlbyname("hw.cpufamily", &cpuFamily, &cpuFamilySize, NULL, 0);
-    if (cpuFamily == CPUFAMILY_ARM_TYPHOON) return false; // A8X is unsupported for now (due to 4k page size)
+    //cpu_subtype_t cpuFamily = 0;
+    //size_t cpuFamilySize = sizeof(cpuFamily);
+    //sysctlbyname("hw.cpufamily", &cpuFamily, &cpuFamilySize, NULL, 0);
+    //if (cpuFamily == CPUFAMILY_ARM_TYPHOON) return false; // A8X is unsupported for now (due to 4k page size)
     
     DOExploitManager *exploitManager = [DOExploitManager sharedManager];
     if ([exploitManager availableExploitsForType:EXPLOIT_TYPE_KERNEL].count) {
