@@ -4,26 +4,6 @@
 <array>
 	<dict>
 		<key>Display Name</key>
-		<string>Ellekit</string>
-		<key>Key</key>
-		<string>ellekit</string>
-		<key>Icon</key>
-		<string>Ellekit</string>
-		<key>Package</key>
-		<string>ellekit.deb</string>
-	</dict>
-	<dict>
-		<key>Display Name</key>
-		<string>Preferenceloader</string>
-		<key>Key</key>
-		<string>preferenceloader</string>
-		<key>Icon</key>
-		<string>Preferenceloader</string>
-		<key>Package</key>
-		<string>preferenceloader.deb</string>
-	</dict>
-	<dict>
-		<key>Display Name</key>
 		<string>Sileo</string>
 		<key>Key</key>
 		<string>org.coolstar.sileo</string>
