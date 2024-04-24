@@ -9,7 +9,7 @@
 
 #import <sys/sysctl.h>
 #import <mach-o/dyld.h>
-#import <libgrabkernel/libgrabkernel.h>
+#import <libgrabkernel2/libgrabkernel2.h>
 #import <libjailbreak/info.h>
 #import <libjailbreak/codesign.h>
 #import <libjailbreak/util.h>
@@ -539,7 +539,7 @@ int reboot3(uint64_t flags, ...);
         [[DOUIManager sharedInstance] sendLog:@"Downloading Kernel" debug:NO];
         NSString *kernelcachePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/kernelcache"];
         if (![[NSFileManager defaultManager] fileExistsAtPath:kernelcachePath]) {
-            if (grabkernel((char *)kernelcachePath.fileSystemRepresentation, 0) != 0) return nil;
+            if (grab_kernelcache(kernelcachePath) == false) return nil;
         }
         return kernelcachePath;
     }
