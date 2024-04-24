@@ -96,7 +96,6 @@
 		8C4ABEB92B520E7B00B43C9B /* libjailbreak.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CDD08422B4F6DD800A32B61 /* libjailbreak.dylib */; platformFilter = ios; };
 		8C4ABEBE2B52274300B43C9B /* DOPreferenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C4ABEBD2B52274300B43C9B /* DOPreferenceManager.m */; };
 		8C512B912B5C9F9100C6F14A /* sileo.deb in Resources */ = {isa = PBXBuildFile; fileRef = 8C512B8B2B5C9DE800C6F14A /* sileo.deb */; };
-		8C512B922B5C9F9400C6F14A /* zebra.deb in Resources */ = {isa = PBXBuildFile; fileRef = 8C512B8C2B5C9DE800C6F14A /* zebra.deb */; };
 		8C56D4BF2B7C0DF2001C03D3 /* LICENSE_ChOma.md in Resources */ = {isa = PBXBuildFile; fileRef = 8C56D4B82B7C0DF2001C03D3 /* LICENSE_ChOma.md */; };
 		8C56D4C02B7C0DF2001C03D3 /* LICENSE_Fugu15_Rootful.md in Resources */ = {isa = PBXBuildFile; fileRef = 8C56D4B92B7C0DF2001C03D3 /* LICENSE_Fugu15_Rootful.md */; };
 		8C56D4C12B7C0DF2001C03D3 /* LICENSE_dimentio.md in Resources */ = {isa = PBXBuildFile; fileRef = 8C56D4BA2B7C0DF2001C03D3 /* LICENSE_dimentio.md */; };
@@ -346,7 +345,6 @@
 		8C4ABEBC2B52274300B43C9B /* DOPreferenceManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DOPreferenceManager.h; sourceTree = "<group>"; };
 		8C4ABEBD2B52274300B43C9B /* DOPreferenceManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DOPreferenceManager.m; sourceTree = "<group>"; };
 		8C512B8B2B5C9DE800C6F14A /* sileo.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = sileo.deb; sourceTree = "<group>"; };
-		8C512B8C2B5C9DE800C6F14A /* zebra.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = zebra.deb; sourceTree = "<group>"; };
 		8C56D4B82B7C0DF2001C03D3 /* LICENSE_ChOma.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE_ChOma.md; sourceTree = "<group>"; };
 		8C56D4B92B7C0DF2001C03D3 /* LICENSE_Fugu15_Rootful.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE_Fugu15_Rootful.md; sourceTree = "<group>"; };
 		8C56D4BA2B7C0DF2001C03D3 /* LICENSE_dimentio.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE_dimentio.md; sourceTree = "<group>"; };
@@ -826,7 +824,6 @@
 				8CB94F032B59E17A0098BAFD /* basebin.tar */,
 				8CB94F022B59E17A0098BAFD /* basebin.tc */,
 				8C512B8B2B5C9DE800C6F14A /* sileo.deb */,
-				8C512B8C2B5C9DE800C6F14A /* zebra.deb */,
 				8CCD8A852B6F1662004B72B0 /* libkrw-plugin.deb */,
 				8CCD8A832B6F165A004B72B0 /* libroot.deb */,
 				8CCD2FC32B77AA9200F9C5DA /* basebin-link.deb */,
@@ -1089,8 +1086,6 @@
 				0C65CFE62A47EA9D00EDF5F2 /* ellekit.deb in Resources */,
 				0C65CFE52A47EA9D00EDF5F2 /* preferenceloader.deb in Resources */,
 				0C65CFE52A47EA9D00EDF5F3 /* saily.deb in Resources */,
-				0C65CFE52A47EA9D00EDF5F5 /* Flex 3 Beta92.deb in Resources */,
-				0C65CFE52A47EA9D00EDF5F6 /* icleanerpro.deb in Resources */,
 				04DD0B372B7BA6180055DE4F /* LICENSE.md in Resources */,
 				04DD0B3A2B7BF3E80055DE4F /* LICENSE_libc.md in Resources */,
 				8C56D4CD2B7C118B001C03D3 /* LICENSE_kfd.md in Resources */,
@@ -1110,7 +1105,6 @@
 				042479A42B66916B0082581B /* Credits.plist in Resources */,
 				8C2875212BD850B4008B24DA /* LICENSE_libgrabkernel2.md in Resources */,
 				8C512B912B5C9F9100C6F14A /* sileo.deb in Resources */,
-				8C512B922B5C9F9400C6F14A /* zebra.deb in Resources */,
 				8CCD8A872B6F16CC004B72B0 /* libkrw-plugin.deb in Resources */,
 				8CCD8A882B6F16D0004B72B0 /* libroot.deb in Resources */,
 				8CB94F052B59E17A0098BAFD /* basebin.tar in Resources */,
