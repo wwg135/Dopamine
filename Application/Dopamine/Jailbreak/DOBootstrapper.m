@@ -513,7 +513,11 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             @"URIs: https://ellekit.space/\n"
             @"Suites: ./\n"
             @"Components:\n";
-        [defaultSources writeToFile:NSJBRootPath(@"/etc/apt/sources.list.d/default.sources") atomically:NO encoding:NSUTF8StringEncoding error:nil];
+        NSString *defaultSourcesPath = NSJBRootPath(@"/etc/apt/sources.list.d/default.sources");
+        BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:defaultSourcesPath];
+        if (!fileExists) {
+            [defaultSources writeToFile:defaultSourcesPath atomically:NO encoding:NSUTF8StringEncoding error:nil];
+        }
         
         NSString *mobilePreferencesPath = NSJBRootPath(@"/var/mobile/Library/Preferences");
         if (![[NSFileManager defaultManager] fileExistsAtPath:mobilePreferencesPath]) {
