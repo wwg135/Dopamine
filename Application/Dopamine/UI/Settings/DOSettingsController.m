@@ -28,6 +28,9 @@
 {
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
+
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -132,7 +135,7 @@
         
         PSSpecifier *headerSpecifier = [PSSpecifier emptyGroupSpecifier];
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
-        [headerSpecifier setProperty:[NSString stringWithFormat:@"Settings"] forKey:@"title"];
+        [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
         
         if (!envManager.isJailbroken) {
@@ -185,6 +188,14 @@
         [tweakInjectionSpecifier setProperty:@"tweakInjectionEnabled" forKey:@"key"];
         [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
         [specifiers addObject:tweakInjectionSpecifier];
+
+        if ([[DOUIManager sharedInstance] isUpdatesAndReboot]) {
+            PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
+            [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
+            [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
+            [checkForUpdateSpecifier setProperty:@NO forKey:@"default"];
+            [specifiers addObject:checkForUpdateSpecifier];
+        }
         
         if (!envManager.isJailbroken) {
             PSSpecifier *verboseLogSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Verbose_Logs") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
@@ -266,8 +277,17 @@
                 }
                 [specifiers addObject:removeJailbreakSpecifier];
             }
+            if ([[DOUIManager sharedInstance] isUpdatesAndReboot] && envManager.isJailbroken) {
+                PSSpecifier *rebootSpecifier = [PSSpecifier emptyGroupSpecifier];
+                rebootSpecifier.target = self;
+                [rebootSpecifier setProperty:@"Menu_Reboot_Title" forKey:@"title"];
+                [rebootSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+                [rebootSpecifier setProperty:@"arrow.triangle.2.circlepath" forKey:@"image"];
+                [rebootSpecifier setProperty:@"rebootPressed" forKey:@"action"];
+                [specifiers addObject:rebootSpecifier];
+            }
         }
-        
+            
         PSSpecifier *themingGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
         themingGroupSpecifier.name = DOLocalizedString(@"Section_Customization");
         [specifiers addObject:themingGroupSpecifier];
@@ -389,6 +409,7 @@
     UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Remove_Jailbreak_Title") message:DOLocalizedString(@"Alert_Remove_Jailbreak_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *uninstallAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [[DOEnvironmentManager sharedManager] deleteBootstrap];
+        [[DOUIManager sharedInstance] resetPackageManagers];
         if ([DOEnvironmentManager sharedManager].isJailbroken) {
             [[DOEnvironmentManager sharedManager] reboot];
         }
@@ -414,5 +435,36 @@
     [self reloadSpecifiers];
 }
 
+- (void)rebootPressed
+{
+    UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:nil message:DOLocalizedString(@"Alert_Reboot_Title") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        [[DOEnvironmentManager sharedManager] reboot];
+    }];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
+    [confirmationAlertController addAction:rebootAction];
+    [confirmationAlertController addAction:cancelAction];
+    [self presentViewController:confirmationAlertController animated:YES completion:nil];
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        CGPoint pressLocation = [gesture locationInView:self.view];
+        [self UpdatesAndRebootEnabledPressed];
+    }
+}
+
+- (void)UpdatesAndRebootEnabledPressed {
+    NSString *key = @"UpdatesAndRebootEnabled";
+    id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
+    if (value == nil) {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+    } else if ([value boolValue]) {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+    } else {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+    }
+    [self reloadSpecifiers];
+}
 
 @end

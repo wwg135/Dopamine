@@ -4,13 +4,63 @@
 <array>
 	<dict>
 		<key>Display Name</key>
+		<string>Ellekit</string>
+		<key>Key</key>
+		<string>ellekit</string>
+		<key>Icon</key>
+		<string>Ellekit</string>
+		<key>Package</key>
+		<string>ellekit.deb</string>
+	</dict>
+	<dict>
+		<key>Display Name</key>
+		<string>Preferenceloader</string>
+		<key>Key</key>
+		<string>preferenceloader</string>
+		<key>Icon</key>
+		<string>Preferenceloader</string>
+		<key>Package</key>
+		<string>preferenceloader.deb</string>
+	</dict>
+	<dict>
+		<key>Display Name</key>
 		<string>Sileo</string>
 		<key>Key</key>
-		<string>org.coolstar.SileoStore</string>
+		<string>org.coolstar.sileo</string>
 		<key>Icon</key>
 		<string>Sileo</string>
 		<key>Package</key>
 		<string>sileo.deb</string>
+	</dict>
+	<dict>
+		<key>Display Name</key>
+		<string>Saily</string>
+		<key>Key</key>
+		<string>saily</string>
+		<key>Icon</key>
+		<string>Saily</string>
+		<key>Package</key>
+		<string>saily.deb</string>
+	</dict>
+	<dict>
+		<key>Display Name</key>
+		<string>Flex 3 Beta92</string>
+		<key>Key</key>
+		<string>flex3beta</string>
+		<key>Icon</key>
+		<string>Flex3beta</string>
+		<key>Package</key>
+		<string>Flex 3 Beta92.deb</string>
+	</dict>
+	<dict>
+		<key>Display Name</key>
+		<string>iCleaner Pro</string>
+		<key>Key</key>
+		<string>icleanerpro</string>
+		<key>Icon</key>
+		<string>icleanerpro</string>
+		<key>Package</key>
+		<string>icleanerpro.deb</string>
 	</dict>
 	<dict>
 		<key>Display Name</key>
