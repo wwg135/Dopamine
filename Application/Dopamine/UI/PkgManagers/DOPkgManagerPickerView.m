@@ -25,49 +25,35 @@
     self = [super init];
     if (self) {
         UIStackView *switchStack = [[UIStackView alloc] init];
-        switchStack.axis = UILayoutConstraintAxisVertical;
+        switchStack.axis = UILayoutConstraintAxisHorizontal;
         switchStack.translatesAutoresizingMaskIntoConstraints = NO;
 
         [self addSubview:switchStack];
 
         [NSLayoutConstraint activateConstraints:@[
             [switchStack.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
-            [switchStack.centerYAnchor constraintEqualToAnchor:self.centerYAnchor]
+            [switchStack.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant: -([DOGlobalAppearance isHomeButtonDevice] ? 0 : 10)]
         ]];
 
         NSArray *packageManagers = [[DOUIManager sharedInstance] availablePackageManagers];
-        int numberOfColumns = 2;
-        int numberOfRows = ceil(packageManagers.count / (float)numberOfColumns);
+        [packageManagers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSDictionary *manager = (NSDictionary *)obj;
+            DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
+            appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
+            appSwitch.onSwitch = ^(BOOL enabled) {
+                [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
+                [self updateButtonState];
+            };
 
-        for (int row = 0; row < numberOfRows; row++) {
-            UIStackView *rowStack = [[UIStackView alloc] init];
-            rowStack.axis = UILayoutConstraintAxisHorizontal;
-            rowStack.spacing = 10;
-            rowStack.distribution = UIStackViewDistributionFillEqually;
-            rowStack.translatesAutoresizingMaskIntoConstraints = NO;
-            [switchStack addArrangedSubview:rowStack];
-    
-            for (int column = 0; column < numberOfColumns; column++) {
-                int index = row * numberOfColumns + column;
-                if (index < packageManagers.count) {
-                    NSDictionary *manager = (NSDictionary *)packageManagers[index];
-                    DOAppSwitch *appSwitch = [[DOAppSwitch alloc] initWithIcon:[UIImage imageNamed:manager[@"Icon"]] title:manager[@"Display Name"]];
-                    appSwitch.selected = [[[DOUIManager sharedInstance] enabledPackageManagerKeys] containsObject:manager[@"Key"]];
-                    appSwitch.onSwitch = ^(BOOL enabled) {
-                        [[DOUIManager sharedInstance] setPackageManager:manager[@"Key"] enabled:enabled];
-                        [self updateButtonState];
-                    };
+            appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
+            [switchStack addArrangedSubview:appSwitch];
 
-                    appSwitch.translatesAutoresizingMaskIntoConstraints = NO;
-                    [rowStack addArrangedSubview:appSwitch];
-
-                    [NSLayoutConstraint activateConstraints:@[
-                        [appSwitch.widthAnchor constraintEqualToConstant:110],
-                        [appSwitch.heightAnchor constraintEqualToConstant:110]
-                    ]];
-                }
-            }
-        }
+            [NSLayoutConstraint activateConstraints:@[
+                [appSwitch.widthAnchor constraintEqualToConstant:110],
+                [appSwitch.heightAnchor constraintEqualToConstant:110]
+            ]];
+        }];
+        
 
         UILabel *title = [[UILabel alloc] init];
         title.text = DOLocalizedString(@"Status_Title_Select_Package_Managers");
@@ -95,7 +81,7 @@
 
         [NSLayoutConstraint activateConstraints:@[
             [tooltip.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
-            [tooltip.topAnchor constraintEqualToAnchor:switchStack.bottomAnchor constant:5],
+            [tooltip.topAnchor constraintEqualToAnchor:switchStack.bottomAnchor constant:15],
             [tooltip.widthAnchor constraintEqualToAnchor:switchStack.widthAnchor multiplier:1.25]
         ]];
         
@@ -108,12 +94,16 @@
         self.continueAction.translatesAutoresizingMaskIntoConstraints = NO;
         
         [self addSubview:self.continueAction];
-   
+
+        
         [NSLayoutConstraint activateConstraints:@[
             [self.continueAction.heightAnchor constraintEqualToConstant:50],
-            [self.continueAction.topAnchor constraintEqualToAnchor:tooltip.bottomAnchor constant:10],
-            [self.continueAction.centerXAnchor constraintEqualToAnchor:self.centerXAnchor]
+            [self.continueAction.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-PADDING_BTN_CONTINUE - ([DOGlobalAppearance isHomeButtonDevice] ? 0 : 10)],
+            [self.continueAction.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:PADDING_BTN_CONTINUE],
+            [self.continueAction.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-PADDING_BTN_CONTINUE]
         ]];
+        
+        
         
         [self updateButtonState];
         
