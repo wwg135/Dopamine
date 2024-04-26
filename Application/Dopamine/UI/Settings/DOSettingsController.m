@@ -423,8 +423,8 @@
         CGPoint pressLocation = [gesture locationInView:self.view];
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
 
-        [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Settings_Check_Update") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self checkForUpdatePressed];
+        [alertController addAction:[UIAlertAction actionWithTitle:[self updateTitle] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+             [self toggleUpdateCheck]; 
         }]];
 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
@@ -449,6 +449,20 @@
     } else {
         [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
     }
+}
+
+- (void)toggleUpdateCheck {
+    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolForKey:@"checkForUpdateEnabled"];
+    if (checkEnabled) {
+        [[DOPreferenceManager sharedManager] setBool:NO forKey:@"checkForUpdateEnabled"];
+    } else {
+        [[DOPreferenceManager sharedManager] setBool:YES forKey:@"checkForUpdateEnabled"]; 
+    }
+}
+
+- (NSString*)updateTitle {
+    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolForKey:@"checkForUpdateEnabled"];
+    return checkEnabled ? @"关闭检查更新" : @"打开检查更新";
 }
 
 @end
