@@ -423,42 +423,29 @@
         CGPoint pressLocation = [gesture locationInView:self.view];
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         
-        UISegmentedControl *updateControl = [[UISegmentedControl alloc] initWithItems:@[DOLocalizedString(@"Settings_Open_Update"), DOLocalizedString(@"Settings_Close_Update")]];
-        updateControl.momentary = YES; 
-        [updateControl addTarget:self action:@selector(updateToggled:) forControlEvents:UIControlEventValueChanged];
+        UISwitch *updateSwitch = [[UISwitch alloc] init];
+        updateSwitch.accessibilityLabel = DOLocalizedString(@"Settings_Check_Update");
+        [updateSwitch addTarget:self action:@selector(updateToggled:) forControlEvents:UIControlEventValueChanged];
+        [alertController.view addSubview:updateSwitch];
 
-        DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-        UIAlertAction *rebootAction = nil;
         if (envManager.isJailbroken) {
-            rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [[DOEnvironmentManager sharedManager] reboot];  
-            }];
+            [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [[DOEnvironmentManager sharedManager] reboot];
+            }]];
         }
 
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
-
-        [alertController.view addSubview:updateControl];
-        [alertController addAction:rebootAction];
-        [alertController addAction:cancelAction];
+        [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil]];       
         [self presentViewController:alertController animated:YES completion:nil];
     }
 }
 
-- (void)updateToggled:(UISegmentedControl *)sender {
-    NSString *key = @"UpdatesAndRebootEnabled";
-    id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
-    if (value == nil) {
-        if (sender.selectedSegmentIndex == 0) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        } else {  
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-        }
-    } else {  
-        if (sender.selectedSegmentIndex == 0) {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-        } else {
-            [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-        }
+- (void)updateToggled:(UISwitch *)sender {
+    NSString *key = @"checkForUpdateEnabled";
+    BOOL value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];  
+    if (sender.isOn) {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
+    } else {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
     }
 }
 
