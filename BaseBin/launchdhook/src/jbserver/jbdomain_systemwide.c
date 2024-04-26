@@ -10,6 +10,7 @@
 #include <libjailbreak/util.h>
 #include <libjailbreak/primitives.h>
 #include <libjailbreak/codesign.h>
+#include "../mlock_dsc.h"
 
 extern bool stringEndsWith(const char* str, const char* suffix);
 
@@ -245,6 +246,22 @@ static int systemwide_cs_revalidate(audit_token_t *callerToken)
 	return -1;
 }
 
+static int systemwide_mlock_dsc(audit_token_t *callerToken, uint64_t unslidStart, uint64_t size)
+{
+#if 1
+	uint64_t pid = audit_token_to_pid(*callerToken);
+	char procPath[4*MAXPATHLEN];
+	if (proc_pidpath(pid, procPath, sizeof(procPath)) < 0) {
+		return -1;
+	}
+	FILE *f = fopen("/var/mobile/launchd_dsc_lock.log", "a");
+	fprintf(f, "[%s] mlock_dsc(addr: 0x%llx, size: 0x%llx)\n", procPath, unslidStart, size);
+	fclose(f);
+#endif
+
+	return mlock_dsc(unslidStart, size);
+}
+
 struct jbserver_domain gSystemwideDomain = {
 	.permissionHandler = systemwide_domain_allowed,
 	.actions = {
@@ -307,6 +324,16 @@ struct jbserver_domain gSystemwideDomain = {
 			.handler = systemwide_cs_revalidate,
 			.args = (jbserver_arg[]) {
 				{ .name = "caller-token", .type = JBS_TYPE_CALLER_TOKEN, .out = false },
+				{ 0 },
+			},
+		},
+		// JBS_SYSTEMWIDE_MLOCK_DSC
+		{
+			.handler = systemwide_mlock_dsc,
+			.args = (jbserver_arg[]) {
+				{ .name = "caller-token", .type = JBS_TYPE_CALLER_TOKEN, .out = false },
+				{ .name = "unslid-addr", .type = JBS_TYPE_UINT64, .out = false },
+				{ .name = "size", .type = JBS_TYPE_UINT64, .out = false },
 				{ 0 },
 			},
 		},

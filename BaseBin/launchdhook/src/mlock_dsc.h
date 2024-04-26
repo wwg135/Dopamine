@@ -1,0 +1,1 @@
+int mlock_dsc(uint64_t unslid_addr, size_t size);
