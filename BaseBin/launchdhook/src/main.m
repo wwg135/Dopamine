@@ -3,10 +3,10 @@
 #import <libjailbreak/util.h>
 #import <libjailbreak/dyld.h>
 #import <libjailbreak/kernel.h>
-#include <dlfcn.h>
-#include <mach/mach.h>
-#include <mach-o/dyld.h>
-#include <mach-o/getsect.h>
+#import <dlfcn.h>
+#import <mach/mach.h>
+#import <mach-o/dyld.h>
+#import <mach-o/getsect.h>
 #import <mach-o/dyld.h>
 #import <spawn.h>
 #import <substrate.h>
