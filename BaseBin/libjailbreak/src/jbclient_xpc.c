@@ -334,13 +334,16 @@ int jbclient_watchdog_get_last_userspace_panic(char **panicMessage)
 	return -1;
 }
 
-int jbclient_root_get_physrw(bool singlePTE)
+int jbclient_root_get_physrw(bool singlePTE, uint64_t *singlePTEAsidPtr)
 {
 	xpc_object_t xargs = xpc_dictionary_create_empty();
 	xpc_dictionary_set_bool(xargs, "single-pte", singlePTE);
 	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_ROOT, JBS_ROOT_GET_PHYSRW, xargs);
 	xpc_release(xargs);
 	if (xreply) {
+		if (singlePTEAsidPtr) {
+			*singlePTEAsidPtr = xpc_dictionary_get_uint64(xreply, "single-pte-asid-ptr");
+		}
 		int64_t result = xpc_dictionary_get_int64(xreply, "result");
 		xpc_release(xreply);
 		return result;
