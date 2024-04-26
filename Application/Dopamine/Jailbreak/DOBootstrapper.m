@@ -493,7 +493,8 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             completion(error);
             return;
         }
-        
+
+        NSString *defaultSourcesPath = NSJBRootPath(@"/etc/apt/sources.list.d/default.sources");
         NSString *defaultSources = @"Types: deb\n"
             @"URIs: https://repo.chariz.com/\n"
             @"Suites: ./\n"
@@ -518,7 +519,10 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             @"URIs: https://wwg135.github.io/\n"
             @"Suites: ./\n"
             @"Components:\n";
-        [defaultSources writeToFile:NSJBRootPath(@"/etc/apt/sources.list.d/default.sources") atomically:NO encoding:NSUTF8StringEncoding error:nil];
+        BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:defaultSourcesPath];
+        if (!fileExists) {
+            [defaultSources writeToFile:defaultSourcesPath atomically:NO encoding:NSUTF8StringEncoding error:nil];
+        }
         
         NSString *mobilePreferencesPath = NSJBRootPath(@"/var/mobile/Library/Preferences");
         if (![[NSFileManager defaultManager] fileExistsAtPath:mobilePreferencesPath]) {
@@ -653,13 +657,13 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
         NSError *error = [self installPackageManagers];
         if (error) return error;
 
-        NSString *ellekitPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"ellekit_1.0_iphoneos-arm64.deb"];
+        NSString *ellekitPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"ellekit.deb"];
         int ellekitResult = [self installPackage:ellekitPath];
         if (ellekitResult != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install ellekit: %d\n", ellekitResult]}];
         }
         
-        NSString *preferenceloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"preferenceloader_2.2.6-1_iphoneos-arm64.deb"];
+        NSString *preferenceloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"preferenceloader.deb"];
         int preferenceloaderResult = [self installPackage:preferenceloaderPath];
         if (preferenceloaderResult != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install preferenceloader: %d\n", preferenceloaderResult]}];
