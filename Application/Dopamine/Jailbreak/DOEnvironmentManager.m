@@ -349,7 +349,6 @@ int reboot3(uint64_t flags, ...);
                     NSString *jailbreakAppPath = [NSJBRootPath(@"/Applications") stringByAppendingPathComponent:jailbreakApp];
                     exec_cmd(JBRootPath("/usr/bin/uicache"), "-u", jailbreakAppPath.fileSystemRepresentation, NULL);
                 }
-                
             }
         }];
     }];
@@ -360,6 +359,17 @@ int reboot3(uint64_t flags, ...);
     [self runAsRoot:^{
         [self runUnsandboxed:^{
             reboot3(0x8000000000000000, 0);
+        }];
+    }];
+}
+
+
+- (void)changeMobilePassword:(NSString *)newPassword
+{
+    [self runAsRoot:^{
+        [self runUnsandboxed:^{
+            NSString *dashCommand = [NSString stringWithFormat:@"printf \"%%s\\n\" \"%@\" | %@ usermod 501 -h 0", newPassword, NSJBRootPath(@"/usr/sbin/pw")];
+            exec_cmd(JBRootPath("/usr/bin/dash"), "-c", dashCommand.UTF8String, NULL);
         }];
     }];
 }

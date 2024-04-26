@@ -48,6 +48,7 @@
 "Button_Unhide_Jailbreak" = "Odkryj jailbreak";
 /*Button_Refresh_Jailbreak_Apps*/
 "Button_Reinstall_Package_Managers" = "Przeinstaluj menedżery pakietów";
+/*Button_Change_Mobile_Password*/
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Ukryj jailbreak\" tymczasowo usuwa wszystkie pliki związane z jailbreakiem (aż do następnego jailbreakowania)";
@@ -65,6 +66,10 @@
 "Alert_Remove_Jailbreak_Title" = "Usuń jailbreak";
 "Alert_Remove_Jailbreak_Pressed_Body" = "Usunięcie jailbreak spowoduje usunięcie wszystkich plików związanych z jailbreakiem, ale wszystkie zwykłe aplikacje, pliki i dane zostaną zachowane. Jesteś pewien, że chcesz kontynuować? Tej czynności nie można cofnąć.";
 /*Alert_Remove_Jailbreak_Enabled_Body*/
+/*Alert_Change_Mobile_Password_Body*/
+/*Password_Placeholder*/
+/*Repeat_Password_Placeholder*/
+/*Button_Change*/
 "Button_Cancel" = "Anuluj";
 /*Button_Continue*/
 
