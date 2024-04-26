@@ -1,7 +1,12 @@
 #import <Foundation/Foundation.h>
 #import <libjailbreak/libjailbreak.h>
 #import <libjailbreak/util.h>
+#import <libjailbreak/dyld.h>
 #import <libjailbreak/kernel.h>
+#include <dlfcn.h>
+#include <mach/mach.h>
+#include <mach-o/dyld.h>
+#include <mach-o/getsect.h>
 #import <mach-o/dyld.h>
 #import <spawn.h>
 #import <substrate.h>
@@ -15,10 +20,35 @@
 #import "crashreporter.h"
 #import "boomerang.h"
 #import "update.h"
+#import "mlock_dsc.h"
 
 bool gInEarlyBoot = true;
 
 void abort_with_reason(uint32_t reason_namespace, uint64_t reason_code, const char *reason_string, uint64_t reason_flags);
+
+static kern_return_t (*EKHookMemoryRaw_orig)(void *target, const void *data, size_t size);
+static kern_return_t EKHookMemoryRaw_impl(void *target, const void *data, size_t size)
+{
+	static uint64_t dscSlide = 0;
+	static dispatch_once_t ot;
+	dispatch_once(&ot, ^{
+		task_dyld_info_data_t dyldInfo;
+		uint32_t count = TASK_DYLD_INFO_COUNT;
+		task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t)&dyldInfo, &count);
+		DyldAllImageInfos64 *infos = (DyldAllImageInfos64 *)dyldInfo.all_image_info_addr;
+		dscSlide = infos->shared_cache_slide;
+	});
+
+	Dl_info targetInfo;
+	if (dladdr(target, &targetInfo) != 0) {
+		if (_dyld_shared_cache_contains_path(targetInfo.dli_fname)) {
+			uint64_t unslidTarget = (uint64_t)target - dscSlide;
+			mlock_dsc(unslidTarget, size);
+		}
+	}
+
+	return EKHookMemoryRaw_orig(target, data, size);
+}
 
 __attribute__((constructor)) static void initializer(void)
 {
@@ -70,6 +100,17 @@ __attribute__((constructor)) static void initializer(void)
 	}
 
 	cs_allow_invalid(proc_self(), false);
+
+#ifdef __arm64e__
+	if (@available(iOS 16.0, *)) {}
+	else {
+		kern_return_t (**EKHookMemoryRaw)(void *, const void *, size_t) = dlsym(RTLD_DEFAULT, "EKHookMemoryRaw");
+		if (EKHookMemoryRaw) {
+			EKHookMemoryRaw_orig = *EKHookMemoryRaw;
+			*EKHookMemoryRaw = EKHookMemoryRaw_impl;
+		}
+	}
+#endif
 
 	initXPCHooks();
 	initDaemonHooks();
