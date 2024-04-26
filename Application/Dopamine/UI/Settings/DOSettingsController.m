@@ -439,18 +439,6 @@
     }
 }
 
-- (void)checkForUpdatePressed {
-    NSString *key = @"checkForUpdateEnabled";
-    id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
-    if (value == nil) {
-        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-    } else if ([value boolValue]) {
-        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
-    } else {
-        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-    }
-}
-
 - (void)toggleUpdateCheck {
     BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolForKey:@"checkForUpdateEnabled"];
     if (checkEnabled) {
