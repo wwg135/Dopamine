@@ -320,12 +320,6 @@
     return candidate;
 }
 
-- (BOOL)isUpdateTitle
-{
-    NSNumber *checkforUpdate = [_preferenceManager preferenceValueForKey:@"checkForUpdateEnabled"];
-    return checkforUpdate.boolValue;
-}
-
 @end
 
 
