@@ -42,7 +42,7 @@
 		<key>icon</key>
 		<string>AppIcon_Blue</string>
 		<key>name</key>
-		<string>深蓝天空</string>
+		<string>Deep Blue Sky</string>
 		<key>image</key>
 		<string>Background_Blue.jpg</string>
 		<key>actionMenuColor</key>
@@ -60,7 +60,7 @@
 		<key>icon</key>
 		<string>AppIcon_Red</string>
 		<key>name</key>
-		<string>酒红天空</string>
+		<string>Blood Sky</string>
 		<key>image</key>
 		<string>Background_Red.jpg</string>
 		<key>actionMenuColor</key>
@@ -78,7 +78,7 @@
 		<key>icon</key>
 		<string>AppIcon_Purple</string>
 		<key>name</key>
-		<string>蓝紫星空</string>
+		<string>Desert Dusk</string>
 		<key>image</key>
 		<string>Background_Purple.jpg</string>
 		<key>actionMenuColor</key>
