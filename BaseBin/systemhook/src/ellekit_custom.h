@@ -1,1 +1,0 @@
-void enable_ellekit_custom_memory_hooks(void);
