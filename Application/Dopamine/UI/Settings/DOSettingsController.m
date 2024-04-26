@@ -425,7 +425,7 @@
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
 
         [alertController addAction:[UIAlertAction actionWithTitle:[self updateTitle] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-             [self toggleUpdateCheck]; 
+             [self checkUpdate]; 
         }]];
 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
@@ -440,18 +440,18 @@
     }
 }
 
-- (void)toggleUpdateCheck {
-    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolForKey:@"checkForUpdateEnabled"];
+- (void)checkUpdate {
+    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"checkForUpdateEnabled" fallback:NO];
     if (checkEnabled) {
-        [[DOPreferenceManager sharedManager] setBool:NO forKey:@"checkForUpdateEnabled"];
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:@"checkForUpdateEnabled"];
     } else {
-        [[DOPreferenceManager sharedManager] setBool:YES forKey:@"checkForUpdateEnabled"]; 
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:@"checkForUpdateEnabled"];
     }
 }
 
 - (NSString*)updateTitle {
-    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolForKey:@"checkForUpdateEnabled"];
-    return checkEnabled ? @"关闭检查更新" : @"打开检查更新";
+    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"checkForUpdateEnabled" fallback:NO];
+    return checkEnabled ? @"关闭更新" : @"启用更新";
 }
 
 @end
