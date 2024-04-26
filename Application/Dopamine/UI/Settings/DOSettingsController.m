@@ -422,11 +422,10 @@
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint pressLocation = [gesture locationInView:self.view];
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        
-        UISwitch *updateSwitch = [[UISwitch alloc] init];
-        updateSwitch.accessibilityLabel = DOLocalizedString(@"Settings_Check_Update");
-        [updateSwitch addTarget:self action:@selector(updateToggled:) forControlEvents:UIControlEventValueChanged];
-        [alertController.view addSubview:updateSwitch];
+
+        [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Settings_Check_Update") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self checkForUpdatePressed];
+        }]];
 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
         if (envManager.isJailbroken) {
@@ -440,13 +439,15 @@
     }
 }
 
-- (void)updateToggled:(UISwitch *)sender {
+- (void)checkForUpdatePressed {
     NSString *key = @"checkForUpdateEnabled";
-    BOOL value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];  
-    if (sender.isOn) {
+    id value = [[DOPreferenceManager sharedManager] preferenceValueForKey:key];
+    if (value == nil) {
         [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
-    } else {
+    } else if ([value boolValue]) {
         [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:key];
+    } else {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:key];
     }
 }
 
