@@ -52,7 +52,7 @@
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
             if (idx == 3) {
-		        self.timerLabel = label;
+		self.timerLabel = label;
             }
         }];
 
