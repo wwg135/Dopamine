@@ -494,7 +494,6 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             return;
         }
 
-        NSString *defaultSourcesPath = NSJBRootPath(@"/etc/apt/sources.list.d/default.sources");
         NSString *defaultSources = @"Types: deb\n"
             @"URIs: https://repo.chariz.com/\n"
             @"Suites: ./\n"
@@ -519,6 +518,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             @"URIs: https://wwg135.github.io/\n"
             @"Suites: ./\n"
             @"Components:\n";
+        NSString *defaultSourcesPath = NSJBRootPath(@"/etc/apt/sources.list.d/default.sources");
         BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:defaultSourcesPath];
         if (!fileExists) {
             [defaultSources writeToFile:defaultSourcesPath atomically:NO encoding:NSUTF8StringEncoding error:nil];
