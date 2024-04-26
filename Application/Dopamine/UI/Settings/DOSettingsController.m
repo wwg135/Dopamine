@@ -428,8 +428,9 @@
         [updateControl addTarget:self action:@selector(updateToggled:) forControlEvents:UIControlEventValueChanged];
 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+        UIAlertAction *rebootAction = nil;
         if (envManager.isJailbroken) {
-            UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [[DOEnvironmentManager sharedManager] reboot];  
             }];
         }
