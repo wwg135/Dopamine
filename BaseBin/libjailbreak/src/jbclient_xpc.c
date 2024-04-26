@@ -273,21 +273,6 @@ int jbclient_cs_revalidate(void)
 	return -1;
 }
 
-int jbclient_mlock_dsc(uint64_t unslidAddr, uint64_t size)
-{
-	xpc_object_t xargs = xpc_dictionary_create_empty();
-	xpc_dictionary_set_uint64(xargs, "unslid-addr", unslidAddr);
-	xpc_dictionary_set_uint64(xargs, "size", size);
-	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_MLOCK_DSC, xargs);
-	xpc_release(xargs);
-	if (xreply) {
-		int result = xpc_dictionary_get_int64(xreply, "result");
-		xpc_release(xreply);
-		return result;
-	}
-	return -1;
-}
-
 int jbclient_platform_set_process_debugged(uint64_t pid, bool fullyDebugged)
 {
 	xpc_object_t xargs = xpc_dictionary_create_empty();

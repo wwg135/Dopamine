@@ -48,6 +48,7 @@
 "Button_Unhide_Jailbreak" = "取消隐藏越狱";
 "Button_Refresh_Jailbreak_Apps" = "刷新越狱应用";
 "Button_Reinstall_Package_Managers" = "重新安装包管理器";
+/*Button_Change_Mobile_Password*/
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "“隐藏越狱”将在下次越狱前移除部分可能导致越狱检测的文件。";
@@ -65,6 +66,10 @@
 "Alert_Remove_Jailbreak_Title" = "移除越狱";
 "Alert_Remove_Jailbreak_Pressed_Body" = "“移除越狱”将移除所有和越狱相关的文件，而常规的 App、文档及数据不会受到任何影响。请注意，此操作无法撤销。确认要移除越狱吗？";
 "Alert_Remove_Jailbreak_Enabled_Body" = "“移除越狱”将在下次越狱时移除所有和越狱相关的文件，而常规的 App、文档及数据不会受到任何影响。请注意，此操作无法撤销。确认要移除越狱吗？";
+/*Alert_Change_Mobile_Password_Body*/
+/*Password_Placeholder*/
+/*Repeat_Password_Placeholder*/
+/*Button_Change*/
 "Button_Cancel" = "取消";
 "Button_Continue" = "继续";
 
@@ -102,3 +107,4 @@
 "Status_Title_Select_Package_Managers" = "请选择包管理器";
 "Select_Package_Managers_Install_Message" = "如果你不确定选择哪一个比较好，请选择 Sileo";
 "Continue" = "继续";
+

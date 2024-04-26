@@ -10,7 +10,6 @@
 #include <libjailbreak/jbclient_xpc.h>
 #include <libjailbreak/codesign.h>
 #include "litehook.h"
-#include "ellekit_custom.h"
 
 int necp_match_policy(uint8_t *parameters, size_t parameters_size, void *returned_result);
 int necp_open(int flags);
@@ -34,6 +33,7 @@ int necp_session_action(int necp_fd, uint32_t action, uint8_t *in_buffer, size_t
 })
 
 extern char **environ;
+bool gTweaksEnabled = false;
 
 int ptrace(int request, pid_t pid, caddr_t addr, int data);
 #define PT_ATTACH       10      /* trace some running process */
@@ -305,17 +305,19 @@ int ptrace_hook(int request, pid_t pid, caddr_t addr, int data)
 
 void loadForkFix(void)
 {
-	static dispatch_once_t onceToken;
-	dispatch_once (&onceToken, ^{
-		// If tweaks have been loaded into this process, we need to load forkfix to ensure forking will work
-		// Optimization: If the process cannot fork at all due to sandbox, we don't need to do anything
-		if (sandbox_check(getpid(), "process-fork", SANDBOX_CHECK_NO_REPORT, NULL) == 0) {
-			dlopen(JBRootPath("/basebin/forkfix.dylib"), RTLD_NOW);
-		}
-	});
+	if (gTweaksEnabled) {
+		static dispatch_once_t onceToken;
+		dispatch_once (&onceToken, ^{
+			// If tweaks have been loaded into this process, we need to load forkfix to ensure forking will work
+			// Optimization: If the process cannot fork at all due to sandbox, we don't need to do anything
+			if (sandbox_check(getpid(), "process-fork", SANDBOX_CHECK_NO_REPORT, NULL) == 0) {
+				dlopen(JBRootPath("/basebin/forkfix.dylib"), RTLD_NOW);
+			}
+		});
+	}
 }
 
-/*pid_t fork_hook(void)
+pid_t fork_hook(void)
 {
 	loadForkFix();
 	return fork();
@@ -337,11 +339,9 @@ int daemon_hook(int __nochdir, int __noclose)
 {
 	loadForkFix();
 	return daemon(__nochdir, __noclose);
-}*/
+}
 
 #else
-
-void loadForkFix(void) {} // stub
 
 // The NECP subsystem is the only thing in the kernel that ever checks CS_VALID on userspace processes (Only on iOS 16)
 // In order to not break system functionality, we need to readd CS_VALID before any of these are invoked
@@ -466,20 +466,11 @@ __attribute__((constructor)) static void initializer(void)
 	}
 
 	if (loadExecutablePath() == 0) {
-#ifdef __arm64e__
-		if (__builtin_available(iOS 16.0, *)) {}
-		else {
-			// Fix spinlock panics by wiring down original page before ellekit applies hooks
-			enable_ellekit_custom_memory_hooks();
-		}
-#endif // __arm64e__
 		if (strcmp(gExecutablePath, "/usr/sbin/cfprefsd") == 0) {
 			dlopen_hook(JBRootPath("/basebin/rootlesshooks.dylib"), RTLD_NOW);
-			loadForkFix();
 		}
 		else if (strcmp(gExecutablePath, "/usr/libexec/watchdogd") == 0) {
 			dlopen_hook(JBRootPath("/basebin/watchdoghook.dylib"), RTLD_NOW);
-			loadForkFix();
 		}
 
 #ifndef __arm64e__
@@ -496,10 +487,11 @@ __attribute__((constructor)) static void initializer(void)
 			litehook_hook_function(necp_session_action, necp_session_action_hook);
 		}
 #endif
+
 		if (shouldEnableTweaks()) {
-			loadForkFix();
 			const char *tweakLoaderPath = "/var/jb/usr/lib/TweakLoader.dylib";
 			if(access(tweakLoaderPath, F_OK) == 0) {
+				gTweaksEnabled = true;
 				void *tweakLoaderHandle = dlopen_hook(tweakLoaderPath, RTLD_NOW);
 				if (tweakLoaderHandle != NULL) {
 					dlclose(tweakLoaderHandle);
@@ -533,8 +525,8 @@ DYLD_INTERPOSE(sandbox_init_with_parameters_hook, sandbox_init_with_parameters)
 DYLD_INTERPOSE(sandbox_init_with_extensions_hook, sandbox_init_with_extensions)
 DYLD_INTERPOSE(ptrace_hook, ptrace)
 #ifdef __arm64e__
-/*DYLD_INTERPOSE(fork_hook, fork)
+DYLD_INTERPOSE(fork_hook, fork)
 DYLD_INTERPOSE(vfork_hook, vfork)
 DYLD_INTERPOSE(forkpty_hook, forkpty)
-DYLD_INTERPOSE(daemon_hook, daemon)*/
+DYLD_INTERPOSE(daemon_hook, daemon)
 #endif
