@@ -428,6 +428,7 @@
         [updateSwitch addTarget:self action:@selector(updateToggled:) forControlEvents:UIControlEventValueChanged];
         [alertController.view addSubview:updateSwitch];
 
+        DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
         if (envManager.isJailbroken) {
             [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [[DOEnvironmentManager sharedManager] reboot];
