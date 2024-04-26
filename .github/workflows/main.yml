@@ -20,7 +20,7 @@ permissions:
   contents: write
 
 env:
-  VERSION: '2.0.11.3'
+  VERSION: '2.0.11.5'
   BUNDLEID: 'com.wwg135.Dopamine'
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
     environment: Auto Build And Release
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4.1.2
         with:
             submodules: recursive
 
@@ -85,7 +85,7 @@ jobs:
         run: |
           echo "${{ env.VERSION }}" >./BaseBin/_external/basebin/.version
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/Settings/DOSettingsController.m
+          sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/DOMainViewController.m
 
       - name: Install libarchive
         run: |
@@ -115,7 +115,7 @@ jobs:
           cat ./release.md >> release.txt
           
       - name: Release ipa
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2.0.4
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.VERSION }}
