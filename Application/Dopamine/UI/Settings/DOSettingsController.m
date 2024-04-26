@@ -16,6 +16,7 @@
 #import "DOPSListItemsController.h"
 #import "DOThemeManager.h"
 #import "DOSceneDelegate.h"
+#import "DOPreferenceManager.h"
 
 
 @interface DOSettingsController ()
