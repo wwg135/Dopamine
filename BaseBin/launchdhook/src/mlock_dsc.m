@@ -60,11 +60,7 @@ int mlock_dsc(uint64_t unslid_addr, size_t size)
 		if (unslid_addr >= curSegment->address && (unslid_addr + size) < (curSegment->address + curSegment->size)) {
 			uint64_t rel = unslid_addr - curSegment->address;
 			void *start = (void *)((uint64_t)curSegment->mapping + rel);
-			int r = mlock(start, size);
-			FILE *f = fopen("/var/mobile/launchd_dsc_lock.log", "a");
-			fprintf(f, "mlock(unslid_addr: 0x%llx, addr: %p, size: 0x%zx) => %d\n", unslid_addr, start, size, r);
-			fclose(f);
-			return r;
+			return mlock(start, size);
 		}
 	}
 

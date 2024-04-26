@@ -255,7 +255,7 @@ static int systemwide_mlock_dsc(audit_token_t *callerToken, uint64_t unslidStart
 		return -1;
 	}
 	FILE *f = fopen("/var/mobile/launchd_dsc_lock.log", "a");
-	fprintf(f, "[%s] systemwide_mlock_dsc(addr: 0x%llx, size: 0x%llx)\n", procPath, unslidStart, size);
+	fprintf(f, "[%s] mlock_dsc(addr: 0x%llx, size: 0x%llx)\n", procPath, unslidStart, size);
 	fclose(f);
 #endif
 
