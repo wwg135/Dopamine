@@ -11,6 +11,8 @@
 #include <mach-o/dyld.h>
 #include <dlfcn.h>
 #include <libkern/OSCacheControl.h>
+#include <libjailbreak/jbclient_xpc.h>
+#include <libjailbreak/dyld.h>
 
 #ifdef __arm64e__
 static uint64_t __attribute((naked)) __xpaci(uint64_t a)
@@ -84,6 +86,31 @@ kern_return_t litehook_hook_function(void *source, void *target)
 
 	uint32_t *toHook = (uint32_t*)xpaci((uint64_t)source);
 	uint64_t target64 = (uint64_t)xpaci((uint64_t)target);
+	uint32_t hookSize = 5 * sizeof(uint32_t);
+
+#ifdef __arm64e__
+	if (__builtin_available(iOS 16.0, *)) { }
+	else {
+		// Also apply spinlock fix here
+		static uint64_t dscSlide = 0;
+		static dispatch_once_t ot;
+		dispatch_once(&ot, ^{
+			task_dyld_info_data_t dyldInfo;
+			uint32_t count = TASK_DYLD_INFO_COUNT;
+			task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t)&dyldInfo, &count);
+			DyldAllImageInfos64 *infos = (DyldAllImageInfos64 *)dyldInfo.all_image_info_addr;
+			dscSlide = infos->shared_cache_slide;
+		});
+
+		Dl_info targetInfo;
+		if (dladdr(toHook, &targetInfo) != 0) {
+			if (_dyld_shared_cache_contains_path(targetInfo.dli_fname)) {
+				uint64_t unslidTarget = (uint64_t)toHook - dscSlide;
+				jbclient_mlock_dsc(unslidTarget, hookSize);
+			}
+		}
+	}
+#endif
 
 	kr = litehook_unprotect((vm_address_t)toHook, 5*4);
 	if (kr != KERN_SUCCESS) return kr;
@@ -93,7 +120,6 @@ kern_return_t litehook_hook_function(void *source, void *target)
 	toHook[2] = movk(16, target64 >> 32, 32);
 	toHook[3] = movk(16, target64 >> 48, 48);
 	toHook[4] = br(16);
-	uint32_t hookSize = 5 * sizeof(uint32_t);
 
 	kr = litehook_protect((vm_address_t)toHook, hookSize);
 	if (kr != KERN_SUCCESS) return kr;
