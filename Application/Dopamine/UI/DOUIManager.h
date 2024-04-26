@@ -31,7 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)startLogCapture;
 - (void)shareLogRecordFromView:(UIView *)sourceView;
 - (BOOL)isUpdateAvailable;
-- (BOOL)isUpdateTitle;
 - (BOOL)environmentUpdateAvailable;
 - (NSArray *)getLatestReleases;
 - (NSString*)getLaunchedReleaseTag;
