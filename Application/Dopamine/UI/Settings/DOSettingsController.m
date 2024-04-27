@@ -428,7 +428,6 @@
              [self checkUpdate]; 
         }]];
         updateAction.image = [UIImage systemImageNamed:@"arrow.3.trianglepath"];
-        [alertController addAction:updateAction];
 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
         if (envManager.isJailbroken) {
@@ -436,16 +435,13 @@
                 [[DOEnvironmentManager sharedManager] reboot];
             }]];
             rebootAction.image = [UIImage systemImageNamed:@"arrow.uturn.down"];
-            [alertController addAction:rebootAction];
         }
 
         [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil]];
         cancelAction.image = [UIImage systemImageNamed:@"xmark.circle.fill"];
-        [alertController addAction:cancelAction];
 
         for (UIAlertAction *action in alertController.actions) {
-            DOAlertAction *doAction = (DOAlertAction *)action;
-            UIImageView *imageView = [[UIImageView alloc] initWithImage:doAction.image];
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:action.image];
             imageView.frame = CGRectMake(0, 0, 20, 20);
             [action setValue:imageView forKey:@"image"];
 
