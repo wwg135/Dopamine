@@ -112,6 +112,4 @@
 
 "Menu_Reboot_Title" = "重启设备";
 "Settings" = "设置";
-"Alert_Reboot_Title" = "确定重启设备吗？";
-"Settings_Check_For_Update" = "检查更新";
 "Mismatching_Environment_Version_Update_Body" = "本机的越狱环境版本与已更新安装 App 版本不匹配。 \n点击更新按钮执行一次「重启用户空间」更新越狱环境。";

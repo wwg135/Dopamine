@@ -320,12 +320,6 @@
     return candidate;
 }
 
-- (BOOL)isUpdatesAndReboot
-{
-    NSNumber *UpdatesAndReboot = [_preferenceManager preferenceValueForKey:@"UpdatesAndRebootEnabled"];
-    return [UpdatesAndReboot boolValue];
-}
-
 @end
 
 
