@@ -451,7 +451,7 @@
 
 - (NSString*)updateTitle {
     BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"checkForUpdateEnabled" fallback:NO];
-    return checkEnabled ? @"关闭更新" : @"启用更新";
+    return checkEnabled ? @"启用更新" : @"关闭更新";
 }
 
 @end
