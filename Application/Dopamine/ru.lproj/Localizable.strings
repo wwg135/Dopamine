@@ -48,6 +48,7 @@
 "Button_Unhide_Jailbreak" = "Отобразить джейлбрейк";
 "Button_Refresh_Jailbreak_Apps" = "Освежить приложения джейлбрейка";
 "Button_Reinstall_Package_Managers" = "Переустановить менеджеры пакетов";
+/*Button_Change_Mobile_Password*/
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Скрыть джейлбрейк\" временно удаляет файлы, связанные с джейлбрейком, до следующего джейлбрейка";
@@ -63,8 +64,12 @@
 "Alert_Tweak_Injection_Toggled_Reboot_Now" = "Сейчас";
 "Alert_Tweak_Injection_Toggled_Reboot_Later" = "Потом";
 "Alert_Remove_Jailbreak_Title" = "Удаление джейлбрейка";
-"Alert_Remove_Jailbreak_Pressed_Body" = "Удаление джейлбрейка приведёт к удалению всех файлов, связанных с джейлбрейком, но все обычные приложения, файлы и данные будут сохранены. Вы уверены, что хотите продолжить? Вы не сможете отменить это действие.";
-"Alert_Remove_Jailbreak_Enabled_Body" = "Нажимая \"Удаление джейлбрейка\", все файлы, связанные с джейлбрейком, будут удалены до следующего джейлбрейка. Все обычные приложения, файлы и данные будут сохранены. Вы уверены, что хотите продолжить? Вы не сможете отменить это действие.";
+"Alert_Remove_Jailbreak_Pressed_Body" = "Удаление джейлбрейка приведет к удалению всех файлов, связанных с джейлбрейком, но все обычные приложения, файлы и данные будут сохранены. Вы уверены, что хотите продолжить? Вы не сможете отменить это действие.";
+/*Alert_Remove_Jailbreak_Enabled_Body*/
+/*Alert_Change_Mobile_Password_Body*/
+/*Password_Placeholder*/
+/*Repeat_Password_Placeholder*/
+/*Button_Change*/
 "Button_Cancel" = "Отмена";
 "Button_Continue" = "Продолжить";
 
@@ -102,4 +107,3 @@
 "Status_Title_Select_Package_Managers" = "Выберите менеджер(ы) пакетов";
 "Select_Package_Managers_Install_Message" = "Если вы не знаете, какой из них выбрать, выберите Sileo";
 "Continue" = "Продолжить";
-

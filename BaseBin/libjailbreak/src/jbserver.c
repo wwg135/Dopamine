@@ -1,4 +1,5 @@
 #include "jbserver.h"
+#include "util.h"
 
 int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xmsg)
 {
@@ -114,5 +115,6 @@ int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xms
 	xpc_dictionary_set_int64(xreply, "result", result);
 	xpc_pipe_routine_reply(xreply);
 	xpc_release(xreply);
+
 	return 0;
 }

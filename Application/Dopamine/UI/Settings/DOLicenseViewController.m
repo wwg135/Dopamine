@@ -85,6 +85,10 @@
             @"file": @"LICENSE_kfd"
         },
         @{
+            @"name": @"libgrabkernel2",
+            @"file": @"LICENSE_libgrabkernel2"
+        },
+        @{
             @"name": @"ElleKit",
             @"file": @"LICENSE_ElleKit"
         },
