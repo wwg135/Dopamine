@@ -423,31 +423,18 @@
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint pressLocation = [gesture locationInView:self.view];
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-
-        [alertController addAction:[UIAlertAction actionWithTitle:[self updateTitle] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [alertController addAction:[UIAlertAction actionWithTitle:[self updateTitle] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
              [self checkUpdate]; 
         }]];
-        updateAction.image = [UIImage systemImageNamed:@"arrow.3.trianglepath"];
 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
         if (envManager.isJailbroken) {
             [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [[DOEnvironmentManager sharedManager] reboot];
             }]];
-            rebootAction.image = [UIImage systemImageNamed:@"arrow.uturn.down"];
         }
 
         [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil]];
-        cancelAction.image = [UIImage systemImageNamed:@"xmark.circle.fill"];
-
-        for (UIAlertAction *action in alertController.actions) {
-            UIImageView *imageView = [[UIImageView alloc] initWithImage:action.image];
-            imageView.frame = CGRectMake(0, 0, 20, 20);
-            [action setValue:imageView forKey:@"image"];
-
-            UILabel *label = [action valueForKey:@"titleViewController"];
-            label.textAlignment = NSTextAlignmentLeft;
-        }
         [self presentViewController:alertController animated:YES completion:nil];
     }
 }
