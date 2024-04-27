@@ -106,8 +106,7 @@ void jbupdate_update_system_info(void)
 		void (*xpf_stop)(void) = dlsym(xpfHandle, "xpf_stop");
 		xpc_object_t (*xpf_construct_offset_dictionary)(const char *sets[]) = dlsym(xpfHandle, "xpf_construct_offset_dictionary");
 
-		// XXX: this is a hack
-		const char *kernelPath = JBRootPath("/../../System/Library/Caches/com.apple.kernelcaches/kernelcache");
+		const char *kernelPath = prebootUUIDPath("/System/Library/Caches/com.apple.kernelcaches/kernelcache");
 		xpc_object_t systemInfoXdict = NULL;
 
 		// Rerun patchfinder

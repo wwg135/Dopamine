@@ -155,7 +155,7 @@ bool can_skip_trusting_file(const char *filePath, bool isLibrary, bool isClient)
 		// Same goes for our /usr/lib bind mount (which is guaranteed to be in dynamic trust cache)
 		// We can't do this in the client because of protobox bullshit where calling statfs crashes some processes
 		struct statfs fs;
-		int sfsret = statfs(filePath, &fs); // XXX: same protobox bullshit as below, just with statfs
+		int sfsret = statfs(filePath, &fs);
 		if (sfsret == 0) {
 			if (!strcmp(fs.f_mntonname, "/") || !strcmp(fs.f_mntonname, "/usr/lib")) {
 				return true;
