@@ -81,41 +81,12 @@ int boomerang_recoverPrimitives(bool firstRetrieval, bool shouldEndBoomerang)
 		unsetenv("BOOMERANG_PID");
 	}
 
-	// Retrieve system info
-	xpc_object_t xSystemInfoDict = NULL;
-	if (jbclient_root_get_sysinfo(&xSystemInfoDict) != 0) return -4;
-	SYSTEM_INFO_DESERIALIZE(xSystemInfoDict);
-
-	// Retrieve physrw
-	bool usePhysrwPTE = firstRetrieval && !is_kcall_available();
-	uint64_t asidPtr = 0;
-	int physrwRet = jbclient_root_get_physrw(usePhysrwPTE, &asidPtr);
-	if (physrwRet != 0) return -20 + physrwRet;
-	if (usePhysrwPTE) {
-		// For performance reasons we only use physrw_pte until the first userspace reboot
-		// Handing off full physrw from the app is really slow and causes watchdog timeouts
-		// But from launchd it's generally fine, no clue why
-		libjailbreak_physrw_pte_init(true, asidPtr);
-	}
-	else {
-		libjailbreak_physrw_init(true);
-	}
-
-	libjailbreak_translation_init();
-
-	libjailbreak_IOSurface_primitives_init();
-	if (!gPrimitives.kalloc_global) {
-		libjailbreak_kalloc_pt_init();
-	}
-
-	// Retrieve kcall if available
-#ifdef __arm64e__
-	if (jbinfo(usesPACBypass)) {
-		jbclient_get_fugu14_kcall();
-	}
-#else
-	arm64_kcall_init();
-#endif
+	// Retrieve primitives
+	// For performance reasons we only use physrw_pte until the first userspace reboot
+	// Handing off full physrw from the app is really slow and causes watchdog timeouts
+	// But from launchd it's generally fine, no clue why
+	bool physrwPTE = firstRetrieval && !is_kcall_available();
+	jbclient_initialize_primitives_internal(physrwPTE);
 
 	if (shouldEndBoomerang) {
 		// Send done message to boomerang

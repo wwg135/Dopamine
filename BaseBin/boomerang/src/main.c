@@ -50,30 +50,8 @@ int main(int argc, char* argv[])
 	if (kr != KERN_SUCCESS) return -1;
 	mach_port_deallocate(mach_task_self(), launchdTaskPort);
 
-	// Retrieve system info
-	xpc_object_t xSystemInfoDict = NULL;
-	if (jbclient_root_get_sysinfo(&xSystemInfoDict) != 0) return -1;
-	SYSTEM_INFO_DESERIALIZE(xSystemInfoDict);
-
-	// Retrieve physrw
-	jbclient_root_get_physrw(false, NULL);
-	libjailbreak_physrw_init(true);
-
-	libjailbreak_translation_init();
-
-	libjailbreak_IOSurface_primitives_init();
-	if (!gPrimitives.kalloc_global) {
-		libjailbreak_kalloc_pt_init();
-	}
-
-	// Retrieve kcall if available
-#ifdef __arm64e__
-	if (jbinfo(usesPACBypass)) {
-		jbclient_get_fugu14_kcall();
-	}
-#else
-	arm64_kcall_init();
-#endif
+	// Retrieve primitives
+	jbclient_initialize_primitives_internal(false);
 
 	// Send done message to launchd
 	jbclient_boomerang_done();
