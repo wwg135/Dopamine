@@ -85,6 +85,10 @@
             @"file": @"LICENSE_kfd"
         },
         @{
+            @"name": @"weightBufs",
+            @"file": @"LICENSE_weightBufs"
+        },
+        @{
             @"name": @"libgrabkernel2",
             @"file": @"LICENSE_libgrabkernel2"
         },

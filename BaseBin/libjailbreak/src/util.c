@@ -11,6 +11,7 @@
 #include <archive.h>
 #include <archive_entry.h>
 #include <math.h>
+#include <IOKit/IOKitLib.h>
 extern char **environ;
 
 #define FAKE_PHYSPAGE_TO_MAP 0x13370000
@@ -758,4 +759,33 @@ void thread_caffeinate_stop(void)
 	if (gCaffeinateThreadRunCount == 0) {
 		pthread_join(gCaffeinateThread, NULL);
 	}
+}
+
+char *boot_manifest_hash(void)
+{
+	static char *gBuf = NULL;
+	
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		io_registry_entry_t registryEntry = IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen");
+		if (registryEntry) {
+			CFDataRef bootManifestHashData = IORegistryEntryCreateCFProperty(registryEntry, CFSTR("boot-manifest-hash"), NULL, 0);
+			CFIndex bootManifestHashLength = CFDataGetLength(bootManifestHashData);
+
+			gBuf = malloc((bootManifestHashLength * 2 * sizeof(char)) + sizeof(char));
+			unsigned char *buf = (unsigned char *)CFDataGetBytePtr(bootManifestHashData);
+			unsigned char *pin = buf;
+			const char *hex = "0123456789ABCDEF";
+			char *pout = gBuf;
+			for(; pin < buf+bootManifestHashLength; pout+=2, pin++){
+				pout[0] = hex[(*pin>>4) & 0xF];
+				pout[1] = hex[ *pin     & 0xF];
+			}
+			pout[0] = 0;
+
+			CFRelease(bootManifestHashData);
+		}
+	});
+
+	return gBuf;
 }
