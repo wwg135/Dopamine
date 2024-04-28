@@ -181,6 +181,18 @@
 				</dict>
 				<dict>
 					<key>name</key>
+					<string>John Aakerblom</string>
+					<key>link</key>
+					<string>https://twitter.com/jaakerblom</string>
+				</dict>
+				<dict>
+					<key>name</key>
+					<string>_simo36</string>
+					<key>link</key>
+					<string>https://twitter.com/_simo36</string>
+				</dict>
+				<dict>
+					<key>name</key>
 					<string>0x7ff</string>
 					<key>link</key>
 					<string>https://github.com/0x7ff</string>
