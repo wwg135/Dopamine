@@ -57,6 +57,15 @@ int exec_cmd_root(const char *binary, ...);
 	(outPath); \
 })
 
+char *boot_manifest_hash(void);
+
+#define prebootUUIDPath(path) ({ \
+	static char outPath[PATH_MAX]; \
+	strlcpy(outPath, "/private/preboot/", PATH_MAX); \
+	strlcat(outPath, boot_manifest_hash(), PATH_MAX); \
+	strlcat(outPath, path, PATH_MAX); \
+	(outPath); \
+})
 
 #define VM_FLAGS_GET_PROT(x)    ((x >>  7) & 0xFULL)
 #define VM_FLAGS_GET_MAXPROT(x) ((x >> 11) & 0xFULL);
@@ -65,6 +74,7 @@ int exec_cmd_root(const char *binary, ...);
 
 #ifdef __OBJC__
 NSString *NSJBRootPath(NSString *relativePath);
+NSString *NSPrebootUUIDPath(NSString *relativePath);
 #endif
 
 #endif
