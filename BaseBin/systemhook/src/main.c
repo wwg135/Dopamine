@@ -473,10 +473,12 @@ __attribute__((constructor)) static void initializer(void)
 	}
 
 	if (loadExecutablePath() == 0) {
-		if (strcmp(gExecutablePath, "/usr/sbin/cfprefsd") == 0) {
+		if (!strcmp(gExecutablePath, "/usr/sbin/cfprefsd") ||
+			!strcmp(gExecutablePath, "/System/Library/CoreServices/SpringBoard.app/SpringBoard") ||
+			!strcmp(gExecutablePath, "/usr/libexec/lsd")) {
 			dlopen_hook(JBRootPath("/basebin/rootlesshooks.dylib"), RTLD_NOW);
 		}
-		else if (strcmp(gExecutablePath, "/usr/libexec/watchdogd") == 0) {
+		else if (!strcmp(gExecutablePath, "/usr/libexec/watchdogd")) {
 			dlopen_hook(JBRootPath("/basebin/watchdoghook.dylib"), RTLD_NOW);
 		}
 

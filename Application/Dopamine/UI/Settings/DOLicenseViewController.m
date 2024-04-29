@@ -121,6 +121,10 @@
             @"file": @"LICENSE_opainject"
         },
         @{
+            @"name": @"plooshinit",
+            @"file": @"LICENSE_plooshinit"
+        },
+        @{
             @"name": @"dimentio",
             @"file": @"LICENSE_dimentio"
         },

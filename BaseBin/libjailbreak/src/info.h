@@ -381,7 +381,7 @@ extern struct system_info gSystemInfo;
 	KERNEL_GADGETS_ITERATE(ctx, iterator); \
 	KERNEL_STRUCTS_ITERATE(ctx, iterator);
 
-static void _safe_xpc_dictionary_get_string(xpc_object_t xdict, const char *name, char **out)
+__attribute__((__unused__)) static void _safe_xpc_dictionary_get_string(xpc_object_t xdict, const char *name, char **out)
 {
 	const char *str = xpc_dictionary_get_string(xdict, name);
 	if (str) {
@@ -390,7 +390,7 @@ static void _safe_xpc_dictionary_get_string(xpc_object_t xdict, const char *name
 	}
 }
 
-static void _safe_xpc_dictionary_set_string(xpc_object_t xdict, const char *name, const char *string)
+__attribute__((__unused__)) static void _safe_xpc_dictionary_set_string(xpc_object_t xdict, const char *name, const char *string)
 {
 	if (string) {
 		xpc_dictionary_set_string(xdict, name, string);
