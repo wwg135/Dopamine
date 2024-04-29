@@ -53,8 +53,9 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     JBErrorCodeFailedPlatformize             = -9,
     JBErrorCodeFailedBasebinTrustcache       = -10,
     JBErrorCodeFailedLaunchdInjection        = -11,
-    JBErrorCodeFailedInitFakeLib             = -12,
-    JBErrorCodeFailedDuplicateApps           = -13,
+    JBErrorCodeFailedInitProtection          = -12,
+    JBErrorCodeFailedInitFakeLib             = -13,
+    JBErrorCodeFailedDuplicateApps           = -14,
 };
 
 @implementation DOJailbreaker
@@ -365,6 +366,15 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     return nil;
 }
 
+- (NSError *)applyProtection
+{
+    int r = exec_cmd(JBRootPath("/basebin/jbctl"), "internal", "protection_init", NULL);
+    if (r != 0) {
+        return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedInitProtection userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed initializing protection with error: %d", r]}];
+    }
+    return nil;
+}
+
 - (NSError *)createFakeLib
 {
     int r = exec_cmd(JBRootPath("/basebin/jbctl"), "internal", "fakelib_init", NULL);
@@ -524,6 +534,13 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Initializing Environment") debug:NO];
     *errOut = [self injectLaunchdHook];
+    if (*errOut) return;
+    
+    // Now that we can, protect important system files by bind mounting on top of them
+    // This will be always be done during the userspace reboot
+    // We also do it now though in case there is a failure between the now step and the userspace reboot
+    [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Initializing Protection") debug:NO];
+    *errOut = [self applyProtection];
     if (*errOut) return;
     
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Applying Bind Mount") debug:NO];
