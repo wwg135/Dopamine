@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "Sinisimulan ang Jailbreak Environment";
+/*Initializing Protection*/
 "Loading BaseBin TrustCache" = "Nilo-load ang BaseBin TrustCache";
 "Applying Bind Mount" = "Paglalapat ng Bind Mount";
 "Removing Jailbreak" = "Tinatatanggal ang Jailbreak";

@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "Ortam Başlatılıyor";
+/*Initializing Protection*/
 /*Loading BaseBin TrustCache*/
 /*Applying Bind Mount*/
 /*Removing Jailbreak*/

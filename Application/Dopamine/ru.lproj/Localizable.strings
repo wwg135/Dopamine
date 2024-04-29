@@ -90,14 +90,15 @@
 "Credits_Button_Source_Code" = "Исходный код";
 
 // Logs
-"Initializing Environment" = "Инициализация среды";
-"Loading BaseBin TrustCache" = "Получение кэша доверия BaseBin";
-"Applying Bind Mount" = "Применение монтирования с привязкой";
-"Removing Jailbreak" = "Удаление джейлбрейка";
-"Elevating Privileges" = "Повышение прав";
-"Cleaning Up Exploits" = "Очистка эксплоитов";
-"Building Phys R/W Primitive" = "Создание R/W примитива";
-"Rebooting Userspace" = "Перезагрузка Userspace";
+"Initializing Environment" = "Инициализация переменной среды";
+/*Initializing Protection*/
+"Loading BaseBin TrustCache" = "Загружаем BaseBin TrustCache";
+/*Applying Bind Mount*/
+"Removing Jailbreak" = "Удаляем джейлбрейк";
+"Elevating Privileges" = "Повышаем права";
+"Cleaning Up Exploits" = "Очищаем Эксплоиты";
+"Building Phys R/W Primitive" = "Создаем R/W примитивы";
+"Rebooting Userspace" = "Перезагружаем Userspace";
 "Patchfinding" = "Поиск патчей";
 "Exploiting Kernel (%@)" = "Эксплуатация ядра (%@)";
 "Bypassing PAC (%@)" = "Обход PAC (%@)";
