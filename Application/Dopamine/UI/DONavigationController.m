@@ -10,12 +10,15 @@
 #import "DOModalBackAction.h"
 #import "DOGlobalAppearance.h"
 #import "DOThemeManager.h"
+#import "DOUIManager.h"
+#import "DOEnvironmentManager.h"
 
 @interface DONavigationController ()
 
 @property (nonatomic) UIImageView *backgroundImageView;
 @property (nonatomic) DOMainViewController *mainView;
 @property (nonatomic) DOModalBackAction *backAction;
+@property (nonatomic, strong) UIImage *selectedBackgroundImage;
 
 @end
 
@@ -33,6 +36,17 @@
     [self pushViewController:(self.mainView = [[DOMainViewController alloc] init]) animated:NO];
     [self setDelegate:self];
     [self setOverrideUserInterfaceStyle:UIUserInterfaceStyleDark];
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSData *imageData = [defaults objectForKey:@"SelectedBackgroundImage"];
+    if (imageData) {
+        UIImage *selectedImage = [UIImage imageWithData:imageData];
+        self.selectedBackgroundImage = selectedImage;
+        [self.backgroundImageView setImage:selectedImage];
+    }
+
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)setupBackground
@@ -41,7 +55,7 @@
     
     self.view.backgroundColor = [UIColor blackColor];
     self.backgroundImageView = [[UIImageView alloc] init];
-    self.backgroundImageView.image = [theme image];
+    self.backgroundImageView.image = self.selectedBackgroundImage ? [self processImage:self.selectedBackgroundImage] : [theme image];
     self.backgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
     self.backgroundImageView.translatesAutoresizingMaskIntoConstraints = NO;
     self.backgroundImageView.userInteractionEnabled = NO;
@@ -75,7 +89,7 @@
 - (void)setBackgroundDimmed:(BOOL)dimmed
 {
     [UIView animateWithDuration:0.3 animations:^{
-        self.backgroundImageView.alpha = dimmed ? 0.4 : 1;
+        self.backgroundImageView.alpha = dimmed ? 1 : 1;
     }];
     self.backgroundImageView.userInteractionEnabled = dimmed;
     self.backAction.hidden = !dimmed;
@@ -117,5 +131,60 @@
 
 }
 
+- (UIImage *)processImage:(UIImage *)image {
+      return [[[UIImage imageNamed:image] imageWithBlur:18.0] imageWithHue: M_PI * 2];  
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet]; 
+        DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+        if (envManager.isJailbroken) {
+            [alertController addAction:[UIAlertAction actionWithTitle:@"重启设备" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [[DOEnvironmentManager sharedManager] reboot];
+            }]];
+        }
+
+        [alertController addAction:[UIAlertAction actionWithTitle:@"自定义主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+            imagePicker.delegate = self;
+            imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+
+            UIViewController *viewController = [UIApplication sharedApplication].windows.firstObject.rootViewController;
+            [viewController presentViewController:imagePicker animated:YES completion:nil];
+        }]];
+
+        [alertController addAction:[UIAlertAction actionWithTitle:@"恢复默认主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
+            self.selectedBackgroundImage = nil;
+            [self.backgroundImageView setImage:theme.image];
+
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            [defaults removeObjectForKey:@"SelectedBackgroundImage"];
+            [defaults synchronize];
+        }]];
+
+        [alertController addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];       
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
+      UIImage *selectedImage = info[UIImagePickerControllerOriginalImage];
+      if (selectedImage) {
+        self.selectedBackgroundImage = selectedImage;
+        [self.backgroundImageView setImage:selectedImage];
+
+        NSData *imageData = UIImagePNGRepresentation(selectedImage);
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:imageData forKey:@"SelectedBackgroundImage"];
+        [defaults synchronize];
+      }
+      [picker dismissViewControllerAnimated:YES completion:nil];
+    }
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+  [picker dismissViewControllerAnimated:YES completion:nil];
+}
 
 @end
