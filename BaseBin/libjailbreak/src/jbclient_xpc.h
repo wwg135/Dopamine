@@ -24,9 +24,11 @@ int jbclient_watchdog_get_last_userspace_panic(char **panicMessage);
 int jbclient_root_get_physrw(bool singlePTE, uint64_t *singlePTEAsidPtr);
 int jbclient_root_sign_thread(mach_port_t threadPort);
 int jbclient_root_get_sysinfo(xpc_object_t *sysInfoOut);
-int jbclient_root_add_cdhash(uint8_t *cdhashData, size_t cdhashLen);
 int jbclient_root_steal_ucred(uint64_t ucredToSteal, uint64_t *orgUcred);
 int jbclient_root_set_mac_label(uint64_t slot, uint64_t label, uint64_t *orgLabel);
+int jbclient_root_trustcache_info(xpc_object_t *infoOut);
+int jbclient_root_trustcache_add_cdhash(uint8_t *cdhashData, size_t cdhashLen);
+int jbclient_root_trustcache_clear(void);
 int jbclient_boomerang_done(void);
 
 #endif

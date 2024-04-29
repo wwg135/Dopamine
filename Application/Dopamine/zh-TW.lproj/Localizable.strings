@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "正在初始化環境";
+/*Initializing Protection*/
 "Loading BaseBin TrustCache" = "正在載入 BaseBin TrustCache";
 "Applying Bind Mount" = "正在套用 Bind Mount";
 "Removing Jailbreak" = "正在移除越獄";

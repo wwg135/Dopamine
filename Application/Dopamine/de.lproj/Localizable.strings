@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "Initialisiere Umgebung";
+"Initializing Protection" = "Initialisiere Schutz";
 "Loading BaseBin TrustCache" = "Lade BaseBin TrustCache";
 "Applying Bind Mount" = "Wende Bind Mount an";
 "Removing Jailbreak" = "Entferne Jailbreak";

@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "Initialisation de l'environnement";
+/*Initializing Protection*/
 "Loading BaseBin TrustCache" = "Chargement des signatures";
 "Applying Bind Mount" = "Montage du disque virtuel";
 "Removing Jailbreak" = "Suppression du jailbreak";

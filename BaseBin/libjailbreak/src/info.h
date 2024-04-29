@@ -423,11 +423,11 @@ void jbinfo_initialize_hardcoded_offsets(void);
 void jbinfo_initialize_boot_constants(void);
 xpc_object_t jbinfo_get_serialized(void);
 
-uint64_t get_vm_real_kernel_page_size();
+uint64_t get_vm_real_kernel_page_size(void);
 #define vm_real_kernel_page_size get_vm_real_kernel_page_size()
 #define vm_real_kernel_page_mask (vm_real_kernel_page_size - 1)
 
-uint64_t get_vm_real_kernel_page_shift();
+uint64_t get_vm_real_kernel_page_shift(void);
 #define vm_real_kernel_page_shift get_vm_real_kernel_page_shift()
 
 uint64_t get_l1_block_size(void);
