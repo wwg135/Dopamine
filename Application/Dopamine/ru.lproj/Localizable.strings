@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "Инициализация переменной среды";
+/*Initializing Protection*/
 "Loading BaseBin TrustCache" = "Загружаем BaseBin TrustCache";
 /*Applying Bind Mount*/
 "Removing Jailbreak" = "Удаляем джейлбрейк";

@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "初始化环境";
+/*Initializing Protection*/
 "Loading BaseBin TrustCache" = "将基础套件加载至信任缓存（TrustCache）";
 "Applying Bind Mount" = "应用绑定挂载";
 "Removing Jailbreak" = "移除越狱";

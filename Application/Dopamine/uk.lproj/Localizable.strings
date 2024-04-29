@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "Ініціалізація середовища";
+/*Initializing Protection*/
 /*Loading BaseBin TrustCache*/
 /*Applying Bind Mount*/
 /*Removing Jailbreak*/

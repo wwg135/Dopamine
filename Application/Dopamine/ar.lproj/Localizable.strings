@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "تحسين بيئة الجيلبريك";
+/*Initializing Protection*/
 "Loading BaseBin TrustCache" = "تحميل BaseBin TrustCache";
 "Applying Bind Mount" = "تطبيق Bind Mount";
 "Removing Jailbreak" = "إزالة الجيلبريك";

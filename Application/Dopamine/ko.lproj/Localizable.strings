@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "환경 초기화 중";
+/*Initializing Protection*/
 "Loading BaseBin TrustCache" = "배이스 바이너리 신뢰 캐시 불러오기";
 "Applying Bind Mount" = "바인드 마운트 적용";
 "Removing Jailbreak" = "탈옥 제거";

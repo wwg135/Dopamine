@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "Khởi tạo môi trường Jailbreak";
+/*Initializing Protection*/
 "Loading BaseBin TrustCache" = "Đang tải TrustCache BaseBin";
 "Applying Bind Mount" = "Đang gắn Bind Mount";
 "Removing Jailbreak" = "Đang gỡ bỏ Jailbreak";

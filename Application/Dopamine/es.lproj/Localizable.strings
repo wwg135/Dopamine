@@ -91,6 +91,7 @@
 
 // Logs
 "Initializing Environment" = "Inicializando entorno de Jailbreak";
+/*Initializing Protection*/
 "Loading BaseBin TrustCache" = "Cargando BaseBin TrustCache";
 "Applying Bind Mount" = "Aplicando montaje por vínculo";
 "Removing Jailbreak" = "Eliminando Jailbreak";
