@@ -378,20 +378,6 @@ int jbclient_root_get_sysinfo(xpc_object_t *sysInfoOut)
 	return -1;
 }
 
-int jbclient_root_add_cdhash(uint8_t *cdhashData, size_t cdhashLen)
-{
-	xpc_object_t xargs = xpc_dictionary_create_empty();
-	xpc_dictionary_set_data(xargs, "cdhash", cdhashData, cdhashLen);
-	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_ROOT, JBS_ROOT_ADD_CDHASH, xargs);
-	xpc_release(xargs);
-	if (xreply) {
-		int64_t result = xpc_dictionary_get_int64(xreply, "result");
-		xpc_release(xreply);
-		return result;
-	}
-	return -1;
-}
-
 int jbclient_root_steal_ucred(uint64_t ucredToSteal, uint64_t *orgUcred)
 {
 	xpc_object_t xargs = xpc_dictionary_create_empty();
@@ -417,6 +403,44 @@ int jbclient_root_set_mac_label(uint64_t slot, uint64_t label, uint64_t *orgLabe
 	if (xreply) {
 		int64_t result = xpc_dictionary_get_int64(xreply, "result");
 		if (orgLabel) *orgLabel = xpc_dictionary_get_uint64(xreply, "org-label");
+		xpc_release(xreply);
+		return result;
+	}
+	return -1;
+}
+
+int jbclient_root_trustcache_info(xpc_object_t *infoOut)
+{
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_ROOT, JBS_ROOT_TRUSTCACHE_INFO, NULL);
+	if (xreply) {
+		int64_t result = xpc_dictionary_get_int64(xreply, "result");
+		xpc_object_t info = xpc_dictionary_get_array(xreply, "tc-info");
+		if (infoOut && info) *infoOut = xpc_copy(info);
+		xpc_release(xreply);
+		return result;
+	}
+	return -1;
+}
+
+int jbclient_root_trustcache_add_cdhash(uint8_t *cdhashData, size_t cdhashLen)
+{
+	xpc_object_t xargs = xpc_dictionary_create_empty();
+	xpc_dictionary_set_data(xargs, "cdhash", cdhashData, cdhashLen);
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_ROOT, JBS_ROOT_TRUSTCACHE_ADD_CDHASH, xargs);
+	xpc_release(xargs);
+	if (xreply) {
+		int64_t result = xpc_dictionary_get_int64(xreply, "result");
+		xpc_release(xreply);
+		return result;
+	}
+	return -1;
+}
+
+int jbclient_root_trustcache_clear(void)
+{
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_ROOT, JBS_ROOT_TRUSTCACHE_CLEAR, NULL);
+	if (xreply) {
+		int64_t result = xpc_dictionary_get_int64(xreply, "result");
 		xpc_release(xreply);
 		return result;
 	}

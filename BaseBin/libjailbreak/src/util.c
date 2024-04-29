@@ -761,6 +761,37 @@ void thread_caffeinate_stop(void)
 	}
 }
 
+void convert_data_to_hex_string(const void *data, size_t size, char *outBuf)
+{
+	unsigned char *pin = (unsigned char *)data;
+	const char *hex = "0123456789ABCDEF";
+	char *pout = outBuf;
+	for(; pin < ((unsigned char *)data)+size; pout+=2, pin++){
+		pout[0] = hex[(*pin>>4) & 0xF];
+		pout[1] = hex[ *pin     & 0xF];
+	}
+	pout[0] = 0;
+}
+
+int convert_hex_string_to_data(const char *string, void *outBuf)
+{
+	size_t length = strlen(string);
+	const char *pin = string;
+	char *pout = outBuf;
+	for (; pin < string+length; pin++) {
+		char byte = *pin;
+		if (byte >= '0' && byte <= '9') byte = byte - '0';
+		else if (byte >= 'a' && byte <='f') byte = byte - 'a' + 10;
+		else if (byte >= 'A' && byte <='F') byte = byte - 'A' + 10;
+		else return -1;
+
+		int shift = ((pin - (string+length)) % 2) ? 0 : 4;
+		*pout = (*pout & ~(0xf << shift)) | (byte << shift);
+		if (shift == 0) pout++;
+	}
+	return 0;
+}
+
 char *boot_manifest_hash(void)
 {
 	static char *gBuf = NULL;
@@ -774,14 +805,7 @@ char *boot_manifest_hash(void)
 
 			gBuf = malloc((bootManifestHashLength * 2 * sizeof(char)) + sizeof(char));
 			unsigned char *buf = (unsigned char *)CFDataGetBytePtr(bootManifestHashData);
-			unsigned char *pin = buf;
-			const char *hex = "0123456789ABCDEF";
-			char *pout = gBuf;
-			for(; pin < buf+bootManifestHashLength; pout+=2, pin++){
-				pout[0] = hex[(*pin>>4) & 0xF];
-				pout[1] = hex[ *pin     & 0xF];
-			}
-			pout[0] = 0;
+			convert_data_to_hex_string(buf, bootManifestHashLength, gBuf);
 
 			CFRelease(bootManifestHashData);
 		}

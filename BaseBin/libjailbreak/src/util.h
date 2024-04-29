@@ -37,6 +37,9 @@ int libarchive_unarchive(const char *fileToExtract, const char *extractionPath);
 void thread_caffeinate_start(void);
 void thread_caffeinate_stop(void);
 
+void convert_data_to_hex_string(const void *data, size_t size, char *outBuf);
+int convert_hex_string_to_data(const char *string, void *outBuf);
+
 int cmd_wait_for_exit(pid_t pid);
 int exec_cmd(const char *binary, ...);
 int exec_cmd_nowait(pid_t *pidOut, const char *binary, ...);
