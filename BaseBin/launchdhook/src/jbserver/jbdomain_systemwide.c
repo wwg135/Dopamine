@@ -101,7 +101,7 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 	if (execExtension) free(execExtension);
 
 	bool fullyDebugged = false;
-	if (stringStartsWith(procPath, "/private/var/containers/Bundle/Application")) {
+	if (stringStartsWith(procPath, "/private/var/containers/Bundle/Application") || stringStartsWith(procPath, JBRootPath("/Applications"))) {
 		// This is an app
 		// Enable CS_DEBUGGED based on user preference
 		if (jbsetting(markAppsAsDebugged)) {
