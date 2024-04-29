@@ -11,7 +11,7 @@
 
 // Action Menu
 "Menu_Settings_Title" = "设置";
-"Menu_Restart_SpringBoard_Title" = "重启 SpringBoard";
+"Menu_Restart_SpringBoard_Title" = "注销";
 "Menu_Reboot_Userspace_Title" = "重启用户空间";
 "Menu_Credits_Title" = "关于";
 
@@ -48,7 +48,6 @@
 "Button_Unhide_Jailbreak" = "取消隐藏越狱";
 "Button_Refresh_Jailbreak_Apps" = "刷新越狱应用";
 "Button_Reinstall_Package_Managers" = "重新安装包管理器";
-/*Button_Change_Mobile_Password*/
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "“隐藏越狱”将在下次越狱前移除部分可能导致越狱检测的文件。";
@@ -66,12 +65,8 @@
 "Alert_Remove_Jailbreak_Title" = "移除越狱";
 "Alert_Remove_Jailbreak_Pressed_Body" = "“移除越狱”将移除所有和越狱相关的文件，而常规的 App、文档及数据不会受到任何影响。请注意，此操作无法撤销。确认要移除越狱吗？";
 "Alert_Remove_Jailbreak_Enabled_Body" = "“移除越狱”将在下次越狱时移除所有和越狱相关的文件，而常规的 App、文档及数据不会受到任何影响。请注意，此操作无法撤销。确认要移除越狱吗？";
-/*Alert_Change_Mobile_Password_Body*/
-/*Password_Placeholder*/
-/*Repeat_Password_Placeholder*/
-/*Button_Change*/
 "Button_Cancel" = "取消";
-"Button_Continue" = "继续";
+"Button_Continue" = "确定";
 
 // Duplicate Apps Errors
 "Duplicate_Apps_Error_Dopamine_App" = "检测到多个标识符为 \"%@\" 的应用在 Dopamine 应用目录中 (\"%@\")，无法继续。";
@@ -102,9 +97,27 @@
 "Exploiting Kernel (%@)" = "正在利用内核 (%@)";
 "Bypassing PAC (%@)" = "正在绕过 PAC (%@)";
 "Bypassing PPL (%@)" = "正在绕过 PPL (%@)";
+"Checking For Duplicate Apps" = "检查重复应用程序";
+"Updating BaseBin" = "更新基础套件";
+"Extracting Bootstrap" = "提取引导";
+"Downloading Bootstrap" = "安装引导";
+"Finalizing Bootstrap" = "完成引导";
+"Updating Bundled Packages" = "更新捆绑包";
+"Downloading Bootstrap (%@/%@)" = "安装引导 (%@/%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "请选择包管理器";
 "Select_Package_Managers_Install_Message" = "如果你不确定选择哪一个比较好，请选择 Sileo";
 "Continue" = "继续";
 
+"Menu_Reboot_Title" = "重启";
+"Settings" = "设置";
+"Alert_Reboot_Title" = "确定重启设备吗？";
+"Settings_Check_For_Update" = "检查更新";
+"Mismatching_Environment_Version_Update_Body" = "本机的越狱环境版本与已更新安装 App 版本不匹配。 \n点击更新按钮执行一次「重启用户空间」更新越狱环境。";;
+
+// mount 
+"Input_Mmount_Title" = "新增挂载";
+"Input_Unmount_Title" = "取消挂载";
+"Input_Mount_Title" = "输入原始路径";
+"Button_Mount" = "确定";

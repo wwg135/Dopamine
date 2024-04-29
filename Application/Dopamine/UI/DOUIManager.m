@@ -33,6 +33,10 @@
 
 - (BOOL)isUpdateAvailable
 {
+    NSNumber *checkforUpdate = [_preferenceManager preferenceValueForKey:@"checkForUpdateEnabled"];
+    if ([checkforUpdate boolValue] == NO)
+        return NO;
+
     NSArray *releases = [self getLatestReleases];
     if (releases.count == 0)
         return NO;
@@ -46,12 +50,13 @@
     long long numericalRepresentation = 0;
 
     NSArray *components = [version componentsSeparatedByCharactersInSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]];
-    while (components.count < 3)
+    while (components.count < 4)
         components = [components arrayByAddingObject:@"0"];
 
-    numericalRepresentation |= [components[0] integerValue] << 16;
-    numericalRepresentation |= [components[1] integerValue] << 8;
-    numericalRepresentation |= [components[2] integerValue];
+    numericalRepresentation |= [components[0] integerValue] << 24;
+    numericalRepresentation |= [components[1] integerValue] << 16;
+    numericalRepresentation |= [components[2] integerValue] << 8;
+    numericalRepresentation |= [components[3] integerValue];
     return numericalRepresentation;
 }
 
@@ -79,7 +84,7 @@
     static dispatch_once_t onceToken;
     static NSArray *releases;
     dispatch_once(&onceToken, ^{
-        NSURL *url = [NSURL URLWithString:@"https://api.github.com/repos/opa334/Dopamine/releases"];
+        NSURL *url = [NSURL URLWithString:@"https://api.github.com/repos/wwg135/Dopamine/releases"];
         NSData *data = [NSData dataWithContentsOfURL:url];
         if (data) {
             NSError *error;
