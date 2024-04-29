@@ -84,6 +84,8 @@
 "Kernel Exploit" = "Exploit du noyau";
 "PPL Bypass" = "Contournement PPL";
 "PAC Bypass" = "Contournement PAC";
+/*None*/
+/*Recommended*/
 
 // Credits
 "Credits_Button_Discord" = "Discord";

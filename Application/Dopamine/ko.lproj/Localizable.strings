@@ -84,6 +84,8 @@
 "Kernel Exploit" = "커널 익스플로잇";
 "PPL Bypass" = "PPL 우회";
 "PAC Bypass" = "PAC 우회";
+/*None*/
+/*Recommended*/
 
 // Credits
 "Credits_Button_Discord" = "Discord";

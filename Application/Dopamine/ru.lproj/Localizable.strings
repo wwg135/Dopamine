@@ -84,6 +84,8 @@
 "Kernel Exploit" = "Эксплоит Ядра";
 "PPL Bypass" = "Обход PPL";
 "PAC Bypass" = "Обход PAC";
+/*None*/
+/*Recommended*/
 
 // Credits
 "Credits_Button_Discord" = "Discord";

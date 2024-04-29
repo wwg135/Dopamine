@@ -84,6 +84,8 @@
 "Kernel Exploit" = "Lỗ hổng Kernel";
 "PPL Bypass" = "Lỗ hổng PPL";
 "PAC Bypass" = "Lỗ hổng PAC";
+/*None*/
+/*Recommended*/
 
 // Credits
 "Credits_Button_Discord" = "Discord";

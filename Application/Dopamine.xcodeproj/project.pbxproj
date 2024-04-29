@@ -82,6 +82,7 @@
 		8C2131A22B50CA4B008E682C /* info.h in Headers */ = {isa = PBXBuildFile; fileRef = 8C21318F2B50CA4B008E682C /* info.h */; };
 		8C2131A32B50CA4B008E682C /* libkfd.h in Headers */ = {isa = PBXBuildFile; fileRef = 8C2131902B50CA4B008E682C /* libkfd.h */; };
 		8C2875212BD850B4008B24DA /* LICENSE_libgrabkernel2.md in Resources */ = {isa = PBXBuildFile; fileRef = 8C2875202BD850B4008B24DA /* LICENSE_libgrabkernel2.md */; };
+		8C296BAC2BE049E4007C2AD1 /* DOPSExploitListItemsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C296BAB2BE049E4007C2AD1 /* DOPSExploitListItemsController.m */; };
 		8C2B1FEA2B53238D009BA166 /* libjailbreak.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CDD08422B4F6DD800A32B61 /* libjailbreak.dylib */; platformFilter = ios; };
 		8C2B1FF02B5324DE009BA166 /* dmaFail.h in Headers */ = {isa = PBXBuildFile; fileRef = 8C2B1FEF2B5324DE009BA166 /* dmaFail.h */; };
 		8C2B1FF42B53492B009BA166 /* dmaFail.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8C2B1FDF2B532374009BA166 /* dmaFail.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -408,6 +409,8 @@
 		8C21318F2B50CA4B008E682C /* info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = info.h; sourceTree = "<group>"; };
 		8C2131902B50CA4B008E682C /* libkfd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libkfd.h; sourceTree = "<group>"; };
 		8C2875202BD850B4008B24DA /* LICENSE_libgrabkernel2.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE_libgrabkernel2.md; sourceTree = "<group>"; };
+		8C296BAA2BE049E4007C2AD1 /* DOPSExploitListItemsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DOPSExploitListItemsController.h; sourceTree = "<group>"; };
+		8C296BAB2BE049E4007C2AD1 /* DOPSExploitListItemsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DOPSExploitListItemsController.m; sourceTree = "<group>"; };
 		8C2B1FC72B52FB56009BA166 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8C2B1FDF2B532374009BA166 /* dmaFail.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = dmaFail.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C2B1FEF2B5324DE009BA166 /* dmaFail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dmaFail.h; sourceTree = "<group>"; };
@@ -714,6 +717,8 @@
 				042479782B66916B0082581B /* DOPSListController.m */,
 				0443A9B02B79D9C10014C933 /* DOPSListItemsController.h */,
 				0443A9AF2B79D9C10014C933 /* DOPSListItemsController.m */,
+				8C296BAA2BE049E4007C2AD1 /* DOPSExploitListItemsController.h */,
+				8C296BAB2BE049E4007C2AD1 /* DOPSExploitListItemsController.m */,
 			);
 			path = PSLists;
 			sourceTree = "<group>";
@@ -1651,6 +1656,7 @@
 				04C246AE2B74ACA200E17924 /* DOAppSwitch.m in Sources */,
 				042479B22B66916B0082581B /* DOLyricsLogView.m in Sources */,
 				042479A52B66916B0082581B /* DOCreditsCell.m in Sources */,
+				8C296BAC2BE049E4007C2AD1 /* DOPSExploitListItemsController.m in Sources */,
 				042479B82B66916B0082581B /* DOMainViewController.m in Sources */,
 				8C029F432B4DFD5D0071DE58 /* DOExploitManager.m in Sources */,
 				042479B02B66916B0082581B /* DOLoadingIndicator.m in Sources */,

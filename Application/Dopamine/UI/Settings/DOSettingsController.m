@@ -14,6 +14,7 @@
 #import "DOEnvironmentManager.h"
 #import "DOExploitManager.h"
 #import "DOPSListItemsController.h"
+#import "DOPSExploitListItemsController.h"
 #import "DOThemeManager.h"
 #import "DOSceneDelegate.h"
 
@@ -48,7 +49,7 @@
 {
     NSMutableArray *identifiers = [NSMutableArray new];
     for (DOExploit *exploit in _availableKernelExploits) {
-        [identifiers addObject:exploit.identfier];
+        [identifiers addObject:exploit.identifier];
     }
     return identifiers;
 }
@@ -69,7 +70,7 @@
         [identifiers addObject:@"none"];
     }
     for (DOExploit *exploit in _availablePACBypasses) {
-        [identifiers addObject:exploit.identfier];
+        [identifiers addObject:exploit.identifier];
     }
     return identifiers;
 }
@@ -90,7 +91,7 @@
 {
     NSMutableArray *identifiers = [NSMutableArray new];
     for (DOExploit *exploit in _availablePPLBypasses) {
-        [identifiers addObject:exploit.identfier];
+        [identifiers addObject:exploit.identifier];
     }
     return identifiers;
 }
@@ -145,11 +146,12 @@
                 
                 PSSpecifier *kernelExploitSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Kernel Exploit") target:self set:defSetter get:defGetter detail:nil cell:PSLinkListCell edit:nil];
                 [kernelExploitSpecifier setProperty:@YES forKey:@"enabled"];
-                [kernelExploitSpecifier setProperty:exploitManager.preferredKernelExploit.identfier forKey:@"default"];
-                kernelExploitSpecifier.detailControllerClass = [DOPSListItemsController class];
+                [kernelExploitSpecifier setProperty:exploitManager.preferredKernelExploit.identifier forKey:@"default"];
+                kernelExploitSpecifier.detailControllerClass = [DOPSExploitListItemsController class];
                 [kernelExploitSpecifier setProperty:@"availableKernelExploitIdentifiers" forKey:@"valuesDataSource"];
                 [kernelExploitSpecifier setProperty:@"availableKernelExploitNames" forKey:@"titlesDataSource"];
                 [kernelExploitSpecifier setProperty:@"selectedKernelExploit" forKey:@"key"];
+                [kernelExploitSpecifier setProperty:(_availableKernelExploits.firstObject.identifier ?: @"none") forKey:@"recommendedExploitIdentifier"];
                 [specifiers addObject:kernelExploitSpecifier];
                 
                 if (envManager.isArm64e) {
@@ -160,21 +162,23 @@
                         [pacBypassSpecifier setProperty:@"none" forKey:@"default"];
                     }
                     else {
-                        [pacBypassSpecifier setProperty:preferredPACBypass.identfier forKey:@"default"];
+                        [pacBypassSpecifier setProperty:preferredPACBypass.identifier forKey:@"default"];
                     }
-                    pacBypassSpecifier.detailControllerClass = [DOPSListItemsController class];
+                    pacBypassSpecifier.detailControllerClass = [DOPSExploitListItemsController class];
                     [pacBypassSpecifier setProperty:@"availablePACBypassIdentifiers" forKey:@"valuesDataSource"];
                     [pacBypassSpecifier setProperty:@"availablePACBypassNames" forKey:@"titlesDataSource"];
                     [pacBypassSpecifier setProperty:@"selectedPACBypass" forKey:@"key"];
+                    [pacBypassSpecifier setProperty:([envManager isPACBypassRequired] ? _availablePACBypasses.firstObject.identifier : @"none") forKey:@"recommendedExploitIdentifier"];
                     [specifiers addObject:pacBypassSpecifier];
                     
                     PSSpecifier *pplBypassSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"PPL Bypass") target:self set:defSetter get:defGetter detail:nil cell:PSLinkListCell edit:nil];
                     [pplBypassSpecifier setProperty:@YES forKey:@"enabled"];
-                    [pplBypassSpecifier setProperty:exploitManager.preferredPPLBypass.identfier forKey:@"default"];
-                    pplBypassSpecifier.detailControllerClass = [DOPSListItemsController class];
+                    [pplBypassSpecifier setProperty:exploitManager.preferredPPLBypass.identifier forKey:@"default"];
+                    pplBypassSpecifier.detailControllerClass = [DOPSExploitListItemsController class];
                     [pplBypassSpecifier setProperty:@"availablePPLBypassIdentifiers" forKey:@"valuesDataSource"];
                     [pplBypassSpecifier setProperty:@"availablePPLBypassNames" forKey:@"titlesDataSource"];
                     [pplBypassSpecifier setProperty:@"selectedPPLBypass" forKey:@"key"];
+                    [pplBypassSpecifier setProperty:(_availablePPLBypasses.firstObject.identifier ?: @"none") forKey:@"recommendedExploitIdentifier"];
                     [specifiers addObject:pplBypassSpecifier];
                 }
             }

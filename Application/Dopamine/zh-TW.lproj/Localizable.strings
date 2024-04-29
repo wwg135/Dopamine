@@ -84,6 +84,8 @@
 "Kernel Exploit" = "核心漏洞";
 "PPL Bypass" = "繞過 PPL";
 "PAC Bypass" = "繞過 PAC";
+/*None*/
+/*Recommended*/
 
 // Credits
 "Credits_Button_Discord" = "Discord";
