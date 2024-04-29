@@ -65,11 +65,11 @@
 - (NSArray *)availablePACBypassIdentifiers
 {
     NSMutableArray *identifiers = [NSMutableArray new];
-    for (DOExploit *exploit in _availablePACBypasses) {
-        [identifiers addObject:exploit.identfier];
-    }
     if (![DOEnvironmentManager sharedManager].isPACBypassRequired) {
         [identifiers addObject:@"none"];
+    }
+    for (DOExploit *exploit in _availablePACBypasses) {
+        [identifiers addObject:exploit.identfier];
     }
     return identifiers;
 }
@@ -77,11 +77,11 @@
 - (NSArray *)availablePACBypassNames
 {
     NSMutableArray *names = [NSMutableArray new];
+    if (![DOEnvironmentManager sharedManager].isPACBypassRequired) {
+        [names addObject:DOLocalizedString(@"None")];
+    }
     for (DOExploit *exploit in _availablePACBypasses) {
         [names addObject:exploit.name];
-    }
-    if (![DOEnvironmentManager sharedManager].isPACBypassRequired) {
-        [names addObject:@"None"];
     }
     return names;
 }
@@ -124,10 +124,12 @@
         SEL defGetter = @selector(readPreferenceValue:);
         SEL defSetter = @selector(setPreferenceValue:specifier:);
         
-        _availableKernelExploits = [exploitManager availableExploitsForType:EXPLOIT_TYPE_KERNEL].allObjects;
+        NSSortDescriptor *prioritySortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"priority" ascending:NO];
+        
+        _availableKernelExploits = [[exploitManager availableExploitsForType:EXPLOIT_TYPE_KERNEL] sortedArrayUsingDescriptors:@[prioritySortDescriptor]];
         if (envManager.isArm64e) {
-            _availablePACBypasses = [exploitManager availableExploitsForType:EXPLOIT_TYPE_PAC].allObjects;
-            _availablePPLBypasses = [exploitManager availableExploitsForType:EXPLOIT_TYPE_PPL].allObjects;
+            _availablePACBypasses = [[exploitManager availableExploitsForType:EXPLOIT_TYPE_PAC] sortedArrayUsingDescriptors:@[prioritySortDescriptor]];
+            _availablePPLBypasses = [[exploitManager availableExploitsForType:EXPLOIT_TYPE_PPL] sortedArrayUsingDescriptors:@[prioritySortDescriptor]];
         }
         
         PSSpecifier *headerSpecifier = [PSSpecifier emptyGroupSpecifier];
@@ -200,6 +202,12 @@
             [idownloadSpecifier setProperty:@"idownloadEnabled" forKey:@"key"];
             [idownloadSpecifier setProperty:@NO forKey:@"default"];
             [specifiers addObject:idownloadSpecifier];
+            
+            PSSpecifier *appJitSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Apps_JIT") target:self set:@selector(setAppJITEnabled:specifier:) get:@selector(readAppJITEnabled:) detail:nil cell:PSSwitchCell edit:nil];
+            [appJitSpecifier setProperty:@YES forKey:@"enabled"];
+            [appJitSpecifier setProperty:@"appJITEnabled" forKey:@"key"];
+            [appJitSpecifier setProperty:@YES forKey:@"default"];
+            [specifiers addObject:appJitSpecifier];
             
             if (!envManager.isJailbroken && !envManager.isInstalledThroughTrollStore) {
                 PSSpecifier *removeJailbreakSwitchSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Button_Remove_Jailbreak") target:self set:@selector(setRemoveJailbreakEnabled:specifier:) get:defGetter detail:nil cell:PSSwitchCell edit:nil];
@@ -356,6 +364,25 @@
         [userspaceRebootAlertController addAction:rebootNowAction];
         [userspaceRebootAlertController addAction:rebootLaterAction];
         [self presentViewController:userspaceRebootAlertController animated:YES completion:nil];
+    }
+}
+
+- (id)readAppJITEnabled:(PSSpecifier *)specifier
+{
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    if (envManager.isJailbroken) {
+        bool v = jbclient_platform_jbsettings_get_bool("markAppsAsDebugged");
+        return @(v);
+    }
+    return [self readPreferenceValue:specifier];
+}
+
+- (void)setAppJITEnabled:(id)value specifier:(PSSpecifier *)specifier
+{
+    [self setPreferenceValue:value specifier:specifier];
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    if (envManager.isJailbroken) {
+        jbclient_platform_jbsettings_set_bool("markAppsAsDebugged", ((NSNumber *)value).boolValue);
     }
 }
 

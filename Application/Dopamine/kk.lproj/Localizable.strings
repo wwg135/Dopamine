@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Твиктерді енгізу";
 "Settings_iDownload" = "iDownload (Әзірлеуші ​​​​терминалы)";
 "Settings_Verbose_Logs" = "Кеңейтілген журналдар";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Джейлбрейкті жою";

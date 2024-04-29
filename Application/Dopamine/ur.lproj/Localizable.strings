@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Tweak Injection";
 "Settings_iDownload" = "iDownload (ڈویلپر ٹرمینل)";
 "Settings_Verbose_Logs" = "Verbose Logs";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = " جیل بریک اتارلو";

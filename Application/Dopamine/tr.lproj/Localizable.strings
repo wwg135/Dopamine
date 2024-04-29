@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Tweak Enjeksiyonu";
 "Settings_iDownload" = "iDownload (Geliştirici Terminali)";
 "Settings_Verbose_Logs" = "Sözlü Loglar";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Jailbreak'i Sil";

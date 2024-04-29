@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Внедрение твиков";
 "Settings_iDownload" = "iDownload (Терминал разработчика)";
 "Settings_Verbose_Logs" = "Расширенные логи";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Удалить джейлбрейк";

@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "트윅 주입";
 "Settings_iDownload" = "iDownload (개발자 터미널)";
 "Settings_Verbose_Logs" = "로그";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "탈옥 제거";

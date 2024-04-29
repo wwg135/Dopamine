@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Tweaks laden";
 "Settings_iDownload" = "iDownload (Entwickler-Terminal)";
 "Settings_Verbose_Logs" = "Detaillierte Logs";
+"Settings_Apps_JIT" = "Erlaube JIT in Apps";
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Jailbreak entfernen";

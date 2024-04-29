@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Wstrzykiwanie tweaków";
 "Settings_iDownload" = "iDownload (terminal dla deweloperów)";
 "Settings_Verbose_Logs" = "Logi verbose";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Usuń jailbreak";

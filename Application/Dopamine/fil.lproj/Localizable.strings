@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Tweak Injection";
 "Settings_iDownload" = "iDownload (Terminal ng Developer)";
 "Settings_Verbose_Logs" = "Mga Verbose Logs";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Tanggalin ang Jailbreak";

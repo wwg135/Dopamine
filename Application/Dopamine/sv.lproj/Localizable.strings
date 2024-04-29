@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Tweak Injection";
 "Settings_iDownload" = "iDownload (Terminal för utvecklare)";
 "Settings_Verbose_Logs" = "Omfattande loggar";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Ta Bot Jailbreak";

@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "تشغيل الأدوات";
 "Settings_iDownload" = "iDownload (محطة المطور)";
 "Settings_Verbose_Logs" = "السجلات المطولة";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "إزالة الجيلبريك";

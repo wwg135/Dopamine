@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "載入插體";
 "Settings_iDownload" = "iDownload (開發者终端)";
 "Settings_Verbose_Logs" = "詳細日誌";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "移除越獄";

@@ -33,6 +33,10 @@ struct system_info {
 	} jailbreakInfo;
 
 	struct {
+		bool markAppsAsDebugged;
+	} jailbreakSettings;
+
+	struct {
 		// Functions
 		uint64_t perfmon_dev_open;
 		uint64_t vn_kqfilter;
@@ -231,6 +235,9 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, jailbreakInfo.usesPACBypass); \
 	iterator(ctx, jailbreakInfo.rootPath);
 
+#define JAILBREAK_SETTINGS_ITERATE(ctx, iterator) \
+	iterator(ctx, jailbreakSettings.markAppsAsDebugged);
+
 #define KERNEL_SYMBOLS_ITERATE(ctx, iterator) \
 	iterator(ctx, kernelSymbol.perfmon_dev_open); \
 	iterator(ctx, kernelSymbol.vn_kqfilter); \
@@ -369,6 +376,7 @@ extern struct system_info gSystemInfo;
 #define SYSTEM_INFO_ITERATE(ctx, iterator) \
 	KERNEL_CONSTANTS_ITERATE(ctx, iterator); \
 	JAILBREAK_INFO_ITERATE(ctx, iterator); \
+	JAILBREAK_SETTINGS_ITERATE(ctx, iterator); \
 	KERNEL_SYMBOLS_ITERATE(ctx, iterator); \
 	KERNEL_GADGETS_ITERATE(ctx, iterator); \
 	KERNEL_STRUCTS_ITERATE(ctx, iterator);
@@ -413,6 +421,7 @@ static void _safe_xpc_dictionary_set_string(xpc_object_t xdict, const char *name
 
 #define kconstant(name) (gSystemInfo.kernelConstant.name)
 #define jbinfo(name) (gSystemInfo.jailbreakInfo.name)
+#define jbsetting(name) (gSystemInfo.jailbreakSettings.name)
 #define ksymbol(name) (gSystemInfo.kernelSymbol.name ? (gSystemInfo.kernelConstant.slide + gSystemInfo.kernelSymbol.name) : 0)
 #define kgadget(name) (gSystemInfo.kernelGadget.name ? (gSystemInfo.kernelConstant.slide + gSystemInfo.kernelGadget.name) : 0)
 #define koffsetof(structname, member) (gSystemInfo.kernelStruct.structname.member)

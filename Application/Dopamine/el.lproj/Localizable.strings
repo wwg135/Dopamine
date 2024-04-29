@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Ενσωμάτωση Tweak";
 "Settings_iDownload" = "iDownload (Τερματικό προγραμματιστή)";
 "Settings_Verbose_Logs" = "Λεπτομερής καταγραφή";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Αφαίρεση Jailbreak";
