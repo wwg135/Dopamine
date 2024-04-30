@@ -42,6 +42,7 @@
 		<string>IOSurfaceRoot</string>
 		<string>IOSurfaceRootUserClient</string>
 		<string>AppleJPEGDriverUserClient</string>
+        <string>H11ANEInDirectPathClient</string>
 	</array>
 	<key>com.apple.developer.kernel.extended-virtual-addressing</key>
 	<true/>
