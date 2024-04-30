@@ -14,6 +14,7 @@
 #import "DOEnvironmentManager.h"
 #import "DOExploitManager.h"
 #import "DOPSListItemsController.h"
+#import "DOPSExploitListItemsController.h"
 #import "DOThemeManager.h"
 #import "DOSceneDelegate.h"
 
@@ -48,7 +49,7 @@
 {
     NSMutableArray *identifiers = [NSMutableArray new];
     for (DOExploit *exploit in _availableKernelExploits) {
-        [identifiers addObject:exploit.identfier];
+        [identifiers addObject:exploit.identifier];
     }
     return identifiers;
 }
@@ -65,11 +66,11 @@
 - (NSArray *)availablePACBypassIdentifiers
 {
     NSMutableArray *identifiers = [NSMutableArray new];
-    for (DOExploit *exploit in _availablePACBypasses) {
-        [identifiers addObject:exploit.identfier];
-    }
     if (![DOEnvironmentManager sharedManager].isPACBypassRequired) {
         [identifiers addObject:@"none"];
+    }
+    for (DOExploit *exploit in _availablePACBypasses) {
+        [identifiers addObject:exploit.identifier];
     }
     return identifiers;
 }
@@ -77,11 +78,11 @@
 - (NSArray *)availablePACBypassNames
 {
     NSMutableArray *names = [NSMutableArray new];
+    if (![DOEnvironmentManager sharedManager].isPACBypassRequired) {
+        [names addObject:DOLocalizedString(@"None")];
+    }
     for (DOExploit *exploit in _availablePACBypasses) {
         [names addObject:exploit.name];
-    }
-    if (![DOEnvironmentManager sharedManager].isPACBypassRequired) {
-        [names addObject:@"None"];
     }
     return names;
 }
@@ -90,7 +91,7 @@
 {
     NSMutableArray *identifiers = [NSMutableArray new];
     for (DOExploit *exploit in _availablePPLBypasses) {
-        [identifiers addObject:exploit.identfier];
+        [identifiers addObject:exploit.identifier];
     }
     return identifiers;
 }
@@ -124,10 +125,12 @@
         SEL defGetter = @selector(readPreferenceValue:);
         SEL defSetter = @selector(setPreferenceValue:specifier:);
         
-        _availableKernelExploits = [exploitManager availableExploitsForType:EXPLOIT_TYPE_KERNEL].allObjects;
+        NSSortDescriptor *prioritySortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"priority" ascending:NO];
+        
+        _availableKernelExploits = [[exploitManager availableExploitsForType:EXPLOIT_TYPE_KERNEL] sortedArrayUsingDescriptors:@[prioritySortDescriptor]];
         if (envManager.isArm64e) {
-            _availablePACBypasses = [exploitManager availableExploitsForType:EXPLOIT_TYPE_PAC].allObjects;
-            _availablePPLBypasses = [exploitManager availableExploitsForType:EXPLOIT_TYPE_PPL].allObjects;
+            _availablePACBypasses = [[exploitManager availableExploitsForType:EXPLOIT_TYPE_PAC] sortedArrayUsingDescriptors:@[prioritySortDescriptor]];
+            _availablePPLBypasses = [[exploitManager availableExploitsForType:EXPLOIT_TYPE_PPL] sortedArrayUsingDescriptors:@[prioritySortDescriptor]];
         }
         
         PSSpecifier *headerSpecifier = [PSSpecifier emptyGroupSpecifier];
@@ -143,11 +146,12 @@
                 
                 PSSpecifier *kernelExploitSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Kernel Exploit") target:self set:defSetter get:defGetter detail:nil cell:PSLinkListCell edit:nil];
                 [kernelExploitSpecifier setProperty:@YES forKey:@"enabled"];
-                [kernelExploitSpecifier setProperty:exploitManager.preferredKernelExploit.identfier forKey:@"default"];
-                kernelExploitSpecifier.detailControllerClass = [DOPSListItemsController class];
+                [kernelExploitSpecifier setProperty:exploitManager.preferredKernelExploit.identifier forKey:@"default"];
+                kernelExploitSpecifier.detailControllerClass = [DOPSExploitListItemsController class];
                 [kernelExploitSpecifier setProperty:@"availableKernelExploitIdentifiers" forKey:@"valuesDataSource"];
                 [kernelExploitSpecifier setProperty:@"availableKernelExploitNames" forKey:@"titlesDataSource"];
                 [kernelExploitSpecifier setProperty:@"selectedKernelExploit" forKey:@"key"];
+                [kernelExploitSpecifier setProperty:(_availableKernelExploits.firstObject.identifier ?: @"none") forKey:@"recommendedExploitIdentifier"];
                 [specifiers addObject:kernelExploitSpecifier];
                 
                 if (envManager.isArm64e) {
@@ -158,21 +162,23 @@
                         [pacBypassSpecifier setProperty:@"none" forKey:@"default"];
                     }
                     else {
-                        [pacBypassSpecifier setProperty:preferredPACBypass.identfier forKey:@"default"];
+                        [pacBypassSpecifier setProperty:preferredPACBypass.identifier forKey:@"default"];
                     }
-                    pacBypassSpecifier.detailControllerClass = [DOPSListItemsController class];
+                    pacBypassSpecifier.detailControllerClass = [DOPSExploitListItemsController class];
                     [pacBypassSpecifier setProperty:@"availablePACBypassIdentifiers" forKey:@"valuesDataSource"];
                     [pacBypassSpecifier setProperty:@"availablePACBypassNames" forKey:@"titlesDataSource"];
                     [pacBypassSpecifier setProperty:@"selectedPACBypass" forKey:@"key"];
+                    [pacBypassSpecifier setProperty:([envManager isPACBypassRequired] ? _availablePACBypasses.firstObject.identifier : @"none") forKey:@"recommendedExploitIdentifier"];
                     [specifiers addObject:pacBypassSpecifier];
                     
                     PSSpecifier *pplBypassSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"PPL Bypass") target:self set:defSetter get:defGetter detail:nil cell:PSLinkListCell edit:nil];
                     [pplBypassSpecifier setProperty:@YES forKey:@"enabled"];
-                    [pplBypassSpecifier setProperty:exploitManager.preferredPPLBypass.identfier forKey:@"default"];
-                    pplBypassSpecifier.detailControllerClass = [DOPSListItemsController class];
+                    [pplBypassSpecifier setProperty:exploitManager.preferredPPLBypass.identifier forKey:@"default"];
+                    pplBypassSpecifier.detailControllerClass = [DOPSExploitListItemsController class];
                     [pplBypassSpecifier setProperty:@"availablePPLBypassIdentifiers" forKey:@"valuesDataSource"];
                     [pplBypassSpecifier setProperty:@"availablePPLBypassNames" forKey:@"titlesDataSource"];
                     [pplBypassSpecifier setProperty:@"selectedPPLBypass" forKey:@"key"];
+                    [pplBypassSpecifier setProperty:(_availablePPLBypasses.firstObject.identifier ?: @"none") forKey:@"recommendedExploitIdentifier"];
                     [specifiers addObject:pplBypassSpecifier];
                 }
             }
@@ -206,6 +212,12 @@
             [idownloadSpecifier setProperty:@"idownloadEnabled" forKey:@"key"];
             [idownloadSpecifier setProperty:@NO forKey:@"default"];
             [specifiers addObject:idownloadSpecifier];
+            
+            PSSpecifier *appJitSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Apps_JIT") target:self set:@selector(setAppJITEnabled:specifier:) get:@selector(readAppJITEnabled:) detail:nil cell:PSSwitchCell edit:nil];
+            [appJitSpecifier setProperty:@YES forKey:@"enabled"];
+            [appJitSpecifier setProperty:@"appJITEnabled" forKey:@"key"];
+            [appJitSpecifier setProperty:@YES forKey:@"default"];
+            [specifiers addObject:appJitSpecifier];
             
             if (!envManager.isJailbroken && !envManager.isInstalledThroughTrollStore) {
                 PSSpecifier *removeJailbreakSwitchSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Button_Remove_Jailbreak") target:self set:@selector(setRemoveJailbreakEnabled:specifier:) get:defGetter detail:nil cell:PSSwitchCell edit:nil];
@@ -380,6 +392,25 @@
         [userspaceRebootAlertController addAction:rebootNowAction];
         [userspaceRebootAlertController addAction:rebootLaterAction];
         [self presentViewController:userspaceRebootAlertController animated:YES completion:nil];
+    }
+}
+
+- (id)readAppJITEnabled:(PSSpecifier *)specifier
+{
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    if (envManager.isJailbroken) {
+        bool v = jbclient_platform_jbsettings_get_bool("markAppsAsDebugged");
+        return @(v);
+    }
+    return [self readPreferenceValue:specifier];
+}
+
+- (void)setAppJITEnabled:(id)value specifier:(PSSpecifier *)specifier
+{
+    [self setPreferenceValue:value specifier:specifier];
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    if (envManager.isJailbroken) {
+        jbclient_platform_jbsettings_set_bool("markAppsAsDebugged", ((NSNumber *)value).boolValue);
     }
 }
 

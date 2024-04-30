@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Tweak-injektion";
 "Settings_iDownload" = "iDownload (Udviklerterminal)";
 "Settings_Verbose_Logs" = "Detaljerede logfiler";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Fjern Jailbreak";
@@ -83,6 +84,8 @@
 /*Kernel Exploit*/
 /*PPL Bypass*/
 /*PAC Bypass*/
+/*None*/
+/*Recommended*/
 
 // Credits
 "Credits_Button_Discord" = "Discord";

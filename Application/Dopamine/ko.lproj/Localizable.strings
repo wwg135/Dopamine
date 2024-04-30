@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "트윅 주입";
 "Settings_iDownload" = "iDownload (개발자 터미널)";
 "Settings_Verbose_Logs" = "로그";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "탈옥 제거";
@@ -83,6 +84,8 @@
 "Kernel Exploit" = "커널 익스플로잇";
 "PPL Bypass" = "PPL 우회";
 "PAC Bypass" = "PAC 우회";
+/*None*/
+/*Recommended*/
 
 // Credits
 "Credits_Button_Discord" = "Discord";

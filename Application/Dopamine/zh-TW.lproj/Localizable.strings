@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "載入插體";
 "Settings_iDownload" = "iDownload (開發者终端)";
 "Settings_Verbose_Logs" = "詳細日誌";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "移除越獄";
@@ -83,6 +84,8 @@
 "Kernel Exploit" = "核心漏洞";
 "PPL Bypass" = "繞過 PPL";
 "PAC Bypass" = "繞過 PAC";
+/*None*/
+/*Recommended*/
 
 // Credits
 "Credits_Button_Discord" = "Discord";
