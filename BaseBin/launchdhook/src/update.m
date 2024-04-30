@@ -190,4 +190,10 @@ void jbupdate_finalize_stage2(const char *prevVersion, const char *newVersion)
 	if (!access(JBRootPath("/basebin/.idownloadd_enabled"), F_OK)) {
 		remove(JBRootPath("/basebin/.idownloadd_enabled"));
 	}
+
+	if (strcmp(prevVersion, "2.1") < 0 && strcmp(newVersion, "2.1") >= 0) {
+		// Default value for this pref is true
+		// Set it during jbupdate if prev version is <2.1 and new version is >=2.1
+		gSystemInfo.jailbreakSettings.markAppsAsDebugged = true;
+	}
 }

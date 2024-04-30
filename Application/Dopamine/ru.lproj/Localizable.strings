@@ -41,6 +41,7 @@
 "Settings_Tweak_Injection" = "Внедрение твиков";
 "Settings_iDownload" = "iDownload (Терминал разработчика)";
 "Settings_Verbose_Logs" = "Расширенные логи";
+/*Settings_Apps_JIT*/
 
 // Settings Buttons
 "Button_Remove_Jailbreak" = "Удалить джейлбрейк";
@@ -64,8 +65,8 @@
 "Alert_Tweak_Injection_Toggled_Reboot_Now" = "Сейчас";
 "Alert_Tweak_Injection_Toggled_Reboot_Later" = "Потом";
 "Alert_Remove_Jailbreak_Title" = "Удаление джейлбрейка";
-"Alert_Remove_Jailbreak_Pressed_Body" = "Удаление джейлбрейка приведет к удалению всех файлов, связанных с джейлбрейком, но все обычные приложения, файлы и данные будут сохранены. Вы уверены, что хотите продолжить? Вы не сможете отменить это действие.";
-/*Alert_Remove_Jailbreak_Enabled_Body*/
+"Alert_Remove_Jailbreak_Pressed_Body" = "Удаление джейлбрейка приведёт к удалению всех файлов, связанных с джейлбрейком, но все обычные приложения, файлы и данные будут сохранены. Вы уверены, что хотите продолжить? Вы не сможете отменить это действие.";
+"Alert_Remove_Jailbreak_Enabled_Body" = "Нажимая \"Удаление джейлбрейка\", все файлы, связанные с джейлбрейком, будут удалены до следующего джейлбрейка. Все обычные приложения, файлы и данные будут сохранены. Вы уверены, что хотите продолжить? Вы не сможете отменить это действие.";
 /*Alert_Change_Mobile_Password_Body*/
 /*Password_Placeholder*/
 /*Repeat_Password_Placeholder*/
@@ -83,6 +84,8 @@
 "Kernel Exploit" = "Эксплоит Ядра";
 "PPL Bypass" = "Обход PPL";
 "PAC Bypass" = "Обход PAC";
+/*None*/
+/*Recommended*/
 
 // Credits
 "Credits_Button_Discord" = "Discord";
@@ -90,15 +93,15 @@
 "Credits_Button_Source_Code" = "Исходный код";
 
 // Logs
-"Initializing Environment" = "Инициализация переменной среды";
+"Initializing Environment" = "Инициализация среды";
 /*Initializing Protection*/
-"Loading BaseBin TrustCache" = "Загружаем BaseBin TrustCache";
-/*Applying Bind Mount*/
-"Removing Jailbreak" = "Удаляем джейлбрейк";
-"Elevating Privileges" = "Повышаем права";
-"Cleaning Up Exploits" = "Очищаем Эксплоиты";
-"Building Phys R/W Primitive" = "Создаем R/W примитивы";
-"Rebooting Userspace" = "Перезагружаем Userspace";
+"Loading BaseBin TrustCache" = "Получение кэша доверия BaseBin";
+"Applying Bind Mount" = "Применение монтирования с привязкой";
+"Removing Jailbreak" = "Удаление джейлбрейка";
+"Elevating Privileges" = "Повышение прав";
+"Cleaning Up Exploits" = "Очистка эксплоитов";
+"Building Phys R/W Primitive" = "Создание R/W примитива";
+"Rebooting Userspace" = "Перезагрузка Userspace";
 "Patchfinding" = "Поиск патчей";
 "Exploiting Kernel (%@)" = "Эксплуатация ядра (%@)";
 "Bypassing PAC (%@)" = "Обход PAC (%@)";

@@ -14,8 +14,8 @@ void print_usage(void)
 Available commands:\n\
 	proc_set_debugged <pid>\t\tMarks the process with the given pid as being debugged, allowing invalid code pages inside of it\n\
 	trustcache info\t\t\tPrint info about all jailbreak related trustcaches and the cdhashes contained in them\n\
-	trustcache clear\t\tClears any existing cdhashes from the jailbreaks trustcaches\n\
-	trustcache add <cdhash>\t\tAdd an arbitrary cdhash to the jailbreaks trustcaches\n\
+	trustcache clear\t\tClears all existing cdhashes from the jailbreaks trustcache\n\
+	trustcache add <cdhash>\t\tAdd an arbitrary cdhash to the jailbreaks trustcache\n\
 	update <tipa/basebin> <path>\tInitiates a jailbreak update either based on a TIPA or based on a basebin.tar file, TIPA installation depends on TrollStore, afterwards it triggers a userspace reboot\n");
 }
 
