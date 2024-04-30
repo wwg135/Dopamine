@@ -88,16 +88,26 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 	systemwide_get_boot_uuid(bootUUIDOut);
 
 	// Generate sandbox extensions for the requesting process
-	char *readExtension = sandbox_extension_issue_file_to_process("com.apple.app-sandbox.read", JBRootPath(""), 0, *processToken);
+
+	// transitd needs to write to /var/jb/var because rootlesshooks make it use that path instead of /var
+	bool writeAllowed = !strcmp(procPath, "/usr/libexec/transitd");
+
+	char *readWriteExtension = NULL;
+	if (writeAllowed) {
+		readWriteExtension = sandbox_extension_issue_file_to_process("com.apple.app-sandbox.read-write", JBRootPath(""), 0, *processToken);
+	}
+	else {
+		readWriteExtension = sandbox_extension_issue_file_to_process("com.apple.app-sandbox.read", JBRootPath(""), 0, *processToken);
+	}
 	char *execExtension = sandbox_extension_issue_file_to_process("com.apple.sandbox.executable", JBRootPath(""), 0, *processToken);
-	if (readExtension && execExtension) {
-		char extensionBuf[strlen(readExtension) + 1 + strlen(execExtension) + 1];
-		strcat(extensionBuf, readExtension);
+	if (readWriteExtension && execExtension) {
+		char extensionBuf[strlen(readWriteExtension) + 1 + strlen(execExtension) + 1];
+		strcpy(extensionBuf, readWriteExtension);
 		strcat(extensionBuf, "|");
 		strcat(extensionBuf, execExtension);
 		*sandboxExtensionsOut = strdup(extensionBuf);
 	}
-	if (readExtension) free(readExtension);
+	if (readWriteExtension) free(readWriteExtension);
 	if (execExtension) free(execExtension);
 
 	bool fullyDebugged = false;
