@@ -198,7 +198,7 @@ void jbupdate_finalize_stage2(const char *prevVersion, const char *newVersion)
 		gSystemInfo.jailbreakSettings.markAppsAsDebugged = true;
 
 #ifndef __arm64e__
-		// Initilaize kcall only after we have the offsets required for it
+		// Initialize kcall only after we have the offsets required for it
 		arm64_kcall_init();
 #endif
 	}
