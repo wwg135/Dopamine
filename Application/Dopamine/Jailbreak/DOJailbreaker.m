@@ -491,9 +491,9 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
     if (*errOut) return;
     *errOut = [self doExploitation];
     if (*errOut) return;
-
+    
     gSystemInfo.jailbreakSettings.markAppsAsDebugged = appJITEnabled;
- 
+
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Building Phys R/W Primitive") debug:NO];
     *errOut = [self buildPhysRWPrimitive];
     if (*errOut) return;

@@ -36,12 +36,8 @@
     NSNumber *checkforUpdate = [_preferenceManager preferenceValueForKey:@"checkForUpdateEnabled"];
     if ([checkforUpdate boolValue] == NO)
         return NO;
-        
-    NSArray *releases = [self getLatestReleases];
-    if (releases.count == 0)
-        return NO;
-    
-    NSString *latestVersion = releases[0][@"tag_name"];
+ 
+    NSString *latestVersion = [self getLatestReleaseTag];
     NSString *currentVersion = [self getLaunchedReleaseTag];
     return [self numericalRepresentationForVersion:latestVersion] > [self numericalRepresentationForVersion:currentVersion];
 }
@@ -60,7 +56,7 @@
     return numericalRepresentation;
 }
 
-- (NSArray *)getUpdatesInRange: (NSString *)start end: (NSString *)end
+- (NSArray *)getUpdatesInRange:(NSString *)start end:(NSString *)end
 {
     NSArray *releases = [self getLatestReleases];
     if (releases.count == 0)
@@ -71,6 +67,11 @@
     NSMutableArray *updates = [NSMutableArray new];
     for (NSDictionary *release in releases) {
         NSString *version = release[@"tag_name"];
+        NSNumber *prerelease = release[@"prerelease"];
+        if ([prerelease boolValue]) {
+            // Skip prereleases
+            continue;
+        }
         long long numericalVersion = [self numericalRepresentationForVersion:version];
         if (numericalVersion > startVersion && numericalVersion <= endVersion) {
             [updates addObject:release];
@@ -126,9 +127,14 @@
 - (NSString*)getLatestReleaseTag
 {
     NSArray *releases = [self getLatestReleases];
-    if (releases.count == 0)
-        return nil;
-    return releases[0][@"tag_name"];
+    for (NSDictionary *release in releases) {
+        NSNumber *prerelease = release[@"prerelease"];
+        if ([prerelease boolValue]) {
+            continue;
+        }
+        return release[@"tag_name"];
+    }
+    return nil;
 }
 
 - (NSString*)getLaunchedReleaseTag
