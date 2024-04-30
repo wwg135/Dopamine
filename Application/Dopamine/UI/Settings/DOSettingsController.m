@@ -17,7 +17,7 @@
 #import "DOPSExploitListItemsController.h"
 #import "DOThemeManager.h"
 #import "DOSceneDelegate.h"
-
+#import "DOPreferenceManager.h"
 
 @interface DOSettingsController ()
 
@@ -29,6 +29,9 @@
 {
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
+
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -135,7 +138,7 @@
         
         PSSpecifier *headerSpecifier = [PSSpecifier emptyGroupSpecifier];
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
-        [headerSpecifier setProperty:[NSString stringWithFormat:@"Settings"] forKey:@"title"];
+        [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
         
         if (envManager.isSupported) {
@@ -206,13 +209,13 @@
             [idownloadSpecifier setProperty:@"idownloadEnabled" forKey:@"key"];
             [idownloadSpecifier setProperty:@NO forKey:@"default"];
             [specifiers addObject:idownloadSpecifier];
-            
+ 
             PSSpecifier *appJitSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Apps_JIT") target:self set:@selector(setAppJITEnabled:specifier:) get:@selector(readAppJITEnabled:) detail:nil cell:PSSwitchCell edit:nil];
             [appJitSpecifier setProperty:@YES forKey:@"enabled"];
             [appJitSpecifier setProperty:@"appJITEnabled" forKey:@"key"];
             [appJitSpecifier setProperty:@YES forKey:@"default"];
             [specifiers addObject:appJitSpecifier];
-            
+ 
             if (!envManager.isJailbroken && !envManager.isInstalledThroughTrollStore) {
                 PSSpecifier *removeJailbreakSwitchSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Button_Remove_Jailbreak") target:self set:@selector(setRemoveJailbreakEnabled:specifier:) get:defGetter detail:nil cell:PSSwitchCell edit:nil];
                 [removeJailbreakSwitchSpecifier setProperty:@YES forKey:@"enabled"];
@@ -462,6 +465,7 @@
     UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Remove_Jailbreak_Title") message:DOLocalizedString(@"Alert_Remove_Jailbreak_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *uninstallAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [[DOEnvironmentManager sharedManager] deleteBootstrap];
+        [[DOUIManager sharedInstance] resetPackageManagers];
         if ([DOEnvironmentManager sharedManager].isJailbroken) {
             [[DOEnvironmentManager sharedManager] reboot];
         }
@@ -487,5 +491,38 @@
     [self reloadSpecifiers];
 }
 
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        CGPoint pressLocation = [gesture locationInView:self.view];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        [alertController addAction:[UIAlertAction actionWithTitle:[self updateTitle] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+             [self checkUpdate]; 
+        }]];
+
+        DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+        if (envManager.isJailbroken) {
+            [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [[DOEnvironmentManager sharedManager] reboot];
+            }]];
+        }
+
+        [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
+- (void)checkUpdate {
+    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"checkForUpdateEnabled" fallback:NO];
+    if (checkEnabled) {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:@"checkForUpdateEnabled"];
+    } else {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:@"checkForUpdateEnabled"];
+    }
+}
+
+- (NSString*)updateTitle {
+    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"checkForUpdateEnabled" fallback:NO];
+    return checkEnabled ? @"关闭更新" : @"启用更新";
+}
 
 @end
