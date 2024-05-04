@@ -1,6 +1,7 @@
 #include "info.h"
 #import <Foundation/Foundation.h>
 #import "util.h"
+#import <sys/stat.h>
 
 NSString *NSJBRootPath(NSString *relativePath)
 {
