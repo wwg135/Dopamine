@@ -138,7 +138,11 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 	};
 	int sandboxExtensionsCount = sizeof(sandboxExtensionsArr) / sizeof(char *);
 	*sandboxExtensionsOut = combine_strings('|', sandboxExtensionsArr, sandboxExtensionsCount);
-	for (int i = 0; i < sandboxExtensionsCount; i++) free(sandboxExtensionsArr[i]);
+	for (int i = 0; i < sandboxExtensionsCount; i++) {
+		if (sandboxExtensionsArr[i]) {
+			free(sandboxExtensionsArr[i]);
+		}
+	}
 
 	bool fullyDebugged = false;
 	if (stringStartsWith(procPath, "/private/var/containers/Bundle/Application") || stringStartsWith(procPath, JBRootPath("/Applications"))) {
