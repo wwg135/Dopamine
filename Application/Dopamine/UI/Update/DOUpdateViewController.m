@@ -166,8 +166,13 @@
         NSDictionary *release = (NSDictionary*)obj;
         NSString *name = release[@"name"];
         NSString *body = release[@"body"];
-        [changelogText appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", name] attributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor], NSParagraphStyleAttributeName:paragraphStyle}]];
-        [changelogText appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n%@\n\n\n", body] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:16], NSForegroundColorAttributeName : [UIColor whiteColor], NSParagraphStyleAttributeName:paragraphStyle}]];
+        BOOL envUpdate = [[DOUIManager sharedInstance] environmentUpdateAvailable];
+        if (envUpdate) {
+            [changelogText appendAttributedString:[[NSAttributedString alloc] initWithString:DOLocalizedString(@"Mismatching_Environment_Version_Update_Body") attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor], NSParagraphStyleAttributeName:paragraphStyle}]];
+        } else {
+            [changelogText appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", name] attributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor], NSParagraphStyleAttributeName:paragraphStyle}]];
+            [changelogText appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n%@\n\n\n", body] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:16], NSForegroundColorAttributeName : [UIColor whiteColor], NSParagraphStyleAttributeName:paragraphStyle}]];
+        }
         if (idx == 0)
         {
             NSArray *assets = release[@"assets"];
