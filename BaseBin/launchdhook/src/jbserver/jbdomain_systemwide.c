@@ -218,6 +218,26 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 		proc_csflags_set(proc, CS_PLATFORM_BINARY);
 	}
 
+#ifdef __arm64e__
+	// On arm64e every image has a trust level associated with it
+	// "In trust cache" trust levels have higher runtime enforcements, this can be a problem for some tools as Dopamine trustcaches everything that's adhoc signed
+	// So we add the ability for a binary to get a different trust level using the "jb.pmap_cs_custom_trust" entitlement
+	// This is for binaries that rely on weaker PMAP_CS checks (e.g. Lua trampolines need it)
+	xpc_object_t customTrustObj = xpc_copy_entitlement_for_token("jb.pmap_cs.custom_trust", processToken);
+	if (customTrustObj) {
+		if (xpc_get_type(customTrustObj) == XPC_TYPE_STRING) {
+			const char *customTrustStr = xpc_string_get_string_ptr(customTrustObj);
+			uint32_t customTrust = pmap_cs_trust_string_to_int(customTrustStr);
+			if (customTrust >= 2) {
+				uint64_t mainCodeDir = proc_find_main_binary_code_dir(proc);
+				if (mainCodeDir) {
+					kwrite32(mainCodeDir + koffsetof(pmap_cs_code_directory, trust), customTrust);
+				}
+			}
+		}
+	}
+#endif
+
 	proc_rele(proc);
 	return 0;
 }
