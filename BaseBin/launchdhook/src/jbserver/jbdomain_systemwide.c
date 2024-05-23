@@ -67,7 +67,7 @@ static int systemwide_get_boot_uuid(char **bootUUIDOut)
 	return 0;
 }
 
-static int trust_file(const char *filePath, const char *dlopenCallerImagePath, const char *dlopenCallerExecutablePath)
+static int trust_file(const char *filePath, const char *dlopenCallerImagePath, const char *dlopenCallerExecutablePath, xpc_object_t preferredArchsArray)
 {
 	// Shared logic between client and server, implemented in client
 	// This should essentially mean these files never reach us in the first place
@@ -76,9 +76,23 @@ static int trust_file(const char *filePath, const char *dlopenCallerImagePath, c
 
 	if (can_skip_trusting_file(filePath, (bool)dlopenCallerExecutablePath, false)) return -1;
 
+	size_t preferredArchCount = 0;
+	if (preferredArchsArray) preferredArchCount = xpc_array_get_count(preferredArchsArray);
+	uint32_t preferredArchTypes[preferredArchCount];
+	uint32_t preferredArchSubtypes[preferredArchCount];
+	for (size_t i = 0; i < preferredArchCount; i++) {
+		preferredArchTypes[i] = 0;
+		preferredArchSubtypes[i] = UINT32_MAX;
+		xpc_object_t arch = xpc_array_get_value(preferredArchsArray, i);
+		if (xpc_get_type(arch) == XPC_TYPE_DICTIONARY) {
+			preferredArchTypes[i] = xpc_dictionary_get_uint64(arch, "type");
+			preferredArchSubtypes[i] = xpc_dictionary_get_uint64(arch, "subtype");
+		}
+	}
+
 	cdhash_t *cdhashes = NULL;
 	uint32_t cdhashesCount = 0;
-	macho_collect_untrusted_cdhashes(filePath, dlopenCallerImagePath, dlopenCallerExecutablePath, &cdhashes, &cdhashesCount);
+	macho_collect_untrusted_cdhashes(filePath, dlopenCallerImagePath, dlopenCallerExecutablePath, preferredArchTypes, preferredArchSubtypes, preferredArchCount, &cdhashes, &cdhashesCount);
 	if (cdhashes && cdhashesCount > 0) {
 		jb_trustcache_add_cdhashes(cdhashes, cdhashesCount);
 		free(cdhashes);
@@ -87,9 +101,9 @@ static int trust_file(const char *filePath, const char *dlopenCallerImagePath, c
 }
 
 // Not static because launchd will directly call this from it's posix_spawn hook
-int systemwide_trust_binary(const char *binaryPath)
+int systemwide_trust_binary(const char *binaryPath, xpc_object_t preferredArchsArray)
 {
-	return trust_file(binaryPath, NULL, NULL);
+	return trust_file(binaryPath, NULL, NULL, preferredArchsArray);
 }
 
 static int systemwide_trust_library(audit_token_t *processToken, const char *libraryPath, const char *callerLibraryPath)
@@ -105,7 +119,7 @@ static int systemwide_trust_library(audit_token_t *processToken, const char *lib
 	// This is to support dlopen("@executable_path/whatever", RTLD_NOW) and stuff like that
 	// (Yes that is a thing >.<)
 	// Also we need to pass the path of the image that called dlopen due to @loader_path, sigh...
-	return trust_file(libraryPath, callerLibraryPath, callerPath);
+	return trust_file(libraryPath, callerLibraryPath, callerPath, NULL);
 }
 
 static int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
@@ -343,6 +357,7 @@ struct jbserver_domain gSystemwideDomain = {
 			.handler = systemwide_trust_binary,
 			.args = (jbserver_arg[]){
 				{ .name = "binary-path", .type = JBS_TYPE_STRING, .out = false },
+				{ .name = "preferred-archs", .type = JBS_TYPE_ARRAY, .out = false },
 				{ 0 },
 			},
 		},

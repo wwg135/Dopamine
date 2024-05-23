@@ -53,7 +53,7 @@ int exec_cmd_suspended(pid_t *pidOut, const char *binary, ...);
 int exec_cmd_root(const char *binary, ...);
 
 #define exec_cmd_trusted(x, args ...) ({ \
-    jbclient_trust_binary(x); \
+    jbclient_trust_binary(x, NULL); \
     int retval; \
     retval = exec_cmd(x, args); \
     retval; \
