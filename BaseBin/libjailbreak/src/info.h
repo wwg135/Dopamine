@@ -379,6 +379,10 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.pmap_cs_region.pmap_cs_region_next); \
 	iterator(ctx, kernelStruct.pmap_cs_region.cd_entry); \
 	\
+	iterator(ctx, kernelStruct.pmap_cs_code_directory.pmap_cs_code_directory_next); \
+	iterator(ctx, kernelStruct.pmap_cs_code_directory.main_binary); \
+	iterator(ctx, kernelStruct.pmap_cs_code_directory.trust); \
+	\
 	iterator(ctx, kernelStruct.pt_desc.pmap); \
 	iterator(ctx, kernelStruct.pt_desc.va); \
 	iterator(ctx, kernelStruct.pt_desc.ptd_info); \
