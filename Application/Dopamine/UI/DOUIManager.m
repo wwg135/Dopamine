@@ -7,6 +7,7 @@
 
 #import "DOUIManager.h"
 #import "DOEnvironmentManager.h"
+#import "NSString+Version.h"
 #import <pthread.h>
 
 @implementation DOUIManager
@@ -35,20 +36,7 @@
 {
     NSString *latestVersion = [self getLatestReleaseTag];
     NSString *currentVersion = [self getLaunchedReleaseTag];
-    return [self numericalRepresentationForVersion:latestVersion] > [self numericalRepresentationForVersion:currentVersion];
-}
-
-- (long long)numericalRepresentationForVersion:(NSString*)version {
-    long long numericalRepresentation = 0;
-
-    NSArray *components = [version componentsSeparatedByCharactersInSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]];
-    while (components.count < 3)
-        components = [components arrayByAddingObject:@"0"];
-
-    numericalRepresentation |= [components[0] integerValue] << 16;
-    numericalRepresentation |= [components[1] integerValue] << 8;
-    numericalRepresentation |= [components[2] integerValue];
-    return numericalRepresentation;
+    return [latestVersion numericalVersionRepresentation] > [currentVersion numericalVersionRepresentation];
 }
 
 - (NSArray *)getUpdatesInRange:(NSString *)start end:(NSString *)end
@@ -57,8 +45,8 @@
     if (releases.count == 0)
         return @[];
 
-    long long startVersion = [self numericalRepresentationForVersion:start];
-    long long endVersion = [self numericalRepresentationForVersion:end];
+    long long startVersion = [start numericalVersionRepresentation];
+    long long endVersion = [end numericalVersionRepresentation];
     NSMutableArray *updates = [NSMutableArray new];
     for (NSDictionary *release in releases) {
         NSString *version = release[@"tag_name"];
@@ -67,7 +55,7 @@
             // Skip prereleases
             continue;
         }
-        long long numericalVersion = [self numericalRepresentationForVersion:version];
+        long long numericalVersion = [version numericalVersionRepresentation];
         if (numericalVersion > startVersion && numericalVersion <= endVersion) {
             [updates addObject:release];
         }
@@ -99,9 +87,11 @@
 {
     if (![[DOEnvironmentManager sharedManager] jailbrokenVersion])
         return NO;
-    long long jailbrokenVersion = [self numericalRepresentationForVersion:[[DOEnvironmentManager sharedManager] jailbrokenVersion]];
-    long long launchedVersion = [self numericalRepresentationForVersion:[self getLaunchedReleaseTag]];
-    return launchedVersion > jailbrokenVersion;
+
+    NSString *jailbrokenVersion = [[DOEnvironmentManager sharedManager] jailbrokenVersion];
+    NSString *launchedVersion = [self getLaunchedReleaseTag];
+    
+    return [launchedVersion numericalVersionRepresentation] > [jailbrokenVersion numericalVersionRepresentation];
 }
 
 - (bool)launchedReleaseNeedsManualUpdate
