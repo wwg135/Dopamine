@@ -319,7 +319,7 @@ __attribute__((constructor)) static void initializer(void)
 	}
 
 	// Initialize stuff neccessary for sandbox_apply hook
-	gLibSandboxHandle = dlopen("/usr/lib/libsandbox.1.dylib", RTLD_NOW);
+	gLibSandboxHandle = dlopen("/usr/lib/libsandbox.1.dylib", RTLD_FIRST | RTLD_LOCAL | RTLD_LAZY);
 	sandbox_apply_orig = dlsym(gLibSandboxHandle, "sandbox_apply");
 
 	// Apply dyld hooks
