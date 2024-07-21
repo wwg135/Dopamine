@@ -3,15 +3,6 @@
 #include <xpc/xpc.h>
 
 #define HOOK_DYLIB_PATH "/usr/lib/systemhook.dylib"
-extern char *JB_BootUUID;
-extern char *JB_RootPath;
-
-#define JBRootPath(path) ({ \
-	char *outPath = alloca(PATH_MAX); \
-	strlcpy(outPath, JB_RootPath, PATH_MAX); \
-	strlcat(outPath, path, PATH_MAX); \
-	(outPath); \
-})
 
 #define SYS_execve 0x3B
 #define SYS_posix_spawn 0xF4

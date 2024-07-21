@@ -144,11 +144,11 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 	// Generate sandbox extensions for the requesting process
 	char *sandboxExtensionsArr[] = {
 		// Make /var/jb readable and executable
-		sandbox_extension_issue_file_to_process("com.apple.app-sandbox.read", JBRootPath(""), 0, *processToken),
-		sandbox_extension_issue_file_to_process("com.apple.sandbox.executable", JBRootPath(""), 0, *processToken),
+		sandbox_extension_issue_file_to_process("com.apple.app-sandbox.read", JBROOT_PATH(""), 0, *processToken),
+		sandbox_extension_issue_file_to_process("com.apple.sandbox.executable", JBROOT_PATH(""), 0, *processToken),
 
 		// Make /var/jb/var/mobile writable
-		sandbox_extension_issue_file_to_process("com.apple.app-sandbox.read-write", JBRootPath("/var/mobile"), 0, *processToken),
+		sandbox_extension_issue_file_to_process("com.apple.app-sandbox.read-write", JBROOT_PATH("/var/mobile"), 0, *processToken),
 	};
 	int sandboxExtensionsCount = sizeof(sandboxExtensionsArr) / sizeof(char *);
 	*sandboxExtensionsOut = combine_strings('|', sandboxExtensionsArr, sandboxExtensionsCount);
@@ -159,7 +159,7 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 	}
 
 	bool fullyDebugged = false;
-	if (stringStartsWith(procPath, "/private/var/containers/Bundle/Application") || stringStartsWith(procPath, JBRootPath("/Applications"))) {
+	if (stringStartsWith(procPath, "/private/var/containers/Bundle/Application") || stringStartsWith(procPath, JBROOT_PATH("/Applications"))) {
 		// This is an app, enable CS_DEBUGGED based on user preference
 		if (jbsetting(markAppsAsDebugged)) {
 			fullyDebugged = true;

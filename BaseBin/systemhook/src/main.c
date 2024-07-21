@@ -6,25 +6,18 @@
 #include <paths.h>
 #include <util.h>
 #include <ptrauth.h>
-#include "sandbox.h"
 #include <libjailbreak/jbclient_xpc.h>
 #include <libjailbreak/codesign.h>
+#include <libjailbreak/jbroot.h>
 #include "litehook.h"
-
-int necp_match_policy(uint8_t *parameters, size_t parameters_size, void *returned_result);
-int necp_open(int flags);
-int necp_client_action(int necp_fd, uint32_t action, uuid_t client_id, size_t client_id_len, uint8_t *buffer, size_t buffer_size);
-int necp_session_open(int flags);
-int necp_session_action(int necp_fd, uint32_t action, uint8_t *in_buffer, size_t in_buffer_length, uint8_t *out_buffer, size_t out_buffer_length);
-
-int ptrace(int request, pid_t pid, caddr_t addr, int data);
-#define PT_ATTACH       10      /* trace some running process */
-#define PT_ATTACHEXC    14      /* attach to running process with signal exception */
-
-extern char **environ;
+#include "sandbox.h"
+#include "private.h"
 
 bool gFullyDebugged = false;
 static void *gLibSandboxHandle;
+char *JB_BootUUID = NULL;
+char *JB_RootPath = NULL;
+char *get_jbroot(void) { return JB_RootPath; }
 
 static char gExecutablePath[PATH_MAX];
 static int load_executable_path(void)
@@ -221,7 +214,7 @@ int csops_audittoken_hook(pid_t pid, unsigned int ops, void *useraddr, size_t us
 
 bool shouldEnableTweaks(void)
 {
-	if (access(JBRootPath("/basebin/.safe_mode"), F_OK) == 0) {
+	if (access(JBROOT_PATH("/basebin/.safe_mode"), F_OK) == 0) {
 		return false;
 	}
 
@@ -343,7 +336,7 @@ __attribute__((constructor)) static void initializer(void)
 	// Since pages have been modified in this process, we need to load forkfix to ensure forking will work
 	// Optimization: If the process cannot fork at all due to sandbox, we don't need to do anything
 	if (sandbox_check(getpid(), "process-fork", SANDBOX_CHECK_NO_REPORT, NULL) == 0) {
-		dlopen(JBRootPath("/basebin/forkfix.dylib"), RTLD_NOW);
+		dlopen(JBROOT_PATH("/basebin/forkfix.dylib"), RTLD_NOW);
 	}
 #endif
 
@@ -352,10 +345,10 @@ __attribute__((constructor)) static void initializer(void)
 		if (!strcmp(gExecutablePath, "/usr/sbin/cfprefsd") ||
 			!strcmp(gExecutablePath, "/System/Library/CoreServices/SpringBoard.app/SpringBoard") ||
 			!strcmp(gExecutablePath, "/usr/libexec/lsd")) {
-			dlopen(JBRootPath("/basebin/rootlesshooks.dylib"), RTLD_NOW);
+			dlopen(JBROOT_PATH("/basebin/rootlesshooks.dylib"), RTLD_NOW);
 		}
 		else if (!strcmp(gExecutablePath, "/usr/libexec/watchdogd")) {
-			dlopen(JBRootPath("/basebin/watchdoghook.dylib"), RTLD_NOW);
+			dlopen(JBROOT_PATH("/basebin/watchdoghook.dylib"), RTLD_NOW);
 		}
 
 #ifndef __arm64e__
