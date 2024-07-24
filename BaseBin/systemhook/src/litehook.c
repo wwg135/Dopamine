@@ -15,7 +15,7 @@
 #include <mach-o/dyld_images.h>
 #include <sys/syslimits.h>
 #include <dispatch/dispatch.h>
-#include "dyld_cache_format.h"
+#include <dyld_cache_format.h>
 
 #ifdef __arm64e__
 static uint64_t __attribute((naked)) __xpaci(uint64_t a)
