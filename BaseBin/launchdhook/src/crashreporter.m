@@ -128,15 +128,18 @@ const char *crashreporter_string_for_code(int code)
 void crashreporter_dump_backtrace_line(FILE *f, vm_address_t addr)
 {
 	Dl_info info;
-	dladdr((void *)addr, &info);
+	if (dladdr((void *)addr, &info) != 0) {
+		const char *sname = info.dli_sname;
+		const char *fname = info.dli_fname;
+		if (!sname) {
+			sname = "<unexported>";
+		}
 
-	const char *sname = info.dli_sname;
-	const char *fname = info.dli_fname;
-	if (!sname) {
-		sname = "<unexported>";
+		fprintf(f, "0x%lX: %s (0x%lX + 0x%lX) (%s(0x%lX) + 0x%lX)\n", addr, sname, (vm_address_t)info.dli_saddr, addr - (vm_address_t)info.dli_saddr, fname, (vm_address_t)info.dli_fbase, addr - (vm_address_t)info.dli_fbase);
 	}
-
-	fprintf(f, "0x%lX: %s (0x%lX + 0x%lX) (%s(0x%lX) + 0x%lX)\n", addr, sname, (vm_address_t)info.dli_saddr, addr - (vm_address_t)info.dli_saddr, fname, (vm_address_t)info.dli_fbase, addr - (vm_address_t)info.dli_fbase);
+	else {
+		fprintf(f, "0x%lX (no association)\n", addr);
+	}
 }
 
 FILE *crashreporter_open_outfile(const char *source, char **nameOut)
