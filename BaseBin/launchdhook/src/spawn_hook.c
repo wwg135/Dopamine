@@ -61,7 +61,7 @@ int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 			fclose(f);
 #endif
 
-			// But before, we want to stash the primitives in boomerang
+			// Before the userspace reboot, we want to stash the primitives into boomerang
 			boomerang_stashPrimitives();
 
 			// Fix Xcode debugging being broken after the userspace reboot
@@ -120,6 +120,7 @@ int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 #endif
 
 	// We can't support injection into processes that get spawned before the launchd XPC server is up
+	// (Technically we could but there is little reason to, since it requires additional work)
 	if (gInEarlyBoot) {
 		if (!strcmp(path, "/usr/libexec/xpcproxy")) {
 			// The spawned process being xpcproxy indicates that the launchd XPC server is up
