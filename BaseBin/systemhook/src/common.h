@@ -14,6 +14,12 @@
 #define SYS_necp_session_open 0x20A
 #define SYS_necp_session_action 0x20B
 
+typedef enum 
+{
+	kSpawnConfigDontInject = 1 << 0,
+	kSpawnConfigDontTrust = 1 << 1
+} kSpawnConfig;
+
 struct _posix_spawn_args_desc {
 	size_t attr_size;
 	posix_spawnattr_t attrp;
@@ -46,8 +52,8 @@ struct _posix_spawn_args_desc {
 int __posix_spawn(pid_t *restrict pid, const char *restrict path, struct _posix_spawn_args_desc *desc, char *const argv[restrict], char *const envp[restrict]);
 int __execve(const char *path, char *const argv[], char *const envp[]);
 
-bool stringStartsWith(const char *str, const char* prefix);
-bool stringEndsWith(const char* str, const char* suffix);
+bool string_has_prefix(const char *str, const char* prefix);
+bool string_has_suffix(const char* str, const char* suffix);
 
 int __posix_spawn_orig(pid_t *restrict pid, const char *restrict path, struct _posix_spawn_args_desc *desc, char *const argv[restrict], char * const envp[restrict]);
 

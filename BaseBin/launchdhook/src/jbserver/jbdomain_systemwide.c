@@ -11,8 +11,8 @@
 #include <libjailbreak/primitives.h>
 #include <libjailbreak/codesign.h>
 
-extern bool stringStartsWith(const char *str, const char* prefix);
-extern bool stringEndsWith(const char* str, const char* suffix);
+extern bool string_has_prefix(const char *str, const char* prefix);
+extern bool string_has_suffix(const char* str, const char* suffix);
 
 char *combine_strings(char separator, char **components, int count)
 {
@@ -159,7 +159,7 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 	}
 
 	bool fullyDebugged = false;
-	if (stringStartsWith(procPath, "/private/var/containers/Bundle/Application") || stringStartsWith(procPath, JBROOT_PATH("/Applications"))) {
+	if (string_has_prefix(procPath, "/private/var/containers/Bundle/Application") || string_has_prefix(procPath, JBROOT_PATH("/Applications"))) {
 		// This is an app, enable CS_DEBUGGED based on user preference
 		if (jbsetting(markAppsAsDebugged)) {
 			fullyDebugged = true;
@@ -220,7 +220,7 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 	}
 	// For the Dopamine app itself we want to give it a saved uid/gid of 0, unsandbox it and give it CS_PLATFORM_BINARY
 	// This is so that the buttons inside it can work when jailbroken, even if the app was not installed by TrollStore
-	else if (stringEndsWith(procPath, "/Dopamine.app/Dopamine")) {
+	else if (string_has_suffix(procPath, "/Dopamine.app/Dopamine")) {
 		// svuid = 0, svgid = 0
 		uint64_t ucred = proc_ucred(proc);
 		kwrite32(proc + koffsetof(proc, svuid), 0);

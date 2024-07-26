@@ -233,7 +233,7 @@ bool shouldEnableTweaks(void)
 		"Dopamine.app/Dopamine",
 	};
 	for (size_t i = 0; i < sizeof(tweaksDisabledPathSuffixes) / sizeof(const char*); i++) {
-		if (stringEndsWith(gExecutablePath, tweaksDisabledPathSuffixes[i])) return false;
+		if (string_has_suffix(gExecutablePath, tweaksDisabledPathSuffixes[i])) return false;
 	}
 
 	if (__builtin_available(iOS 16.0, *)) {

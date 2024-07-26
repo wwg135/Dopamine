@@ -21,7 +21,7 @@
 #define JETSAM_MULTIPLIER 3
 #define XPC_TIMEOUT 0.1 * NSEC_PER_SEC
 
-bool stringStartsWith(const char *str, const char* prefix)
+bool string_has_prefix(const char *str, const char* prefix)
 {
 	if (!str || !prefix) {
 		return false;
@@ -37,7 +37,7 @@ bool stringStartsWith(const char *str, const char* prefix)
 	return !strncmp(str, prefix, prefix_len);
 }
 
-bool stringEndsWith(const char* str, const char* suffix)
+bool string_has_suffix(const char* str, const char* suffix)
 {
 	if (!str || !suffix) {
 		return false;
@@ -53,40 +53,29 @@ bool stringEndsWith(const char* str, const char* suffix)
 	return !strcmp(str + str_len - suffix_len, suffix);
 }
 
-void enumeratePathString(const char *pathsString, void (^enumBlock)(const char *pathString, bool *stop))
+void string_enumerate_components(const char *string, const char *separator, void (^enumBlock)(const char *pathString, bool *stop))
 {
-	char *pathsCopy = strdup(pathsString);
-	char *pathString = strtok(pathsCopy, ":");
-	while (pathString != NULL) {
+	char *stringCopy = strdup(string);
+	char *curString = strtok(stringCopy, separator);
+	while (curString != NULL) {
 		bool stop = false;
-		enumBlock(pathString, &stop);
+		enumBlock(curString, &stop);
 		if (stop) break;
-		pathString = strtok(NULL, ":");
+		curString = strtok(NULL, separator);
 	}
-	free(pathsCopy);
+	free(stringCopy);
 }
 
-int __posix_spawn_orig(pid_t *restrict pid, const char *restrict path, struct _posix_spawn_args_desc *desc, char *const argv[restrict], char * const envp[restrict])
-{
-	return syscall(SYS_posix_spawn, pid, path, desc, argv, envp);
-}
-
-typedef enum 
-{
-	kBinaryConfigDontInject = 1 << 0,
-	kBinaryConfigDontProcess = 1 << 1
-} kBinaryConfig;
-
-kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
+static kSpawnConfig spawn_config_for_executable(const char* path, char *const argv[restrict])
 {
 	if (!strcmp(path, "/usr/libexec/xpcproxy")) {
 		if (argv) {
 			if (argv[0]) {
 				if (argv[1]) {
-					if (stringStartsWith(argv[1], "com.apple.WebKit.WebContent")) {
+					if (string_has_prefix(argv[1], "com.apple.WebKit.WebContent")) {
 						// The most sandboxed process on the system, we can't support it on iOS 16+ for now
 						if (__builtin_available(iOS 16.0, *)) {
-							return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+							return (kSpawnConfigDontInject | kSpawnConfigDontTrust);
 						}
 					}
 				}
@@ -105,10 +94,15 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 	size_t blacklistCount = sizeof(processBlacklist) / sizeof(processBlacklist[0]);
 	for (size_t i = 0; i < blacklistCount; i++)
 	{
-		if (!strcmp(processBlacklist[i], path)) return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+		if (!strcmp(processBlacklist[i], path)) return (kSpawnConfigDontInject | kSpawnConfigDontTrust);
 	}
 
 	return 0;
+}
+
+int __posix_spawn_orig(pid_t *restrict pid, const char *restrict path, struct _posix_spawn_args_desc *desc, char *const argv[restrict], char * const envp[restrict])
+{
+	return syscall(SYS_posix_spawn, pid, path, desc, argv, envp);
 }
 
 // 1. Ensure the binary about to be spawned and all of it's dependencies are trust cached
@@ -131,9 +125,9 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 	posix_spawnattr_t attr = NULL;
 	if (desc) attr = desc->attrp;
 
-	kBinaryConfig binaryConfig = configForBinary(path, argv);
+	kSpawnConfig spawnConfig = spawn_config_for_executable(path, argv);
 
-	if (!(binaryConfig & kBinaryConfigDontProcess)) {
+	if (!(spawnConfig & kSpawnConfigDontTrust)) {
 		bool preferredArchsSet = false;
 		cpu_type_t preferredTypes[4];
 		cpu_subtype_t preferredSubtypes[4];
@@ -170,11 +164,12 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 	const char *existingLibraryInserts = envbuf_getenv((const char **)envp, "DYLD_INSERT_LIBRARIES");
 	__block bool systemHookAlreadyInserted = false;
 	if (existingLibraryInserts) {
-		enumeratePathString(existingLibraryInserts, ^(const char *existingLibraryInsert, bool *stop) {
+		string_enumerate_components(existingLibraryInserts, ":", ^(const char *existingLibraryInsert, bool *stop) {
 			if (!strcmp(existingLibraryInsert, HOOK_DYLIB_PATH)) {
 				systemHookAlreadyInserted = true;
 			}
 			else {
+				// Upload everything already in DYLD_INSERT_LIBRARIES to trustcache aswell
 				trust_binary(existingLibraryInsert, NULL);
 			}
 		});
@@ -187,7 +182,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 	bool shouldInsertJBEnv = true;
 	bool hasSafeModeVariable = false;
 	do {
-		if (binaryConfig & kBinaryConfigDontInject) {
+		if (spawnConfig & kSpawnConfigDontInject) {
 			shouldInsertJBEnv = false;
 			break;
 		}
@@ -278,7 +273,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 			// 	if (!strcmp(path, "/usr/libexec/xpcproxy") && argv) {
 			// 		if (argv[0]) {
 			// 			if (argv[1]) {
-			// 				if (stringStartsWith(argv[1], "com.apple.WebKit.WebContent.")) {
+			// 				if (string_has_prefix(argv[1], "com.apple.WebKit.WebContent.")) {
 			// 					*(uint8_t *)(attrStruct + POSIX_SPAWNATTR_OFF_LAUNCH_TYPE) = 0;
 			// 				}
 			// 			}
@@ -320,7 +315,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 					newLibraryInsert[0] = '\0';
 
 					__block bool first = true;
-					enumeratePathString(existingLibraryInserts, ^(const char *existingLibraryInsert, bool *stop) {
+					string_enumerate_components(existingLibraryInserts, ":", ^(const char *existingLibraryInsert, bool *stop) {
 						if (strcmp(existingLibraryInsert, HOOK_DYLIB_PATH) != 0) {
 							if (first) {
 								strcpy(newLibraryInsert, existingLibraryInsert);
