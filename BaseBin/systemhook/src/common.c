@@ -75,7 +75,7 @@ static kSpawnConfig spawn_config_for_executable(const char* path, char *const ar
 					if (string_has_prefix(argv[1], "com.apple.WebKit.WebContent")) {
 						// The most sandboxed process on the system, we can't support it on iOS 16+ for now
 						if (__builtin_available(iOS 16.0, *)) {
-							return (kSpawnConfigDontInject | kSpawnConfigDontTrust);
+							return 0;
 						}
 					}
 				}
@@ -94,10 +94,10 @@ static kSpawnConfig spawn_config_for_executable(const char* path, char *const ar
 	size_t blacklistCount = sizeof(processBlacklist) / sizeof(processBlacklist[0]);
 	for (size_t i = 0; i < blacklistCount; i++)
 	{
-		if (!strcmp(processBlacklist[i], path)) return (kSpawnConfigDontInject | kSpawnConfigDontTrust);
+		if (!strcmp(processBlacklist[i], path)) return 0;
 	}
 
-	return 0;
+	return (kSpawnConfigInject | kSpawnConfigTrust);
 }
 
 int __posix_spawn_orig(pid_t *restrict pid, const char *restrict path, struct _posix_spawn_args_desc *desc, char *const argv[restrict], char * const envp[restrict])
@@ -127,7 +127,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 
 	kSpawnConfig spawnConfig = spawn_config_for_executable(path, argv);
 
-	if (!(spawnConfig & kSpawnConfigDontTrust)) {
+	if (spawnConfig & kSpawnConfigTrust) {
 		bool preferredArchsSet = false;
 		cpu_type_t preferredTypes[4];
 		cpu_subtype_t preferredSubtypes[4];
@@ -168,7 +168,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 			if (!strcmp(existingLibraryInsert, HOOK_DYLIB_PATH)) {
 				systemHookAlreadyInserted = true;
 			}
-			else if (!(spawnConfig & kSpawnConfigDontTrust)) {
+			else if (spawnConfig & kSpawnConfigTrust) {
 				// Upload everything already in DYLD_INSERT_LIBRARIES to trustcache aswell
 				trust_binary(existingLibraryInsert, NULL);
 			}
@@ -182,7 +182,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 	bool shouldInsertJBEnv = true;
 	bool hasSafeModeVariable = false;
 	do {
-		if (spawnConfig & kSpawnConfigDontInject) {
+		if (!(spawnConfig & kSpawnConfigInject)) {
 			shouldInsertJBEnv = false;
 			break;
 		}

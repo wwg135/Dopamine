@@ -16,8 +16,8 @@
 
 typedef enum 
 {
-	kSpawnConfigDontInject = 1 << 0,
-	kSpawnConfigDontTrust = 1 << 1
+	kSpawnConfigInject = 1 << 0,
+	kSpawnConfigTrust = 1 << 1,
 } kSpawnConfig;
 
 struct _posix_spawn_args_desc {
