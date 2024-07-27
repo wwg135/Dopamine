@@ -11,15 +11,9 @@
 #include "envbuf.h"
 #include "private.h"
 #include <libjailbreak/jbclient_xpc.h>
-
-#define JBD_MSG_SETUID_FIX 21
-#define JBD_MSG_PROCESS_BINARY 22
-#define JBD_MSG_DEBUG_ME 24
-#define JBD_MSG_FORK_FIX 25
-#define JBD_MSG_INTERCEPT_USERSPACE_PANIC 26
+#include <libjailbreak/jbserver_domains.h>
 
 #define JETSAM_MULTIPLIER 3
-#define XPC_TIMEOUT 0.1 * NSEC_PER_SEC
 
 bool string_has_prefix(const char *str, const char* prefix)
 {
