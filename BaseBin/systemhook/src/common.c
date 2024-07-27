@@ -13,8 +13,6 @@
 #include <libjailbreak/jbclient_xpc.h>
 #include <libjailbreak/jbserver_domains.h>
 
-#define JETSAM_MULTIPLIER 3
-
 bool string_has_prefix(const char *str, const char* prefix)
 {
 	if (!str || !prefix) {
@@ -109,7 +107,8 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 					   char *const envp[restrict],
 					   void *orig,
 					   int (*trust_binary)(const char *path, xpc_object_t preferredArchsArray),
-					   int (*set_process_debugged)(uint64_t pid, bool fullyDebugged))
+					   int (*set_process_debugged)(uint64_t pid, bool fullyDebugged),
+					   double jetsamMultiplier)
 {
 	int (*pspawn_orig)(pid_t *restrict, const char *restrict, struct _posix_spawn_args_desc *, char *const[restrict], char *const[restrict]) = orig;
 	if (!path) {
@@ -216,17 +215,20 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 		}
 	} while (0);
 
-	// If systemhook is being injected and jetsam limits are set, increase them by a factor of JETSAM_MULTIPLIER
-	/*if (shouldInsertJBEnv) {
+	// If systemhook is being injected and jetsam limits are set, increase them by a factor of jetsamMultiplier
+	if (shouldInsertJBEnv) {
 		uint8_t *attrStruct = (uint8_t *)attr;
 		if (attrStruct) {
-			int memlimit_active = *(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_ACTIVE);
-			if (memlimit_active != -1) {
-				*(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_ACTIVE) = memlimit_active * JETSAM_MULTIPLIER;
-			}
-			int memlimit_inactive = *(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_INACTIVE);
-			if (memlimit_inactive != -1) {
-				*(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_INACTIVE) = memlimit_inactive * JETSAM_MULTIPLIER;
+			if (jetsamMultiplier == 0 || isnan(jetsamMultiplier)) jetsamMultiplier = 2; // default value (2x)
+			if (jetsamMultiplier > 1) {
+				int memlimit_active = *(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_ACTIVE);
+				if (memlimit_active != -1) {
+					*(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_ACTIVE) = memlimit_active * jetsamMultiplier;
+				}
+				int memlimit_inactive = *(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_INACTIVE);
+				if (memlimit_inactive != -1) {
+					*(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_INACTIVE) = memlimit_inactive * jetsamMultiplier;
+				}
 			}
 
 			// On iOS 16, disable launch constraints
@@ -275,7 +277,7 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 			// 	}
 			// }
 		}
-	}*/
+	}
 
 	int retval = -1;
 

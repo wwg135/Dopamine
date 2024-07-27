@@ -253,12 +253,12 @@ bool should_enable_tweaks(void)
 
 int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path, struct _posix_spawn_args_desc *desc, char *const argv[restrict], char * const envp[restrict])
 {
-	return spawn_hook_common(pid, path, desc, argv, envp, (void *)__posix_spawn_orig, jbclient_trust_binary, jbclient_platform_set_process_debugged);
+	return spawn_hook_common(pid, path, desc, argv, envp, (void *)__posix_spawn_orig, jbclient_trust_binary, jbclient_platform_set_process_debugged, jbclient_jbsettings_get_double("jetsamMultiplier"));
 }
 
 int __posix_spawn_hook_with_filter(pid_t *restrict pid, const char *restrict path, char *const argv[restrict], char * const envp[restrict], struct _posix_spawn_args_desc *desc, int *ret)
 {
-	*ret = spawn_hook_common(pid, path, desc, argv, envp, (void *)__posix_spawn_orig, jbclient_trust_binary, jbclient_platform_set_process_debugged);
+	*ret = spawn_hook_common(pid, path, desc, argv, envp, (void *)__posix_spawn_orig, jbclient_trust_binary, jbclient_platform_set_process_debugged, jbclient_jbsettings_get_double("jetsamMultiplier"));
 	return 1;
 }
 
