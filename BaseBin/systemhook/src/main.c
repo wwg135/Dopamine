@@ -113,28 +113,30 @@ void *(*dyld_dlsym_orig)(void *dyld, void *handle, const char *name);
 void *dyld_dlsym_hook(void *dyld, void *handle, const char *name)
 {
 	if (handle == gLibSandboxHandle && !strcmp(name, "sandbox_apply")) {
-		// We abuse the fact that libsystem_c will call dlsym to get the sandbox_apply pointer here
+		// We abuse the fact that libsystem_sandbox will call dlsym to get the sandbox_apply pointer here
 		// Because we can just return a different pointer, we avoid doing instruction replacements
 		return sandbox_apply_hook;
 	}
 	return dyld_dlsym_orig(dyld, handle, name);
 }
 
-// TODO: Reenable in relevant processes
-/*int ptrace_hook(int request, pid_t pid, caddr_t addr, int data)
+int ptrace_hook(int request, pid_t pid, caddr_t addr, int data)
 {
-	int retval = ptrace(request, pid, addr, data);
+	int r = syscall(SYS_ptrace, request, pid, addr, data);
 
-	// ptrace works on any process when the parent is unsandboxed,
+	// ptrace works on any process when the caller is unsandboxed,
 	// but when the victim process does not have the get-task-allow entitlement,
 	// it will fail to set the debug flags, therefore we patch ptrace to manually apply them
-	if (retval == 0 && (request == PT_ATTACHEXC || request == PT_ATTACH)) {
+	// processes that have tweak injection enabled will have their debug flags already set
+	// this is only relevant for ones that don't, e.g. if you disable tweak injection on an app via choicy
+	// but still want to be able to attach a debugger to them
+	if (r == 0 && (request == PT_ATTACHEXC || request == PT_ATTACH)) {
 		jbclient_platform_set_process_debugged(pid, true);
 		jbclient_platform_set_process_debugged(getpid(), true);
 	}
 
-	return retval;
-}*/
+	return r;
+}
 
 #ifndef __arm64e__
 
@@ -349,6 +351,15 @@ __attribute__((constructor)) static void initializer(void)
 		}
 		else if (!strcmp(gExecutablePath, "/usr/libexec/watchdogd")) {
 			dlopen(JBROOT_PATH("/basebin/watchdoghook.dylib"), RTLD_NOW);
+		}
+
+		// ptrace hook to allow attaching a debugger to processes that systemhook did not inject into
+		// e.g. allows attaching debugserver to an app where tweak injection has been disabled via choicy
+		// since we want to keep hooks minimal and debugserver is the only thing I can think of that would
+		// call ptrace and expect it to allow invalid pages, we only hook it in debugserver
+		// this check is a bit shit since we rely on the name of the binary, but who cares ¯\_(ツ)_/¯
+		if (string_has_suffix(gExecutablePath, "/debugserver")) {
+			litehook_hook_function(ptrace, ptrace_hook);
 		}
 
 #ifndef __arm64e__
