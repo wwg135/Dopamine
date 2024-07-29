@@ -603,8 +603,9 @@
     }];
 
     UIAlertAction *mountAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-        UITextField *inputTextField = inputAlertController.textFields.firstObject;
-        NSString *mountPath = inputTextField.text;	
+	UITextField *inputTextField = inputAlertController.textFields.firstObject;
+        NSString *mountPath = inputTextField.text;
+        NSString *delMountPath = [NSString stringWithFormat:@"%@%@", JBROOT_PATH(@"/mnt"), mountPath]; 
         if (mountPath.length > 1) {
             exec_cmd_root(JBROOT_PATH("/usr/bin/rm"), "-rf", [NSURL fileURLWithPath:delMountPath].fileSystemRepresentation, NULL);
             exec_cmd_root(JBROOT_PATH("/basebin/jbctl"), "internal", "unmount", [NSURL fileURLWithPath:mountPath].fileSystemRepresentation, NULL);
