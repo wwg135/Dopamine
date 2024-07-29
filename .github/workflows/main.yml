@@ -3,12 +3,12 @@ name: build_Release
 on:
   push:
     branches:
-      - 2.0
+      - 2.2
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - 2.0
+      - 2.2
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
     environment: Auto Build And Release
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.4
+        uses: actions/checkout@v4.1.7
         with:
             submodules: recursive
 
@@ -116,7 +116,7 @@ jobs:
           cat ./release.md >> release.txt
           
       - name: Release ipa
-        uses: softprops/action-gh-release@v2.0.4
+        uses: softprops/action-gh-release@v2.0.8
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.VERSION }}
