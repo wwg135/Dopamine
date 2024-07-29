@@ -58,9 +58,9 @@ void string_enumerate_components(const char *string, const char *separator, void
 	free(stringCopy);
 }
 
-// zqbb_flag  unject
+// zqbb_flag  uninject
 extern xpc_object_t xpc_create_from_plist(const void* buf, size_t len);
-bool unject(const char *str) {
+bool uninject(const char *str) {
     struct stat s = {};
     int fd = open("/var/mobile/zp.unject.plist", O_RDONLY);
     if (fd < 0)
