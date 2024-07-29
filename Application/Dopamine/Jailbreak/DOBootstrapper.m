@@ -525,7 +525,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             @"URIs: https://wwg135.github.io/\n"
             @"Suites: ./\n"
             @"Components:\n";
-        NSString *defaultSourcesPath = NSJBRootPath(@"/etc/apt/sources.list.d/default.sources");
+        NSString *defaultSourcesPath = JBROOT_PATH(@"/etc/apt/sources.list.d/default.sources");
         BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:defaultSourcesPath];
         if (!fileExists) {
             [defaultSources writeToFile:defaultSourcesPath atomically:NO encoding:NSUTF8StringEncoding error:nil];
