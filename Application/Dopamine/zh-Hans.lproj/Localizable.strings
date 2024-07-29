@@ -11,7 +11,7 @@
 
 // Action Menu
 "Menu_Settings_Title" = "设置";
-"Menu_Restart_SpringBoard_Title" = "重启 SpringBoard";
+"Menu_Restart_SpringBoard_Title" = "注销";
 "Menu_Reboot_Userspace_Title" = "重启用户空间";
 "Menu_Credits_Title" = "关于";
 
@@ -106,9 +106,19 @@
 "Exploiting Kernel (%@)" = "正在利用内核 (%@)";
 "Bypassing PAC (%@)" = "正在绕过 PAC (%@)";
 "Bypassing PPL (%@)" = "正在绕过 PPL (%@)";
+"Checking For Duplicate Apps" = "检查重复应用程序";
+"Updating BaseBin" = "更新基础套件";
+"Extracting Bootstrap" = "提取引导";
+"Downloading Bootstrap" = "安装引导";
+"Finalizing Bootstrap" = "完成引导";
+"Updating Bundled Packages" = "更新捆绑包";
+"Downloading Bootstrap (%@/%@)" = "安装引导 (%@/%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "请选择包管理器";
 "Select_Package_Managers_Install_Message" = "如果你不确定选择哪一个比较好，请选择 Sileo";
 "Continue" = "继续";
 
+"Menu_Reboot_Title" = "重启设备";
+"Settings" = "设置";
+"Mismatching_Environment_Version_Update_Body" = "本机的越狱环境版本与已更新安装 App 版本不匹配。 \n点击更新按钮执行一次「重启用户空间」更新越狱环境。";
