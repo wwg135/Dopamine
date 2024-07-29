@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C65CFE62A47EA9D00EDF5F2 /* ellekit.deb in Resources */ = {isa = PBXBuildFile; fileRef = 0C65CFE42A47EA9D00EDF5F2 /* ellekit.deb */; };
+                0C65CFE52A47EA9D00EDF5F2 /* preferenceloader.deb in Resources */ = {isa = PBXBuildFile; fileRef = 0C65CFE32A47EA9D00EDF5F2 /* preferenceloader.deb */; };		
 		040622AA2B77FE8E00393AAD /* DOPkgManagerPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 040622A92B77FE8E00393AAD /* DOPkgManagerPickerViewController.m */; };
 		042479A22B66916B0082581B /* DOCreditsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0424796B2B66916B0082581B /* DOCreditsViewController.m */; };
 		042479A32B66916B0082581B /* DOSettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0424796C2B66916B0082581B /* DOSettingsController.m */; };
@@ -272,7 +274,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		040622A82B77FE8E00393AAD /* DOPkgManagerPickerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DOPkgManagerPickerViewController.h; sourceTree = "<group>"; };
+		0C65CFE42A47EA9D00EDF5F2 /* ellekit.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "ellekit.deb"; path = "Dopamine/Resources/ellekit.deb"; sourceTree = "<group>"; };
+		0C65CFE32A47EA9D00EDF5F2 /* preferenceloader.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "preferenceloader.deb"; path = "Dopamine/Resources/preferenceloader.deb"; sourceTree = "<group>"; };		040622A82B77FE8E00393AAD /* DOPkgManagerPickerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DOPkgManagerPickerViewController.h; sourceTree = "<group>"; };
 		040622A92B77FE8E00393AAD /* DOPkgManagerPickerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DOPkgManagerPickerViewController.m; sourceTree = "<group>"; };
 		042479682B66916B0082581B /* DOJailbreakButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOJailbreakButton.h; sourceTree = "<group>"; };
 		0424796B2B66916B0082581B /* DOCreditsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DOCreditsViewController.m; sourceTree = "<group>"; };
@@ -1020,6 +1023,8 @@
 		8C71980C2ABF0E82003C6658 = {
 			isa = PBXGroup;
 			children = (
+				0C65CFE42A47EA9D00EDF5F2 /* ellekit.deb */,
+				0C65CFE32A47EA9D00EDF5F2 /* preferenceloader.deb */,				
 				8C7198172ABF0E82003C6658 /* Dopamine */,
 				8C7198162ABF0E82003C6658 /* Products */,
 				8C029F642B4E2E7D0071DE58 /* Frameworks */,
@@ -1481,6 +1486,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C65CFE62A47EA9D00EDF5F2 /* ellekit.deb in Resources */,
+				0C65CFE52A47EA9D00EDF5F2 /* preferenceloader.deb in Resources */,				
 				8C609C9F2C19B6FA0023DD12 /* libkrw-dopamine.deb in Resources */,
 				04DD0B372B7BA6180055DE4F /* LICENSE.md in Resources */,
 				04DD0B3A2B7BF3E80055DE4F /* LICENSE_libc.md in Resources */,
