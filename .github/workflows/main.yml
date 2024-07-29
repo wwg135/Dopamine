@@ -20,7 +20,7 @@ permissions:
   contents: write
 
 env:
-  VERSION: '2.1.7'
+  VERSION: '2.2'
   BUNDLEID: 'com.wwg135.Dopamine'
 
 jobs:
