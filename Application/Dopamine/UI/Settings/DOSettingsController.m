@@ -606,7 +606,7 @@
         UITextField *inputTextField = inputAlertController.textFields.firstObject;
         NSString *mountPath = inputTextField.text;	
         if (mountPath.length > 1) {
-            exec_cmd_root(JBROOT_PATH("/usr/bin/rm"), "-rf", JBRootPath([NSURL fileURLWithPath:mountPath].fileSystemRepresentation), NULL);
+            exec_cmd_root(JBROOT_PATH("/usr/bin/rm"), "-rf", [NSURL fileURLWithPath:delMountPath].fileSystemRepresentation, NULL);
             exec_cmd_root(JBROOT_PATH("/basebin/jbctl"), "internal", "unmount", [NSURL fileURLWithPath:mountPath].fileSystemRepresentation, NULL);
 
             NSString *plistPath = @"/var/mobile/newFakePath.plist";
