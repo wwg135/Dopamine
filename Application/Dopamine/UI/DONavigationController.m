@@ -146,6 +146,7 @@
         }
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"自定义主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self deleteAppTmpDirectory];
             UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
             imagePicker.delegate = self;
             imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
@@ -155,6 +156,7 @@
         }]];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"恢复默认主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self deleteAppTmpDirectory];
             DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
             self.selectedBackgroundImage = nil;
             [self.backgroundImageView setImage:theme.image];
@@ -185,6 +187,20 @@
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
   [picker dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)deleteAppTmpDirectory {
+    NSString *tmpDirectory = NSTemporaryDirectory();
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error = nil;
+
+    [fileManager removeItemAtPath:tmpDirectory error:&error];
+
+    if (error) {
+        NSLog(@"Error deleting app's tmp directory: %@", error.localizedDescription);
+    } else {
+        NSLog(@"App's tmp directory deleted successfully.");
+    }
 }
 
 @end
