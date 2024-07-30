@@ -431,7 +431,7 @@
     DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
     if (envManager.isJailbroken) {
         double v = jbclient_jbsettings_get_double("jetsamMultiplier");
-        return @((v < 1 || isnan(v)) ? 4 : ceil(v * 2));
+        return @((v < 1 || isnan(v)) ? 6 : ceil(v * 2));
     }
     return [self readPreferenceValue:specifier];
 }
