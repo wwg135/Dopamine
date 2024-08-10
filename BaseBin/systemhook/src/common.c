@@ -97,22 +97,25 @@ int __posix_spawn_orig(pid_t *restrict pid, const char *restrict path, struct _p
 	return syscall(SYS_posix_spawn, pid, path, desc, argv, envp);
 }
 
+int __execve_orig(const char *path, char *const argv[], char *const envp[])
+{
+	return syscall(SYS_execve, path, argv, envp);
+}
+
 // 1. Ensure the binary about to be spawned and all of it's dependencies are trust cached
 // 2. Insert "DYLD_INSERT_LIBRARIES=/usr/lib/systemhook.dylib" into all binaries spawned
 // 3. Increase Jetsam limit to more sane value (Multipler defined as JETSAM_MULTIPLIER)
 
-int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
-					   struct _posix_spawn_args_desc *desc,
-					   char *const argv[restrict],
-					   char *const envp[restrict],
-					   void *orig,
-					   int (*trust_binary)(const char *path, xpc_object_t preferredArchsArray),
-					   int (*set_process_debugged)(uint64_t pid, bool fullyDebugged),
-					   double jetsamMultiplier)
+static int spawn_exec_hook_common(const char *path,
+								  char *const argv[restrict],
+								  char *const envp[restrict],
+			   struct _posix_spawn_args_desc *desc,
+										int (*trust_binary)(const char *path, xpc_object_t preferredArchsArray),
+									   double jetsamMultiplier,
+									    int (^orig)(char *const envp[restrict]))
 {
-	int (*pspawn_orig)(pid_t *restrict, const char *restrict, struct _posix_spawn_args_desc *, char *const[restrict], char *const[restrict]) = orig;
 	if (!path) {
-		return pspawn_orig(pid, path, desc, argv, envp);
+		return orig(envp);
 	}
 
 	posix_spawnattr_t attr = NULL;
@@ -230,60 +233,14 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 					*(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_INACTIVE) = memlimit_inactive * jetsamMultiplier;
 				}
 			}
-
-			// On iOS 16, disable launch constraints
-			// Not working, doesn't seem feasable
-			// if (__builtin_available(iOS 16.0, *)) {
-			// 	uint32_t bufsize = PATH_MAX;
-			// 	char executablePath[PATH_MAX];
-			// 	_NSGetExecutablePath(executablePath, &bufsize);
-			// 	// We could do the following here
-			// 	// posix_spawnattr_set_launch_type_np(*attrp, 0);
-			// 	// But I don't know how to get the compiler to weak link it
-			// 	// So we just set it by offset
-			// 	if (getpid() == 1) {
-			// 		FILE *f = fopen("/var/mobile/launch_type.txt", "a");
-			// 		const char *toLog = path;
-			// 		if (!strcmp(path, "/usr/libexec/xpcproxy") && argv) {
-			// 			if (argv[0]) {
-			// 				if (argv[1]) {
-			// 					toLog = argv[1];
-			// 				}
-			// 			}
-			// 		}
-			// 		fprintf(f, "%s has launch type %u\n", toLog, *(uint8_t *)(attrStruct + POSIX_SPAWNATTR_OFF_LAUNCH_TYPE));
-			// 		fclose(f);
-			// 	}
-			// 	else if (!strcmp(executablePath, "/usr/libexec/xpcproxy")) {
-			// 		FILE *f = fopen("/tmp/launch_type_xpcproxy.txt", "a");
-			// 		if (f) {
-			// 			fprintf(f, "%s has launch type %u\n", path, *(uint8_t *)(attrStruct + POSIX_SPAWNATTR_OFF_LAUNCH_TYPE));
-			// 			fclose(f);
-			// 		}
-			// 	}
-			// 	else {
-			// 		os_log(OS_LOG_DEFAULT, "systemhook %{public}s has launch type %u\n", path, *(uint8_t *)(attrStruct + POSIX_SPAWNATTR_OFF_LAUNCH_TYPE));
-			// 	}
-				
-			// 	*(uint8_t *)(attrStruct + POSIX_SPAWNATTR_OFF_LAUNCH_TYPE) = ...
-			// 	if (!strcmp(path, "/usr/libexec/xpcproxy") && argv) {
-			// 		if (argv[0]) {
-			// 			if (argv[1]) {
-			// 				if (string_has_prefix(argv[1], "com.apple.WebKit.WebContent.")) {
-			// 					*(uint8_t *)(attrStruct + POSIX_SPAWNATTR_OFF_LAUNCH_TYPE) = 0;
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// }
 		}
 	}
 
-	int retval = -1;
+	int r = -1;
 
 	if ((shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 1) || (!shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 0 && !hasSafeModeVariable)) {
 		// we're already good, just call orig
-		retval = pspawn_orig(pid, path, desc, argv, envp);
+		r = orig(envp);
 	}
 	else {
 		// the state we want to be in is not the state we are in right now
@@ -332,11 +289,32 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 			envbuf_unsetenv(&envc, "_MSSafeMode");
 		}
 
-		retval = pspawn_orig(pid, path, desc, argv, envc);
+		r = orig(envc);
+
 		envbuf_free(envc);
 	}
 
-	if (retval == 0 && pid != NULL) {
+	return r;
+}
+
+int posix_spawn_hook_shared(pid_t *restrict pid, 
+					   const char *restrict path,
+			 struct _posix_spawn_args_desc *desc,
+						  	    char *const argv[restrict],
+					   			char *const envp[restrict],
+					   				  void *orig,
+					   				  int (*trust_binary)(const char *path, xpc_object_t preferredArchsArray),
+					   				  int (*set_process_debugged)(uint64_t pid, bool fullyDebugged),
+					   				 double jetsamMultiplier)
+{
+	int (*posix_spawn_orig)(pid_t *restrict, const char *restrict, struct _posix_spawn_args_desc *, char *const[restrict], char *const[restrict]) = orig;
+
+	int r = spawn_exec_hook_common(path, argv, envp, desc, trust_binary, jetsamMultiplier, ^int(char *const envp_patched[restrict]){
+		return posix_spawn_orig(pid, path, desc, argv, envp_patched);
+	});
+
+	if (r == 0 && pid && desc) {
+		posix_spawnattr_t attr = desc->attrp;
 		short flags = 0;
 		if (posix_spawnattr_getflags(&attr, &flags) == 0) {
 			if (flags & POSIX_SPAWN_START_SUSPENDED) {
@@ -348,5 +326,20 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 		}
 	}
 
-	return retval;
+	return r;
+}
+
+int execve_hook_shared(const char *path,
+					   char *const argv[],
+					   char *const envp[],
+			 				 void *orig,
+			 				 int (*trust_binary)(const char *path, xpc_object_t preferredArchsArray))
+{
+	int (*execve_orig)(const char *, char *const[], char *const[]) = orig;
+
+	int r = spawn_exec_hook_common(path, argv, envp, NULL, trust_binary, 0, ^int(char *const envp_patched[restrict]){
+		return execve_orig(path, argv, envp_patched);
+	});
+
+	return r;
 }
