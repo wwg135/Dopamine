@@ -255,34 +255,18 @@ bool should_enable_tweaks(void)
 
 int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path, struct _posix_spawn_args_desc *desc, char *const argv[restrict], char * const envp[restrict])
 {
-	return spawn_hook_common(pid, path, desc, argv, envp, (void *)__posix_spawn_orig, jbclient_trust_binary, jbclient_platform_set_process_debugged, jbclient_jbsettings_get_double("jetsamMultiplier"));
+	return posix_spawn_hook_shared(pid, path, desc, argv, envp, (void *)__posix_spawn_orig, jbclient_trust_binary, jbclient_platform_set_process_debugged, jbclient_jbsettings_get_double("jetsamMultiplier"));
 }
 
 int __posix_spawn_hook_with_filter(pid_t *restrict pid, const char *restrict path, char *const argv[restrict], char * const envp[restrict], struct _posix_spawn_args_desc *desc, int *ret)
 {
-	*ret = spawn_hook_common(pid, path, desc, argv, envp, (void *)__posix_spawn_orig, jbclient_trust_binary, jbclient_platform_set_process_debugged, jbclient_jbsettings_get_double("jetsamMultiplier"));
+	*ret = posix_spawn_hook_shared(pid, path, desc, argv, envp, (void *)__posix_spawn_orig, jbclient_trust_binary, jbclient_platform_set_process_debugged, jbclient_jbsettings_get_double("jetsamMultiplier"));
 	return 1;
 }
 
 int __execve_hook(const char *path, char *const argv[], char *const envp[])
 {
-	// For execve, just make it call posix_spawn instead
-	// Since posix_spawn is hooked, all the logic will happen in there
-
-	posix_spawnattr_t attr = NULL;
-	posix_spawnattr_init(&attr);
-	posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETEXEC);
-	int result = posix_spawn(NULL, path, NULL, &attr, argv, envp);
-	if (attr) {
-		posix_spawnattr_destroy(&attr);
-	}
-
-	if(result != 0) { // posix_spawn will return errno and restore errno if it fails
-		errno = result; // so we need to set errno by ourself
-		return -1;
-	}
-
-	return result;
+	return execve_hook_shared(path, argv, envp, (void *)__execve_orig, jbclient_trust_binary);
 }
 
 __attribute__((constructor)) static void initializer(void)
