@@ -348,7 +348,7 @@
         if (envManager.isJailbroken) {	    
             PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
             mountSpecifier.target = self;
-            [mountSpecifier setProperty:@"Input_Mmount_Title" forKey:@"title"];
+            [mountSpecifier setProperty:@"新增挂载" forKey:@"title"];
             [mountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
             [mountSpecifier setProperty:@"doc" forKey:@"image"];
             [mountSpecifier setProperty:@"mountPressed" forKey:@"action"];
@@ -356,7 +356,7 @@
 
             PSSpecifier *unmountSpecifier = [PSSpecifier emptyGroupSpecifier];
             unmountSpecifier.target = self;
-            [unmountSpecifier setProperty:@"Input_Unmount_Title" forKey:@"title"];
+            [unmountSpecifier setProperty:@"管理挂载" forKey:@"title"];
             [unmountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
             [unmountSpecifier setProperty:@"trash" forKey:@"image"];
             [unmountSpecifier setProperty:@"unmountPressed" forKey:@"action"];
