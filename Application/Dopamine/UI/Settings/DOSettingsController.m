@@ -603,7 +603,7 @@
     NSMutableArray *paths = [plist[@"path"] mutableCopy];
     
     // 设置富文本标题
-    NSString *titleText = DOLocalizedString(@"选择需要操作的路径");
+    NSString *titleText = DOLocalizedString(@"Select_Mount_Title");
     NSMutableAttributedString *attrTitle = [[NSMutableAttributedString alloc] initWithString:titleText];
     [attrTitle addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:24] range:NSMakeRange(0, titleText.length)];
     
@@ -626,8 +626,17 @@
     
             // 设置富文本标题到UIAlertController
             [actionAlertController setValue:attrActionTitle forKey:@"attributedTitle"];
-
-            UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"取消挂载") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    
+            // 删除路径的操作
+            UIAlertAction *deletePathAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Delete_Path_Only") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+                // 删除plist中的对应路径并保存
+                [paths removeObject:path];
+                plist[@"path"] = paths;
+                [plist writeToFile:plistPath atomically:YES];
+            }];
+            
+            // 删除路径并卸载的操作
+            UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Delete") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
                 
                 exec_cmd_root(JBROOT_PATH("/usr/bin/rm"), "-rf", [NSURL fileURLWithPath:targetMountPath].fileSystemRepresentation, NULL);
                 exec_cmd_root(JBROOT_PATH("/basebin/jbctl"), "internal", "unmount", [NSURL fileURLWithPath:path].fileSystemRepresentation, NULL);
@@ -638,7 +647,7 @@
                 [plist writeToFile:plistPath atomically:YES];
             }];
             
-            UIAlertAction *viewAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Filza查看") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UIAlertAction *viewAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_View") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"filza://"]]) {
                     NSURL *filzaURL = [NSURL URLWithString:[@"filza://view" stringByAppendingString:targetMountPath]];
                     [[UIApplication sharedApplication] openURL:filzaURL options:@{} completionHandler:nil];
@@ -650,8 +659,9 @@
             
             UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
 
-            [actionAlertController addAction:viewAction];
             [actionAlertController addAction:deleteAction];
+            [actionAlertController addAction:viewAction];
+            [actionAlertController addAction:deletePathAction]; // 添加仅删除路径的操作
             [actionAlertController addAction:cancelAction];
             
             [self presentViewController:actionAlertController animated:YES completion:nil];
@@ -671,6 +681,5 @@
     [self.navigationController popToRootViewControllerAnimated:YES];
     [self reloadSpecifiers];
 }
-
 
 @end
