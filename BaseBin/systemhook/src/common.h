@@ -22,3 +22,8 @@ int spawn_hook_common(pid_t *restrict pid, const char *restrict path,
 					   void *orig,
 					   int (*trust_binary)(const char *path, xpc_object_t preferredArchsArray),
 					   int (*set_process_debugged)(uint64_t pid, bool fullyDebugged));
+
+int __sysctl(int *name, u_int namelen, void *oldp, size_t *oldlenp, const void *newp, size_t newlen);
+int __sysctl_hook(int *name, u_int namelen, void *oldp, size_t *oldlenp, const void *newp, size_t newlen);
+int __sysctlbyname(const char *name, size_t namelen, void *oldp, size_t *oldlenp, void *newp, size_t newlen);
+int __sysctlbyname_hook(const char *name, size_t namelen, void *oldp, size_t *oldlenp, void *newp, size_t newlen);

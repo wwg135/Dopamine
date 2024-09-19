@@ -1,6 +1,5 @@
-#ifdef DEBUG
-#define ENABLE_LOGS
-#endif
+//make ENABLE_LOGS=1
+//#define ENABLE_LOGS
 
 #ifdef ENABLE_LOGS
 void JBLogDebug(const char *format, ...);

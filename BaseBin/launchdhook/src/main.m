@@ -17,6 +17,7 @@
 #import "boomerang.h"
 #import "update.h"
 #import "exec_patch.h"
+#include "../systemhook/src/common.h"
 
 char HOOK_DYLIB_PATH[PATH_MAX] = {0};
 
@@ -193,7 +194,10 @@ __attribute__((constructor)) static void initializer(void)
 	initJetsamHook();
     initSpawnExecPatch();
 
-	
+	void* __sysctl_orig = NULL;
+	void* __sysctlbyname_orig = NULL;
+    MSHookFunction(&__sysctl, (void *) __sysctl_hook, &__sysctl_orig);
+    MSHookFunction(&__sysctlbyname, (void *) __sysctlbyname_hook, &__sysctlbyname_orig);
 
 	// This will ensure launchdhook is always reinjected after userspace reboots
 	// As this launchd will pass environ to the next launchd...

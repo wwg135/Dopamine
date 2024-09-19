@@ -11,7 +11,7 @@ endif
 sign: $(TARGET)
 	@ldid -S $^
 
-$(TARGET): $(wildcard src/*.m src/*.c src/jbserver/*.c ../systemhook/src/common.c ../systemhook/src/envbuf.c)
+$(TARGET): $(wildcard src/*.m src/*.c src/jbserver/*.c ../systemhook/src/common.c ../systemhook/src/envbuf.c ../systemhook/src/syscall.S)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 clean:

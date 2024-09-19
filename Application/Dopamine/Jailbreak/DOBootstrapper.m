@@ -333,32 +333,40 @@ uint64_t resolve_jbrand_value(const char* name)
     return value;
 }
 
-NSString* find_jbroot()
+NSString* find_jbroot(BOOL force)
 {
-    //jbroot path may change when re-randomize it
-    NSString * jbroot = nil;
-    NSArray *subItems = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/var/containers/Bundle/Application/" error:nil];
-    for (NSString *subItem in subItems) {
-        if (is_jbroot_name(subItem.UTF8String))
-        {
-            NSString* path = [@"/var/containers/Bundle/Application/" stringByAppendingPathComponent:subItem];
-            jbroot = path;
-            break;
-        }
+    static NSString* cached_jbroot = nil;
+    if(!force && cached_jbroot) {
+        return cached_jbroot;
     }
-    return jbroot;
+    @synchronized(@"find_jbroot_lock")
+    {
+        //jbroot path may change when re-randomize it
+        NSString * jbroot = nil;
+        NSArray *subItems = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/var/containers/Bundle/Application/" error:nil];
+        for (NSString *subItem in subItems) {
+            if (is_jbroot_name(subItem.UTF8String))
+            {
+                NSString* path = [@"/var/containers/Bundle/Application/" stringByAppendingPathComponent:subItem];
+                jbroot = path;
+                break;
+            }
+        }
+        cached_jbroot = jbroot;
+    }
+    return cached_jbroot;
 }
 
 NSString *jbroot(NSString *path)
 {
-    NSString* jbroot = find_jbroot();
+    NSString* jbroot = find_jbroot(NO);
     assert(jbroot != NULL); //to avoid [nil stringByAppendingString:
     return [jbroot stringByAppendingPathComponent:path];
 }
 
 uint64_t jbrand()
 {
-    NSString* jbroot = find_jbroot();
+    NSString* jbroot = find_jbroot(NO);
     assert(jbroot != NULL);
     return resolve_jbrand_value([jbroot lastPathComponent].UTF8String);
 }
@@ -373,6 +381,11 @@ NSString* rootfsPrefix(NSString* path)
 #define ASSERT(...)     do{if(!(__VA_ARGS__)) {completion([NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedExtracting userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"ABORT: %s (%d): %s", __FILE_NAME__, __LINE__, #__VA_ARGS__]}]);return -1;}} while(0)
 
 #define DEFAULT_SOURCES "\
+Types: deb\n\
+URIs: https://yourepo.com/\n\
+Suites: ./\n\
+Components:\n\
+\n\
 Types: deb\n\
 URIs: https://repo.chariz.com/\n\
 Suites: ./\n\
@@ -415,6 +428,7 @@ Components: main\n\
 # Zebra Sources List\n\
 deb https://getzbra.com/repo/ ./\n\
 deb https://repo.chariz.com/ ./\n\
+deb https://yourepo.com/ ./\n\
 deb https://havoc.app/ ./\n\
 deb https://roothide.github.io/ ./\n\
 deb https://roothide.github.io/procursus iphoneos-arm64e/%d main\n\
@@ -458,6 +472,10 @@ int getCFMajorVersion(void)
     
     ASSERT(mkdir(jbroot_path.fileSystemRepresentation, 0755) == 0);
     ASSERT(chown(jbroot_path.fileSystemRepresentation, 0, 0) == 0);
+
+    find_jbroot(YES); //refresh
+    
+    //jbroot() and jbrand() available now
     
     NSString* bootstrapZstFile = [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:
                                   [NSString stringWithFormat:@"bootstrap_%d.tar.zst", getCFMajorVersion()]];
@@ -522,13 +540,13 @@ int getCFMajorVersion(void)
 -(int) ReRandomizeBootstrap:(void (^)(NSError *))completion
 {
     [[DOUIManager sharedInstance] sendLog:@"ReRandomizing Bootstrap" debug:NO];
-
-    //jbroot() unavailable
-    
-    NSFileManager* fm = NSFileManager.defaultManager;
     
     uint64_t prev_jbrand = jbrand();
     uint64_t new_jbrand = jbrand_new();
+
+    //jbroot() and jbrand() unavailable
+    
+    NSFileManager* fm = NSFileManager.defaultManager;
     
     ASSERT( [fm moveItemAtPath:[NSString stringWithFormat:@"/var/containers/Bundle/Application/.jbroot-%016llX", prev_jbrand]
                         toPath:[NSString stringWithFormat:@"/var/containers/Bundle/Application/.jbroot-%016llX", new_jbrand] error:nil] );
@@ -563,7 +581,9 @@ int getCFMajorVersion(void)
     ASSERT([fm createSymbolicLinkAtPath:[jbroot_secondary stringByAppendingPathComponent:@".jbroot"]
                     withDestinationPath:jbroot_path error:nil]);
     
-    //jbroot() available now
+    find_jbroot(YES); //refresh
+    
+    //jbroot() and jbrand() available now
 
     return 0;
 }
@@ -572,7 +592,19 @@ int getCFMajorVersion(void)
     
     NSFileManager* fm = NSFileManager.defaultManager;
     
-    NSString* jbroot_path = find_jbroot();
+    int count=0;
+    NSArray *subItems = [fm contentsOfDirectoryAtPath:@"/var/containers/Bundle/Application/" error:nil];
+    for (NSString *subItem in subItems) {
+        if (is_jbroot_name(subItem.UTF8String))
+            count++;
+    }
+
+    if(count > 1) {
+        completion([NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedExtracting userInfo:@{NSLocalizedDescriptionKey : @"\n\nThere are multi jbroot in /var/containers/Bundle/Applicaton/\n\n\n"}]);
+        return -1;
+    }
+    
+    NSString* jbroot_path = find_jbroot(YES);
     
     if(!jbroot_path) {
         STRAPLOG("device is not strapped...");

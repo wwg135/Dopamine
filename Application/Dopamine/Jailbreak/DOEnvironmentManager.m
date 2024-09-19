@@ -99,7 +99,7 @@ int reboot3(uint64_t flags, ...);
 {
     if(gSystemInfo.jailbreakInfo.rootPath) free(gSystemInfo.jailbreakInfo.rootPath);
     
-    NSString* jbroot_path = find_jbroot();
+    NSString* jbroot_path = find_jbroot(YES);
     if(jbroot_path) {
         gSystemInfo.jailbreakInfo.rootPath = strdup(jbroot_path.fileSystemRepresentation);
         gSystemInfo.jailbreakInfo.jbrand = jbrand();

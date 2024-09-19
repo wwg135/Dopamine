@@ -740,6 +740,15 @@ __attribute__((constructor)) static void initializer(void)
 		}
 #endif
 
+		if (__builtin_available(iOS 16.0, *)) {
+			bool is_app_path(const char* path);
+			if(!is_app_path(gExecutablePath)) {
+				gShouldFixFork = true;
+				litehook_hook_function(__sysctl, __sysctl_hook);
+				litehook_hook_function(__sysctlbyname, __sysctlbyname_hook);
+			}
+		}
+
 		dlopen_hook(JBRootPath("/usr/lib/roothidepatch.dylib"), RTLD_NOW); //require jit
 
 		if (shouldEnableTweaks()) {
