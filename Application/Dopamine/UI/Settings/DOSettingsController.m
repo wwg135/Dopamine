@@ -301,15 +301,6 @@
                     [specifiers addObject:removeJailbreakSpecifier];
                 }
             }
-            if(envManager.isJailbroken || envManager.isInstalledThroughTrollStore){
-                PSSpecifier *rebootDeviceSpecifier = [PSSpecifier emptyGroupSpecifier];
-                rebootDeviceSpecifier.target = self;
-                [rebootDeviceSpecifier setProperty:@"Button_Reboot_Device" forKey:@"title"];
-                [rebootDeviceSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-                [rebootDeviceSpecifier setProperty:@"arrow.clockwise.circle" forKey:@"image"];
-                [rebootDeviceSpecifier setProperty:@"rebootDevicePressed" forKey:@"action"];
-                [specifiers addObject:rebootDeviceSpecifier];
-            }
         }
         
         PSSpecifier *themingGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
@@ -522,18 +513,6 @@
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
 }
 
-- (void)rebootDevicePressed
-{
-    UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Reboot_Device_Title") message:DOLocalizedString(@"Alert_Reboot_Device_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-        [[DOEnvironmentManager sharedManager] reboot];
-    }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
-    [confirmationAlertController addAction:rebootAction];
-    [confirmationAlertController addAction:cancelAction];
-    [self presentViewController:confirmationAlertController animated:YES completion:nil];
-}
-
 - (void)resetSettingsPressed
 {
     [[DOUIManager sharedInstance] resetSettings];
@@ -550,7 +529,7 @@
         }]];
 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-        if (envManager.isJailbroken) {
+        if (envManager.isJailbroken || envManager.isInstalledThroughTrollStore){
             [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [[DOEnvironmentManager sharedManager] reboot];
             }]];
