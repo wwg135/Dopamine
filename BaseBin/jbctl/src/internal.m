@@ -1,6 +1,6 @@
 #import "internal.h"
-#import "dyldpatch.h"
 #import "codesign.h"
+#import "dyldpatch.h"
 #import <libjailbreak/carboncopy.h>
 #import <Foundation/Foundation.h>
 #import <libjailbreak/libjailbreak.h>
@@ -38,8 +38,8 @@ void ensureProtectionActive(void)
 {
 	// Protect /private/preboot/UUID/<System, usr> from being modified by bind mounting them on top of themselves
 	// This protects dumb users from accidentally deleting these, which would induce a recovery loop after rebooting
-	ensureProtected(prebootUUIDPath("/System"));
-	ensureProtected(prebootUUIDPath("/usr"));
+	// ensureProtected(prebootUUIDPath("/System"));
+	// ensureProtected(prebootUUIDPath("/usr"));
 }
 
 int jbctl_handle_internal(const char *command, int argc, char* argv[])
@@ -90,8 +90,8 @@ int jbctl_handle_internal(const char *command, int argc, char* argv[])
 		return 0;
 	}
 	else if (!strcmp(command, "fakelib_init")) {
-		NSString *basebinPath = JBROOT_PATH(@"/basebin");
-		NSString *fakelibPath = JBROOT_PATH(@"/basebin/.fakelib");
+		NSString *basebinPath = NSJBRootPath(@"/basebin");
+		NSString *fakelibPath = NSJBRootPath(@"/basebin/.fakelib");
 		printf("Initalizing fakelib...\n");
 
 		// Copy /usr/lib to /var/jb/basebin/.fakelib
@@ -100,25 +100,26 @@ int jbctl_handle_internal(const char *command, int argc, char* argv[])
 		carbonCopy(@"/usr/lib", fakelibPath);
 
 		// Backup and patch dyld
-		NSString *dyldBackupPath = JBROOT_PATH(@"/basebin/.dyld.orig");
-		NSString *dyldPatchPath = JBROOT_PATH(@"/basebin/.dyld.patched");
+		NSString *dyldBackupPath = NSJBRootPath(@"/basebin/.dyld.orig");
+		NSString *dyldPatchPath = NSJBRootPath(@"/basebin/.dyld.patched");
 		carbonCopy(@"/usr/lib/dyld", dyldBackupPath);
 		carbonCopy(@"/usr/lib/dyld", dyldPatchPath);
 		apply_dyld_patch(dyldPatchPath.fileSystemRepresentation);
 		resign_file(dyldPatchPath, YES);
 
 		// Copy systemhook to fakelib
-		carbonCopy(JBROOT_PATH(@"/basebin/systemhook.dylib"), JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib"));
+		carbonCopy(NSJBRootPath(@"/basebin/systemhook.dylib"), NSJBRootPath(@"/basebin/.fakelib/systemhook.dylib"));
 
 		// Replace dyld in fakelib with patched dyld
-		NSString *fakelibDyldPath = [fakelibPath stringByAppendingPathComponent:@"dyld"];
-		[[NSFileManager defaultManager] removeItemAtPath:fakelibDyldPath error:nil];
-		carbonCopy(dyldPatchPath, JBROOT_PATH(@"/basebin/.fakelib/dyld"));
+		// NSString *fakelibDyldPath = [fakelibPath stringByAppendingPathComponent:@"dyld"];
+		// [[NSFileManager defaultManager] removeItemAtPath:fakelibDyldPath error:nil];
+		// carbonCopy(dyldPatchPath, NSJBRootPath(@"/basebin/.fakelib/dyld"));
+
 		return 0;
 	}
 	else if (!strcmp(command, "fakelib_mount")) {
 		printf("Applying mount...\n");
-		return mount_unsandboxed("bindfs", "/usr/lib", MNT_RDONLY, (void *)JBROOT_PATH("/basebin/.fakelib"));
+		return mount_unsandboxed("bindfs", "/usr/lib", MNT_RDONLY, (void *)JBRootPath("/basebin/.fakelib"));
 	}
 	else if (!strcmp(command, "startup")) {
 		ensureProtectionActive();
@@ -128,12 +129,16 @@ int jbctl_handle_internal(const char *command, int argc, char* argv[])
 			CFUserNotificationDisplayAlert(0, 2/*kCFUserNotificationCautionAlertLevel*/, NULL, NULL, NULL, CFSTR("Watchdog Timeout"), (__bridge CFStringRef)printMessage, NULL, NULL, NULL, NULL);
 			free(panicMessage);
 		}
-		exec_cmd(JBROOT_PATH("/usr/bin/uicache"), "-a", NULL);
+
+		//only bootstrap after launchdhook and systemhook available
+		exec_cmd(JBRootPath("/usr/bin/launchctl"), "bootstrap", "system", "/Library/LaunchDaemons", NULL);
+
+		exec_cmd(JBRootPath("/usr/bin/uicache"), "-a", NULL);
 	}
 	else if (!strcmp(command, "install_pkg")) {
 		if (argc > 1) {
 			extern char **environ;
-			char *dpkg = JBROOT_PATH("/usr/bin/dpkg");
+			char *dpkg = JBRootPath("/usr/bin/dpkg");
 			int r = execve(dpkg, (char *const *)(const char *[]){dpkg, "-i", argv[1], NULL}, environ);
 			return r;
 		}

@@ -19,13 +19,13 @@ extern void __fork(void);
 
 int childToParentPipe[2];
 int parentToChildPipe[2];
-static void open_pipes(void)
+static void openPipes(void)
 {
 	if (pipe(parentToChildPipe) < 0 || pipe(childToParentPipe) < 0) {
 		abort();
 	}
 }
-static void close_pipes(void)
+static void closePipes(void)
 {
 	if (ffsys_close(parentToChildPipe[0]) != 0 || ffsys_close(parentToChildPipe[1]) != 0 || ffsys_close(childToParentPipe[0]) != 0 || ffsys_close(childToParentPipe[1]) != 0) {
 		abort();
@@ -73,11 +73,11 @@ void parent_fixup(pid_t childPid)
 
 __attribute__((visibility ("default"))) pid_t forkfix___fork(void)
 {
-	open_pipes();
+	openPipes();
 
 	pid_t pid = ffsys_fork();
 	if (pid < 0) {
-		close_pipes();
+		closePipes();
 		return pid;
 	}
 
@@ -88,17 +88,11 @@ __attribute__((visibility ("default"))) pid_t forkfix___fork(void)
 		parent_fixup(pid);
 	}
 
-	close_pipes();
+	closePipes();
 	return pid;
 }
 
 __attribute__((constructor)) static void initializer(void)
 {
-	void *systemhookHandle = dlopen("systemhook.dylib", RTLD_NOLOAD);
-	if (systemhookHandle) {
-		kern_return_t (*litehook_hook_function)(void *source, void *target) = dlsym(systemhookHandle, "litehook_hook_function");
-		if (litehook_hook_function) {
-			litehook_hook_function((void *)&__fork, (void *)&forkfix___fork);
-		}
-	}
+	litehook_hook_function((void *)&__fork, (void *)&forkfix___fork);
 }

@@ -3,6 +3,8 @@
 #include "info.h"
 #include "kernel.h"
 #include "translation.h"
+#include "libproc.h"
+#include "libproc_private.h"
 #include <spawn.h>
 #include <mach/mach_time.h>
 #include <pthread.h>
@@ -72,6 +74,34 @@ uint64_t pmap_self(void)
 		gSelfPmap = kread_ptr(vm_map_self() + koffsetof(vm_map, pmap));
 	});
 	return gSelfPmap;
+}
+
+pid_t proc_get_ppid(pid_t pid)
+{
+    struct proc_bsdinfo procInfo;
+    if (proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &procInfo, sizeof(procInfo)) <= 0) {
+        return -1;
+    }
+    return procInfo.pbi_ppid;
+}
+
+int proc_paused(pid_t pid, bool* paused)
+{
+    *paused = false;
+
+    struct proc_bsdinfo procInfo = {0};
+    int ret = proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &procInfo, sizeof(procInfo));
+    if (ret != sizeof(procInfo)) {
+        return -1;
+    }
+
+    if (procInfo.pbi_status == SSTOP) {
+        *paused = true;
+    } else if (procInfo.pbi_status != SRUN) {
+        return -1;
+    }
+
+    return 0;
 }
 
 uint64_t ttep_self(void)
@@ -457,9 +487,9 @@ uint64_t kpacda(uint64_t pointer, uint64_t modifier)
 {
 	if (gPrimitives.kexec && kgadget(pacda)) {
 		// |------- GADGET -------|
-		// | cmp x1, #0		      |
+		// | cmp x1, #0		      |
 		// | pacda x1, x9         |
-		// | str x9, [x8]         |
+		// | str x9, [x8]         |
 		// | csel x9, xzr, x1, eq |
 		// | ret                  |
 		// |----------------------|
@@ -544,9 +574,9 @@ int __exec_cmd_internal_va(bool suspended, bool root, bool waitForExit, pid_t *p
 
 	posix_spawnattr_t attr = NULL;
 	posix_spawnattr_init(&attr);
-	if (suspended) {
+	// if (suspended) {
 		posix_spawnattr_setflags(&attr, POSIX_SPAWN_START_SUSPENDED);
-	}
+	// }
 	if (root) {
 		posix_spawnattr_set_persona_np(&attr, 99, POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE);
 		posix_spawnattr_set_persona_uid_np(&attr, 0);
@@ -558,6 +588,10 @@ int __exec_cmd_internal_va(bool suspended, bool root, bool waitForExit, pid_t *p
 	if (attr) posix_spawnattr_destroy(&attr);
 	if (spawnError != 0) return spawnError;
 
+	jbclient_patch_spawn(spawnedPid, false);
+
+	if (!suspended) kill(spawnedPid, SIGCONT);
+	
 	if (waitForExit && !suspended) {
 		return cmd_wait_for_exit(spawnedPid);
 	}
@@ -850,26 +884,4 @@ int convert_hex_string_to_data(const char *string, void *outBuf)
 		if (shift == 0) pout++;
 	}
 	return 0;
-}
-
-char *boot_manifest_hash(void)
-{
-	static char *gBuf = NULL;
-	
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		io_registry_entry_t registryEntry = IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen");
-		if (registryEntry) {
-			CFDataRef bootManifestHashData = IORegistryEntryCreateCFProperty(registryEntry, CFSTR("boot-manifest-hash"), NULL, 0);
-			CFIndex bootManifestHashLength = CFDataGetLength(bootManifestHashData);
-
-			gBuf = malloc((bootManifestHashLength * 2 * sizeof(char)) + sizeof(char));
-			unsigned char *buf = (unsigned char *)CFDataGetBytePtr(bootManifestHashData);
-			convert_data_to_hex_string(buf, bootManifestHashLength, gBuf);
-
-			CFRelease(bootManifestHashData);
-		}
-	});
-
-	return gBuf;
 }

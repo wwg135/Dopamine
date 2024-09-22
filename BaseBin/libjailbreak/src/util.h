@@ -3,7 +3,6 @@
 
 #include "info.h"
 #include "jbclient_xpc.h"
-#include "jbroot.h"
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -60,12 +59,9 @@ int exec_cmd_root(const char *binary, ...);
     retval; \
 })
 
-char *boot_manifest_hash(void);
-
-#define prebootUUIDPath(path) ({ \
+#define JBRootPath(path) ({ \
 	static char outPath[PATH_MAX]; \
-	strlcpy(outPath, "/private/preboot/", PATH_MAX); \
-	strlcat(outPath, boot_manifest_hash(), PATH_MAX); \
+	strlcpy(outPath, jbinfo(rootPath), PATH_MAX); \
 	strlcat(outPath, path, PATH_MAX); \
 	(outPath); \
 })
@@ -76,9 +72,19 @@ char *boot_manifest_hash(void);
 #define VM_FLAGS_SET_MAXPROT(x, p) x = ((x & ~(0xFULL << 11)) | (((uint64_t)p) << 11))
 
 #ifdef __OBJC__
-NSString *NSPrebootUUIDPath(NSString *relativePath);
+NSString *NSJBRootPath(NSString *relativePath);
 #endif
 
 void JBFixMobilePermissions(void);
+
+/* Status values. */
+#define SIDL    1               /* Process being created by fork. */
+#define SRUN    2               /* Currently runnable. */
+#define SSLEEP  3               /* Sleeping on an address. */
+#define SSTOP   4               /* Process debugging or suspension. */
+#define SZOMB   5               /* Awaiting collection by parent. */
+
+pid_t proc_get_ppid(pid_t pid);
+int proc_paused(pid_t pid, bool* paused);
 
 #endif

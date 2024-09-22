@@ -14,6 +14,7 @@
     NSInteger numericalRepresentation = 0;
 
     NSArray *components = [self componentsSeparatedByCharactersInSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]];
+    assert(components.count <= 3);
     while (components.count < 3)
         components = [components arrayByAddingObject:@"0"];
 

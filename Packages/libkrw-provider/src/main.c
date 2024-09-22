@@ -18,7 +18,7 @@ static int kwritebuf_wrapper(void *from, uint64_t to, size_t len)
 
 static int kcall_wrapper(uint64_t func, size_t argc, const uint64_t *argv, uint64_t *ret)
 {
-	if (is_kcall_available()) {
+	if (jbinfo(usesPACBypass)) {
 		return kcall(ret, func, argc, argv);
 	}
 	return ENOTSUP;

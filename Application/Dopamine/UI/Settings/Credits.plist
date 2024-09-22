@@ -253,6 +253,12 @@
 				</dict>
 				<dict>
 					<key>name</key>
+					<string>Ylarod</string>
+					<key>link</key>
+					<string>https://github.com/Ylarod</string>
+				</dict>
+				<dict>
+					<key>name</key>
 					<string>roothideDev</string>
 					<key>link</key>
 					<string>https://twitter.com/roothideDev</string>

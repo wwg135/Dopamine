@@ -4,6 +4,7 @@
 #include <libjailbreak/kcall_arm64.h>
 #include <xpc/xpc.h>
 #include <dlfcn.h>
+#include <sys/mount.h>
 
 #import <Foundation/Foundation.h>
 
@@ -15,7 +16,7 @@ int jbupdate_basebin(const char *basebinTarPath)
 		int r = 0;
 		if (access(basebinTarPath, F_OK) != 0) return 1;
 
-		NSString *prevVersion = [NSString stringWithContentsOfFile:JBROOT_PATH(@"/basebin/.version") encoding:NSUTF8StringEncoding error:nil] ?: @"2.0";
+		NSString *prevVersion = [NSString stringWithContentsOfFile:NSJBRootPath(@"/basebin/.version") encoding:NSUTF8StringEncoding error:nil] ?: @"2.0";
 
 		// Extract basebin tar
 		NSString *tmpExtractionPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
@@ -48,7 +49,7 @@ int jbupdate_basebin(const char *basebinTarPath)
 		NSArray *newBasebinContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpBasebinPath error:nil];
 		for (NSString *basebinItem in newBasebinContents) {
 			NSString *newBasebinPath = [tmpBasebinPath stringByAppendingPathComponent:basebinItem];
-			NSString *oldBasebinPath = [JBROOT_PATH(@"/basebin") stringByAppendingPathComponent:basebinItem];
+			NSString *oldBasebinPath = [NSJBRootPath(@"/basebin") stringByAppendingPathComponent:basebinItem];
 			if ([[NSFileManager defaultManager] fileExistsAtPath:oldBasebinPath]) {
 				[[NSFileManager defaultManager] removeItemAtPath:oldBasebinPath error:nil];
 			}
@@ -57,11 +58,12 @@ int jbupdate_basebin(const char *basebinTarPath)
 		[[NSFileManager defaultManager] removeItemAtPath:tmpExtractionPath error:nil];
 
 		// Update systemhook in fakelib
-		[[NSFileManager defaultManager] removeItemAtPath:JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib") error:nil];
-		[[NSFileManager defaultManager] copyItemAtPath:JBROOT_PATH(@"/basebin/systemhook.dylib") toPath:JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib") error:nil];
+		NSString* systemhookFilePath = [NSString stringWithFormat:@"%@/systemhook-%016llX.dylib", NSJBRootPath(@"/basebin"), jbinfo(jbrand)];
+		[[NSFileManager defaultManager] removeItemAtPath:systemhookFilePath error:nil];
+		[[NSFileManager defaultManager] copyItemAtPath:NSJBRootPath(@"/basebin/systemhook.dylib") toPath:systemhookFilePath error:nil];
 
 		// Patch basebin plists
-		NSURL *basebinDaemonsURL = [NSURL fileURLWithPath:JBROOT_PATH(@"/basebin/LaunchDaemons")];
+		NSURL *basebinDaemonsURL = [NSURL fileURLWithPath:NSJBRootPath(@"/basebin/LaunchDaemons")];
 		for (NSURL *basebinDaemonURL in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:basebinDaemonsURL includingPropertiesForKeys:nil options:0 error:nil]) {
 			NSString *plistPath = basebinDaemonURL.path;
 			NSMutableDictionary *plistDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath];
@@ -70,7 +72,7 @@ int jbupdate_basebin(const char *basebinTarPath)
 				NSMutableArray *programArguments = ((NSArray *)plistDict[@"ProgramArguments"]).mutableCopy;
 				for (NSString *argument in [programArguments reverseObjectEnumerator]) {
 					if ([argument containsString:@"@JBROOT@"]) {
-						programArguments[[programArguments indexOfObject:argument]] = [argument stringByReplacingOccurrencesOfString:@"@JBROOT@" withString:JBROOT_PATH(@"/")];
+						programArguments[[programArguments indexOfObject:argument]] = [argument stringByReplacingOccurrencesOfString:@"@JBROOT@" withString:NSJBRootPath(@"/")];
 						madeChanges = YES;
 					}
 				}
@@ -81,7 +83,7 @@ int jbupdate_basebin(const char *basebinTarPath)
 			}
 		}
 
-		NSString *newVersion = [NSString stringWithContentsOfFile:JBROOT_PATH(@"/basebin/.version") encoding:NSUTF8StringEncoding error:nil];
+		NSString *newVersion = [NSString stringWithContentsOfFile:NSJBRootPath(@"/basebin/.version") encoding:NSUTF8StringEncoding error:nil];
 		if (!newVersion) return 6;
 
 		setenv("JBUPDATE_PREV_VERSION", prevVersion.UTF8String, 1);
@@ -107,7 +109,11 @@ void jbupdate_update_system_info(void)
 		void (*xpf_stop)(void) = dlsym(xpfHandle, "xpf_stop");
 		xpc_object_t (*xpf_construct_offset_dictionary)(const char *sets[]) = dlsym(xpfHandle, "xpf_construct_offset_dictionary");
 
-		const char *kernelPath = prebootUUIDPath("/System/Library/Caches/com.apple.kernelcaches/kernelcache");
+		// XXX: this is also a hack
+		struct statfs fst={0};
+		statfs("/usr/standalone/firmware", &fst);
+		char kernelPath[PATH_MAX];
+		snprintf(kernelPath,sizeof(kernelPath),"%s/../../../System/Library/Caches/com.apple.kernelcaches/kernelcache", fst.f_mntfromname);
 		xpc_object_t systemInfoXdict = NULL;
 
 		// Rerun patchfinder
@@ -122,13 +128,15 @@ void jbupdate_update_system_info(void)
 				"struct",
 				"physrw",
 				"perfkrw",
+                "namecache",
+				"amfi_oids",
 				NULL,
 				NULL,
 				NULL,
 				NULL,	
 			};
 
-			uint32_t idx = 7;
+			uint32_t idx = 8;
 			if (xpf_set_is_supported("devmode")) {
 				sets[idx++] = "devmode"; 
 			}
@@ -169,6 +177,7 @@ void jbupdate_update_system_info(void)
 		xpc_dictionary_set_uint64(systemInfoXdict, "kernelConstant.cpuTTEP", kconstant(cpuTTEP));
 		xpc_dictionary_set_uint64(systemInfoXdict, "jailbreakInfo.usesPACBypass", jbinfo(usesPACBypass));
 		xpc_dictionary_set_string(systemInfoXdict, "jailbreakInfo.rootPath", jbinfo(rootPath));
+		xpc_dictionary_set_uint64(systemInfoXdict, "jailbreakInfo.jbrand", jbinfo(jbrand));
 
 		// Rebuild gSystemInfo
 		jbinfo_initialize_dynamic_offsets(systemInfoXdict);
@@ -188,8 +197,8 @@ void jbupdate_finalize_stage2(const char *prevVersion, const char *newVersion)
 	jbupdate_update_system_info();
 
 	// Legacy, this file is no longer used
-	if (!access(JBROOT_PATH("/basebin/.idownloadd_enabled"), F_OK)) {
-		remove(JBROOT_PATH("/basebin/.idownloadd_enabled"));
+	if (!access(JBRootPath("/basebin/.idownloadd_enabled"), F_OK)) {
+		remove(JBRootPath("/basebin/.idownloadd_enabled"));
 	}
 
 	if (strcmp(prevVersion, "2.1") < 0 && strcmp(newVersion, "2.1") >= 0) {
