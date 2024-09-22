@@ -470,7 +470,7 @@ int getCFMajorVersion(void)
 
 -(int) InstallBootstrap:(NSString*)installPath WithCompletion:(void (^)(NSError *))completion
 {
-    [[DOUIManager sharedInstance] sendLog:@"Extracting Bootstrap" debug:NO];
+    [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Extracting Bootstrap") debug:NO];
 
     NSFileManager* fm = NSFileManager.defaultManager;
     
@@ -831,7 +831,7 @@ int getCFMajorVersion(void)
 {
     // Initial setup on first jailbreak
     if ([[NSFileManager defaultManager] fileExistsAtPath:NSJBRootPath(@"/prep_bootstrap.sh")]) {
-        [[DOUIManager sharedInstance] sendLog:@"Finalizing Bootstrap" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Finalizing Bootstrap") debug:NO];
         int r = exec_cmd_trusted(JBRootPath("/bin/sh"), "/prep_bootstrap.sh", NULL);
         if (r != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"prep_bootstrap.sh returned %d\n", r]}];
