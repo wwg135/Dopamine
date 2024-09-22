@@ -108,7 +108,7 @@ jobs:
           export BASEDIR="$(pwd)"
           export THEOS="${BASEDIR}/theos"
           gmake -j$(sysctl -n hw.physicalcpu) NIGHTLY=1
-          mv Application/Dopamine-roothide.tipa Dopamine-roothide.ipa
+          mv Application/Dopamine.tipa Dopamine-roothide.ipa
 
       #- name: Release Logs
         #run: |
