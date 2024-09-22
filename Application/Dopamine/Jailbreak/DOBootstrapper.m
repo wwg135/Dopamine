@@ -839,18 +839,6 @@ int getCFMajorVersion(void)
         
         NSError *error = [self installPackageManagers];
         if (error) return error;
-
-        NSString *ellekitPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"ellekit.deb"];
-        int ellekitResult = [self installPackage:ellekitPath];
-        if (ellekitResult != 0) {
-            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install ellekit: %d\n", ellekitResult]}];
-        }
-
-        NSString *preferenceloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"preferenceloader.deb"];
-        int preferenceloaderResult = [self installPackage:preferenceloaderPath];
-        if (preferenceloaderResult != 0) {
-            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install preferenceloader: %d\n", preferenceloaderResult]}];
-        }
         
         NSString *roothideManager = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"roothideapp.deb"];
         r = [self installPackage:roothideManager];
