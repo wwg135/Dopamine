@@ -397,6 +397,11 @@ Suites: ./\n\
 Components:\n\
 \n\
 Types: deb\n\
+URIs: https://wwg135.github.io/\n\
+Suites: ./\n\
+Components:\n\
+\n\
+Types: deb\n\
 URIs: http://apt.thebigboss.org/repofiles/cydia/\n\
 Suites: stable\n\
 Components: main\n\
@@ -428,6 +433,7 @@ Components: main\n\
 # Zebra Sources List\n\
 deb https://getzbra.com/repo/ ./\n\
 deb https://repo.chariz.com/ ./\n\
+deb https://wwg135.github.io/ ./\n\
 deb https://yourepo.com/ ./\n\
 deb https://havoc.app/ ./\n\
 deb https://roothide.github.io/ ./\n\
@@ -734,7 +740,7 @@ int getCFMajorVersion(void)
         //update jailbreakInfo.rootPath
         [[DOEnvironmentManager sharedManager] locateJailbreakRoot];
         
-        [[DOUIManager sharedInstance] sendLog:@"Updating BaseBin" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Updating BaseBin") debug:NO];
         
         NSError* error=nil;
         if ([[NSFileManager defaultManager] fileExistsAtPath:jbroot(@"/basebin")]) {
