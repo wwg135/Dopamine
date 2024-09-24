@@ -301,15 +301,6 @@
                     [specifiers addObject:removeJailbreakSpecifier];
                 }
             }
-            if(envManager.isJailbroken || envManager.isInstalledThroughTrollStore){
-                PSSpecifier *rebootDeviceSpecifier = [PSSpecifier emptyGroupSpecifier];
-                rebootDeviceSpecifier.target = self;
-                [rebootDeviceSpecifier setProperty:@"Button_Reboot_Device" forKey:@"title"];
-                [rebootDeviceSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-                [rebootDeviceSpecifier setProperty:@"arrow.clockwise.circle" forKey:@"image"];
-                [rebootDeviceSpecifier setProperty:@"rebootDevicePressed" forKey:@"action"];
-                [specifiers addObject:rebootDeviceSpecifier];
-            }
         }
         
         PSSpecifier *themingGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
