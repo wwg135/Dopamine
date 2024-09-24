@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - roothide
+      - RH
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - roothide
+      - RH
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
