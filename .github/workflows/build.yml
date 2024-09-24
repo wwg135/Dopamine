@@ -84,12 +84,6 @@ jobs:
       - name: Pre Version
         run: |
           set -x
-          orig_version=$(cat ./BaseBin/_external/basebin/.version)
-          if [[ "${{ env.VERSION }}" > "$orig_version" ]]; then
-            echo "${{ env.VERSION }}" >./BaseBin/_external/basebin/.version
-            sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
-          fi
-          echo "newVERSION=$(cat ./BaseBin/_external/basebin/.version)" >> $GITHUB_ENV
           #sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/Settings/DOSettingsController.m
 
       - name: Install libarchive
