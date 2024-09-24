@@ -11,13 +11,6 @@ on:
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
-  
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  contents: write
 
 env:
   VERSION: '2.1.7'
@@ -26,15 +19,14 @@ env:
 jobs:
   build:
     runs-on: macos-13
-    environment: Auto Build And Release
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@main
         with:
             submodules: recursive
 
       - name: Pre Procursus
-        uses: wwg135/procursus-action@main
+        uses: w2599/procursus-action@main
         with:
           packages: ldid findutils coreutils make sed
 
@@ -65,70 +57,89 @@ jobs:
         run: |
           sed -i '' "s/com.opa334.Dopamine-roothide/${{ env.BUNDLEID }}/g" ./Application/Dopamine/Jailbreak/DOPreferenceManager.m
           sed -i '' "s/com.opa334.Dopamine-roothide/${{ env.BUNDLEID }}/g" ./Application/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/com.opa334.Dopamine-roothide/${{ env.BUNDLEID }}/g" ./BaseBin/jbctl/src/main.m 
-
-      - name: Set env
-        run: |
-          sT=$(TZ=UTC-8 date +'%S')
-          echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
-          echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
-          echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
-          
-      - name: Print env
-        run: |
-          echo ${{ env.VERSION }}
-          echo ${{ env.msT }}
-          echo ${{ env.shT }}
-          echo ${{ env.logT }}
+          sed -i '' "s/com.opa334.Dopamine-roothide/${{ env.BUNDLEID }}/g" ./BaseBin/jbctl/src/main.m
 
       - name: Pre Version
         run: |
           set -x
-          #sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/Settings/DOSettingsController.m
+          orig_version=$(cat ./BaseBin/_external/basebin/.version)
+          if [[ "${{ env.VERSION }}" > "$orig_version" ]]; then
+            echo "${{ env.VERSION }}" >./BaseBin/_external/basebin/.version
+            sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
+          fi
+          echo "newVERSION=$(cat ./BaseBin/_external/basebin/.version)" >> $GITHUB_ENV
 
-      - name: Install libarchive
+      - name: Pre env
         run: |
-          brew install libarchive
+         sT=$(TZ=UTC-8 date +'%S')
+         echo "msT=$(TZ=UTC-8 date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
+         echo "shT=$(TZ=UTC-8 date +'%Y.%m.%d/%H.%M').${sT}" >> $GITHUB_ENV
+         echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
+         echo "SHASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: Download Bootstraps
+      - name: Log env
         run: |
-          set -x
-          cd Application/Dopamine/Resources
-          ./download_bootstraps.sh
+         echo ${{ env.newVERSION }}
+         echo ${{ env.msT }}
+         echo ${{ env.shT }}
+         echo ${{ env.logT }}
+         echo ${{ env.SHASH }}
 
-      - name: Build ipa
+      - name: Pre code
+        run: |
+          sed -i '' "s/AAAA/v${{ env.newVERSION }}.${{ env.msT }}/g" ./Application/Dopamine/UI/DOMainViewController.m
+          sed -i '' "s/AAAB/不要为了升级而放弃越狱的乐趣~/g" ./Application/Dopamine/UI/DOMainViewController.m
+          sed -i '' "s/AAAB/不要为了升级而放弃越狱的乐趣~/g" ./Application/Dopamine/UI/DOMainViewController.m
+          # sed -i '' "s/opa334/w2599/g" ./Application/Dopamine/UI/Settings/DOCreditsViewController.m
+          # sed -i '' "s/opa334/w2599/g" ./Application/Dopamine/UI/Update/DOUpdateViewController.m
+          # sed -i '' "s/opa334/w2599/g" ./Application/Dopamine/UI/DOUIManager.m
+          
+      # - name: Pre body
+      #   run: |
+      #     echo -e "版本：${{ env.newVERSION }}\n编译时间戳：${{ env.msT }}\n北京时间：${{ env.shT }}" >> body.txt
+      #     echo -e "\n增删改：" >> body.txt
+      #     echo -e "${{ env.logT }}" >> body.txt
+      #     echo -e "> - .1默认主题为修仙.不喜可在设置修改主题~" >> body.txt
+      #     echo -e "> - .2设置界面新增挂载按钮.在最底下~~" >> body.txt
+      #     echo -e "> - . 越狱时自动挂载/var/mobile/newFakePath_RH.plist里面的目录" >> body.txt
+      #     echo -e "> - .3修复更新越狱工具相关代码" >> body.txt
+      #     echo -e "> - .4添加开机时间显示" >> body.txt
+      #     echo -e "> - .5添加禁止更新检测" >> body.txt
+          
+      - name: Pre xcode-select
+        run: |
+          # sudo xcode-select --switch /Applications/Xcode_15.0.app
+
+      # - name: Pre Bootstraps
+      #   run: |
+      #     set -x
+      #     cd Application/Dopamine/Resources
+      #     ./download_bootstraps.sh
+
+      - name: Build tipa
         run: |
           set -x
           export BASEDIR="$(pwd)"
           export THEOS="${BASEDIR}/theos"
           gmake -j$(sysctl -n hw.physicalcpu) NIGHTLY=1
-          mv Application/Dopamine.tipa Dopamine-roothide.ipa
+          # cp Dopamine/Dopamine.tipa Dopamine.tipa
+          mv Application/Dopamine.tipa Dopamine_roothide_blacklist_${{ env.newVERSION }}_${{ env.msT }}_${{ env.SHASH }}.tipa
 
-      #- name: Release Logs
-        #run: |
-          #set -x
-          #echo -e "更新时间：${{ env.logT }}" >> body.txt
-          #echo "" >> ./release.md
-          #cat body.txt > release.txt
-          #echo "" >> release.txt
-          #cat ./release.md >> release.txt
-          
-      #- name: Release ipa
-        #uses: softprops/action-gh-release@v1
-        #with:
-          #name: ${{ env.VERSION }}
-          #tag_name: ${{ env.VERSION }}
-          #target_commitish: 2.x
-          #body_path: release.txt
-          #latest: true
-          #token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          #files: |
-           #*.ipa
+      # - name: Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     name: ${{ env.newVERSION }}
+      #     tag_name: ${{ env.newVERSION }}
+      #     body_path: body.txt
+      #     prerelease: false
+      #     token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+      #     files: |
+      #      *.tipa
 
-      - name: Upload Artifact
+      - name: Upload Latest Artifact
         id: dopamine-latest-upload
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@main
         with:
-          name: Dopamine-roothide
+          name: Dopamine_Latest
           path: |
-           *.ipa
+            *.tipa
