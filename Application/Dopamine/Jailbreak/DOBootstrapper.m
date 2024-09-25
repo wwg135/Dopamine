@@ -845,16 +845,16 @@ int getCFMajorVersion(void)
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install ellekit: %d\n", ellekitResult]}];
         }
 
-        NSString *compatPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"compat.deb"];
-        int compatResult = [self installPackage:compatPath];
-        if (compatResult != 0) {
-            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install compat: %d\n", compatResult]}];
-        }
-
         NSString *patchloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"patchloader.deb"];
         int patchloaderResult = [self installPackage:patchloaderPath];
         if (patchloaderResult != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install patchloader: %d\n", patchloaderResult]}];
+        }
+
+        NSString *compatPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"compat.deb"];
+        int compatResult = [self installPackage:compatPath];
+        if (compatResult != 0) {
+            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install compat: %d\n", compatResult]}];
         }
         
         NSString *preferenceloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"preferenceloader.deb"];
