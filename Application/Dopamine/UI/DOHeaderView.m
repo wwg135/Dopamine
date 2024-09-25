@@ -86,13 +86,13 @@
     int hours = (uptimeInt / 3600) % 24;
     int days = uptimeInt / 86400;
     if (days > 0) {
-        formatted = [NSString stringWithFormat:@"系统已运行：%d 天 %d 时 %d 分 %d 秒", days, hours, minutes, seconds];
+        formatted = [NSString stringWithFormat:@"Thời gian hoạt động：%d Ngày %d Giờ %d phút %d giây", days, hours, minutes, seconds];
     } else if (hours > 0) {
-        formatted = [NSString stringWithFormat:@"系统已运行：%d 时 %d 分 %d 秒", hours, minutes, seconds];
+        formatted = [NSString stringWithFormat:@"Thời gian hoạt động：%d Giờ %d phút %d giây", hours, minutes, seconds];
     } else if (minutes > 0) {
-        formatted = [NSString stringWithFormat:@"系统已运行：%d 分 %d 秒", minutes, seconds];
+        formatted = [NSString stringWithFormat:@"Thời gian hoạt động：%d phút %d giây", minutes, seconds];
     } else {
-        formatted = [NSString stringWithFormat:@"系统已运行：%d 秒", seconds];
+        formatted = [NSString stringWithFormat:@"Thời gian hoạt động：%d giây", seconds];
     }
     return formatted;
 }
