@@ -688,9 +688,6 @@
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint pressLocation = [gesture locationInView:self.view];
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        [alertController addAction:[UIAlertAction actionWithTitle:[self updateTitle] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-             [self checkUpdate]; 
-        }]];
 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
         if (envManager.isJailbroken || envManager.isInstalledThroughTrollStore){
@@ -702,20 +699,6 @@
         [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil]];
         [self presentViewController:alertController animated:YES completion:nil];
     }
-}
-
-- (void)checkUpdate {
-    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"checkForUpdateEnabled" fallback:NO];
-    if (checkEnabled) {
-        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:@"checkForUpdateEnabled"];
-    } else {
-        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:@"checkForUpdateEnabled"];
-    }
-}
-
-- (NSString*)updateTitle {
-    BOOL checkEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"checkForUpdateEnabled" fallback:NO];
-    return checkEnabled ? @"关闭更新" : @"启用更新";
 }
 
 @end
