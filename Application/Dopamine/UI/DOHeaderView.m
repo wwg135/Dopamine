@@ -88,11 +88,11 @@
     if (days > 0) {
         formatted = [NSString stringWithFormat:@"Thời gian hoạt đông：%d Ngày %d Giờ %d phút %d giây", days, hours, minutes, seconds];
     } else if (hours > 0) {
-        formatted = [NSString stringWithFormat:@"hời gian hoạt đông：%d Giờ %d phút %d giây", hours, minutes, seconds];
+        formatted = [NSString stringWithFormat:@"Thời gian hoạt đông：%d Giờ %d phút %d giây", hours, minutes, seconds];
     } else if (minutes > 0) {
-        formatted = [NSString stringWithFormat:@"hời gian hoạt đông：%d phút %d giây", minutes, seconds];
+        formatted = [NSString stringWithFormat:@"Thời gian hoạt đông：%d phút %d giây", minutes, seconds];
     } else {
-        formatted = [NSString stringWithFormat:@"hời gian hoạt đông：%d giây", seconds];
+        formatted = [NSString stringWithFormat:@"Thời gian hoạt đông：%d giây", seconds];
     }
     return formatted;
 }
