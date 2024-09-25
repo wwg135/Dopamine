@@ -140,12 +140,12 @@
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet]; 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
         if (envManager.isJailbroken) {
-            [alertController addAction:[UIAlertAction actionWithTitle:@"重启设备" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [alertController addAction:[UIAlertAction actionWithTitle:@"Reboot" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [[DOEnvironmentManager sharedManager] reboot];
             }]];
         }
 
-        [alertController addAction:[UIAlertAction actionWithTitle:@"自定义主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Chọn ảnh nền" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
             imagePicker.delegate = self;
             imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
@@ -154,7 +154,7 @@
             [viewController presentViewController:imagePicker animated:YES completion:nil];
         }]];
 
-        [alertController addAction:[UIAlertAction actionWithTitle:@"恢复默认主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Khôi phục ảnh mặc định" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             DOTheme *theme = [[DOThemeManager sharedInstance] enabledTheme];
             self.selectedBackgroundImage = nil;
             [self.backgroundImageView setImage:theme.image];
