@@ -520,6 +520,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             @"URIs: https://ellekit.space/\n"
             @"Suites: ./\n"
             @"Components:\n"
+            @"\n"
         NSString *defaultSourcesPath = NSJBRootPath(@"/etc/apt/sources.list.d/default.sources");
         BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:defaultSourcesPath];
         if (!fileExists) {
