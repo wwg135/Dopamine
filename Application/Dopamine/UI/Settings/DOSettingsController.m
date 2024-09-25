@@ -29,9 +29,6 @@
 {
     _lastKnownTheme = [[DOThemeManager sharedInstance] enabledTheme].key;
     [super viewDidLoad];
-
-    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    [self.view addGestureRecognizer:longPressGesture];
 }
 
 - (void)viewWillAppear:(BOOL)arg1
@@ -539,18 +536,6 @@
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
 }
 
-- (void)rebootDevicePressed
-{
-    UIAlertController *confirmationAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Alert_Reboot_Device_Title") message:DOLocalizedString(@"Alert_Reboot_Device_Pressed_Body") preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Continue") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-        [[DOEnvironmentManager sharedManager] reboot];
-    }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
-    [confirmationAlertController addAction:rebootAction];
-    [confirmationAlertController addAction:cancelAction];
-    [self presentViewController:confirmationAlertController animated:YES completion:nil];
-}
-
 - (void)mountPressed
 {
  
@@ -682,23 +667,6 @@
     [[DOUIManager sharedInstance] resetSettings];
     [self.navigationController popToRootViewControllerAnimated:YES];
     [self reloadSpecifiers];
-}
-
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
-    if (gesture.state == UIGestureRecognizerStateBegan) {
-        CGPoint pressLocation = [gesture locationInView:self.view];
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-
-        DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-        if (envManager.isJailbroken || envManager.isInstalledThroughTrollStore){
-            [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [[DOEnvironmentManager sharedManager] reboot];
-            }]];
-        }
-
-        [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
 }
 
 @end
