@@ -469,7 +469,7 @@ int getCFMajorVersion(void)
 
 -(int) InstallBootstrap:(NSString*)installPath WithCompletion:(void (^)(NSError *))completion
 {
-    [[DOUIManager sharedInstance] sendLog:@"Extracting Bootstrap" debug:NO];
+    [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Extracting Bootstrap") debug:NO];
 
     NSFileManager* fm = NSFileManager.defaultManager;
     
