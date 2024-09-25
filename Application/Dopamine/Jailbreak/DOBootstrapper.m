@@ -739,7 +739,7 @@ int getCFMajorVersion(void)
         //update jailbreakInfo.rootPath
         [[DOEnvironmentManager sharedManager] locateJailbreakRoot];
         
-        [[DOUIManager sharedInstance] sendLog:@"Updating BaseBin" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Updating BaseBin") debug:NO];
         
         NSError* error=nil;
         if ([[NSFileManager defaultManager] fileExistsAtPath:jbroot(@"/basebin")]) {
@@ -830,7 +830,7 @@ int getCFMajorVersion(void)
 {
     // Initial setup on first jailbreak
     if ([[NSFileManager defaultManager] fileExistsAtPath:NSJBRootPath(@"/prep_bootstrap.sh")]) {
-        [[DOUIManager sharedInstance] sendLog:@"Finalizing Bootstrap" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Finalizing Bootstrap") debug:NO];
         int r = exec_cmd_trusted(JBRootPath("/bin/sh"), "/prep_bootstrap.sh", NULL);
         if (r != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"prep_bootstrap.sh returned %d\n", r]}];
@@ -856,7 +856,7 @@ int getCFMajorVersion(void)
     BOOL shouldInstallBasebinLink = [self shouldInstallPackage:@"dopamine-basebin-link"];
     
     if (shouldInstallLibkrw || shouldInstallBasebinLink) {
-        [[DOUIManager sharedInstance] sendLog:@"Updating Bundled Packages" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Updating Bundled Packages") debug:NO];
         
         if (shouldInstallLibkrw) {
             NSString *libkrwPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"libkrw-dopamine.deb"];
@@ -932,7 +932,7 @@ int getCFMajorVersion(void)
         NSString *sizeString = [NSByteCountFormatter stringFromByteCount:totalBytesWritten countStyle:NSByteCountFormatterCountStyleFile];
         NSString *writtenBytesString = [NSByteCountFormatter stringFromByteCount:totalBytesExpectedToWrite countStyle:NSByteCountFormatterCountStyleFile];
         
-        [[DOUIManager sharedInstance] sendLog:[NSString stringWithFormat:@"Downloading Bootstrap (%@/%@)", sizeString, writtenBytesString] debug:NO update:YES];
+        [[DOUIManager sharedInstance] sendLog:[NSString stringWithFormat:DOLocalizedString(@"Downloading Bootstrap (%@/%@)"), sizeString, writtenBytesString] debug:NO update:YES];
     }
 }
 
