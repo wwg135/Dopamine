@@ -22,7 +22,7 @@ permissions:
 
 env:
   VERSION: '2.1.7'
-  BUNDLEID: 'com.wwg135.Dopamine'
+  BUNDLEID: 'com.opa334.Dopamine'
 
 jobs:
   build:
@@ -86,7 +86,7 @@ jobs:
         run: |
           echo "${{ env.VERSION }}" >./BaseBin/_external/basebin/.version
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/DOMainViewController.m
+          sed -i '' "s/AAA/${{ env.shT }} /g" ./Application/Dopamine/UI/DOMainViewController.m
 
       - name: Install libarchive
         run: |
@@ -123,6 +123,5 @@ jobs:
           target_commitish: 2.x
           body_path: release.txt
           latest: true
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
