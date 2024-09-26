@@ -9,6 +9,7 @@
 #import "DOThemeManager.h"
 
 @interface DOPSListController ()
+@property (nonatomic) CGRect currentFrame;
 
 @end
 
@@ -29,6 +30,8 @@
     UIView *resizeHandle = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width - 20, self.view.bounds.size.height - 20, 20, 20)];
     resizeHandle.backgroundColor = [UIColor blueColor]; // 可根据需要设置颜色
     [self.view addSubview:resizeHandle];
+
+    self.currentFrame = self.view.frame;
 }
 
 + (void)setupViewControllerStyle:(UIViewController*)vc
@@ -45,6 +48,11 @@
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     cell.backgroundColor = [UIColor clearColor];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
+  self.view.frame = self.currentFrame;
 }
 
 - (void)viewDidLayoutSubviews {
@@ -68,6 +76,8 @@
     
     self.view.frame = frame;
     [gesture setTranslation:CGPointZero inView:self.view];
+
+    self.currentFrame = self.view.frame;
 }
 
 @end
