@@ -69,12 +69,19 @@
     CGRect frame = self.view.frame;
     frame.size.width *= scale;
     frame.size.height *= scale;
+    
     self.view.frame = frame;
     
     // 根据缩放比例调整字体大小
-    CGFloat fontSize = 17.0 * scale; // 初始字体大小为 16，可根据需要调整
-    UIFont *font = [UIFont systemFontOfSize:fontSize];
-    _label.font = font; // 假设_label是你的一个UILabel
+    CGFloat fontSize = 17.0 * scale; // 初始字体大小为 17，可根据需要调整
+    
+    for (UIView *subview in self.view.subviews) {
+        if ([subview isKindOfClass:[UILabel class]]) {
+            UILabel *label = (UILabel *)subview;
+            label.font = [UIFont systemFontOfSize:fontSize];
+        }
+    }
+    
     gesture.scale = 1.0;
 }
 
