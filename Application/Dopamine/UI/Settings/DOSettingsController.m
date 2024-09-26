@@ -555,7 +555,7 @@
         }]];
 
         DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
-        if (envManager.isJailbroken) {
+        if (envManager.isJailbroken || (envManager.isInstalledThroughTrollStore)) {
             [alertController addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [[DOEnvironmentManager sharedManager] reboot];
             }]];
