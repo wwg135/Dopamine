@@ -20,6 +20,15 @@
     [_table setSeparatorColor:[UIColor clearColor]];
     [_table setBackgroundColor:[UIColor clearColor]];
     [DOPSListController setupViewControllerStyle:self];
+
+    // 添加拖动手势识别器
+    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+    [self.view addGestureRecognizer:panGesture];
+    
+    // 添加拖动大小标志视图
+    UIView *resizeHandle = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width - 20, self.view.bounds.size.height - 20, 20, 20)];
+    resizeHandle.backgroundColor = [UIColor blueColor]; // 可根据需要设置颜色
+    [self.view addSubview:resizeHandle];
 }
 
 + (void)setupViewControllerStyle:(UIViewController*)vc
@@ -50,5 +59,15 @@
     return UIStatusBarStyleLightContent;
 }
 
+- (void)handlePan:(UIPanGestureRecognizer *)gesture {
+    CGPoint translation = [gesture translationInView:self.view];
+    
+    CGRect frame = self.view.frame;
+    frame.size.width += translation.x;
+    frame.size.height += translation.y;
+    
+    self.view.frame = frame;
+    [gesture setTranslation:CGPointZero inView:self.view];
+}
 
 @end
