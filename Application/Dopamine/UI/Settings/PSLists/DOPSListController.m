@@ -63,15 +63,19 @@
     return UIStatusBarStyleLightContent;
 }
 
-- (void)handlePan:(UIPanGestureRecognizer *)gesture {
-    CGPoint translation = [gesture translationInView:self.view];
+- (void)handlePinch:(UIPinchGestureRecognizer *)gesture {
+    CGFloat scale = gesture.scale;
     
     CGRect frame = self.view.frame;
-    frame.size.width += translation.x;
-    frame.size.height += translation.y;
-    
+    frame.size.width *= scale;
+    frame.size.height *= scale;
     self.view.frame = frame;
-    [gesture setTranslation:CGPointZero inView:self.view];
+    
+    // 根据缩放比例调整字体大小
+    CGFloat fontSize = 17.0 * scale; // 初始字体大小为 16，可根据需要调整
+    UIFont *font = [UIFont systemFontOfSize:fontSize];
+    _label.font = font; // 假设_label是你的一个UILabel
+    gesture.scale = 1.0;
 }
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
