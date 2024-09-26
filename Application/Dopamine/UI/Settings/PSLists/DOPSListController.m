@@ -29,6 +29,10 @@
     UIView *resizeHandle = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width - 20, self.view.bounds.size.height - 20, 20, 20)];
     resizeHandle.backgroundColor = [UIColor blueColor]; // 可根据需要设置颜色
     [self.view addSubview:resizeHandle];
+
+    // 添加长按手势识别器
+    UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+    [self.view addGestureRecognizer:longPressGesture];
 }
 
 + (void)setupViewControllerStyle:(UIViewController*)vc
@@ -68,6 +72,13 @@
     
     self.view.frame = frame;
     [gesture setTranslation:CGPointZero inView:self.view];
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        CGPoint location = [gesture locationInView:self.view];
+        self.view.center = location;
+    }
 }
 
 @end
