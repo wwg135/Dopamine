@@ -55,11 +55,6 @@
   self.view.frame = self.currentFrame;
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    _table.frame = CGRectMake(12, 5, self.view.bounds.size.width - 24, self.view.bounds.size.height - 10);
-}
-
 #pragma mark - Status Bar
 
 - (UIStatusBarStyle)preferredStatusBarStyle
