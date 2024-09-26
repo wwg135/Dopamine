@@ -37,9 +37,6 @@
             [border.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-2],
             [border.heightAnchor constraintEqualToConstant:1]
         ]];
-
-        UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-        [self.contentView addGestureRecognizer:panGesture];
     }
     return self;
 }
@@ -47,16 +44,6 @@
 - (CGFloat)preferredHeightForWidth:(CGFloat)width
 {
 	return 60;
-}
-
-- (void)handlePan:(UIPanGestureRecognizer *)gesture {
-    CGPoint translation = [gesture translationInView:self.contentView];
-    CGRect frame = self.contentView.frame;
-    frame.size.width += translation.x;
-    frame.size.height += translation.y;
-    
-    self.contentView.frame = frame;  
-    [gesture setTranslation:CGPointZero inView:self.contentView];
 }
 
 @end
