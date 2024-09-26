@@ -29,6 +29,16 @@
     UIView *resizeHandle = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width - 20, self.view.bounds.size.height - 20, 20, 20)];
     resizeHandle.backgroundColor = [UIColor blueColor]; // 可根据需要设置颜色
     [self.view addSubview:resizeHandle];
+
+    // 恢复保存的窗口大小
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    CGFloat savedWidth = [userDefaults floatForKey:@"savedWidth"];
+    CGFloat savedHeight = [userDefaults floatForKey:@"savedHeight"];
+    
+    if (savedWidth > 0 && savedHeight > 0) {
+        CGRect savedFrame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, savedWidth, savedHeight);
+        self.view.frame = savedFrame;
+    }
 }
 
 + (void)setupViewControllerStyle:(UIViewController*)vc
@@ -45,6 +55,16 @@
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     cell.backgroundColor = [UIColor clearColor];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    // 保存当前窗口大小
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setFloat:self.view.frame.size.width forKey:@"savedWidth"];
+    [userDefaults setFloat:self.view.frame.size.height forKey:@"savedHeight"];
+    [userDefaults synchronize];
 }
 
 - (void)viewDidLayoutSubviews {
