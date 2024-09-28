@@ -7,6 +7,7 @@
 
 #import "DOHeaderView.h"
 #import "DOThemeManager.h"
+#import "DOPreferenceManager.h"
 
 @interface DOHeaderView ()
 
@@ -51,8 +52,12 @@
             label.attributedText = formatedText;
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
-            if (idx == 2) {
-		        self.timerLabel = label;
+
+	    NSNumber *showEnabled = [[DOPreferenceManager sharedManager] preferenceValueForKey:@"showUpTimeEnabled"];
+	    if ([showEnabled boolValue]) {
+            	if (idx == 2) {
+		    self.timerLabel = label;
+      		}
             }
         }];
 

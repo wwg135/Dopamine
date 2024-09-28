@@ -145,6 +145,10 @@
             }]];
         }
 
+        [alertController addAction:[UIAlertAction actionWithTitle:[self showUpTimetitle] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+             [self showUpTime]; 
+        }]];
+
         [alertController addAction:[UIAlertAction actionWithTitle:@"自定义主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self deleteAppTmpDirectory];
             UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
@@ -201,6 +205,20 @@
     } else {
         NSLog(@"App's tmp directory deleted successfully.");
     }
+}
+
+- (void)showUpTime {
+    BOOL showEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"showUpTimeEnabled" fallback:NO];
+    if (showEnabled) {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(NO) forKey:@"showUpTimeEnabled"];
+    } else {
+        [[DOPreferenceManager sharedManager] setPreferenceValue:@(YES) forKey:@"showUpTimeEnabled"];
+    }
+}
+
+- (NSString*)showUpTimetitle {
+    BOOL showEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"showUpTimeEnabled" fallback:NO];
+    return showEnabled ? @"隐藏运行时间" : @"显示运行时间";
 }
 
 @end
