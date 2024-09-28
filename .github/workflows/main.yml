@@ -123,6 +123,5 @@ jobs:
           target_commitish: 2.x
           body_path: release.txt
           latest: true
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
