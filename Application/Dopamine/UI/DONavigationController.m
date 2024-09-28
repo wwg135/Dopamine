@@ -151,7 +151,7 @@
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"查看插件配置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             NSFileManager* fm = NSFileManager.defaultManager;
-            NSURL *filzaURL = [NSURL URLWithString:[fm jbroot:@"/var/mobile/Library/Preferences"]];
+            NSURL *filzaURL = [NSURL URLWithString:@"fm jbroot(/var/mobile/Library/Preferences)"];
             [[UIApplication sharedApplication] openURL:filzaURL options:@{} completionHandler:nil]; 
         }]];
 
