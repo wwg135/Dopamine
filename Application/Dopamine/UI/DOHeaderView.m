@@ -53,8 +53,8 @@
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
 
-     	    BOOL showEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"showUpTimeEnabled"];
-	    if (showEnabled) {
+	    NSNumber *showEnabled = [_preferenceManager preferenceValueForKey:@"showUpTimeEnabled"];
+	    if ([showEnabled boolValue]) {
             	if (idx == 2) {
 		    self.timerLabel = label;
       		}
