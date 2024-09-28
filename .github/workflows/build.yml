@@ -107,18 +107,6 @@ jobs:
           cat body.txt > release.txt
           echo "" >> release.txt
           cat ./release.md >> release.txt
-          
-      - name: Release ipa
-        uses: softprops/action-gh-release@v1
-        with:
-          name: roothide 2.1.7
-          tag_name: roothide
-          target_commitish: RH
-          body_path: release.txt
-          latest: true
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          files: |
-           *.ipa
 
       - name: Upload Artifact
         id: dopamine-latest-upload
