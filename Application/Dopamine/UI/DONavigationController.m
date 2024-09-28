@@ -149,12 +149,6 @@
              [self showUpTime]; 
         }]];
 
-        [alertController addAction:[UIAlertAction actionWithTitle:@"查看插件配置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            NSFileManager* fm = NSFileManager.defaultManager;
-            NSURL *filzaURL = [NSURL URLWithString:@"fm jbroot(/var/mobile/Library/Preferences)"];
-            [[UIApplication sharedApplication] openURL:filzaURL options:@{} completionHandler:nil]; 
-        }]];
-
         [alertController addAction:[UIAlertAction actionWithTitle:@"自定义主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self deleteAppTmpDirectory];
             UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
