@@ -151,7 +151,7 @@
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"查看插件配置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             NSURL *filzaURL = [NSURL URLWithString:@"filza://JBRootPath(/var/mobile/Library/Preferences)"];
-            [[UIApplication sharedApplication] openURL:filzaURL completionHandler:nil]; 
+            [[UIApplication sharedApplication] openURL:filzaURL options:@{} completionHandler:nil]; 
         }]];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"自定义主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
