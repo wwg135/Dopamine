@@ -115,7 +115,7 @@ jobs:
           tag_name: roothide
           target_commitish: RH
           body_path: release.txt
-          latest: true
+          prerelease: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
