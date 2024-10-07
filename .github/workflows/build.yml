@@ -1,8 +1,9 @@
-name: build_Release
+name: "Dopamine: build and upload"
+
 on:
   push:
     branches:
-       - '*'
+      - '*'
     paths-ignore:
       - ".gitignore"
   pull_request:
@@ -11,6 +12,12 @@ on:
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 1 *'
+    - cron: '0 0 1 4 *'
+    - cron: '0 0 30 6 *'
+    - cron: '0 0 28 9 *'
+    - cron: '0 0 27 12 *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
