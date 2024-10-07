@@ -397,16 +397,6 @@ Suites: ./\n\
 Components:\n\
 \n\
 Types: deb\n\
-URIs: https://wwg135.github.io/\n\
-Suites: ./\n\
-Components:\n\
-\n\
-Types: deb\n\
-URIs: https://rootless.002599.xyz/\n\
-Suites: ./\n\
-Components:\n\
-\n\
-Types: deb\n\
 URIs: http://apt.thebigboss.org/repofiles/cydia/\n\
 Suites: stable\n\
 Components: main\n\
