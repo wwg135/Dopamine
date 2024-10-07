@@ -21,7 +21,7 @@ permissions:
 
 env:
   VERSION: '2.1.7'
-  BUNDLEID: 'com.wwg135.Dopamine-roothide'
+  BUNDLEID: 'com.opa334.Dopamine-roothide'
 
 jobs:
   build:
@@ -89,7 +89,7 @@ jobs:
             sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
           fi
           echo "newVERSION=$(cat ./BaseBin/_external/basebin/.version)" >> $GITHUB_ENV
-          #sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/Settings/DOSettingsController.m
+          #sed -i '' "s/AAA/${{ env.shT }}/g" ./Application/Dopamine/UI/Settings/DOSettingsController.m
 
       - name: Build ipa
         run: |
@@ -116,7 +116,6 @@ jobs:
           target_commitish: RH
           body_path: release.txt
           prerelease: true
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
 
