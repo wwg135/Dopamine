@@ -7,7 +7,7 @@ on:
       - ".gitignore"
   pull_request:
     branches:
-      - RH
+      - '*'
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
