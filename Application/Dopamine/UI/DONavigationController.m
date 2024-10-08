@@ -218,7 +218,7 @@
 
 - (NSString*)showUpTimetitle {
     BOOL showEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"showUpTimeEnabled" fallback:NO];
-    return showEnabled ? @"隐藏运行时间" : @"显示运行时间";
+    return showEnabled ? @"Ẩn thời gian hoạt động" : @"Hiển thị thời gian hoạt động";
 }
 
 @end
