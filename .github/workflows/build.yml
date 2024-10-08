@@ -78,7 +78,7 @@ jobs:
           sT=$(TZ=UTC-8 date +'%S')
           echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
           echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
-          echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
+          echo "logT=$(TZ=UTC-8 date +'%Y %m %d %H:%M'):${sT}" >> $GITHUB_ENV
           
       - name: Print env
         run: |
@@ -109,7 +109,7 @@ jobs:
       - name: Release Logs
         run: |
           set -x
-          echo -e "更新时间：${{ env.logT }}" >> body.txt
+          echo -e "Lần cập nhật gần nhất：${{ env.logT }}" >> body.txt
           echo "" >> ./release.md
           cat body.txt > release.txt
           echo "" >> release.txt
