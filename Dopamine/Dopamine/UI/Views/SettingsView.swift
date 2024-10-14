@@ -23,8 +23,6 @@ struct SettingsView: View {
     @State var removeJailbreakAlertShown = false
     @State var isSelectingPackageManagers = false
     @State var tweakInjectionToggledAlertShown = false
-    @State var backupAlertShown = false
-    @State var completedAlert = false
     
     init(isPresented: Binding<Bool>?) {
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .init(named: "AccentColor")
@@ -119,30 +117,7 @@ struct SettingsView: View {
                                                 .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
                                         )
                                     }
-                                }
-                                if isJailbroken() {
-                                    if hiddenFunction {
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            backupAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "doc")
-                                                Text("Button_Backup")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
-                                            }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
-                                        }
-                                    } else {
-                                    }
-                                }
+                                } 
                             }
                         }
                     }
@@ -184,31 +159,7 @@ struct SettingsView: View {
                             Button("Menu_Reboot_Userspace_Title") {
                                 userspaceReboot()
                             }
-                        }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })
-                        .alert("Settings_Backup_Alert_Title", isPresented: $backupAlertShown, actions: {
-                            Button("Button_Cancel", role: .cancel) { }
-                            Button("Button_Set") {
-                                let fileManager = FileManager.default
-                                let filePath = "/var/mobile/Documents/DebBackup/"
-                                do {
-                                    let contents = try fileManager.contentsOfDirectory(atPath: filePath)
-                                    if contents.isEmpty {
-                                        backupAlertShown = false
-                                        showAlert(title: "备份失败", message: "请先使用“DEB备份”app备份插件！！！")
-                                    } else {
-                                        backup()
-                                        completedAlert = true
-                                    }
-                                } catch {
-                                }
-                            }
-                        }, message: { Text("Settings_One-click_Backup") })
-                        .alert("备份成功", isPresented: $completedAlert, actions: {
-                            Button("好的") {
-                                backupAlertShown = false
-                            }
-                        }, message: { Text("请使用Filza打开路径：var/mobile/backup+日期时间/，查看是否成功.") })
-                        .frame(maxHeight: 0)        
+                        }, message: { Text("Alert_Tweak_Injection_Toggled_Body") })      
                 }
                 .foregroundColor(.white)              
             } else {
@@ -234,12 +185,6 @@ struct SettingsView: View {
         } else {
             return String(format: "%.1f", Double(successfulJailbreaks) / Double(totalJailbreaks) * 100)
         }
-    }
-
-    func showAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "确定", style: .default, handler: nil))
-        UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true, completion: nil)
     }
 }
 
