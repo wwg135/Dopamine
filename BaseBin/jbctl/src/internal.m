@@ -74,7 +74,7 @@ void initMountPath(NSString *mountPath)
     bool new = NO;
 
     if([fileManager fileExistsAtPath:mountPath]){
-        NSString *newPath = NSJBRootPathMnt(mountPath); 
+        NSString *newPath = [NSString stringWithFormat:@"%@%@", JBROOT_PATH(@"/mnt"), mountPath];
 
         if (![fileManager fileExistsAtPath:newPath]) {
             [fileManager createDirectoryAtPath:newPath withIntermediateDirectories:YES attributes:nil error:nil];
