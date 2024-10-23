@@ -16,3 +16,4 @@ cmake-build-*
 jbupdate.sh
 BaseBin/jbupdate.sh
 BaseBin/opainject
+update.sh
