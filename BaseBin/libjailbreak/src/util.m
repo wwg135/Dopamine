@@ -12,6 +12,16 @@ NSString *NSPrebootUUIDPath(NSString *relativePath)
 }
 */
 
+NSString *NSJBRootPathMnt(NSString *relativePath)
+{
+	@autoreleasepool {
+		NSString *rootPath = [NSString stringWithUTF8String:jbinfo(rootPath)];
+		NSString *pathWithMnt = [rootPath stringByAppendingPathComponent:@"mnt"];
+		NSString *fullPath = [pathWithMnt stringByAppendingPathComponent:relativePath];
+		return fullPath;
+	}
+}
+
 void _JBFixMobilePermissionsOfDirectory(NSString *directoryPath, BOOL recursive)
 {
 	struct stat s;

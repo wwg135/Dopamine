@@ -12,15 +12,5 @@
 		<key>Package</key>
 		<string>sileo.deb</string>
 	</dict>
-	<dict>
-		<key>Display Name</key>
-		<string>Zebra</string>
-		<key>Key</key>
-		<string>xyz.willy.Zebra</string>
-		<key>Icon</key>
-		<string>Zebra</string>
-		<key>Package</key>
-		<string>zebra.deb</string>
-	</dict>
 </array>
 </plist>

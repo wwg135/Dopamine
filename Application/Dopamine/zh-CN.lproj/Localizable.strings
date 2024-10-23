@@ -11,7 +11,7 @@
 
 // Action Menu
 "Menu_Settings_Title" = "设置";
-"Menu_Restart_SpringBoard_Title" = "重启 SpringBoard";
+"Menu_Restart_SpringBoard_Title" = "注销";
 "Menu_Reboot_Userspace_Title" = "重启用户空间";
 "Menu_Credits_Title" = "关于";
 
@@ -108,12 +108,28 @@
 "Exploiting Kernel (%@)" = "正在利用内核 (%@)";
 "Bypassing PAC (%@)" = "正在绕过 PAC (%@)";
 "Bypassing PPL (%@)" = "正在绕过 PPL (%@)";
+"Checking For Duplicate Apps" = "检查重复应用程序";
+"Updating BaseBin" = "更新基础套件";
+"Extracting Bootstrap" = "提取引导";
+"Downloading Bootstrap" = "安装引导";
+"Finalizing Bootstrap" = "完成引导";
+"Updating Bundled Packages" = "更新捆绑包";
+"Downloading Bootstrap (%@/%@)" = "安装引导 (%@/%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "请选择包管理器";
 "Select_Package_Managers_Install_Message" = "如果你不确定选择哪一个比较好，请选择 Sileo";
 "Continue" = "继续";
 
+<<<<<<< HEAD
+=======
+"Menu_Reboot_Title" = "重启设备";
+"Settings" = "设置";
+"Mismatching_Environment_Version_Update_Body" = "本机的越狱环境版本与已更新安装 App 版本不匹配。 \n点击更新按钮执行一次「重启用户空间」更新越狱环境。";
+"Error" = "错误";
+"rootless dopamine jailbroken at present, please reboot the device." = "目前在无根多巴胺越狱状态中，请重启设备后再越狱！";
+
+>>>>>>> origin/roothide217
 // mount 
 "Input_Mmount_Title" = "新增挂载";
 "Input_Unmount_Title" = "管理挂载";
@@ -124,8 +140,15 @@
 "Button_View" = "Filza查看";
 "Button_Mount" = "确定";
 
+<<<<<<< HEAD
 "Input_Unmount_Title_B" = "输入原始路径";
 "Input_Unmount_Path" = "输入原始路径";
 "Button_Unmount" = "确定";
 "System_Uptime_Format" = "已运行: %d天 %d时 %d分 %d秒";
 
+=======
+"Input_Unmount_Title" = "取消挂载";
+"Input_Unmount_Title_B" = "输入原始路径";
+"Input_Unmount_Path" = "输入原始路径";
+"Button_Unmount" = "确定";
+>>>>>>> origin/roothide217

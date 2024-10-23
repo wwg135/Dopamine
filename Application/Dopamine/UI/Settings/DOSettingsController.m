@@ -162,7 +162,7 @@
         
         PSSpecifier *headerSpecifier = [PSSpecifier emptyGroupSpecifier];
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
-        [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Menu_Settings_Title")] forKey:@"title"];
+        [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
         
         if (envManager.isSupported) {
@@ -372,13 +372,13 @@
             [specifiers addObject:unmountSpecifier];
         }
 
-			PSSpecifier *rebootSpecifier = [PSSpecifier emptyGroupSpecifier];
-            rebootSpecifier.target = self;
-            [rebootSpecifier setProperty:@"Button_Reboot" forKey:@"title"];
-            [rebootSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
-            [rebootSpecifier setProperty:@"arrow.triangle.2.circlepath" forKey:@"image"];
-            [rebootSpecifier setProperty:@"rebootPressed" forKey:@"action"];
-            [specifiers addObject:rebootSpecifier];
+			// 			PSSpecifier *rebootSpecifier = [PSSpecifier emptyGroupSpecifier];
+            // rebootSpecifier.target = self;
+            // [rebootSpecifier setProperty:@"Button_Reboot" forKey:@"title"];
+            // [rebootSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            // [rebootSpecifier setProperty:@"arrow.triangle.2.circlepath" forKey:@"image"];
+            // [rebootSpecifier setProperty:@"rebootPressed" forKey:@"action"];
+            // [specifiers addObject:rebootSpecifier];
         
 
         _specifiers = specifiers;
@@ -705,8 +705,6 @@
     [self presentViewController:listAlertController animated:YES completion:nil];
 }
 
-
-
 - (void)resetSettingsPressed
 {
     [[DOUIManager sharedInstance] resetSettings];
@@ -739,27 +737,5 @@
     [confirmationAlertController addAction:cancelAction];
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
 }
-- (void)rebootPressed
-{
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Button_Reboot")
-                                                                   message:DOLocalizedString(@"Update_Status_Subtitle_Restart_Soon")
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel")
-                                                             style:UIAlertActionStyleCancel
-                                                           handler:nil];
-    
-    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Reboot")
-                                                             style:UIAlertActionStyleDestructive
-                                                           handler:^(UIAlertAction * _Nonnull action) {
-        exec_cmd_root(JBROOT_PATH("/sbin/reboot"), NULL);
-    }];
-    
-    [alert addAction:cancelAction];
-    [alert addAction:rebootAction];
-    
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
 
 @end

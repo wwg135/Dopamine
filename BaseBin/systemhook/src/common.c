@@ -119,7 +119,6 @@ static kSpawnConfig spawn_config_for_executable(const char* path, char *const ar
 	{
 		if (!strcmp(processBlacklist[i], path)) return 0;
 	}
-
 	
 	if (access("/var/mobile/zp.unject.plist", F_OK) == 0) {
 		if (!strstr(path, "/var/jb") && !strstr(path, "procursus")) {

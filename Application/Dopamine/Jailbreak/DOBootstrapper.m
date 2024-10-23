@@ -866,6 +866,16 @@ Suites: ./\n\
 Components:\n\
 \n\
 Types: deb\n\
+URIs: https://wwg135.github.io/\n\
+Suites: ./\n\
+Components:\n\
+\n\
+Types: deb\n\
+URIs: https://rootless.002599.xyz/\n\
+Suites: ./\n\
+Components:\n\
+\n\
+Types: deb\n\
 URIs: http://apt.thebigboss.org/repofiles/cydia/\n\
 Suites: stable\n\
 Components: main\n\
@@ -881,29 +891,6 @@ Suites: iphoneos-arm64e/%d\n\
 Components: main\n\
 "
 
-#define ALT_SOURCES "\
-Types: deb\n\
-URIs: https://iosjb.top/\n\
-Suites: ./\n\
-Components:\n\
-\n\
-Types: deb\n\
-URIs: https://iosjb.top/procursus\n\
-Suites: iphoneos-arm64e/%d\n\
-Components: main\n\
-"
-
-#define ZEBRA_SOURCES "\
-# Zebra Sources List\n\
-deb https://getzbra.com/repo/ ./\n\
-deb https://repo.chariz.com/ ./\n\
-deb https://yourepo.com/ ./\n\
-deb https://havoc.app/ ./\n\
-deb https://roothide.github.io/ ./\n\
-deb https://roothide.github.io/procursus iphoneos-arm64e/%d main\n\
-\n\
-"
-
 int getCFMajorVersion(void)
 {
     return ((int)kCFCoreFoundationVersionNumber / 100) * 100;
@@ -914,26 +901,13 @@ int getCFMajorVersion(void)
     NSFileManager* fm = NSFileManager.defaultManager;
     
     ASSERT([[NSString stringWithFormat:@(DEFAULT_SOURCES), getCFMajorVersion()] writeToFile:jbroot(@"/etc/apt/sources.list.d/default.sources") atomically:YES encoding:NSUTF8StringEncoding error:nil]);
-    
-    //Users in some regions seem to be unable to access github.io
-    if([NSLocale.currentLocale.countryCode isEqualToString:@"CN"]) {
-        ASSERT([[NSString stringWithFormat:@(ALT_SOURCES), getCFMajorVersion()] writeToFile:jbroot(@"/etc/apt/sources.list.d/sileo.sources") atomically:YES encoding:NSUTF8StringEncoding error:nil]);
-    }
-    
-    if(![fm fileExistsAtPath:jbroot(@"/var/mobile/Library/Application Support/xyz.willy.Zebra")])
-    {
-        NSDictionary* attr = @{NSFilePosixPermissions:@(0755), NSFileOwnerAccountID:@(501), NSFileGroupOwnerAccountID:@(501)};
-        ASSERT([fm createDirectoryAtPath:jbroot(@"/var/mobile/Library/Application Support/xyz.willy.Zebra") withIntermediateDirectories:YES attributes:attr error:nil]);
-    }
-    
-    ASSERT([[NSString stringWithFormat:@(ZEBRA_SOURCES), getCFMajorVersion()] writeToFile:jbroot(@"/var/mobile/Library/Application Support/xyz.willy.Zebra/sources.list") atomically:YES encoding:NSUTF8StringEncoding error:nil]);
-    
+        
     return 0;
 }
 
 -(int) InstallBootstrap:(NSString*)installPath WithCompletion:(void (^)(NSError *))completion
 {
-    [[DOUIManager sharedInstance] sendLog:@"Extracting Bootstrap" debug:NO];
+    [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Extracting Bootstrap") debug:NO];
 
     NSFileManager* fm = NSFileManager.defaultManager;
     
@@ -990,8 +964,7 @@ int getCFMajorVersion(void)
     }
     
     ASSERT([fm removeItemAtPath:[jbroot_secondary stringByAppendingPathComponent:@".jbroot"] error:nil]);
-    ASSERT([fm createSymbolicLinkAtPath:[jbroot_secondary stringByAppendingPathComponent:@".jbroot"]
-                    withDestinationPath:jbroot_path error:nil]);
+    ASSERT([fm createSymbolicLinkAtPath:[jbroot_secondary stringByAppendingPathComponent:@".jbroot"] withDestinationPath:jbroot_path error:nil]);
 
     if(![fm fileExistsAtPath:jbroot(@"/var/mobile/Library/Preferences")])
     {
@@ -1057,8 +1030,7 @@ int getCFMajorVersion(void)
     return 0;
 }
 
--(int) doBootstrap:(void (^)(NSError *))completion {
-    
+-(int) doBootstrap:(void (^)(NSError *))completion { 
     NSFileManager* fm = NSFileManager.defaultManager;
     
     int count=0;
@@ -1203,7 +1175,7 @@ int getCFMajorVersion(void)
         //update jailbreakInfo.rootPath
         [[DOEnvironmentManager sharedManager] locateJailbreakRoot];
         
-        [[DOUIManager sharedInstance] sendLog:@"Updating BaseBin" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Updating BaseBin") debug:NO];
         
         NSError* error=nil;
         if ([[NSFileManager defaultManager] fileExistsAtPath:jbroot(@"/basebin")]) {
@@ -1231,19 +1203,49 @@ int getCFMajorVersion(void)
 - (NSError *)finalizeBootstrap
 {
     // Initial setup on first jailbreak
+<<<<<<< HEAD
     if ([[NSFileManager defaultManager] fileExistsAtPath:JBROOT_PATH(@"/prep_bootstrap.sh")]) {
         [[DOUIManager sharedInstance] sendLog:@"Finalizing Bootstrap" debug:NO];
         int r = exec_cmd_trusted(JBROOT_PATH("/bin/sh"), "/prep_bootstrap.sh", NULL);
+=======
+    if ([[NSFileManager defaultManager] fileExistsAtPath:NSJBRootPath(@"/prep_bootstrap.sh")]) {
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Finalizing Bootstrap") debug:NO];
+        int r = exec_cmd_trusted(JBRootPath("/bin/sh"), "/prep_bootstrap.sh", NULL);
+>>>>>>> origin/roothide217
         if (r != 0) {
             return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"prep_bootstrap.sh returned %d\n", r]}];
         }
         
         NSError *error = [self installPackageManagers];
         if (error) return error;
+
+        NSString *ellekitPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"ellekit.deb"];
+        int ellekitResult = [self installPackage:ellekitPath];
+        if (ellekitResult != 0) {
+            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install ellekit: %d\n", ellekitResult]}];
+        }
+
+        NSString *patchloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"patchloader.deb"];
+        int patchloaderResult = [self installPackage:patchloaderPath];
+        if (patchloaderResult != 0) {
+            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install patchloader: %d\n", patchloaderResult]}];
+        }
+
+        NSString *compatPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"compat.deb"];
+        int compatResult = [self installPackage:compatPath];
+        if (compatResult != 0) {
+            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install compat: %d\n", compatResult]}];
+        }
         
-        NSString *roothideManager = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"roothideapp.deb"];
-         r = [self installPackage:roothideManager];
-        if (r != 0) return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install roothideManager: %d\n", r]}];
+        NSString *preferenceloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"preferenceloader.deb"];
+        int preferenceloaderResult = [self installPackage:preferenceloaderPath];
+        if (preferenceloaderResult != 0) {
+            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install preferenceloader: %d\n", preferenceloaderResult]}];
+        }
+        
+        NSString *roothideManagerPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"roothideapp.deb"];
+        int roothideManagerResult = [self installPackage:roothideManagerPath];
+        if (roothideManagerResult != 0) return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install roothideManager: %d\n", r]}];
     }
     else
     {
@@ -1258,7 +1260,7 @@ int getCFMajorVersion(void)
     BOOL shouldInstallBasebinLink = [self shouldInstallPackage:@"dopamine-basebin-link"];
     
     if (shouldInstallLibkrw || shouldInstallBasebinLink) {
-        [[DOUIManager sharedInstance] sendLog:@"Updating Bundled Packages" debug:NO];
+        [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Updating Bundled Packages") debug:NO];
         
         if (shouldInstallLibkrw) {
             NSString *libkrwPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"libkrw-dopamine.deb"];
@@ -1331,5 +1333,27 @@ int getCFMajorVersion(void)
     return nil;
 }
 
+<<<<<<< HEAD
+=======
+- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
+{
+    if (downloadTask == _bootstrapDownloadTask) {
+        NSString *sizeString = [NSByteCountFormatter stringFromByteCount:totalBytesWritten countStyle:NSByteCountFormatterCountStyleFile];
+        NSString *writtenBytesString = [NSByteCountFormatter stringFromByteCount:totalBytesExpectedToWrite countStyle:NSByteCountFormatterCountStyleFile];
+        
+        [[DOUIManager sharedInstance] sendLog:[NSString stringWithFormat:DOLocalizedString(@"Downloading Bootstrap (%@/%@)"), sizeString, writtenBytesString] debug:NO update:YES];
+    }
+}
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
+{
+    _downloadCompletionBlock(nil, error);
+}
+
+- (void)URLSession:(nonnull NSURLSession *)session downloadTask:(nonnull NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(nonnull NSURL *)location
+{
+    _downloadCompletionBlock(location, nil);
+}
+>>>>>>> origin/roothide217
 
 @end

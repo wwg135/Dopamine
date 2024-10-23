@@ -7,6 +7,7 @@
 
 #import "DOHeaderView.h"
 #import "DOThemeManager.h"
+#import "DOPreferenceManager.h"
 
 @interface DOHeaderView ()
 
@@ -51,8 +52,12 @@
             label.attributedText = formatedText;
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
-            if (idx == 4) {
-		self.timerLabel = label;
+
+	    NSNumber *showEnabled = [[DOPreferenceManager sharedManager] preferenceValueForKey:@"showUpTimeEnabled"];
+	    if ([showEnabled boolValue]) {
+            	if (idx == 2) {
+		    self.timerLabel = label;
+      		}
             }
         }];
 
@@ -73,18 +78,28 @@
 }
 
 - (void)updateLabel {
-        self.timerLabel.text = [self formatUptime];
+    self.timerLabel.text = [self formatUptime];
 }
 
 - (NSString *)formatUptime {
+    NSString *formatted;
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-    long uptimeInt = ts.tv_sec;
+    int uptimeInt = ts.tv_sec;
     int seconds = uptimeInt % 60;
     int minutes = (uptimeInt / 60) % 60;
     int hours = (uptimeInt / 3600) % 24;
-    long days = uptimeInt / 86400;
-    return [NSString stringWithFormat:NSLocalizedString(@"System_Uptime_Format", nil), days, hours, minutes, seconds];
+    int days = uptimeInt / 86400;
+    if (days > 0) {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 天 %d 时 %d 分 %d 秒", days, hours, minutes, seconds];
+    } else if (hours > 0) {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 时 %d 分 %d 秒", hours, minutes, seconds];
+    } else if (minutes > 0) {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 分 %d 秒", minutes, seconds];
+    } else {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 秒", seconds];
+    }
+    return formatted;
 }
 
 @end
