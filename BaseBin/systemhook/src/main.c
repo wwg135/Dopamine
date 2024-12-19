@@ -75,8 +75,7 @@ int dyld_hook_routine(void **dyld, int idx, void *hook, void **orig, uint16_t pa
 
 // All dlopen/dlsym calls use __builtin_return_address(0) to determine what library called it
 // Since we hook them, if we just call the original function on our own, the return address will always point to systemhook
-// Therefore we must ensure the call to the original function is a tail call, 
-// which ensures that the stack and lr are restored and the compiler turns the call into a direct branch
+// Therefore we must ensure the call to the original function is a tail call, which ensures that the stack and lr are restored and the compiler turns the call into a direct branch
 // This is done via __attribute__((musttail)), this way __builtin_return_address(0) will point to the original calling library instead of systemhook
 
 void* (*dyld_dlopen_orig)(void *dyld, const char* path, int mode);
@@ -296,18 +295,18 @@ __attribute__((constructor)) static void initializer(void)
 	// Apply posix_spawn / execve hooks
 	if (__builtin_available(iOS 16.0, *)) {
 		litehook_hook_function(__posix_spawn, __posix_spawn_hook);
-		litehook_hook_function(__execve, __execve_hook);
+		litehook_hook_function(__execve,      __execve_hook);
 	}
 	else {
 		// On iOS 15 there is a way to hook posix_spawn and execve without doing instruction replacements
-		// This is fairly convinient due to instruction replacements being presumed to be the primary trigger for spinlock panics on iOS 15 arm64e
+		// This is fairly convenient due to instruction replacements being presumed to be the primary trigger for spinlock panics on iOS 15 arm64e
 		// Unfortunately Apple decided to remove these in iOS 16 :( Doesn't matter too much though because spinlock panics are fixed there
 
 		void **posix_spawn_with_filter = litehook_find_dsc_symbol("/usr/lib/system/libsystem_kernel.dylib", "_posix_spawn_with_filter");
-		*posix_spawn_with_filter = __posix_spawn_hook_with_filter;
+		void **execve_with_filter      = litehook_find_dsc_symbol("/usr/lib/system/libsystem_kernel.dylib", "_execve_with_filter");
 
-		void **execve_with_filter = litehook_find_dsc_symbol("/usr/lib/system/libsystem_kernel.dylib", "_execve_with_filter");
-		*execve_with_filter = __execve_hook;
+		*posix_spawn_with_filter = __posix_spawn_hook_with_filter;
+		*execve_with_filter      = __execve_hook;
 	}
 
 	// Initialize stuff neccessary for sandbox_apply hook
@@ -317,11 +316,11 @@ __attribute__((constructor)) static void initializer(void)
 	// Apply dyld hooks
 	void ***gDyldPtr = litehook_find_dsc_symbol("/usr/lib/system/libdyld.dylib", "__ZN5dyld45gDyldE");
 	if (gDyldPtr) {
-		dyld_hook_routine(*gDyldPtr, 14, (void *)&dyld_dlopen_hook, (void **)&dyld_dlopen_orig, 0xBF31);
-		dyld_hook_routine(*gDyldPtr, 17, (void *)&dyld_dlsym_hook, (void **)&dyld_dlsym_orig, 0x839D);
+		dyld_hook_routine(*gDyldPtr, 14, (void *)&dyld_dlopen_hook,           (void **)&dyld_dlopen_orig,           0xBF31);
+		dyld_hook_routine(*gDyldPtr, 17, (void *)&dyld_dlsym_hook,            (void **)&dyld_dlsym_orig,            0x839D);
 		dyld_hook_routine(*gDyldPtr, 18, (void *)&dyld_dlopen_preflight_hook, (void **)&dyld_dlopen_preflight_orig, 0xB1B6);
-		dyld_hook_routine(*gDyldPtr, 97, (void *)&dyld_dlopen_from_hook, (void **)&dyld_dlopen_from_orig, 0xD48C);
-		dyld_hook_routine(*gDyldPtr, 98, (void *)&dyld_dlopen_audited_hook, (void **)&dyld_dlopen_audited_orig, 0xD2A5);
+		dyld_hook_routine(*gDyldPtr, 97, (void *)&dyld_dlopen_from_hook,      (void **)&dyld_dlopen_from_orig,      0xD48C);
+		dyld_hook_routine(*gDyldPtr, 98, (void *)&dyld_dlopen_audited_hook,   (void **)&dyld_dlopen_audited_orig,   0xD2A5);
 	}
 
 #ifdef __arm64e__
@@ -333,7 +332,7 @@ __attribute__((constructor)) static void initializer(void)
 #endif
 
 	if (load_executable_path() == 0) {
-		// Load rootlesshooks and watchdoghook if neccessary
+		// Load rootlesshooks / watchdoghook when neccessary
 		if (!strcmp(gExecutablePath, "/usr/sbin/cfprefsd") ||
 			!strcmp(gExecutablePath, "/System/Library/CoreServices/SpringBoard.app/SpringBoard") ||
 			!strcmp(gExecutablePath, "/usr/libexec/lsd")) {
@@ -354,7 +353,7 @@ __attribute__((constructor)) static void initializer(void)
 
 #ifndef __arm64e__
 		// On arm64, writing to executable pages removes CS_VALID from the csflags of the process
-		// These hooks are neccessary to get the system to behave with this
+		// These hooks are neccessary to get the system to behave with this (since multiple system APIs check for CS_VALID and produce failures if it's not set)
 		// They are ugly but needed
 		litehook_hook_function(csops, csops_hook);
 		litehook_hook_function(csops_audittoken, csops_audittoken_hook);
