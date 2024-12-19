@@ -137,8 +137,8 @@ __attribute__((constructor)) static void initializer(void)
 	else {
 		void *systemhookHandle = dlopen("systemhook.dylib", RTLD_NOLOAD);
 		if (systemhookHandle) {
-			// On iOS 15 arm64e, instead of using instruction replacements, rebind __fork instead
-			// Less instruction replacements = Less spinlock panics
+			// On iOS 15 arm64e, instead of using instruction replacements, rebind everything that calls __fork instead
+			// Less instruction replacements = Less spinlock panics (DO NOT QUOTE ME ON THIS)
 			kern_return_t (*litehook_rebind_symbol_globally)(void *source, void *target) = dlsym(systemhookHandle, "litehook_rebind_symbol_globally");
 			if (litehook_rebind_symbol_globally) {
 				litehook_rebind_symbol_globally((void *)fork, (void *)fork_hook);
