@@ -6,7 +6,7 @@
 		<key>Display Name</key>
 		<string>Sileo</string>
 		<key>Key</key>
-		<string>org.coolstar.SileoStore</string>
+		<string>org.coolstar.sileo</string>
 		<key>Icon</key>
 		<string>Sileo</string>
 		<key>Package</key>
@@ -14,13 +14,13 @@
 	</dict>
 	<dict>
 		<key>Display Name</key>
-		<string>Zebra</string>
+		<string>Saily</string>
 		<key>Key</key>
-		<string>xyz.willy.Zebra</string>
+		<string>wiki.qaq.chromatic.rootless</string>
 		<key>Icon</key>
-		<string>Zebra</string>
+		<string>Saily</string>
 		<key>Package</key>
-		<string>zebra.deb</string>
+		<string>saily.deb</string>
 	</dict>
 </array>
 </plist>
