@@ -162,7 +162,7 @@
         
         PSSpecifier *headerSpecifier = [PSSpecifier emptyGroupSpecifier];
         [headerSpecifier setProperty:@"DOHeaderCell" forKey:@"headerCellClass"];
-        [headerSpecifier setProperty:[NSString stringWithFormat:@"Settings"] forKey:@"title"];
+        [headerSpecifier setProperty:[NSString stringWithFormat:DOLocalizedString(@"Settings")] forKey:@"title"];
         [specifiers addObject:headerSpecifier];
         
         if (envManager.isSupported) {
@@ -219,7 +219,13 @@
             [tweakInjectionSpecifier setProperty:@"tweakInjectionEnabled" forKey:@"key"];
             [tweakInjectionSpecifier setProperty:@YES forKey:@"default"];
             [specifiers addObject:tweakInjectionSpecifier];
-            
+
+            PSSpecifier *checkForUpdateSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Check_For_Update") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
+            [checkForUpdateSpecifier setProperty:@YES forKey:@"enabled"];
+            [checkForUpdateSpecifier setProperty:@"checkForUpdateEnabled" forKey:@"key"];
+            [checkForUpdateSpecifier setProperty:@NO forKey:@"default"];
+            [specifiers addObject:checkForUpdateSpecifier];
+
             if (!envManager.isJailbroken) {
                 PSSpecifier *verboseLogSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Verbose_Logs") target:self set:defSetter get:defGetter detail:nil cell:PSSwitchCell edit:nil];
                 [verboseLogSpecifier setProperty:@YES forKey:@"enabled"];
@@ -338,6 +344,24 @@
         [themeSpecifier setProperty:@"themeIdentifiers" forKey:@"valuesDataSource"];
         [themeSpecifier setProperty:@"themeNames" forKey:@"titlesDataSource"];
         [specifiers addObject:themeSpecifier];
+
+        if (envManager.isJailbroken) {	    
+            PSSpecifier *mountSpecifier = [PSSpecifier emptyGroupSpecifier];
+            mountSpecifier.target = self;
+            [mountSpecifier setProperty:@"新增挂载" forKey:@"title"];
+            [mountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [mountSpecifier setProperty:@"doc" forKey:@"image"];
+            [mountSpecifier setProperty:@"mountPressed" forKey:@"action"];
+            [specifiers addObject:mountSpecifier];
+
+            PSSpecifier *unmountSpecifier = [PSSpecifier emptyGroupSpecifier];
+            unmountSpecifier.target = self;
+            [unmountSpecifier setProperty:@"管理挂载" forKey:@"title"];
+            [unmountSpecifier setProperty:@"DOButtonCell" forKey:@"headerCellClass"];
+            [unmountSpecifier setProperty:@"trash" forKey:@"image"];
+            [unmountSpecifier setProperty:@"unmountPressed" forKey:@"action"];
+            [specifiers addObject:unmountSpecifier];
+        }
         
         _specifiers = specifiers;
     }
@@ -535,12 +559,127 @@
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
 }
 
+- (void)mountPressed
+{
+    UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:@"新增挂载" message:@"输入原始路径" preferredStyle:UIAlertControllerStyleAlert];
+    [inputAlertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.placeholder = @"输入原始路径";
+    }];
+
+    UIAlertAction *mountAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {        // 获取用户输入的Jailbreak路径
+        UITextField *inputTextField = inputAlertController.textFields.firstObject;
+        NSString *mountPath = inputTextField.text;
+        if (mountPath.length > 1) {
+            NSString *plistFilePath = @"/var/mobile/newFakePath.plist";
+            NSMutableDictionary *plistDictionary = [NSMutableDictionary dictionaryWithContentsOfFile:plistFilePath];
+            if (!plistDictionary) {
+                plistDictionary = [NSMutableDictionary dictionary];
+            }
+            NSMutableArray *pathArray = plistDictionary[@"path"];
+            if (!pathArray) {
+                pathArray = [NSMutableArray array];
+            }
+            if (![pathArray containsObject:mountPath]) {
+		[pathArray addObject:mountPath];
+		[plistDictionary setObject:pathArray forKey:@"path"];				 
+                [plistDictionary writeToFile:plistFilePath atomically:YES];
+            } 
+            exec_cmd_root(JBROOT_PATH("/basebin/jbctl"), "internal", "mount", [NSURL fileURLWithPath:mountPath].fileSystemRepresentation, NULL);
+
+        }
+    }];
+
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleDefault handler:nil];
+    [inputAlertController addAction:mountAction];
+    [inputAlertController addAction:cancelAction]; 
+    [self presentViewController:inputAlertController animated:YES completion:nil];
+}
+
+- (void)unmountPressed
+{
+    // 读取plist文件中的路径数组
+    NSString *plistPath = @"/var/mobile/newFakePath.plist";
+    NSMutableDictionary *plist = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath];
+    NSMutableArray *paths = [plist[@"path"] mutableCopy];
+    
+    // 设置富文本标题
+    NSString *titleText = DOLocalizedString(@"Select_Mount_Title");
+    NSMutableAttributedString *attrTitle = [[NSMutableAttributedString alloc] initWithString:titleText];
+    [attrTitle addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:24] range:NSMakeRange(0, titleText.length)];
+    
+    // 创建一个UIAlertController作为列表
+    UIAlertController *listAlertController = [UIAlertController alertControllerWithTitle:@"" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    // 设置富文本标题到UIAlertController
+    [listAlertController setValue:attrTitle forKey:@"attributedTitle"];
+    
+    for (NSString *path in paths) {
+        UIAlertAction *pathAction = [UIAlertAction actionWithTitle:path style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            NSString *targetMountPath = [NSString stringWithFormat:@"%@%@", JBROOT_PATH(@"/mnt"), path];
+            
+            // 设置富文本标题
+            NSMutableAttributedString *attrActionTitle = [[NSMutableAttributedString alloc] initWithString:path];
+            [attrActionTitle addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(0, path.length)];
+    
+            // 创建一个UIAlertController作为列表
+            UIAlertController *actionAlertController = [UIAlertController alertControllerWithTitle:@"" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+            // 设置富文本标题到UIAlertController
+            [actionAlertController setValue:attrActionTitle forKey:@"attributedTitle"];
+    
+            // 删除路径的操作
+            UIAlertAction *deletePathAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Delete_Path_Only") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+                // 删除plist中的对应路径并保存
+                [paths removeObject:path];
+                plist[@"path"] = paths;
+                [plist writeToFile:plistPath atomically:YES];
+            }];
+            
+            // 删除路径并卸载的操作
+            UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Delete") style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+                
+                exec_cmd_root(JBROOT_PATH("/usr/bin/rm"), "-rf", [NSURL fileURLWithPath:targetMountPath].fileSystemRepresentation, NULL);
+                exec_cmd_root(JBROOT_PATH("/basebin/jbctl"), "internal", "unmount", [NSURL fileURLWithPath:path].fileSystemRepresentation, NULL);
+                
+                // 删除plist中的对应路径并保存
+                [paths removeObject:path];
+                plist[@"path"] = paths;
+                [plist writeToFile:plistPath atomically:YES];
+            }];
+            
+            UIAlertAction *viewAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_View") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"filza://"]]) {
+                    NSURL *filzaURL = [NSURL URLWithString:[@"filza://view" stringByAppendingString:targetMountPath]];
+                    [[UIApplication sharedApplication] openURL:filzaURL options:@{} completionHandler:nil];
+                }else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"fffff://"]]) {
+                    NSURL *fffffURL = [NSURL URLWithString:[@"fffff://view" stringByAppendingString:targetMountPath]];
+                    [[UIApplication sharedApplication] openURL:fffffURL options:@{} completionHandler:nil];
+                }
+            }];
+            
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
+
+            [actionAlertController addAction:deleteAction];
+            [actionAlertController addAction:viewAction];
+            [actionAlertController addAction:deletePathAction]; // 添加仅删除路径的操作
+            [actionAlertController addAction:cancelAction];
+            
+            [self presentViewController:actionAlertController animated:YES completion:nil];
+        }];
+        
+        [listAlertController addAction:pathAction];
+    }
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
+    [listAlertController addAction:cancelAction];
+    [self presentViewController:listAlertController animated:YES completion:nil];
+}
+
 - (void)resetSettingsPressed
 {
     [[DOUIManager sharedInstance] resetSettings];
     [self.navigationController popToRootViewControllerAnimated:YES];
     [self reloadSpecifiers];
 }
-
 
 @end
