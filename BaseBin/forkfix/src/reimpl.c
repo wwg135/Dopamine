@@ -1,0 +1,190 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <dlfcn.h>
+#include <os/log.h>
+#include <util.h>
+#include <errno.h>
+#include <syslog.h>
+kern_return_t bootstrap_parent(mach_port_t bp, mach_port_t *parent_port);
+void __fork(void);
+
+// There are two functions with direct branches to __fork: fork and vfork
+// We want to rebind these to reimplementations that work the same, but call our __forkfix_fork instead
+
+// Additionally, there are also two functions with direct branches to fork: daemon and forkpty
+// For these, we want to rebind them to reimplementations that work the same, but call our fork_reimpl instead
+
+// Unfortunately, there is no other option here than to reimplement the functions, since the point is to do no instruction replacements
+
+static int (*__fork_ptr)(void) = NULL;
+
+void (**_libSystem_atfork_prepare)(uint64_t v2Arg) = NULL;
+void (**_libSystem_atfork_parent) (uint64_t v2Arg) = NULL;
+void (**_libSystem_atfork_child)  (uint64_t v2Arg) = NULL;
+
+int fork_reimpl(void)
+{
+	(*_libSystem_atfork_prepare)(0);
+	int pid = __fork_ptr();
+	if (pid != 0) {
+		(*_libSystem_atfork_parent)(0);
+	}
+	else {
+		(*_libSystem_atfork_child)(0);
+	}
+	return pid;
+}
+
+int vfork_reimpl(void)
+{
+	(*_libSystem_atfork_prepare)(1);
+	int pid = __fork_ptr();
+	if (pid != 0) {
+		(*_libSystem_atfork_parent)(1);
+	}
+	else {
+		(*_libSystem_atfork_child)(1);
+	}
+	return pid;
+}
+
+static void move_to_root_bootstrap(void)
+{
+	mach_port_t parent_port = 0;
+	mach_port_t previous_port = 0;
+
+	do {
+		if (previous_port) {
+			mach_port_deallocate(mach_task_self(), previous_port);
+			previous_port = parent_port;
+		} else {
+			previous_port = bootstrap_port;
+		}
+
+		if (bootstrap_parent(previous_port, &parent_port) != 0) {
+			return;
+		}
+	} while (parent_port != previous_port);
+
+	task_set_bootstrap_port(mach_task_self(), parent_port);
+	bootstrap_port = parent_port;
+}
+
+int daemon_reimpl(int nochdir, int noclose)
+{
+	struct sigaction osa, sa;
+	int fd;
+	pid_t newgrp;
+	int oerrno;
+	int osa_ok;
+
+	/* A SIGHUP may be thrown when the parent exits below. */
+	sigemptyset(&sa.sa_mask);
+	sa.sa_handler = SIG_IGN;
+	sa.sa_flags = 0;
+	osa_ok = sigaction(SIGHUP, &sa, &osa);
+	move_to_root_bootstrap();
+	switch (fork_reimpl()) {
+	case -1:
+		return (-1);
+	case 0:
+		break;
+	default:
+		_exit(0);
+	}
+
+	newgrp = setsid();
+	oerrno = errno;
+	if (osa_ok != -1)
+		sigaction(SIGHUP, &osa, NULL);
+
+	if (newgrp == -1) {
+		errno = oerrno;
+		return (-1);
+	}
+
+	if (!nochdir)
+		(void)chdir("/");
+
+	if (!noclose && (fd = open("/dev/null", O_RDWR, 0)) != -1) {
+		(void)dup2(fd, STDIN_FILENO);
+		(void)dup2(fd, STDOUT_FILENO);
+		(void)dup2(fd, STDERR_FILENO);
+		if (fd > 2)
+			(void)close(fd);
+	}
+	return (0);
+}
+
+int forkpty_reimpl(int *aprimary, char *name, struct termios *termp, struct winsize *winp)
+{
+	int primary, replica, pid;
+
+	if (openpty(&primary, &replica, name, termp, winp) == -1)
+		return (-1);
+	switch (pid = fork_reimpl()) {
+	case -1:
+		(void) close(primary);
+		(void) close(replica);
+		return (-1);
+	case 0:
+		/* 
+		 * child
+		 */
+		(void) close(primary);
+		/*
+		 * 4300297: login_tty() may fail to set the controlling tty.
+		 * Since we have already forked, the best we can do is to 
+		 * dup the replica as if login_tty() succeeded.
+		 */
+		if (login_tty(replica) < 0) {
+			syslog(LOG_ERR, "forkpty: login_tty could't make controlling tty");
+			(void) dup2(replica, 0);
+			(void) dup2(replica, 1);
+			(void) dup2(replica, 2);
+			if (replica > 2)
+				(void) close(replica);
+		}
+		return (0);
+	}
+	/*
+	 * parent
+	 */
+	*aprimary = primary;
+	(void) close(replica);
+	return (pid);
+}
+
+bool fork_reimpl_init(void *fork_ptr)
+{
+	if (!fork_ptr) return false;
+
+	__fork_ptr = fork_ptr;
+
+	void *systemhookHandle = dlopen("systemhook.dylib", RTLD_NOLOAD);
+	if (!systemhookHandle) return false;
+
+	kern_return_t (*litehook_rebind_symbol_globally)(void *source, void *target) = dlsym(systemhookHandle, "litehook_rebind_symbol_globally");
+	void *(*litehook_find_dsc_symbol)(const char *imagePath, const char *symbolName) = dlsym(systemhookHandle, "litehook_find_dsc_symbol");
+	if (!litehook_rebind_symbol_globally || !litehook_find_dsc_symbol) return false;
+
+	// The v2 functions take one argument, but we can still store them in the same pointer since the argument will just be discarded if the non v2 implementation is used
+	// In practice, the v2 implementation should always exist, since we're not dealing with super old versions, so all of this doesn't matter too much
+	const char *libcpath = "/usr/lib/system/libsystem_c.dylib";
+	_libSystem_atfork_prepare = litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_prepare_v2") ?: litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_prepare");
+	_libSystem_atfork_parent  = litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_parent_v2")  ?: litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_parent");
+	_libSystem_atfork_child   = litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_child_v2")   ?: litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_child");
+
+	litehook_rebind_symbol_globally((void *)__fork, (void *)__fork_ptr);
+	litehook_rebind_symbol_globally((void *)fork, (void *)fork_reimpl);
+	litehook_rebind_symbol_globally((void *)vfork, (void *)vfork_reimpl);
+	litehook_rebind_symbol_globally((void *)daemon, (void *)daemon_reimpl);
+	litehook_rebind_symbol_globally((void *)forkpty, (void *)forkpty_reimpl);
+
+	return true;
+}
