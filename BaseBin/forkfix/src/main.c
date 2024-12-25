@@ -8,6 +8,7 @@
 #include <util.h>
 #include "syscall.h"
 #include "litehook.h"
+#include "reimpl.h"
 #include <libjailbreak/jbclient_xpc.h>
 
 extern void _malloc_fork_prepare(void);
@@ -107,48 +108,11 @@ void apply_fork_hook(void)
 	});
 }
 
-// iOS 15 arm64e wrappers
-// Only apply fork hook when something actually calls it
-int fork_hook(void)
-{
-	apply_fork_hook();
-	return fork();
-}
-int vfork_hook(void)
-{
-	apply_fork_hook();
-	return vfork();
-}
-pid_t forkpty_hook(int *amaster, char *name, struct termios *termp, struct winsize *winp)
-{
-	apply_fork_hook();
-	return forkpty(amaster, name, termp, winp);
-}
-int daemon_hook(int __nochdir, int __noclose)
-{
-	apply_fork_hook();
-	return daemon(__nochdir, __noclose);
-}
-
 __attribute__((constructor)) static void initializer(void)
 {
 #ifdef __arm64e__
 	if (__builtin_available(iOS 16.0, *)) { /* fall through */ }
-	else {
-		void *systemhookHandle = dlopen("systemhook.dylib", RTLD_NOLOAD);
-		if (systemhookHandle) {
-			// On iOS 15 arm64e, instead of using instruction replacements, rebind everything that calls __fork instead
-			// Less instruction replacements = Less spinlock panics (DO NOT QUOTE ME ON THIS)
-			kern_return_t (*litehook_rebind_symbol_globally)(void *source, void *target) = dlsym(systemhookHandle, "litehook_rebind_symbol_globally");
-			if (litehook_rebind_symbol_globally) {
-				litehook_rebind_symbol_globally((void *)fork, (void *)fork_hook);
-				litehook_rebind_symbol_globally((void *)vfork, (void *)vfork_hook);
-				litehook_rebind_symbol_globally((void *)forkpty, (void *)forkpty_hook);
-				litehook_rebind_symbol_globally((void *)daemon, (void *)daemon_hook);
-			}
-		}
-		return;
-	}
+	else if (fork_reimpl_init(forkfix___fork)) return;
 #endif
 
 	apply_fork_hook();
