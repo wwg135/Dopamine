@@ -2,12 +2,12 @@ name: build_Release
 on:
   push:
     branches:
-      - 1.1.11
+      - 1.1.11_mount
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - 1.1.11
+      - 1.1.11_mount
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -96,14 +96,10 @@ jobs:
           gmake -j$(sysctl -n hw.physicalcpu)
           mv Dopamine/Dopamine.tipa Dopamine.ipa
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Upload Artifact
+        id: dopamine-latest-upload
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.VERSION }}
-          tag_name: ${{ env.msT }}
-          target_commitish: 1.1.11_Mount
-          body_path: release.txt
-          latest: true
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          files: |
-           *.ipa
+          name: Dopamine
+          path: |
+            ${{ github.workspace }}/*.ipa
