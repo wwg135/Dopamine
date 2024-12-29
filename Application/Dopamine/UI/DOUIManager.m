@@ -38,6 +38,10 @@
     if ([checkforUpdate boolValue] == NO)
         return NO;
 
+    NSArray *releases = [self getLatestReleases];
+    if (releases.count == 0)
+        return NO;
+
     NSString *latestVersion = [self getLatestReleaseTag];
     NSString *currentVersion = [self getLaunchedReleaseTag];
     return [latestVersion numericalVersionRepresentation] > [currentVersion numericalVersionRepresentation];
