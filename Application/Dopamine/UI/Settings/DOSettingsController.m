@@ -240,6 +240,14 @@
             [appJitSpecifier setProperty:@YES forKey:@"default"];
             [specifiers addObject:appJitSpecifier];
             
+            if (envManager.isArm64e) {
+                PSSpecifier *oldabiSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Allow_Old_arm64e_ABI_Libraries") target:self set:@selector(setOldABIEnabled:specifier:) get:@selector(readOldABIEnabled:) detail:nil cell:PSSwitchCell edit:nil];
+                [oldabiSpecifier setProperty:@YES forKey:@"enabled"];
+                [oldabiSpecifier setProperty:@"oldAbiSupportEnabled" forKey:@"key"];
+                [oldabiSpecifier setProperty:@YES forKey:@"default"];
+                [specifiers addObject:oldabiSpecifier];
+            }
+            
             PSSpecifier *jetsamSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"Settings_Jetsam_Multiplier") target:self set:@selector(setJetsamMultiplier:specifier:) get:@selector(readJetsamMultiplier:) detail:nil cell:PSLinkListCell edit:nil];
             [jetsamSpecifier setProperty:@YES forKey:@"enabled"];
             [jetsamSpecifier setProperty:@"jetsamMultiplier" forKey:@"key"];
@@ -442,6 +450,25 @@
     DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
     if (envManager.isJailbroken) {
         jbclient_platform_jbsettings_set_double("jetsamMultiplier", ((NSNumber *)value).doubleValue / 2);
+    }
+}
+
+- (id)readOldABIEnabled:(PSSpecifier *)specifier
+{
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    if (envManager.isJailbroken) {
+        bool v = jbclient_jbsettings_get_bool("oldAbiSupportEnabled");
+        return @(v);
+    }
+    return [self readPreferenceValue:specifier];
+}
+
+- (void)setOldABIEnabled:(id)value specifier:(PSSpecifier *)specifier
+{
+    [self setPreferenceValue:value specifier:specifier];
+    DOEnvironmentManager *envManager = [DOEnvironmentManager sharedManager];
+    if (envManager.isJailbroken) {
+        jbclient_platform_jbsettings_set_bool("oldAbiSupportEnabled", ((NSNumber *)value).boolValue);
     }
 }
 

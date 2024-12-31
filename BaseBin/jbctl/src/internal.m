@@ -133,7 +133,7 @@ int jbctl_handle_internal(const char *command, int argc, char* argv[])
 	else if (!strcmp(command, "install_pkg")) {
 		if (argc > 1) {
 			extern char **environ;
-			char *dpkg = JBROOT_PATH("/usr/bin/dpkg");
+			const char *dpkg = JBROOT_PATH("/usr/bin/dpkg");
 			int r = execve(dpkg, (char *const *)(const char *[]){dpkg, "-i", argv[1], NULL}, environ);
 			return r;
 		}

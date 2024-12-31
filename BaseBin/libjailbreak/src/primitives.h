@@ -24,6 +24,7 @@ int kreadbuf(uint64_t kaddr, void* output, size_t size);
 int kwritebuf(uint64_t kaddr, const void* input, size_t size);
 int physreadbuf(uint64_t physaddr, void* output, size_t size);
 int physwritebuf(uint64_t physaddr, const void* input, size_t size);
+void vwritebuf(uint64_t ttep, const void *addr, const void *indata, size_t datalen);
 
 uint64_t physread64(uint64_t pa);
 uint64_t physread_ptr(uint64_t va);

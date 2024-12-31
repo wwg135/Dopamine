@@ -8,6 +8,7 @@
 #include <mach-o/dyld.h>
 #include <sys/param.h>
 #include <sys/mount.h>
+#include "oldabi.h"
 extern char **environ;
 
 extern int systemwide_trust_binary(const char *binaryPath, xpc_object_t preferredArchsArray);
@@ -73,6 +74,9 @@ int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 				int r = jbupdate_basebin(stagedJailbreakUpdate);
 				unsetenv("STAGED_JAILBREAK_UPDATE");
 			}
+
+			// Restore original page contents of oldabi patched pages
+			jb_set_oldabi_support_enabled(false);
 
 			// Always use environ instead of envp, as boomerang_stashPrimitives calls setenv
 			// setenv / unsetenv can sometimes cause environ to get reallocated
