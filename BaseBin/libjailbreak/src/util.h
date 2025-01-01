@@ -8,6 +8,7 @@
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
+const struct mach_header *get_mach_header(const char *name);
 void proc_iterate(void (^itBlock)(uint64_t, bool*));
 
 uint64_t proc_self(void);
@@ -37,6 +38,9 @@ uint64_t kpacda(uint64_t pointer, uint64_t modifier);
 uint64_t kptr_sign(uint64_t kaddr, uint64_t pointer, uint16_t salt);
 
 void proc_allow_all_syscalls(uint64_t proc);
+
+int mlock_dsc(void *addr, size_t size);
+int mlock_library(const char *name);
 
 void killall(const char *executablePathToKill, bool softly);
 int libarchive_unarchive(const char *fileToExtract, const char *extractionPath);

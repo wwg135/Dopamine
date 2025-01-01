@@ -7,11 +7,17 @@
 #include <mach/mach_time.h>
 #include <pthread.h>
 #include <signal.h>
+#include <dlfcn.h>
 #include <sys/sysctl.h>
 #include <archive.h>
 #include <archive_entry.h>
 #include <math.h>
+#include <mach-o/dyld.h>
+#include <dirent.h>
 #include <IOKit/IOKitLib.h>
+#include <mach-o/dyld_images.h>
+#include <mach-o/getsect.h>
+#include <dyld_cache_format.h>
 extern char **environ;
 
 #define FAKE_PHYSPAGE_TO_MAP 0x13370000
@@ -20,6 +26,18 @@ extern char **environ;
 extern int posix_spawnattr_set_persona_np(const posix_spawnattr_t* __restrict, uid_t, uint32_t);
 extern int posix_spawnattr_set_persona_uid_np(const posix_spawnattr_t* __restrict, uid_t);
 extern int posix_spawnattr_set_persona_gid_np(const posix_spawnattr_t* __restrict, uid_t);
+
+const struct mach_header *get_mach_header(const char *name)
+{
+	const struct mach_header *mh = NULL;
+	for (int i = 0; i < _dyld_image_count(); i++) {
+		if (!strcmp(_dyld_get_image_name(i), name)) {
+			mh = _dyld_get_image_header(i);
+			break;
+		}
+	}
+	return mh;
+}
 
 void proc_iterate(void (^itBlock)(uint64_t, bool*))
 {
@@ -520,6 +538,122 @@ void proc_allow_all_syscalls(uint64_t proc)
 	if (machKobjFilter) {
 		kwrite1_bits(machKobjFilter, kread64(ksymbol(mach_kobj_count)));
 	}
+}
+
+struct dsc_text_segment {
+	void *mapping;
+	uint64_t offset;
+	uint64_t address;
+	uint64_t size;
+};
+
+int mlock_dsc_unslid(uint64_t unslid_addr, size_t size)
+{
+	static struct dsc_text_segment *segments = NULL;
+	static int segmentCount = 0;
+	static dispatch_once_t ot;
+	dispatch_once(&ot, ^{
+		const char *dscPath = "/System/Library/Caches/com.apple.dyld";
+		DIR *dir = opendir(dscPath);
+		if (!dir) {
+			return;
+		}
+
+		struct dirent *entry;
+
+		while ((entry = readdir(dir)) != NULL) {
+			if (entry->d_name[0] == '.') {
+				continue; // Skip "." and ".." entries
+			}
+
+			const char *ext = strrchr(entry->d_name, '.');
+			if (ext && strcmp(ext, ".symbols") == 0) {
+				continue; // Skip files with ".symbols" extension
+			}
+
+			char filePath[PATH_MAX];
+			snprintf(filePath, sizeof(filePath), "%s/%s", dscPath, entry->d_name);
+
+			int fd = open(filePath, O_RDONLY);
+			if (fd < 0) {
+				continue;
+			}
+
+			struct stat sb;
+			if (fstat(fd, &sb) != 0) {
+				continue;
+			}
+
+			void *localMap = mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+			if (localMap == MAP_FAILED) {
+				continue;
+			}
+
+			struct dyld_cache_header *header = (struct dyld_cache_header *)localMap;
+			for (uint32_t i = 0; i < header->mappingCount; i++) {
+				uint32_t curMappingOff = header->mappingOffset + (i * sizeof(struct dyld_cache_mapping_info));
+				struct dyld_cache_mapping_info *curMapping = (struct dyld_cache_mapping_info *)((uint8_t *)localMap + curMappingOff);
+
+				if (curMapping->initProt & PROT_EXEC) {
+					void *textMap = mmap(NULL, curMapping->size, PROT_READ, MAP_SHARED, fd, curMapping->fileOffset);
+					if (textMap != MAP_FAILED) {
+						segmentCount++;
+						segments = realloc(segments, segmentCount * sizeof(struct dsc_text_segment));
+						if (!segments) {
+							munmap(textMap, curMapping->size);
+							break;
+						}
+						segments[segmentCount - 1] = (struct dsc_text_segment){
+							.mapping = textMap,
+							.offset = curMapping->fileOffset,
+							.address = curMapping->address,
+							.size = curMapping->size,
+						};
+					}
+				}
+			}
+
+			munmap(localMap, sb.st_size);
+			close(fd);
+		}
+	});
+
+	for (int i = 0; i < segmentCount; i++) {
+		struct dsc_text_segment *curSegment = &segments[i];
+		if (unslid_addr >= curSegment->address && (unslid_addr + size) < (curSegment->address + curSegment->size)) {
+			uint64_t rel = unslid_addr - curSegment->address;
+			void *start = (void *)((uint64_t)curSegment->mapping + rel);
+			return mlock(start, size);
+		}
+	}
+
+	return -1;
+}
+
+int mlock_dsc(void *addr, size_t size)
+{
+	static uint64_t dscSlide = 0;
+	static dispatch_once_t ot;
+	dispatch_once(&ot, ^{
+		task_dyld_info_data_t dyldInfo;
+		uint32_t count = TASK_DYLD_INFO_COUNT;
+		task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t)&dyldInfo, &count);
+		struct dyld_all_image_infos *infos = (struct dyld_all_image_infos *)dyldInfo.all_image_info_addr;
+		dscSlide = infos->sharedCacheSlide;
+	});
+	return mlock_dsc_unslid((uint64_t)addr - dscSlide, size);
+}
+
+int mlock_library(const char *name)
+{
+	dlopen(name, RTLD_NOW);
+	const struct mach_header *mh = get_mach_header(name);
+	if (!mh) return -1;
+
+	unsigned long sectionSize = 0;
+	uint32_t *instructions = (uint32_t *)getsectiondata((const struct mach_header_64 *)mh, "__TEXT", "__text", &sectionSize);
+
+	return mlock_dsc(instructions, sectionSize);
 }
 
 int cmd_wait_for_exit(pid_t pid)
