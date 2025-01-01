@@ -14,6 +14,7 @@
 #include "private.h"
 
 bool gFullyDebugged = false;
+bool gOldAbiSupportEnabled = false;
 static void *gLibSandboxHandle;
 char *JB_BootUUID = NULL;
 char *JB_RootPath = NULL;
@@ -84,6 +85,15 @@ void* dyld_dlopen_hook(void *dyld, const char* path, int mode)
 	if (path && !(mode & RTLD_NOLOAD)) {
 		jbclient_trust_library(path, __builtin_return_address(0));
 	}
+
+	if (gOldAbiSupportEnabled && path) {
+		// If Dopamine's oldABI support is enabled, prevent ellekit oldabi from injecting
+		// It's redundant in this case, it also hooks dlopen which is not good for spinlocks
+		if (!strcmp(path, "/var/jb/usr/lib/ellekit/OldABI.dylib")) {
+			return NULL;
+		}
+	}
+
     __attribute__((musttail)) return dyld_dlopen_orig(dyld, path, mode);
 }
 
@@ -278,7 +288,7 @@ __attribute__((constructor)) static void initializer(void)
 {
 	// Tell jbserver (in launchd) that this process exists
 	// This will disable page validation, which allows the rest of this constructor to apply hooks
-	if (jbclient_process_checkin(&JB_RootPath, &JB_BootUUID, &JB_SandboxExtensions, &gFullyDebugged) != 0) return;
+	if (jbclient_process_checkin(&JB_RootPath, &JB_BootUUID, &JB_SandboxExtensions, &gFullyDebugged, &gOldAbiSupportEnabled) != 0) return;
 
 	// Apply sandbox extensions
 	apply_sandbox_extensions();

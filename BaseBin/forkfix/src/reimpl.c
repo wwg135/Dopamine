@@ -10,6 +10,9 @@
 #include <util.h>
 #include <errno.h>
 #include <syslog.h>
+#include <mach-o/dyld.h>
+#include "../_external/modules/litehook/src/litehook.h"
+
 kern_return_t bootstrap_parent(mach_port_t bp, mach_port_t *parent_port);
 void __fork(void);
 
@@ -160,6 +163,31 @@ int forkpty_reimpl(int *aprimary, char *name, struct termios *termp, struct wins
 	return (pid);
 }
 
+bool fork_rebind_filter(const mach_header *header)
+{
+	Dl_info info;
+	dladdr(header, &info);
+
+	const char *path = info.dli_fname;
+	if (_dyld_shared_cache_contains_path(path)) {
+		// Ignore all dsc images that don't have fork or __fork pointers in their GOTs
+		// Just reading a GOT faults it in, which increases the resident memory
+		// By skipping these we save a fuck ton of memory and avoid issues with jetsam
+		// Unfortunately this is hardcoded since you cannot know them without reading their GOTs
+		// Since this code is only used on iOS 15, it should be fine
+		if (!strcmp(path, "/usr/lib/system/libsystem_c.dylib") || 
+			!strcmp(path, "/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration") ||
+			!strcmp(path, "/System/Library/Frameworks/FileProvider.framework/FileProvider") || 
+			!strcmp(path, "/System/Library/PrivateFrameworks/UIKitCore.framework/UIKitCore") ||
+			!strcmp(path, "/System/Library/PrivateFrameworks/LoggingSupport.framework/LoggingSupport")) {
+			return true;
+		}
+		return false;
+	}
+
+	return true;
+}
+
 bool fork_reimpl_init(void *fork_ptr)
 {
 	if (!fork_ptr) return false;
@@ -169,9 +197,9 @@ bool fork_reimpl_init(void *fork_ptr)
 	void *systemhookHandle = dlopen("systemhook.dylib", RTLD_NOLOAD);
 	if (!systemhookHandle) return false;
 
-	kern_return_t (*litehook_rebind_symbol_globally)(void *source, void *target) = dlsym(systemhookHandle, "litehook_rebind_symbol_globally");
+	kern_return_t (*litehook_rebind_symbol)(const mach_header *targetHeader, void *replacee, void *replacement, bool (*exceptionFilter)(const mach_header *header)) = dlsym(systemhookHandle, "litehook_rebind_symbol");
 	void *(*litehook_find_dsc_symbol)(const char *imagePath, const char *symbolName) = dlsym(systemhookHandle, "litehook_find_dsc_symbol");
-	if (!litehook_rebind_symbol_globally || !litehook_find_dsc_symbol) return false;
+	if (!litehook_rebind_symbol || !litehook_find_dsc_symbol) return false;
 
 	// The v2 functions take one argument, but we can still store them in the same pointer since the argument will just be discarded if the non v2 implementation is used
 	// In practice, the v2 implementation should always exist, since we're not dealing with super old versions, so all of this doesn't matter too much
@@ -180,11 +208,11 @@ bool fork_reimpl_init(void *fork_ptr)
 	_libSystem_atfork_parent  = litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_parent_v2")  ?: litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_parent");
 	_libSystem_atfork_child   = litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_child_v2")   ?: litehook_find_dsc_symbol(libcpath, "__libSystem_atfork_child");
 
-	litehook_rebind_symbol_globally((void *)__fork, (void *)__fork_ptr);
-	litehook_rebind_symbol_globally((void *)fork, (void *)fork_reimpl);
-	litehook_rebind_symbol_globally((void *)vfork, (void *)vfork_reimpl);
-	litehook_rebind_symbol_globally((void *)daemon, (void *)daemon_reimpl);
-	litehook_rebind_symbol_globally((void *)forkpty, (void *)forkpty_reimpl);
+	litehook_rebind_symbol(LITEHOOK_REBIND_GLOBAL, (void *)__fork,  (void *)__fork_ptr,     fork_rebind_filter);
+	litehook_rebind_symbol(LITEHOOK_REBIND_GLOBAL, (void *)fork,    (void *)fork_reimpl,    fork_rebind_filter);
+	litehook_rebind_symbol(LITEHOOK_REBIND_GLOBAL, (void *)vfork,   (void *)vfork_reimpl,   fork_rebind_filter);
+	litehook_rebind_symbol(LITEHOOK_REBIND_GLOBAL, (void *)daemon,  (void *)daemon_reimpl , fork_rebind_filter);
+	litehook_rebind_symbol(LITEHOOK_REBIND_GLOBAL, (void *)forkpty, (void *)forkpty_reimpl, fork_rebind_filter);
 
 	return true;
 }

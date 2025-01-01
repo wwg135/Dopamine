@@ -148,6 +148,15 @@ int physwritebuf(uint64_t physaddr, const void* input, size_t size)
 	return -1;
 }
 
+void vwritebuf(uint64_t ttep, const void *addr, const void *indata, size_t datalen)
+{
+	enumerate_pages((uint64_t)addr, datalen, vm_real_kernel_page_size, ^bool(uint64_t curStart, size_t curSize){
+		uint64_t curPA = vtophys(ttep, curStart);		
+		physwritebuf(curPA, &indata[curStart - (uint64_t)addr], curSize);
+		return true;
+	});
+}
+
 // Convenience Wrappers
 
 uint64_t physread64(uint64_t pa)

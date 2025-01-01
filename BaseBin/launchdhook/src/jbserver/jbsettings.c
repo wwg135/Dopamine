@@ -1,5 +1,6 @@
 #include "jbsettings.h"
 #include <libjailbreak/info.h>
+#include "../oldabi.h"
 
 int jbsettings_get(const char *key, xpc_object_t *valueOut)
 {
@@ -9,6 +10,10 @@ int jbsettings_get(const char *key, xpc_object_t *valueOut)
 	}
 	else if (!strcmp(key, "jetsamMultiplier")) {
 		*valueOut = xpc_double_create(jbsetting(jetsamMultiplier));
+		return 0;
+	}
+	else if (!strcmp(key, "oldAbiSupportEnabled")) {
+		*valueOut = xpc_bool_create(jbsetting(oldAbiSupportEnabled));
 		return 0;
 	}
 	return -1;
@@ -22,6 +27,11 @@ int jbsettings_set(const char *key, xpc_object_t value)
 	}
 	else if (!strcmp(key, "jetsamMultiplier") && xpc_get_type(value) == XPC_TYPE_DOUBLE) {
 		gSystemInfo.jailbreakSettings.jetsamMultiplier = xpc_double_get_value(value);
+		return 0;
+	}
+	else if (!strcmp(key, "oldAbiSupportEnabled") && xpc_get_type(value) == XPC_TYPE_BOOL) {
+		gSystemInfo.jailbreakSettings.oldAbiSupportEnabled = xpc_bool_get_value(value);
+		jb_set_oldabi_support_enabled(gSystemInfo.jailbreakSettings.oldAbiSupportEnabled);
 		return 0;
 	}
 	return -1;

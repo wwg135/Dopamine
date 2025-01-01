@@ -55,6 +55,7 @@ struct jbserver_domain gPlatformDomain = {
 			.args = (jbserver_arg[]){
 				{ .name = "key", .type = JBS_TYPE_STRING, .out = false },
 				{ .name = "value", .type = JBS_TYPE_XPC_GENERIC, .out = false },
+				{ 0 },
 			},
 		},
 		{ 0 },

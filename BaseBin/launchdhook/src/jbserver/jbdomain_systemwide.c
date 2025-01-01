@@ -1,5 +1,6 @@
 #include "jbserver_global.h"
 #include "jbsettings.h"
+#import "../oldabi.h"
 #include <libjailbreak/info.h>
 #include <sandbox.h>
 #include <libproc.h>
@@ -123,7 +124,7 @@ static int systemwide_trust_library(audit_token_t *processToken, const char *lib
 	return trust_file(libraryPath, callerLibraryPath, callerPath, NULL);
 }
 
-static int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
+static int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut, bool *oldABIEnabledOut)
 {
 	// Fetch process info
 	pid_t pid = audit_token_to_pid(*processToken);
@@ -170,6 +171,8 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 
 	// Allow invalid pages
 	cs_allow_invalid(proc, fullyDebugged);
+
+	*oldABIEnabledOut = jb_is_oldabi_fix_enabled();
 
 	// Fix setuid
 	struct stat sb;
@@ -381,6 +384,7 @@ struct jbserver_domain gSystemwideDomain = {
 				{ .name = "boot-uuid", .type = JBS_TYPE_STRING, .out = true },
 				{ .name = "sandbox-extensions", .type = JBS_TYPE_STRING, .out = true },
 				{ .name = "fully-debugged", .type = JBS_TYPE_BOOL, .out = true },
+				{ .name = "oldabi-enabled", .type = JBS_TYPE_BOOL, .out = true },
 				{ 0 },
 			},
 		},
