@@ -1,4 +1,5 @@
 #include "oldabi.h"
+#include <libjailbreak/dsc_mlock.h>
 #include <libjailbreak/util.h>
 #include <libjailbreak/primitives.h>
 #include <mach-o/getsect.h>
@@ -17,7 +18,7 @@ int oldabi_patch_library(const char *name, void **backupdata, size_t *backupsize
 		memcpy(*backupdata, instructions, sectionSize);
 	}
 
-	mlock_dsc(instructions, sectionSize);
+	dsc_mlock(instructions, sectionSize);
 
 	for (int i = 0; i < (sectionSize / sizeof(uint32_t)); i++) {
 		if ((instructions[i] & 0xfffffc00) == 0xdac11800) {

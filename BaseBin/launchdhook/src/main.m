@@ -2,6 +2,7 @@
 #import <libjailbreak/libjailbreak.h>
 #import <libjailbreak/util.h>
 #import <libjailbreak/kernel.h>
+#import <libjailbreak/dsc_mlock.h>
 #import <mach-o/dyld.h>
 #import <spawn.h>
 #import <substrate.h>
@@ -79,22 +80,24 @@ __attribute__((constructor)) static void initializer(void)
 	initDSCHooks();
 	initJetsamHook();
 
-	// If enabled, reenable oldabi support
-	jb_set_oldabi_support_enabled(gSystemInfo.jailbreakSettings.oldAbiSupportEnabled);
+	if (!firstLoad) {
+		// If enabled, reenable oldabi support
+		jb_set_oldabi_support_enabled(gSystemInfo.jailbreakSettings.oldAbiSupportEnabled);
 
 #ifdef __arm64e__
-	if (__builtin_available(iOS 16.0, *)) { /* fall through */ }
-	else {
-		// Spinlock panics happen when a lot of processes try to fault in the same TEXT page at the same time
-		// For some reason, in all panics I personally looked at, the page is inside one of these 5 libraries
-		// If we mlock all of them (to prevent them from ever being paged out), we can reduce spinlock panics by a significant amount
-		mlock_library("/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices");
-		mlock_library("/System/Library/PrivateFrameworks/HMFoundation.framework/HMFoundation");
-		mlock_library("/System/Library/PrivateFrameworks/GeoServices.framework/GeoServices");
-		mlock_library("/System/Library/PrivateFrameworks/BluetoothManager.framework/BluetoothManager");
-		mlock_library("/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration");
-	}
+		if (__builtin_available(iOS 16.0, *)) { /* fall through */ }
+		else {
+			// Spinlock panics happen when a lot of processes try to fault in the same TEXT page at the same time
+			// For some reason, in all panics I personally looked at, the page is inside one of these 5 libraries
+			// If we mlock all of them (to prevent them from ever being paged out), we can reduce spinlock panics by a significant amount
+			dsc_mlock_library_exec("/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices");
+			dsc_mlock_library_exec("/System/Library/PrivateFrameworks/HMFoundation.framework/HMFoundation");
+			dsc_mlock_library_exec("/System/Library/PrivateFrameworks/GeoServices.framework/GeoServices");
+			dsc_mlock_library_exec("/System/Library/PrivateFrameworks/BluetoothManager.framework/BluetoothManager");
+			dsc_mlock_library_exec("/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration");
+		}
 #endif
+	}
 
 	// This will ensure launchdhook is always reinjected after userspace reboots
 	// As this launchd will pass environ to the next launchd...
