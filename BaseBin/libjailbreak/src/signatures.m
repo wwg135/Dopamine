@@ -1,4 +1,4 @@
-#include <choma/FAT.h>
+#include <choma/Fat.h>
 #include <choma/MachO.h>
 #include <choma/Host.h>
 #include <mach-o/dyld.h>
@@ -6,7 +6,7 @@
 
 #import <Foundation/Foundation.h>
 
-MachO *ljb_fat_find_preferred_slice(FAT *fat)
+MachO *ljb_fat_find_preferred_slice(Fat *fat)
 {
 	cpu_type_t cputype;
 	cpu_subtype_t cpusubtype;
@@ -77,7 +77,7 @@ NSString *resolveDependencyPath(NSString *dylibPath, NSString *sourceImagePath, 
 			NSString *(^resolveRpaths)(NSString *) = ^NSString *(NSString *binaryPath) {
 				if (!binaryPath) return nil;
 				__block NSString *rpathResolvedPath = nil;
-				FAT *fat = fat_init_from_path(binaryPath.fileSystemRepresentation);
+				Fat *fat = fat_init_from_path(binaryPath.fileSystemRepresentation);
 				if (fat) {
 					MachO *macho = ljb_fat_find_preferred_slice(fat);
 					if (macho) {
@@ -138,7 +138,7 @@ void macho_collect_untrusted_cdhashes(const char *path, const char *callerImageP
 		};
 
 		if (!callerExecutablePath) {
-			FAT *mainFAT = fat_init_from_path(path);
+			Fat *mainFAT = fat_init_from_path(path);
 			if (mainFAT) {
 				MachO *mainMachO = NULL;
 				if (preferredArchCount > 0) {
@@ -167,7 +167,7 @@ void macho_collect_untrusted_cdhashes(const char *path, const char *callerImageP
 		__weak __block void (^binaryTrustHandler_recurse)(NSString *, NSString *, NSString *);
 		void (^binaryTrustHandler)(NSString *, NSString *, NSString *) = ^(NSString *binaryPath, NSString *sourceImagePath, NSString *sourceExecutablePath) {
 			NSString *resolvedBinaryPath = resolveDependencyPath(binaryPath, sourceImagePath, sourceExecutablePath);
-			FAT *fat = fat_init_from_path(resolvedBinaryPath.fileSystemRepresentation);
+			Fat *fat = fat_init_from_path(resolvedBinaryPath.fileSystemRepresentation);
 			if (!fat) return;
 			MachO *macho = NULL;
 			if ([binaryPath isEqualToString:sourceExecutablePath]) {
@@ -196,7 +196,7 @@ void macho_collect_untrusted_cdhashes(const char *path, const char *callerImageP
 					if (csd_superblob_is_adhoc_signed(decodedSuperblob)) {
 						isAdhocSigned = true;
 						cdhash_t cdhash;
-						if (csd_superblob_calculate_best_cdhash(decodedSuperblob, cdhash) == 0) {
+						if (csd_superblob_calculate_best_cdhash(decodedSuperblob, cdhash, NULL) == 0) {
 							if (!cdhashesContains(cdhash)) {
 								if (!is_cdhash_trustcached(cdhash)) {
 									// If something is trustcached we do not want to add it to your array

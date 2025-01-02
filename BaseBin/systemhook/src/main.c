@@ -379,7 +379,7 @@ __attribute__((constructor)) static void initializer(void)
 		// We can hardcode /var/jb here since if it doesn't exist, loading TweakLoader.dylib is not going to work anyways
 		if (should_enable_tweaks()) {
 			const char *tweakLoaderPath = "/var/jb/usr/lib/TweakLoader.dylib";
-			if(access(tweakLoaderPath, F_OK) == 0) {
+			if (access(tweakLoaderPath, F_OK) == 0) {
 				void *tweakLoaderHandle = dlopen(tweakLoaderPath, RTLD_NOW);
 				if (tweakLoaderHandle != NULL) {
 					dlclose(tweakLoaderHandle);
