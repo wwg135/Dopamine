@@ -108,7 +108,7 @@ void jbupdate_update_system_info(void)
 		xpc_object_t (*xpf_construct_offset_dictionary)(const char *sets[]) = dlsym(xpfHandle, "xpf_construct_offset_dictionary");
 
 		const char *kernelPath = prebootUUIDPath("/System/Library/Caches/com.apple.kernelcaches/kernelcache");
-		xpc_object_t systemInfoXdict = NULL;
+		xpc_object_t newSystemInfoXdict = NULL;
 
 		// Rerun patchfinder
 		int r = xpf_start_with_kernel_path(kernelPath);
@@ -139,8 +139,8 @@ void jbupdate_update_system_info(void)
 				sets[idx++] = "arm64kcall"; 
 			}
 
-			systemInfoXdict = xpf_construct_offset_dictionary((const char **)sets);
-			if (!systemInfoXdict) {
+			newSystemInfoXdict = xpf_construct_offset_dictionary((const char **)sets);
+			if (!newSystemInfoXdict) {
 				error = xpf_get_error();
 			}
 			xpf_stop();
@@ -159,16 +159,12 @@ void jbupdate_update_system_info(void)
 
 		dlclose(xpfHandle);
 
-		// Get stuff that won't change from current info
-		xpc_dictionary_set_uint64(systemInfoXdict, "kernelConstant.staticBase", kconstant(staticBase));
-		xpc_dictionary_set_uint64(systemInfoXdict, "kernelConstant.slide", kconstant(slide));
-		xpc_dictionary_set_uint64(systemInfoXdict, "kernelConstant.base", kconstant(base));
-		xpc_dictionary_set_uint64(systemInfoXdict, "kernelConstant.virtBase", kconstant(virtBase));
-		xpc_dictionary_set_uint64(systemInfoXdict, "kernelConstant.physBase", kconstant(physBase));
-		xpc_dictionary_set_uint64(systemInfoXdict, "kernelConstant.physSize", kconstant(physSize));
-		xpc_dictionary_set_uint64(systemInfoXdict, "kernelConstant.cpuTTEP", kconstant(cpuTTEP));
-		xpc_dictionary_set_uint64(systemInfoXdict, "jailbreakInfo.usesPACBypass", jbinfo(usesPACBypass));
-		xpc_dictionary_set_string(systemInfoXdict, "jailbreakInfo.rootPath", jbinfo(rootPath));
+		// Get old info and merge new info into it
+		xpc_object_t systemInfoXdict = jbinfo_get_serialized();
+		xpc_dictionary_apply(newSystemInfoXdict, ^_Bool(const char *key, xpc_object_t xobj) {
+			xpc_dictionary_set_value(systemInfoXdict, key, xobj);
+			return true;
+		});
 
 		// Rebuild gSystemInfo
 		jbinfo_initialize_dynamic_offsets(systemInfoXdict);
