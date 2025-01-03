@@ -488,7 +488,6 @@ void *boomerang_server(struct boomerang_info *info)
     BOOL tweaksEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"tweakInjectionEnabled" fallback:YES];
     BOOL idownloadEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"idownloadEnabled" fallback:NO];
     BOOL appJITEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"appJITEnabled" fallback:YES];
-    BOOL oldAbiSupportEnabled = [[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"oldAbiSupportEnabled" fallback:YES];
     NSNumber *jetsamMultiplierOption = [[DOPreferenceManager sharedManager] preferenceValueForKey:@"jetsamMultiplier"];
     
     struct utsname systemInfo;
@@ -503,7 +502,6 @@ void *boomerang_server(struct boomerang_info *info)
     
     gSystemInfo.jailbreakSettings.markAppsAsDebugged = appJITEnabled;
     gSystemInfo.jailbreakSettings.jetsamMultiplier = jetsamMultiplierOption ? (jetsamMultiplierOption.doubleValue / 2) : 0;
-    gSystemInfo.jailbreakSettings.oldAbiSupportEnabled = oldAbiSupportEnabled;
     
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Building Phys R/W Primitive") debug:NO];
     *errOut = [self buildPhysRWPrimitive];
