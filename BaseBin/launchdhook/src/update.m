@@ -199,11 +199,5 @@ void jbupdate_finalize_stage2(const char *prevVersion, const char *newVersion)
 #endif
 	}
 
-	if (strcmp(prevVersion, "2.3") < 0 && strcmp(newVersion, "2.3") >= 0) {
-		// Default value for this pref is true
-		// Set it during jbupdate if prev version is <2.3 and new version is >=2.3
-		gSystemInfo.jailbreakSettings.oldAbiSupportEnabled = true;
-	}
-
 	JBFixMobilePermissions();
 }
