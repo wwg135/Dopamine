@@ -75,9 +75,6 @@ int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 				unsetenv("STAGED_JAILBREAK_UPDATE");
 			}
 
-			// Restore original page contents of oldabi patched pages
-			jb_set_oldabi_support_enabled(false);
-
 			// Always use environ instead of envp, as boomerang_stashPrimitives calls setenv
 			// setenv / unsetenv can sometimes cause environ to get reallocated
 			// In that case envp may point to garbage or be empty

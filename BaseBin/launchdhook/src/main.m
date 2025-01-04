@@ -5,6 +5,7 @@
 #import <libjailbreak/dsc_mlock.h>
 #import <mach-o/dyld.h>
 #import <spawn.h>
+#import <pthread.h>
 #import <substrate.h>
 
 #import "spawn_hook.h"
@@ -21,6 +22,25 @@
 bool gInEarlyBoot = true;
 
 void abort_with_reason(uint32_t reason_namespace, uint64_t reason_code, const char *reason_string, uint64_t reason_flags);
+
+void *handle_text_locks(void *a1)
+{
+#ifdef __arm64e__
+	if (__builtin_available(iOS 16.0, *)) { /* fall through */ }
+	else {
+		// Spinlock panics happen when a lot of processes try to fault in the same TEXT page at the same time
+		// For some reason, in all panics I personally looked at, the page is inside one of these 5 libraries
+		// If we mlock all of them (to prevent them from ever being paged out), we can reduce spinlock panics by a significant amount
+		dsc_mlock_library_exec("/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices");
+		dsc_mlock_library_exec("/System/Library/PrivateFrameworks/HMFoundation.framework/HMFoundation");
+		dsc_mlock_library_exec("/System/Library/PrivateFrameworks/GeoServices.framework/GeoServices");
+		dsc_mlock_library_exec("/System/Library/PrivateFrameworks/BluetoothManager.framework/BluetoothManager");
+		dsc_mlock_library_exec("/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration");
+	}
+#endif
+
+	return NULL;
+}
 
 __attribute__((constructor)) static void initializer(void)
 {
@@ -73,31 +93,16 @@ __attribute__((constructor)) static void initializer(void)
 
 	cs_allow_invalid(proc_self(), false);
 
+	pthread_t tmpThread;
+	pthread_create(&tmpThread, NULL, handle_text_locks, NULL);
+	pthread_join(tmpThread, NULL);
+
 	initXPCHooks();
 	initDaemonHooks();
 	initSpawnHooks();
 	initIPCHooks();
 	initDSCHooks();
 	initJetsamHook();
-
-	if (!firstLoad) {
-		// If enabled, reenable oldabi support
-		jb_set_oldabi_support_enabled(gSystemInfo.jailbreakSettings.oldAbiSupportEnabled);
-
-#ifdef __arm64e__
-		if (__builtin_available(iOS 16.0, *)) { /* fall through */ }
-		else {
-			// Spinlock panics happen when a lot of processes try to fault in the same TEXT page at the same time
-			// For some reason, in all panics I personally looked at, the page is inside one of these 5 libraries
-			// If we mlock all of them (to prevent them from ever being paged out), we can reduce spinlock panics by a significant amount
-			dsc_mlock_library_exec("/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices");
-			dsc_mlock_library_exec("/System/Library/PrivateFrameworks/HMFoundation.framework/HMFoundation");
-			dsc_mlock_library_exec("/System/Library/PrivateFrameworks/GeoServices.framework/GeoServices");
-			dsc_mlock_library_exec("/System/Library/PrivateFrameworks/BluetoothManager.framework/BluetoothManager");
-			dsc_mlock_library_exec("/System/Library/Frameworks/SystemConfiguration.framework/SystemConfiguration");
-		}
-#endif
-	}
 
 	// This will ensure launchdhook is always reinjected after userspace reboots
 	// As this launchd will pass environ to the next launchd...
