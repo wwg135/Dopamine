@@ -1,4 +1,4 @@
-name: build_Release
+name: build roothide
 
 on:
   push:
@@ -123,7 +123,7 @@ jobs:
 
       - name: Upload Artifact
         id: dopamine-latest-upload
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: Dopamine-roothide
           path: |
