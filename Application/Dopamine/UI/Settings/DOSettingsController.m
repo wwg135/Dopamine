@@ -709,6 +709,8 @@
     [self presentViewController:listAlertController animated:YES completion:nil];
 }
 
+
+
 - (void)resetSettingsPressed
 {
     [[DOUIManager sharedInstance] resetSettings];
@@ -741,5 +743,27 @@
     [confirmationAlertController addAction:cancelAction];
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
 }
+- (void)rebootPressed
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Button_Reboot")
+                                                                   message:DOLocalizedString(@"Update_Status_Subtitle_Restart_Soon")
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel")
+                                                             style:UIAlertActionStyleCancel
+                                                           handler:nil];
+    
+    UIAlertAction *rebootAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Reboot")
+                                                             style:UIAlertActionStyleDestructive
+                                                           handler:^(UIAlertAction * _Nonnull action) {
+        exec_cmd_root(JBROOT_PATH("/sbin/reboot"), NULL);
+    }];
+    
+    [alert addAction:cancelAction];
+    [alert addAction:rebootAction];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 
 @end

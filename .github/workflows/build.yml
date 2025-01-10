@@ -29,7 +29,7 @@ jobs:
     runs-on: macos-13
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.2
         with:
             submodules: recursive
 
@@ -67,6 +67,7 @@ jobs:
           sed -i '' "s/com.opa334.Dopamine-roothide/${{ env.BUNDLEID }}/g" ./Application/Dopamine.xcodeproj/project.pbxproj
           sed -i '' "s/com.opa334.Dopamine-roothide/${{ env.BUNDLEID }}/g" ./BaseBin/jbctl/src/main.m
 
+<<<<<<< HEAD
       - name: Set env
         run: |
           sT=$(TZ=UTC-8 date +'%S')
