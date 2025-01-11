@@ -22,9 +22,7 @@ permissions:
 
 env:
   VERSION: '2.3'
-  VERSION_rh: '2.2.2'
   BUNDLEID: 'com.wwg135.Dopamine'
-  BUNDLEID_rh: 'com.wwg135.Dopamine-roothide'
 
 jobs:
   build:
@@ -80,7 +78,6 @@ jobs:
       - name: Print env
         run: |
           echo ${{ env.VERSION }}
-          echo ${{ env.VERSION_rh }}
           echo ${{ env.msT }}
           echo ${{ env.shT }}
           echo ${{ env.logT }}
@@ -108,24 +105,6 @@ jobs:
           export THEOS="${BASEDIR}/theos"
           gmake -j$(sysctl -n hw.physicalcpu) NIGHTLY=1
           mv Application/Dopamine.tipa Dopamine.ipa
-
-      - name: Build Roothide
-        run: |
-          git reset --hard HEAD
-          git checkout -f rh222
-          git submodule update --init --remote --recursive
-
-          sed -i '' "s/com.opa334.Dopamine-roothide/${{ env.BUNDLEID_rh }}/g" ./Application/Dopamine/Jailbreak/DOPreferenceManager.m
-          sed -i '' "s/com.opa334.Dopamine-roothide/${{ env.BUNDLEID_rh }}/g" ./Application/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/com.opa334.Dopamine-roothide/${{ env.BUNDLEID_rh }}/g" ./BaseBin/jbctl/src/main.m
-          
-          echo "${{ env.VERSION_rh }}" >./BaseBin/_external/basebin/.version
-          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION_rh }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
-          sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/DOMainViewController.m
-
-          export THEOS=$HOME/theos
-          gmake -j$(sysctl -n hw.physicalcpu)
-          mv Application/Dopamine.tipa Dopamine-roothide.ipa
 
       - name: Release Logs
         run: |
