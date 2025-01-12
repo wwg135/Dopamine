@@ -116,7 +116,7 @@ jobs:
           cat ./release.md >> release.txt
           
       - name: Release ipa
-        uses: softprops/action-gh-release@v2.0.8
+        uses: softprops/action-gh-release@v2.2.1
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.VERSION }}
