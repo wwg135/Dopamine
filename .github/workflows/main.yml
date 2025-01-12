@@ -29,7 +29,7 @@ jobs:
     environment: Auto Build And Release
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.2
         with:
             submodules: recursive
 
@@ -115,7 +115,7 @@ jobs:
           #cat ./release.md >> release.txt
           
       #- name: Release ipa
-        #uses: softprops/action-gh-release@v1
+        #uses: softprops/action-gh-release@v2.2.1
         #with:
           #name: ${{ env.VERSION }}
           #tag_name: ${{ env.VERSION }}
@@ -128,7 +128,7 @@ jobs:
 
       - name: Upload Artifact
         id: dopamine-latest-upload
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: Dopamine
           path: |
