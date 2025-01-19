@@ -110,10 +110,10 @@ void apply_fork_hook(void)
 
 __attribute__((constructor)) static void initializer(void)
 {
-#ifdef __arm64e__
-	if (__builtin_available(iOS 16.0, *) || getenv("FORKFIX_DISABLE_REBIND")) { /* fall through */ }
-	else if (fork_reimpl_init(forkfix___fork)) return;
-#endif
+//#ifdef __arm64e__
+//	if (__builtin_available(iOS 16.0, *) || getenv("FORKFIX_DISABLE_REBIND")) { /* fall through */ }
+//	else if (fork_reimpl_init(forkfix___fork)) return;
+//#endif
 
 	apply_fork_hook();
 }
