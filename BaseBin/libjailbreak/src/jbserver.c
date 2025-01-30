@@ -122,3 +122,12 @@ int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xms
 
 	return 0;
 }
+
+int (*jbserver_mach_msg_handler)(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg);
+int jbserver_received_mach_message(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg)
+{
+	if (jbserver_mach_msg_handler) {
+		return jbserver_mach_msg_handler(auditToken, jbsMachMsg);
+	}
+	return -1;
+}

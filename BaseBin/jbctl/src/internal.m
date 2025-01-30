@@ -1,5 +1,6 @@
 #import "internal.h"
 #import "dyldpatch.h"
+#import "dyldmerge.h"
 #import "codesign.h"
 #import <libjailbreak/carboncopy.h>
 #import <Foundation/Foundation.h>
@@ -102,10 +103,14 @@ int jbctl_handle_internal(const char *command, int argc, char* argv[])
 		// Backup and patch dyld
 		NSString *dyldBackupPath = JBROOT_PATH(@"/basebin/.dyld.orig");
 		NSString *dyldPatchPath = JBROOT_PATH(@"/basebin/.dyld.patched");
+		NSString *dyldMergePath = JBROOT_PATH(@"/basebin/.dyld.merged");
 		carbonCopy(@"/usr/lib/dyld", dyldBackupPath);
 		carbonCopy(@"/usr/lib/dyld", dyldPatchPath);
 		apply_dyld_patch(dyldPatchPath.fileSystemRepresentation);
-		resign_file(dyldPatchPath, YES);
+		if (merge_dyldhook(dyldPatchPath, basebinPath, dyldMergePath) != 0) {
+			return -1;
+		}
+		resign_file(dyldMergePath, @"com.apple.dyld", YES);
 
 		// Copy systemhook to fakelib
 		carbonCopy(JBROOT_PATH(@"/basebin/systemhook.dylib"), JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib"));
@@ -113,7 +118,7 @@ int jbctl_handle_internal(const char *command, int argc, char* argv[])
 		// Replace dyld in fakelib with patched dyld
 		NSString *fakelibDyldPath = [fakelibPath stringByAppendingPathComponent:@"dyld"];
 		[[NSFileManager defaultManager] removeItemAtPath:fakelibDyldPath error:nil];
-		carbonCopy(dyldPatchPath, JBROOT_PATH(@"/basebin/.fakelib/dyld"));
+		carbonCopy(dyldMergePath, JBROOT_PATH(@"/basebin/.fakelib/dyld"));
 		return 0;
 	}
 	else if (!strcmp(command, "fakelib_mount")) {

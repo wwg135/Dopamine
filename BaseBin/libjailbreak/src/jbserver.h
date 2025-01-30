@@ -44,4 +44,30 @@ extern struct jbserver_impl gGlobalServer;
 
 int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xmsg);
 
+#define JBSERVER_MACH_MAGIC 0x444F50414D494E45
+#define JBSERVER_MACH_CHECKIN_STAGE1 0
+
+struct jbserver_mach_msg {
+    mach_msg_header_t hdr;
+    uint64_t magic;
+    uint64_t action;
+};
+
+struct jbserver_mach_msg_reply {
+    struct jbserver_mach_msg msg;
+    uint64_t status;
+};
+
+struct jbserver_mach_msg_checkin_stage1 {
+    struct jbserver_mach_msg base;
+};
+
+struct jbserver_mach_msg_checkin_stage1_reply {
+    struct jbserver_mach_msg_reply base;
+    char sbx_tokens[2000];
+};
+
+extern int (*jbserver_mach_msg_handler)(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg);
+int jbserver_received_mach_message(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg);
+
 #endif

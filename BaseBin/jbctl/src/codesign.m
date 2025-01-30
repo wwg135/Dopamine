@@ -65,6 +65,7 @@ typedef struct CF_BRIDGED_TYPE(id) __SecCodeSigner* SecCodeSignerRef SPI_AVAILAB
 typedef struct __SecCodeSigner* SecCodeSignerRef SPI_AVAILABLE(macos(10.5), ios(15.0), macCatalyst(13.0));
 #endif
 
+extern const CFStringRef kSecCodeSignerTeamIdentifier SPI_AVAILABLE(macos(10.5), ios(15.0), macCatalyst(13.0));
 extern const CFStringRef kSecCodeSignerEntitlements SPI_AVAILABLE(macos(10.5), ios(15.0), macCatalyst(13.0));
 extern const CFStringRef kSecCodeSignerIdentifier SPI_AVAILABLE(macos(10.5), ios(15.0), macCatalyst(13.0));
 extern const CFStringRef kSecCodeSignerIdentity SPI_AVAILABLE(macos(10.5), ios(15.0), macCatalyst(13.0));
@@ -90,7 +91,7 @@ extern const CFStringRef kSecCodeInfoResourceDirectory; /* Internal */
 }
 #endif
 
-int resign_file(NSString *filePath, bool preserveMetadata)
+int resign_file(NSString *filePath, NSString *identifier, bool preserveMetadata)
 {
 	OSStatus status = 0;
 	int retval = 200;
@@ -101,6 +102,10 @@ int resign_file(NSString *filePath, bool preserveMetadata)
 	parameters[(__bridge NSString*)kSecCodeSignerIdentity] = (__bridge id)identity;
 	if (preserveMetadata) {
 		parameters[(__bridge NSString*)kSecCodeSignerPreserveMetadata] = @(kSecCSPreserveIdentifier | kSecCSPreserveRequirements | kSecCSPreserveEntitlements | kSecCSPreserveResourceRules);
+	}
+
+	if (identifier) {
+		parameters[(__bridge NSString *)kSecCodeSignerIdentifier] = identifier;
 	}
 
 	SecCodeSignerRef signerRef;

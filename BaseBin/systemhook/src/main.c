@@ -279,7 +279,8 @@ __attribute__((constructor)) static void initializer(void)
 {
 	// Tell jbserver (in launchd) that this process exists
 	// This will disable page validation, which allows the rest of this constructor to apply hooks
-	if (jbclient_process_checkin(&JB_RootPath, &JB_BootUUID, &JB_SandboxExtensions, &gFullyDebugged) != 0) return;
+	if (jbclient_process_checkin_stage1(&JB_SandboxExtensions) != 0) return;
+	if (jbclient_process_checkin_stage2(&JB_RootPath, &JB_BootUUID, &gFullyDebugged) != 0) return;
 
 	// Apply sandbox extensions
 	apply_sandbox_extensions();

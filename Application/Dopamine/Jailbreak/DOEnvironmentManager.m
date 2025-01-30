@@ -519,7 +519,7 @@ int reboot3(uint64_t flags, ...);
             else {
                 [[NSFileManager defaultManager] createSymbolicLinkAtPath:@"/var/jb" withDestinationPath:JBROOT_PATH(@"/") error:nil];
                 if ([self isJailbroken]) {
-                    carbonCopy(JBROOT_PATH(@"/basebin/.dyld.patched"), JBROOT_PATH(@"/basebin/.fakelib/dyld"));
+                    carbonCopy(JBROOT_PATH(@"/basebin/.dyld.merged"), JBROOT_PATH(@"/basebin/.fakelib/dyld"));
                     carbonCopy(JBROOT_PATH(@"/basebin/systemhook.dylib"), JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib"));
                     [self refreshJailbreakApps];
                 }

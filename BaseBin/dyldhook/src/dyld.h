@@ -1,0 +1,1 @@
+const char *_simple_getenv(char **envp, char *key);

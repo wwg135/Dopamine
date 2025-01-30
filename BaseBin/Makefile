@@ -9,7 +9,7 @@
 
 all: basebin.tar
 
-subprojects: ChOma XPF opainject libjailbreak systemhook forkfix launchdhook boomerang jbctl idownloadd watchdoghook rootlesshooks
+subprojects: ChOma XPF MachOMerger opainject libjailbreak systemhook forkfix launchdhook boomerang jbctl idownloadd watchdoghook rootlesshooks
 
 ChOma: .build .include
 	@$(MAKE) -C ChOma TARGET=ios DISABLE_SIGNING=1 DISABLE_TESTS=1 DYLIB_LDFLAGS="-install_name @loader_path/libchoma.dylib"
@@ -21,6 +21,10 @@ XPF: .build .include ChOma
 	@cp XPF/libxpf.dylib .build
 	@mkdir -p .include/xpf
 	@cp XPF/src/xpf.h .include/xpf
+
+MachOMerger: .build .include
+	@$(MAKE) -C MachOMerger
+	@cp MachOMerger/MachOMerger .build
 
 opainject: .build .include
 	$(MAKE) -C opainject FINALPACKAGE=1
@@ -83,12 +87,18 @@ basebin.tc: subprojects
 	trustcache create .build/basebin.tc .build
 	cp .build/basebin.tc basebin.tc
 
-basebin.tar: basebin.tc
+# dyldhook dylibs do not need to be added to the basebin trustcache
+dyldhook: basebin.tc
+	$(MAKE) -C dyldhook
+	@cp dyldhook/*.dylib .build
+
+basebin.tar: basebin.tc dyldhook
 	@DYLD_FALLBACK_LIBRARY_PATH="." ./tar --transform "s/^.build/basebin/" -cvf "basebin.tar" ".build" --owner=0 --group=0
 
 clean:
 	@$(MAKE) -C ChOma $@
 	@$(MAKE) -C XPF $@
+	@$(MAKE) -C MachOMerger $@
 	@$(MAKE) -C opainject $@
 	@$(MAKE) -C libjailbreak $@
 	@$(MAKE) -C systemhook $@
@@ -99,9 +109,10 @@ clean:
 	@$(MAKE) -C idownloadd $@
 	@$(MAKE) -C watchdoghook $@
 	@$(MAKE) -C rootlesshooks $@
+	@$(MAKE) -C dyldhook $@
 	@rm -rf .build
 	@rm -rf .include
 	@rm -rf basebin.tar
 	@rm -rf basebin.tc
 
-.PHONY: clean .build .include ChOma XPF opainject libjailbreak systemhook forkfix launchdhook boomerang jbctl idownloadd watchdoghook rootlesshooks basebin.tc basebin.tar
+.PHONY: clean .build .include ChOma XPF MachOMerger opainject libjailbreak systemhook forkfix launchdhook boomerang jbctl idownloadd watchdoghook rootlesshooks basebin.tc dyldhook basebin.tar

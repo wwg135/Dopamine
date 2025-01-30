@@ -1,4 +1,5 @@
 #include "jbclient_xpc.h"
+#include "jbclient_mach.h"
 #include "jbserver.h"
 #include <dispatch/dispatch.h>
 #include <sys/stat.h>
@@ -58,10 +59,9 @@ xpc_object_t jbserver_xpc_send_dict(xpc_object_t xdict)
 		}
 		if (!globalData) return NULL;
 		if (!globalData->xpc_bootstrap_pipe) {
-			mach_port_t *initPorts;
-			mach_msg_type_number_t initPortsCount = 0;
-			if (mach_ports_lookup(mach_task_self(), &initPorts, &initPortsCount) == 0) {
-				globalData->task_bootstrap_port = initPorts[0];
+			mach_port_t launchdPort = jbclient_mach_get_launchd_port();
+			if (launchdPort != MACH_PORT_NULL) {
+				globalData->task_bootstrap_port = launchdPort;
 				globalData->xpc_bootstrap_pipe = xpc_pipe_create_from_port(globalData->task_bootstrap_port, 0);
 			}
 		}
@@ -234,17 +234,28 @@ int jbclient_trust_library(const char *libraryPath, void *addressInCaller)
 	return -1;
 }
 
-int jbclient_process_checkin(char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
+int jbclient_process_checkin_stage1(char **sandboxExtensionsOut)
 {
-	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_PROCESS_CHECKIN, NULL);
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_PROCESS_CHECKIN_STAGE1, NULL);
+	if (xreply) {
+		int64_t result = xpc_dictionary_get_int64(xreply, "result");
+		const char *sandboxExtensions = xpc_dictionary_get_string(xreply, "sandbox-extensions");
+		if (sandboxExtensionsOut) *sandboxExtensionsOut = sandboxExtensions ? strdup(sandboxExtensions) : NULL;
+		xpc_release(xreply);
+		return result;
+	}
+	return -1;
+}
+
+int jbclient_process_checkin_stage2(char **rootPathOut, char **bootUUIDOut, bool *fullyDebuggedOut)
+{
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_PROCESS_CHECKIN_STAGE2, NULL);
 	if (xreply) {
 		int64_t result = xpc_dictionary_get_int64(xreply, "result");
 		const char *rootPath = xpc_dictionary_get_string(xreply, "root-path");
 		const char *bootUUID = xpc_dictionary_get_string(xreply, "boot-uuid");
-		const char *sandboxExtensions = xpc_dictionary_get_string(xreply, "sandbox-extensions");
 		if (rootPathOut) *rootPathOut = rootPath ? strdup(rootPath) : NULL;
 		if (bootUUIDOut) *bootUUIDOut = bootUUID ? strdup(bootUUID) : NULL;
-		if (sandboxExtensionsOut) *sandboxExtensionsOut = sandboxExtensions ? strdup(sandboxExtensions) : NULL;
 		if (fullyDebuggedOut) *fullyDebuggedOut = xpc_dictionary_get_bool(xreply, "fully-debugged");
 		xpc_release(xreply);
 		return result;
