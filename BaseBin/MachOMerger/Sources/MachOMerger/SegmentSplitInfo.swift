@@ -164,6 +164,12 @@ func processSplitInfo(_ reader: ULEB128Reader, relocInfo: RelocInfo, isB: Bool) 
                     //print("Fixing up \(pStr(fromAddr)) -> \(pStr(toAddr)) [orig: \(pStr(fromAddrOld)) -> \(pStr(toAddrOld))]")
                     
                     switch kind {
+                    case 2:
+                        let loc = fromSection.getGeneric(type: UInt32.self, offset: UInt(fromSectionOffset))
+                        let new = loc + UInt32(toAddr - toAddrOld)
+                        fromSection = fromSection[0..<Int(fromSectionOffset)] + Data(fromObject: new) + fromSection[Int(fromSectionOffset + 4)...]
+                        break
+
                     case 5:
                         let adrp = fromSection.getGeneric(type: UInt32.self, offset: UInt(fromSectionOffset))
                         let new = ssiFixAdrp(adrp: adrp, at: fromAddr, to: toAddr)
