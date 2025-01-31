@@ -2,7 +2,6 @@
 #import <libjailbreak/libjailbreak.h>
 #import <libjailbreak/util.h>
 #import <libjailbreak/kernel.h>
-#import <libjailbreak/dsc_mlock.h>
 #import <mach-o/dyld.h>
 #import <spawn.h>
 #import <pthread.h>
@@ -12,12 +11,10 @@
 #import "xpc_hook.h"
 #import "daemon_hook.h"
 #import "ipc_hook.h"
-#import "dsc_hook.h"
 #import "jetsam_hook.h"
 #import "crashreporter.h"
 #import "boomerang.h"
 #import "update.h"
-#import "oldabi.h"
 
 bool gInEarlyBoot = true;
 
@@ -81,7 +78,6 @@ __attribute__((constructor)) static void initializer(void)
 	initDaemonHooks();
 	initSpawnHooks();
 	initIPCHooks();
-	initDSCHooks();
 	initJetsamHook();
 
 	// This will ensure launchdhook is always reinjected after userspace reboots
