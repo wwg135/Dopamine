@@ -26,17 +26,33 @@ int64_t sandbox_extension_consume(const char *extension_token)
 	}
 }
 
+// mig_get_reply_port has to be reimplemented because the implementation inside dyld accesses TPIDRRO_EL0 (which is NULL when the dyldhook code runs)
+// We make the reimplementation store it in a global instead, which is enough since we will only be calling it from one thread anyways
+mach_port_t gMigReplyPort = 0;
+
+#if IOS == 15
 extern mach_port_t mach_reply_port(void);
-mach_port_t gReplyPort = 0;
+
 mach_port_t mig_get_reply_port(void) {
-    if (!gReplyPort) {
-        gReplyPort = mach_reply_port();
+    if (!gMigReplyPort) {
+        gMigReplyPort = mach_reply_port();
     }
 
-    return gReplyPort;
+    return gMigReplyPort;
 }
+#else // iOS 16+
 
-#if IOS >= 16
+struct mach_port_options gMigOptions = {
+	.flags = 0x1000,
+};
+
+mach_port_t mig_get_reply_port(void) {
+    if (!gMigReplyPort) {
+		struct mach_port_options options = gMigOptions;
+        mach_port_construct(task_self_trap(), &options, 0, &gMigReplyPort);
+    }
+    return gMigReplyPort;
+}
 
 // iOS 16+ dyld's do no longer have mach_msg, reimplement it
 // We also need to reimplement mach_msg2, since task.c needs it
