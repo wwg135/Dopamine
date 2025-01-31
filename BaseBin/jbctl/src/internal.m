@@ -100,13 +100,17 @@ int jbctl_handle_internal(const char *command, int argc, char* argv[])
 		[[NSFileManager defaultManager] createDirectoryAtPath:fakelibPath withIntermediateDirectories:YES attributes:nil error:nil];
 		carbonCopy(@"/usr/lib", fakelibPath);
 
+		NSString *dopamineVersion = [NSString stringWithContentsOfFile:JBROOT_PATH(@"/basebin/.version") encoding:NSUTF8StringEncoding error:nil];
+		if (!dopamineVersion) return -1;
+		NSString *dyldIdentifier = [@"DOPA" stringByAppendingString:dopamineVersion];
+
 		// Backup and patch dyld
 		NSString *dyldBackupPath = JBROOT_PATH(@"/basebin/.dyld.orig");
 		NSString *dyldPatchPath = JBROOT_PATH(@"/basebin/.dyld.patched");
 		NSString *dyldMergePath = JBROOT_PATH(@"/basebin/.dyld.merged");
 		carbonCopy(@"/usr/lib/dyld", dyldBackupPath);
 		carbonCopy(@"/usr/lib/dyld", dyldPatchPath);
-		apply_dyld_patch(dyldPatchPath.fileSystemRepresentation);
+		apply_dyld_patch(dyldPatchPath.fileSystemRepresentation, dyldIdentifier.UTF8String);
 		if (merge_dyldhook(dyldPatchPath, basebinPath, dyldMergePath) != 0) {
 			return -1;
 		}

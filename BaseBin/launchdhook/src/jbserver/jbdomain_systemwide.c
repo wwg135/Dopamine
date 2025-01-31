@@ -124,20 +124,7 @@ static int systemwide_trust_library(audit_token_t *processToken, const char *lib
 	return trust_file(libraryPath, callerLibraryPath, callerPath, NULL);
 }
 
-static bool _systemwide_process_checkin_should_set_fully_debugged(char *procPath)
-{
-	bool fullyDebugged = false;
-	if (string_has_prefix(procPath, "/private/var/containers/Bundle/Application") || string_has_prefix(procPath, JBROOT_PATH("/Applications"))) {
-		// This is an app, enable CS_DEBUGGED based on user preference
-		if (jbsetting(markAppsAsDebugged)) {
-			fullyDebugged = true;
-		}
-	}
-	return fullyDebugged;
-}
-
-// Check-in stage 1 coming from dyld itself
-int systemwide_process_checkin_stage1(audit_token_t *processToken, char **sandboxExtensionsOut)
+int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
 {
 	// Fetch process info
 	pid_t pid = audit_token_to_pid(*processToken);
@@ -151,6 +138,10 @@ int systemwide_process_checkin_stage1(audit_token_t *processToken, char **sandbo
 	if (!proc) {
 		return -1;
 	}
+
+	// Get jbroot and boot uuid
+	systemwide_get_jbroot(rootPathOut);
+	systemwide_get_boot_uuid(bootUUIDOut);
 
 	// Generate sandbox extensions for the requesting process
 	char *sandboxExtensionsArr[] = {
@@ -169,8 +160,17 @@ int systemwide_process_checkin_stage1(audit_token_t *processToken, char **sandbo
 		}
 	}
 
+	bool fullyDebugged = false;
+	if (string_has_prefix(procPath, "/private/var/containers/Bundle/Application") || string_has_prefix(procPath, JBROOT_PATH("/Applications"))) {
+		// This is an app, enable CS_DEBUGGED based on user preference
+		if (jbsetting(markAppsAsDebugged)) {
+			fullyDebugged = true;
+		}
+	}
+	*fullyDebuggedOut = fullyDebugged;
+
 	// Allow invalid pages
-	cs_allow_invalid(proc, _systemwide_process_checkin_should_set_fully_debugged(procPath));
+	cs_allow_invalid(proc, fullyDebugged);
 
 	// Fix setuid
 	struct stat sb;
@@ -255,24 +255,6 @@ int systemwide_process_checkin_stage1(audit_token_t *processToken, char **sandbo
 #endif
 
 	proc_rele(proc);
-	return 0;
-}
-
-// Check-in stage 2 coming from systemhook.dylib
-static int systemwide_process_checkin_stage2(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, bool *fullyDebuggedOut)
-{
-	// Fetch process info
-	pid_t pid = audit_token_to_pid(*processToken);
-	char procPath[4*MAXPATHLEN];
-	if (proc_pidpath(pid, procPath, sizeof(procPath)) <= 0) {
-		return -1;
-	}
-
-	// Get jbroot and boot uuid
-	systemwide_get_jbroot(rootPathOut);
-	systemwide_get_boot_uuid(bootUUIDOut);
-
-	*fullyDebuggedOut = _systemwide_process_checkin_should_set_fully_debugged(procPath);
 	return 0;
 }
 
@@ -391,22 +373,14 @@ struct jbserver_domain gSystemwideDomain = {
 				{ 0 },
 			},
 		},
-		// JBS_SYSTEMWIDE_PROCESS_CHECKIN_STAGE1
+		// JBS_SYSTEMWIDE_PROCESS_CHECKIN
 		{
-			.handler = systemwide_process_checkin_stage1,
-			.args = (jbserver_arg[]) {
-				{ .name = "caller-token", .type = JBS_TYPE_CALLER_TOKEN, .out = false },
-				{ .name = "sandbox-extensions", .type = JBS_TYPE_STRING, .out = true },
-				{ 0 },
-			},
-		},
-		// JBS_SYSTEMWIDE_PROCESS_CHECKIN_STAGE2
-		{
-			.handler = systemwide_process_checkin_stage2,
+			.handler = systemwide_process_checkin,
 			.args = (jbserver_arg[]) {
 				{ .name = "caller-token", .type = JBS_TYPE_CALLER_TOKEN, .out = false },
 				{ .name = "root-path", .type = JBS_TYPE_STRING, .out = true },
 				{ .name = "boot-uuid", .type = JBS_TYPE_STRING, .out = true },
+				{ .name = "sandbox-extensions", .type = JBS_TYPE_STRING, .out = true },
 				{ .name = "fully-debugged", .type = JBS_TYPE_BOOL, .out = true },
 				{ 0 },
 			},

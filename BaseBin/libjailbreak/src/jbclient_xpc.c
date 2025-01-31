@@ -234,28 +234,17 @@ int jbclient_trust_library(const char *libraryPath, void *addressInCaller)
 	return -1;
 }
 
-int jbclient_process_checkin_stage1(char **sandboxExtensionsOut)
+int jbclient_process_checkin(char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
 {
-	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_PROCESS_CHECKIN_STAGE1, NULL);
-	if (xreply) {
-		int64_t result = xpc_dictionary_get_int64(xreply, "result");
-		const char *sandboxExtensions = xpc_dictionary_get_string(xreply, "sandbox-extensions");
-		if (sandboxExtensionsOut) *sandboxExtensionsOut = sandboxExtensions ? strdup(sandboxExtensions) : NULL;
-		xpc_release(xreply);
-		return result;
-	}
-	return -1;
-}
-
-int jbclient_process_checkin_stage2(char **rootPathOut, char **bootUUIDOut, bool *fullyDebuggedOut)
-{
-	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_PROCESS_CHECKIN_STAGE2, NULL);
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_PROCESS_CHECKIN, NULL);
 	if (xreply) {
 		int64_t result = xpc_dictionary_get_int64(xreply, "result");
 		const char *rootPath = xpc_dictionary_get_string(xreply, "root-path");
 		const char *bootUUID = xpc_dictionary_get_string(xreply, "boot-uuid");
+		const char *sandboxExtensions = xpc_dictionary_get_string(xreply, "sandbox-extensions");
 		if (rootPathOut) *rootPathOut = rootPath ? strdup(rootPath) : NULL;
 		if (bootUUIDOut) *bootUUIDOut = bootUUID ? strdup(bootUUID) : NULL;
+		if (sandboxExtensionsOut) *sandboxExtensionsOut = sandboxExtensions ? strdup(sandboxExtensions) : NULL;
 		if (fullyDebuggedOut) *fullyDebuggedOut = xpc_dictionary_get_bool(xreply, "fully-debugged");
 		xpc_release(xreply);
 		return result;

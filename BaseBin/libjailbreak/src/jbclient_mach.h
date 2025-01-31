@@ -7,6 +7,6 @@
 
 mach_port_t jbclient_mach_get_launchd_port(void);
 int jbclient_mach_send_msg(struct jbserver_mach_msg *msg, struct jbserver_mach_msg_reply *reply);
-int jbclient_mach_process_checkin_stage1(char *sandboxExtensionsOut);
+int jbclient_mach_process_checkin(char *jbRootPathOut, char *bootUUIDOut, char *sandboxExtensionsOut, bool *fullyDebuggedOut);
 
 #endif

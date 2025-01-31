@@ -1,10 +1,13 @@
-#define DYLD_JBINFO_MAXSIZE 0x3f00
+#define DYLD_JBINFO_MAXSIZE 0x4000
+
+#define DYLD_STATE_CHECKED_IN 1
 
 // A struct that allows dyldhook to stash information that systemhook can later access
 struct dyld_jbinfo {
-	char *sandboxExtensions;
-	char *bootUUID;
+	uint64_t state;
 	char *jbRootPath;
+	char *bootUUID;
+	char *sandboxExtensions;
 	bool fullyDebugged;
 
 	char data[];

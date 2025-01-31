@@ -2,29 +2,36 @@
 #include <mach/mach.h>
 #include <bsm/audit.h>
 
-int systemwide_process_checkin_stage1(audit_token_t *processToken, char **sandboxExtensionsOut);
+int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut);
 
 static int mach_msg_handler(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg)
 {
 	uint64_t callerPid = audit_token_to_pid(*auditToken);
 
-	if (jbsMachMsg->action == JBSERVER_MACH_CHECKIN_STAGE1) {
-		FILE *f = fopen("/var/mobile/launchd_mach.txt", "a");
-		fprintf(f, "Received stage1 checkin from %d\n", callerPid);
-		fclose(f);
+	if (jbsMachMsg->action == JBSERVER_MACH_CHECKIN) {
+		struct jbserver_mach_msg_stage1 *checkinStage1Msg = (struct jbserver_mach_msg_stage1 *)jbsMachMsg;
 
-		struct jbserver_mach_msg_checkin_stage1 *checkinStage1Msg = (struct jbserver_mach_msg_checkin_stage1 *)jbsMachMsg;
+		struct jbserver_mach_msg_checkin_reply reply;
+		memset(&reply, 0, sizeof(reply));
 		
-		char *sandboxExtensions = NULL;
-		int result = systemwide_process_checkin_stage1(auditToken, &sandboxExtensions);
+		char *jbRootPath = NULL, *bootUUID = NULL, *sandboxExtensions = NULL;
+		bool fullyDebugged = false;
+		int result = systemwide_process_checkin(auditToken, &jbRootPath, &bootUUID, &sandboxExtensions, &reply.fullyDebugged);
 
-		struct jbserver_mach_msg_checkin_stage1_reply reply;
 		reply.base.msg.magic = jbsMachMsg->magic;
 		reply.base.msg.action = jbsMachMsg->action;
 		reply.base.msg.hdr.msgh_size = sizeof(reply);
 
+		if (jbRootPath) {
+			strlcpy(reply.jbRootPath, jbRootPath, sizeof(reply.jbRootPath));
+			free(jbRootPath);
+		}
+		if (bootUUID) {
+			strlcpy(reply.bootUUID, bootUUID, sizeof(reply.bootUUID));
+			free(bootUUID);
+		}
 		if (sandboxExtensions) {
-			strlcpy(reply.sbx_tokens, sandboxExtensions, sizeof(reply.sbx_tokens));
+			strlcpy(reply.sandboxExtensions, sandboxExtensions, sizeof(reply.sandboxExtensions));
 			free(sandboxExtensions);
 		}
 

@@ -1,1 +1,1 @@
-int apply_dyld_patch(const char *dyldPath);
+int apply_dyld_patch(const char *dyldPath, const char *newIdentifier);

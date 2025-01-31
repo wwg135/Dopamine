@@ -1,4 +1,4 @@
-#if __arm64e__
+#if IOS==15 && __arm64e__
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -18,7 +18,7 @@
 char *__locate_dsc(void)
 {
 	// We make two assumptions here
-	// 1. This code is only called on iOS 15 arm64e (cause the spinlock panic doesn't affect anything else)
+	// 1. This code is only called on iOS 15 arm64e (since the spinlock panic doesn't affect anything else)
 	// 2. This code is only called if the shared cache has been mapped in via a shared region
 	// For these reasons, we can just hardcode the path
 	return "/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64e";

@@ -1,6 +1,8 @@
 #include "common.h"
 
 #include <mach-o/dyld.h>
+#include <mach-o/dyld_images.h>
+#include <mach-o/getsect.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
 #include <paths.h>
@@ -9,6 +11,7 @@
 #include <libjailbreak/jbclient_xpc.h>
 #include <libjailbreak/codesign.h>
 #include <libjailbreak/jbroot.h>
+#include "../dyldhook/src/dyld_jbinfo.h"
 #include "litehook.h"
 #include "sandbox.h"
 #include "private.h"
@@ -31,24 +34,29 @@ static int load_executable_path(void)
 }
 
 static char *JB_SandboxExtensions = NULL;
-void apply_sandbox_extensions(void)
+
+void consume_tokenized_sandbox_extensions(char *sandboxExtensions)
 {
-	if (JB_SandboxExtensions) {
-		char *JB_SandboxExtensions_dup = strdup(JB_SandboxExtensions);
-		char *extension = strtok(JB_SandboxExtensions_dup, "|");
-		while (extension != NULL) {
-			sandbox_extension_consume(extension);
-			extension = strtok(NULL, "|");
+	if (sandboxExtensions[0] == '\0') return;
+
+	char *it = sandboxExtensions;
+	char *last = sandboxExtensions;
+	while (*(++it) != '\0') {
+		if (*it == '|') {
+			*it = '\0';
+			sandbox_extension_consume(last);
+			last = &it[1];
+			*it = '|';
 		}
-		free(JB_SandboxExtensions_dup);
 	}
+	sandbox_extension_consume(last);
 }
 
 void *(*sandbox_apply_orig)(void *) = NULL;
 void *sandbox_apply_hook(void *a1)
 {
 	void *r = sandbox_apply_orig(a1);
-	apply_sandbox_extensions();
+	consume_tokenized_sandbox_extensions(JB_SandboxExtensions);
 	return r;
 }
 
@@ -275,15 +283,60 @@ int __execve_hook(const char *path, char *const argv[], char *const envp[])
 	return execve_hook_shared(path, argv, envp, (void *)__execve_orig, jbclient_trust_binary);
 }
 
-__attribute__((constructor)) static void initializer(void)
+const struct mach_header_64 *get_dyld_mach_header(void)
 {
-	// Tell jbserver (in launchd) that this process exists
-	// This will disable page validation, which allows the rest of this constructor to apply hooks
-	if (jbclient_process_checkin_stage1(&JB_SandboxExtensions) != 0) return;
-	if (jbclient_process_checkin_stage2(&JB_RootPath, &JB_BootUUID, &gFullyDebugged) != 0) return;
+	task_dyld_info_data_t dyldInfo;
+	uint32_t count = TASK_DYLD_INFO_COUNT;
+	kern_return_t kr = task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t)&dyldInfo, &count);
+	if (kr != KERN_SUCCESS) return NULL;
+	struct dyld_all_image_infos *infos = (struct dyld_all_image_infos *)dyldInfo.all_image_info_addr;
+	return (const struct mach_header_64 *)infos->dyldImageLoadAddress;
+}
 
-	// Apply sandbox extensions
-	apply_sandbox_extensions();
+int parse_dyldhook_jbinfo(char **jbRootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
+{
+	// Get dyld header
+	const struct mach_header_64 *dyldHeader = get_dyld_mach_header();
+	if (!dyldHeader) return -1;
+
+	// Check if dyld LC_UUID contains dopamine magic
+	uuid_t dyldUUID;
+	if (!_dyld_get_image_uuid((const struct mach_header *)dyldHeader, dyldUUID)) return -2;
+	if (!string_has_prefix((char *)dyldUUID, "DOPA")) return -3;
+
+	// If so, get __jbinfo section
+	size_t jbInfoSize = 0;
+	struct dyld_jbinfo *jbInfo = (struct dyld_jbinfo *)getsectiondata(dyldHeader, "__DATA", "__jbinfo", &jbInfoSize);
+	if (!jbInfo) return -4;
+
+	// Check if dyld already performed check-in
+	if (jbInfo->state != DYLD_STATE_CHECKED_IN) return -5;
+
+	// If so, parse jbinfo
+	if (jbRootPathOut)        *jbRootPathOut        = jbInfo->jbRootPath;
+	if (bootUUIDOut)          *bootUUIDOut          = jbInfo->bootUUID;
+	if (sandboxExtensionsOut) *sandboxExtensionsOut = jbInfo->sandboxExtensions;
+	if (fullyDebuggedOut)     *fullyDebuggedOut     = jbInfo->fullyDebugged;
+
+	return 0;
+}
+
+__attribute__((constructor)) static void initializer(void)
+{	
+	// Under normal circumstances, dyldhook will have already handled the check-in, so get the check-in information from the __jbinfo section
+	// For more information on the check-in process, check the comments in dyldhook
+	if (parse_dyldhook_jbinfo(&JB_RootPath, &JB_BootUUID, &JB_SandboxExtensions, &gFullyDebugged) != 0) {
+		// If under any circumstances dyldhook has *not* performed a check-in, do it now
+		// This code path is taken inside xpcproxy on iOS 16, because launchd apparently no longer passes it a bootstrap port
+		if (jbclient_process_checkin(&JB_RootPath, &JB_BootUUID, &JB_SandboxExtensions, &gFullyDebugged) == 0) {
+			consume_tokenized_sandbox_extensions(JB_SandboxExtensions);
+		}
+		else {
+			// If neither dyldhook nor systemhook managed to perform the check-in, something is very wrong and the best thing we can do is bail out
+			// Should realistically never happen though
+			return;
+		}
+	}
 
 	// Unset DYLD_INSERT_LIBRARIES, but only if systemhook itself is the only thing contained in it
 	// Feeable attempt at making jailbreak detection harder

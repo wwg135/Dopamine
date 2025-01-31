@@ -8,10 +8,9 @@
 
 #include "dyld.h"
 #include "dyld_jbinfo.h"
-#include "private_api.h"
 
-__attribute__((section("__DATA,__jbinfo"))) static char jbinfoPage[0x4000];
-#define jbInfo ((struct dyld_jbinfo *)&jbinfoPage[0])
+__attribute__((section("__DATA,__jbinfo"))) static char jbinfoSection[0x4000];
+#define jbInfo ((struct dyld_jbinfo *)&jbinfoSection[0])
 
 void consume_tokenized_sandbox_extensions(char *sandboxExtensions)
 {
@@ -30,6 +29,25 @@ void consume_tokenized_sandbox_extensions(char *sandboxExtensions)
 	sandbox_extension_consume(last);
 }
 
+void dyldhook_perform_checkin(void)
+{
+	struct jbserver_mach_msg_checkin_reply *replyPtr; // Only for sizeof macro
+
+	char *jbRootPathPtr = &jbInfo->data[0];
+	char *bootUUIDPtr = &jbInfo->data[sizeof(replyPtr->jbRootPath)];
+	char *sandboxExtensionsPtr = &jbInfo->data[sizeof(replyPtr->jbRootPath)+sizeof(replyPtr->bootUUID)];
+
+	// Tell jbserver (in launchd) that this process exists
+	// This will, amongst other things, disable page validation, which allows instruction hooks to be applied later
+	if (jbclient_mach_process_checkin(jbRootPathPtr, bootUUIDPtr, sandboxExtensionsPtr, &jbInfo->fullyDebugged) == 0) {
+		consume_tokenized_sandbox_extensions(sandboxExtensionsPtr);
+		jbInfo->jbRootPath = jbRootPathPtr;
+		jbInfo->bootUUID = bootUUIDPtr;
+		jbInfo->sandboxExtensions = sandboxExtensionsPtr;
+		jbInfo->state = DYLD_STATE_CHECKED_IN;
+	}
+}
+
 void dyldhook_init(uintptr_t kernelParams)
 {
 	// If we are in launchd, bail out
@@ -46,9 +64,6 @@ void dyldhook_init(uintptr_t kernelParams)
 	if (!insertLibrariesVar) return;
 	if (!strstr(insertLibrariesVar, "/systemhook.dylib")) return;
 
-	// If all is well, do stage1 check-in right here before dyld_start!
-	char sandboxExtensions[2000];
-	if (jbclient_mach_process_checkin_stage1(sandboxExtensions) == 0) {
-		consume_tokenized_sandbox_extensions(sandboxExtensions);
-	}
+	// If all is well, do check-in right here before dyld_start!
+	dyldhook_perform_checkin();
 }

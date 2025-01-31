@@ -27,7 +27,7 @@ int main(int argc, char * argv[]) {
     
     if (argc >= 2) {
         // Legacy, called by Dopamine 1.x before initiating a jbupdate
-        // As updating from 1.x to 2.x unsupported, just initiate a device reboot
+        // As updating from 1.x to 2.x is unsupported, just initiate a device reboot
         if (!strcmp(argv[1], "prepare_jbupdate")) {
             [[DOEnvironmentManager sharedManager] reboot];
             return 0;
@@ -36,8 +36,7 @@ int main(int argc, char * argv[]) {
     
     // If systemhook isn't loaded and we are already jailbroken, we need to do the checkin ourselves
     // This can happen when the jailbreak is hidden or when tweak injection into the Dopamine app is disabled via Choicy
-    jbclient_process_checkin_stage1(NULL);
-    jbclient_process_checkin_stage2(NULL, NULL, NULL);
+    jbclient_process_checkin(NULL, NULL, NULL, NULL);
     
     if ([DOEnvironmentManager sharedManager].isJailbroken) {
         setenv("PATH", "/sbin:/bin:/usr/sbin:/usr/bin:/var/jb/sbin:/var/jb/bin:/var/jb/usr/sbin:/var/jb/usr/bin", 1);
