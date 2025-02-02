@@ -1,7 +1,7 @@
 #include <Foundation/Foundation.h>
 #include <Security/Security.h>
 #include <TargetConditionals.h>
-#import <libjailbreak/libjailbreak.h>
+#import "libjailbreak.h"
 
 #ifdef __cplusplus
 extern "C" {

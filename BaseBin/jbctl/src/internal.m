@@ -1,8 +1,4 @@
 #import "internal.h"
-#import "dyldpatch.h"
-#import "dyldmerge.h"
-#import "codesign.h"
-#import <libjailbreak/carboncopy.h>
 #import <Foundation/Foundation.h>
 #import <libjailbreak/libjailbreak.h>
 #import <sys/mount.h>
@@ -26,21 +22,73 @@ int mount_unsandboxed(const char *type, const char *dir, int flags, void *data)
 	return r;
 }
 
-void ensureProtected(const char *path)
+int unmount_unsandboxed(const char *dir, int flags)
+{
+	__block int r = 0;
+	execute_unsandboxed(^{
+		r = unmount(dir, flags);
+	});
+	return r;
+}
+
+bool is_protected(const char *path)
 {
 	struct statfs sb;
 	statfs(path, &sb);
-	if (strcmp(path, sb.f_mntonname) != 0) {
-		mount_unsandboxed("bindfs", path, 0, (void *)path);
-	}
+	return strcmp(path, sb.f_mntonname) == 0;
 }
 
-void ensureProtectionActive(void)
+int ensure_protected(const char *path)
 {
-	// Protect /private/preboot/UUID/<System, usr> from being modified by bind mounting them on top of themselves
-	// This protects dumb users from accidentally deleting these, which would induce a recovery loop after rebooting
-	ensureProtected(prebootUUIDPath("/System"));
-	ensureProtected(prebootUUIDPath("/usr"));
+	if (!is_protected(path)) {
+		return mount_unsandboxed("bindfs", path, 0, (void *)path);
+	}
+	return 0;
+}
+
+int ensure_unprotected(const char *path)
+{
+	if (is_protected(path)) {
+		return unmount_unsandboxed(path, MNT_FORCE);
+	}
+	return 0;
+}
+
+int protection_set_active(bool active)
+{
+	int r = 0;
+	if (active) {
+		// Protect /private/preboot/UUID/<System, usr> from being modified by bind mounting them on top of themselves
+		// This protects dumb users from accidentally deleting these, which would induce a recovery loop after rebooting
+		r |= ensure_protected(prebootUUIDPath("/System"));
+		r |= ensure_protected(prebootUUIDPath("/usr"));
+	}
+	else {
+		r |= ensure_unprotected(prebootUUIDPath("/System"));
+		r |= ensure_unprotected(prebootUUIDPath("/usr"));
+	}
+	return r;
+}
+
+bool fakelib_is_mounted(void)
+{
+	struct statfs fsb;
+    if (statfs("/usr/lib", &fsb) != 0) return NO;
+    return strcmp(fsb.f_mntonname, "/usr/lib") == 0;
+}
+
+int fakelib_set_mounted(bool mounted)
+{
+	int r = 0;
+	if (mounted != fakelib_is_mounted()) {
+		if (mounted) {
+			r = mount_unsandboxed("bindfs", "/usr/lib", MNT_RDONLY, (void *)JBROOT_PATH("/basebin/.fakelib"));
+		}
+		else {
+			r = unmount_unsandboxed("/usr/lib", MNT_FORCE);
+		}
+	}
+	return r;
 }
 
 int jbctl_handle_internal(const char *command, int argc, char* argv[])
@@ -86,51 +134,42 @@ int jbctl_handle_internal(const char *command, int argc, char* argv[])
 		mach_port_deallocate(mach_task_self(), launchdTaskPort);
 		return 0;
 	}
-	else if (!strcmp(command, "protection_init")) {
-		ensureProtectionActive();
-		return 0;
-	}
-	else if (!strcmp(command, "fakelib_init")) {
-		NSString *basebinPath = JBROOT_PATH(@"/basebin");
-		NSString *fakelibPath = JBROOT_PATH(@"/basebin/.fakelib");
-		printf("Initalizing fakelib...\n");
+	else if (!strcmp(command, "protection")) {
+		bool toSet = false;
+		if (argc > 1) {
+			if (!strcmp(argv[1], "activate")) {
+				toSet = true;
+			}
+			else if (!strcmp(argv[1], "deactivate")) {
+				toSet = false;
+			}
+			else {
+				return -1;
+			}
 
-		// Copy /usr/lib to /var/jb/basebin/.fakelib
-		[[NSFileManager defaultManager] removeItemAtPath:fakelibPath error:nil];
-		[[NSFileManager defaultManager] createDirectoryAtPath:fakelibPath withIntermediateDirectories:YES attributes:nil error:nil];
-		carbonCopy(@"/usr/lib", fakelibPath);
-
-		NSString *dopamineVersion = [NSString stringWithContentsOfFile:JBROOT_PATH(@"/basebin/.version") encoding:NSUTF8StringEncoding error:nil];
-		if (!dopamineVersion) return -1;
-		NSString *dyldIdentifier = [@"DOPA" stringByAppendingString:dopamineVersion];
-
-		// Backup and patch dyld
-		NSString *dyldBackupPath = JBROOT_PATH(@"/basebin/.dyld.orig");
-		NSString *dyldPatchPath = JBROOT_PATH(@"/basebin/.dyld.patched");
-		NSString *dyldMergePath = JBROOT_PATH(@"/basebin/.dyld.merged");
-		carbonCopy(@"/usr/lib/dyld", dyldBackupPath);
-		carbonCopy(@"/usr/lib/dyld", dyldPatchPath);
-		apply_dyld_patch(dyldPatchPath.fileSystemRepresentation, dyldIdentifier.UTF8String);
-		if (merge_dyldhook(dyldPatchPath, basebinPath, dyldMergePath) != 0) {
-			return -1;
+			return protection_set_active(toSet);
 		}
-		resign_file(dyldMergePath, @"com.apple.dyld", YES);
-
-		// Copy systemhook to fakelib
-		carbonCopy(JBROOT_PATH(@"/basebin/systemhook.dylib"), JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib"));
-
-		// Replace dyld in fakelib with patched dyld
-		NSString *fakelibDyldPath = [fakelibPath stringByAppendingPathComponent:@"dyld"];
-		[[NSFileManager defaultManager] removeItemAtPath:fakelibDyldPath error:nil];
-		carbonCopy(dyldMergePath, JBROOT_PATH(@"/basebin/.fakelib/dyld"));
-		return 0;
+		return -1;
 	}
-	else if (!strcmp(command, "fakelib_mount")) {
-		printf("Applying mount...\n");
-		return mount_unsandboxed("bindfs", "/usr/lib", MNT_RDONLY, (void *)JBROOT_PATH("/basebin/.fakelib"));
+	else if (!strcmp(command, "fakelib")) {
+		bool toMount = false;
+		if (argc > 1) {
+			if (!strcmp(argv[1], "mount")) {
+				toMount = true;
+			}
+			else if (!strcmp(argv[1], "unmount")) {
+				toMount = false;
+			}
+			else {
+				return -1;
+			}
+
+			return fakelib_set_mounted(toMount);
+		}
+		return -1;
 	}
 	else if (!strcmp(command, "startup")) {
-		ensureProtectionActive();
+		protection_set_active(true);
 		char *panicMessage = NULL;
 		if (jbclient_watchdog_get_last_userspace_panic(&panicMessage) == 0) {
 			NSString *printMessage = [NSString stringWithFormat:@"Dopamine has protected you from a userspace panic by temporarily disabling tweak injection and triggering a userspace reboot instead. A log is available under Analytics in the Preferences app. You can reenable tweak injection in the Dopamine app.\n\nPanic message: \n%s", panicMessage];

@@ -8,6 +8,8 @@
 #import "DOEnvironmentManager.h"
 
 #import <sys/sysctl.h>
+#import <sys/mount.h>
+#import <sys/stat.h>
 #import <mach-o/dyld.h>
 #import <libgrabkernel2/libgrabkernel2.h>
 #import <libjailbreak/info.h>
@@ -493,6 +495,29 @@ int reboot3(uint64_t flags, ...);
     }
 }
 
+- (BOOL)isFakelibMounted
+{
+    struct statfs fsb;
+    if (statfs("/usr/lib", &fsb) != 0) return NO;
+    return strcmp(fsb.f_mntonname, "/usr/lib") == 0;
+}
+
+- (int)setFakelibMounted:(BOOL)mounted
+{
+    int r = 0;
+    if (mounted != [self isFakelibMounted]) {
+        const char *arg = mounted ? "mount" : "unmount";
+        r = exec_cmd(JBROOT_PATH("/basebin/jbctl"), "internal", "fakelib", arg, NULL);
+    }
+    return r;
+}
+
+- (int)setPrivatePrebootProtected:(BOOL)protected
+{
+    const char *arg = protected ? "activate" : "deactivate";
+    return exec_cmd(JBROOT_PATH("/basebin/jbctl"), "internal", "protection", arg, NULL);
+}
+
 - (BOOL)isJailbreakHidden
 {
     return ![[NSFileManager defaultManager] fileExistsAtPath:@"/var/jb"];
@@ -511,16 +536,16 @@ int reboot3(uint64_t flags, ...);
             if (hidden) {
                 if ([self isJailbroken]) {
                     [self unregisterJailbreakApps];
-                    [[NSFileManager defaultManager] removeItemAtPath:JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib") error:nil];
-                    carbonCopy(JBROOT_PATH(@"/basebin/.dyld.orig"), JBROOT_PATH(@"/basebin/.fakelib/dyld"));
+                    [self setPrivatePrebootProtected:NO];
+                    [self setFakelibMounted:NO];
                 }
                 [[NSFileManager defaultManager] removeItemAtPath:@"/var/jb" error:nil];
             }
             else {
                 [[NSFileManager defaultManager] createSymbolicLinkAtPath:@"/var/jb" withDestinationPath:JBROOT_PATH(@"/") error:nil];
                 if ([self isJailbroken]) {
-                    carbonCopy(JBROOT_PATH(@"/basebin/.dyld.merged"), JBROOT_PATH(@"/basebin/.fakelib/dyld"));
-                    carbonCopy(JBROOT_PATH(@"/basebin/systemhook.dylib"), JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib"));
+                    [self setFakelibMounted:YES];
+                    [self setPrivatePrebootProtected:YES];
                     [self refreshJailbreakApps];
                 }
             }

@@ -154,10 +154,10 @@ bool can_skip_trusting_file(const char *filePath, bool isLibrary, bool isClient)
 		// If the file is on rootfs mount point, it doesn't need to be trusted as it should be in static trust cache
 		// Same goes for our /usr/lib bind mount (which is guaranteed to be in dynamic trust cache)
 		// We can't do this in the client because of protobox bullshit where calling statfs crashes some processes
-		struct statfs fs;
-		int sfsret = statfs(filePath, &fs);
-		if (sfsret == 0) {
-			if (!strcmp(fs.f_mntonname, "/") || !strcmp(fs.f_mntonname, "/usr/lib")) {
+		struct statfs fsb;
+		int fsr = statfs(filePath, &fsb);
+		if (fsr == 0) {
+			if (!strcmp(fsb.f_mntonname, "/") || !strcmp(fsb.f_mntonname, "/usr/lib")) {
 				return true;
 			}
 		}
