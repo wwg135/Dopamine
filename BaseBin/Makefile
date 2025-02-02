@@ -40,7 +40,7 @@ systemhook: .build .include libjailbreak
 	$(MAKE) -C systemhook
 	@cp systemhook/systemhook.dylib .build
 
-forkfix: .build .include libjailbreak
+forkfix: .build .include libjailbreak systemhook
 	$(MAKE) -C forkfix
 	@cp forkfix/forkfix.dylib .build
 

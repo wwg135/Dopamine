@@ -8,7 +8,6 @@
 #include <util.h>
 #include "syscall.h"
 #include "litehook.h"
-#include "reimpl.h"
 #include <libjailbreak/jbclient_xpc.h>
 
 extern void _malloc_fork_prepare(void);
@@ -98,22 +97,11 @@ void apply_fork_hook(void)
 {
 	static dispatch_once_t onceToken;
 	dispatch_once (&onceToken, ^{
-		void *systemhookHandle = dlopen("systemhook.dylib", RTLD_NOLOAD);
-		if (systemhookHandle) {
-			kern_return_t (*litehook_hook_function)(void *source, void *target) = dlsym(systemhookHandle, "litehook_hook_function");
-			if (litehook_hook_function) {
-				litehook_hook_function((void *)__fork, (void *)forkfix___fork);
-			}
-		}
+		litehook_hook_function((void *)__fork, (void *)forkfix___fork);
 	});
 }
 
 __attribute__((constructor)) static void initializer(void)
 {
-//#ifdef __arm64e__
-//	if (__builtin_available(iOS 16.0, *) || getenv("FORKFIX_DISABLE_REBIND")) { /* fall through */ }
-//	else if (fork_reimpl_init(forkfix___fork)) return;
-//#endif
-
 	apply_fork_hook();
 }
