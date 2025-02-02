@@ -93,6 +93,7 @@ dyldhook: basebin.tc
 	@cp dyldhook/*.dylib .build
 
 basebin.tar: basebin.tc dyldhook
+	@find ./.build -name ".DS_Store" -delete
 	@DYLD_FALLBACK_LIBRARY_PATH="." ./tar --transform "s/^.build/basebin/" -cvf "basebin.tar" ".build" --owner=0 --group=0
 
 clean:
