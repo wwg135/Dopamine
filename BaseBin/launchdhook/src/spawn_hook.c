@@ -10,6 +10,8 @@
 #include <sys/mount.h>
 extern char **environ;
 
+void abort_with_reason(uint32_t reason_namespace, uint64_t reason_code, const char *reason_string, uint64_t reason_flags);
+
 extern int systemwide_trust_binary(const char *binaryPath, xpc_object_t preferredArchsArray);
 extern int platform_set_process_debugged(uint64_t pid, bool fullyDebugged);
 
@@ -71,6 +73,11 @@ int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 			const char *stagedJailbreakUpdate = getenv("STAGED_JAILBREAK_UPDATE");
 			if (stagedJailbreakUpdate) {
 				int r = jbupdate_basebin(stagedJailbreakUpdate);
+				if (r != 0) {
+					char msg[1000];
+					snprintf(msg, 1000, "Failed updating basebin (error %d).", r);
+					abort_with_reason(7, 1, msg, 0);
+				}
 				unsetenv("STAGED_JAILBREAK_UPDATE");
 			}
 

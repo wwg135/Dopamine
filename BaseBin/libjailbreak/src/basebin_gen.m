@@ -107,7 +107,7 @@ int basebin_generate(bool comingFromJBUpdate)
 	NSString *dyldPatchedPath  = [genPath stringByAppendingPathComponent:@"dyld"];
 
 	NSString *dopamineVersion = [NSString stringWithContentsOfFile:JBROOT_PATH(@"/basebin/.version") encoding:NSUTF8StringEncoding error:nil];
-	if (!dopamineVersion) return -1;
+	if (!dopamineVersion) return 1;
 
 	if (!comingFromJBUpdate) {
 		// Copy /usr/lib to /var/jb/basebin/.fakelib
@@ -131,9 +131,9 @@ int basebin_generate(bool comingFromJBUpdate)
 	carbonCopy(dyldOrigPath, dyldInflightPath);
 
 	NSString *dyldUUIDPrefix = [@"DOPA" stringByAppendingString:dopamineVersion];
-	if (apply_dyld_patch(dyldInflightPath, dyldUUIDPrefix.UTF8String) != 0) return -1;
-	if (merge_dyldhook(dyldInflightPath, dyldInflightPath) != 0) return -1;
-	if (resign_file(dyldInflightPath, @"com.apple.dyld", YES) != 0) return -1;
+	if (apply_dyld_patch(dyldInflightPath, dyldUUIDPrefix.UTF8String) != 0) return 2;
+	if (merge_dyldhook(dyldInflightPath, dyldInflightPath) != 0) return 3;
+	if (resign_file(dyldInflightPath, @"com.apple.dyld", YES) != 0) return 4;
 
 	if (comingFromJBUpdate) {
 		// We cannot delete dyld as this point because it's still in use

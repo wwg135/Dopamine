@@ -2,6 +2,8 @@
 #include <libjailbreak/util.h>
 #include <libjailbreak/trustcache.h>
 #include <libjailbreak/kcall_arm64.h>
+#include <libjailbreak/signatures.h>
+#include <libjailbreak/basebin_gen.h>
 #include <xpc/xpc.h>
 #include <dlfcn.h>
 
@@ -55,10 +57,6 @@ int jbupdate_basebin(const char *basebinTarPath)
 			[[NSFileManager defaultManager] copyItemAtPath:newBasebinPath toPath:oldBasebinPath error:nil];
 		}
 		[[NSFileManager defaultManager] removeItemAtPath:tmpExtractionPath error:nil];
-
-		// Update systemhook in fakelib
-		[[NSFileManager defaultManager] removeItemAtPath:JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib") error:nil];
-		[[NSFileManager defaultManager] copyItemAtPath:JBROOT_PATH(@"/basebin/systemhook.dylib") toPath:JBROOT_PATH(@"/basebin/.fakelib/systemhook.dylib") error:nil];
 
 		// Patch basebin plists
 		NSURL *basebinDaemonsURL = [NSURL fileURLWithPath:JBROOT_PATH(@"/basebin/LaunchDaemons")];
@@ -183,6 +181,15 @@ void jbupdate_finalize_stage2(const char *prevVersion, const char *newVersion)
 {
 	jbupdate_update_system_info();
 
+	if (strcmp(prevVersion, "2.4") < 0 && strcmp(newVersion, "2.4") >= 0) {
+		// On Dopamine <= 2.3, dyld used to be a file on the fakelib mount
+		// Due to that, the fakelib mount cannot be unmounted, or else the system will panic
+		// Additionally it cannot be modified because bind mounts are weird and won't update correctly
+		// In >= 2.4 dyld is a symlink to elsewhere, which allows it to be updated and the bind mount to be unmounted
+		// But if we're coming from <= 2.3, we have no option other than to reboot the device
+		reboot(0);
+	}
+
 	// Legacy, this file is no longer used
 	if (!access(JBROOT_PATH("/basebin/.idownloadd_enabled"), F_OK)) {
 		remove(JBROOT_PATH("/basebin/.idownloadd_enabled"));
@@ -197,6 +204,44 @@ void jbupdate_finalize_stage2(const char *prevVersion, const char *newVersion)
 		// Initialize kcall only after we have the offsets required for it
 		arm64_kcall_init();
 #endif
+	}
+
+	// Update patched dyld
+	int r = basebin_generate(YES);
+	if (r != 0) {
+		char msg[4000];
+		snprintf(msg, 4000, "Dopamine: Updating patched dyld failed with error %d, cannot continue.", r);
+		abort_with_reason(7, 1, msg, 0);
+	}
+
+	// Update dyld trustcache
+	cdhash_t *cdhashes = NULL;
+	uint32_t cdhashesCount = 0;
+	macho_collect_untrusted_cdhashes(JBROOT_PATH("/basebin/.fakelib/dyld"), NULL, NULL, NULL, NULL, 0, &cdhashes, &cdhashesCount);
+
+	if (cdhashesCount > 1) {
+		char msg[4000];
+		snprintf(msg, 4000, "Dopamine: Updating patched dyld failed due to unexpected amount of cdhashes (%d), cannot continue.", cdhashesCount);
+		abort_with_reason(7, 1, msg, 0);
+	}
+	else if (cdhashesCount == 1) {
+		trustcache_file_v1 *dyldTCFile = NULL;
+		r = trustcache_file_build_from_cdhashes(cdhashes, cdhashesCount, &dyldTCFile);
+		free(cdhashes);
+		if (r != 0) {
+			char msg[4000];
+			snprintf(msg, 4000, "Dopamine: Building dyld trustcache failed with error %d, cannot continue.", r);
+			abort_with_reason(7, 1, msg, 0);
+		}
+
+		r = trustcache_file_upload_with_uuid(dyldTCFile, DYLD_TRUSTCACHE_UUID);
+		if (r != 0) {
+			char msg[4000];
+			snprintf(msg, 4000, "Dopamine: Updating dyld trustcache failed with error %d, cannot continue.", r);
+			abort_with_reason(7, 1, msg, 0);
+		}
+
+		free(dyldTCFile);
 	}
 
 	JBFixMobilePermissions();

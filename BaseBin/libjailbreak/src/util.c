@@ -551,7 +551,7 @@ int cmd_wait_for_exit(pid_t pid)
 	return status;
 }
 
-int __exec_cmd_internal_va(bool suspended, bool root, bool waitForExit, pid_t *pidOut, const char *binary, int argc, va_list va_args)
+int __exec_cmd_internal_va(bool suspended, bool root, bool waitForExit, pid_t *pidOut, const char *binary, int argc, va_list va_args, char **envp)
 {
 	const char *argv[argc+1];
 	argv[0] = binary;
@@ -571,8 +571,15 @@ int __exec_cmd_internal_va(bool suspended, bool root, bool waitForExit, pid_t *p
 		posix_spawnattr_set_persona_gid_np(&attr, 0);
 	}
 
+	char **envToUse = envp;
+	if (!envToUse && getpid() != 1) {
+		// We NEVER want to pass launchd's environment to any process whatsoever
+		// This is because, amongst other things, it has DYLD_INSERT_LIBRARIES set to launchdhook which is NO good
+		envToUse = environ;
+	}
+
 	pid_t spawnedPid = 0;
-	int spawnError = posix_spawn(&spawnedPid, binary, NULL, &attr, (char *const *)argv, environ);
+	int spawnError = posix_spawn(&spawnedPid, binary, NULL, &attr, (char *const *)argv, envToUse);
 	if (attr) posix_spawnattr_destroy(&attr);
 	if (spawnError != 0) return spawnError;
 
@@ -594,7 +601,7 @@ int exec_cmd(const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(false, false, true, NULL, binary, argc, args);
+	int r = __exec_cmd_internal_va(false, false, true, NULL, binary, argc, args, NULL);
 	va_end(args);
 	return r;
 }
@@ -608,7 +615,7 @@ int exec_cmd_nowait(pid_t *pidOut, const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(false, false, false, pidOut, binary, argc, args);
+	int r = __exec_cmd_internal_va(false, false, false, pidOut, binary, argc, args, NULL);
 	va_end(args);
 	return r;
 }
@@ -622,7 +629,7 @@ int exec_cmd_suspended(pid_t *pidOut, const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(true, false, false, pidOut, binary, argc, args);
+	int r = __exec_cmd_internal_va(true, false, false, pidOut, binary, argc, args, NULL);
 	va_end(args);
 	return r;
 }
@@ -636,7 +643,21 @@ int exec_cmd_root(const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(false, true, true, NULL, binary, argc, args);
+	int r = __exec_cmd_internal_va(false, true, true, NULL, binary, argc, args, NULL);
+	va_end(args);
+	return r;
+}
+
+int exec_cmd_env(char **envp, const char *binary, ...)
+{
+	int argc = 1;
+	va_list args;
+	va_start(args, binary);
+	while (va_arg(args, const char *)) argc++;
+	va_end(args);
+
+	va_start(args, binary);
+	int r = __exec_cmd_internal_va(false, false, true, NULL, binary, argc, args, envp);
 	va_end(args);
 	return r;
 }
