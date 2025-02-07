@@ -342,7 +342,7 @@ int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid)
 	if (childProc)  proc_rele(childProc);
 	if (parentProc) proc_rele(parentProc);
 
-	return 0;
+	return retval;
 }
 
 static int systemwide_cs_revalidate(audit_token_t *callerToken)
