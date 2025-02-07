@@ -99,7 +99,9 @@ void* dyld_dlopen_hook(void *dyld, const char* path, int mode)
 		if (string_has_prefix(path, "/usr/lib") && !access(path, F_OK) && strlen(path) > 9) {
 			strlcpy(gFakeLibPathCache, JBROOT_PATH("/basebin/.fakelib"), PATH_MAX);
 			strlcat(gFakeLibPathCache, &path[8], PATH_MAX);
-			path = (const char *)gFakeLibPathCache;
+			if (sandbox_check(getpid(), "file-read-data", SANDBOX_FILTER_PATH | SANDBOX_CHECK_NO_REPORT, gFakeLibPathCache) == 0) {
+				path = (const char *)gFakeLibPathCache;
+			}
 		}
 	}
 
@@ -114,7 +116,9 @@ void* dyld_dlopen_from_hook(void *dyld, const char* path, int mode, void* addres
 		if (string_has_prefix(path, "/usr/lib") && !access(path, F_OK) && strlen(path) > 9) {
 			strlcpy(gFakeLibPathCache, JBROOT_PATH("/basebin/.fakelib"), PATH_MAX);
 			strlcat(gFakeLibPathCache, &path[8], PATH_MAX);
-			path = (const char *)gFakeLibPathCache;
+			if (sandbox_check(getpid(), "file-read-data", SANDBOX_FILTER_PATH | SANDBOX_CHECK_NO_REPORT, gFakeLibPathCache) == 0) {
+				path = (const char *)gFakeLibPathCache;
+			}
 		}
 	}
 	__attribute__((musttail)) return dyld_dlopen_from_orig(dyld, path, mode, addressInCaller);
