@@ -8,10 +8,9 @@ mach_port_t gLocalJBServerPort = MACH_PORT_NULL;
 
 void *jbserver_local_loop(void *arg)
 {
-	mach_port_t port = (mach_port_t)arg;
 	while (gLocalJBServerRunning) {
 		xpc_object_t xdict = NULL;
-		if (!xpc_pipe_receive(port, &xdict)) {
+		if (!xpc_pipe_receive(gLocalJBServerPort, &xdict)) {
 			jbserver_received_xpc_message(&gGlobalServer, xdict);
 			xpc_release(xdict);
 		}
@@ -27,7 +26,7 @@ mach_port_t jbserver_local_start(void)
 	mach_port_insert_right(mach_task_self(), gLocalJBServerPort, gLocalJBServerPort, MACH_MSG_TYPE_MAKE_SEND);
 
 	gLocalJBServerRunning = true;
-	pthread_create(&gLocalJBServerThread, NULL, (void *(*)(void *))jbserver_local_loop, (void *)gLocalJBServerPort);
+	pthread_create(&gLocalJBServerThread, NULL, (void *(*)(void *))jbserver_local_loop, NULL);
 
 	return gLocalJBServerPort;
 }
