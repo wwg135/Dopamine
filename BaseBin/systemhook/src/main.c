@@ -86,11 +86,21 @@ int dyld_hook_routine(void **dyld, int idx, void *hook, void **orig, uint16_t pa
 // Therefore we must ensure the call to the original function is a tail call, which ensures that the stack and lr are restored and the compiler turns the call into a direct branch
 // This is done via __attribute__((musttail)), this way __builtin_return_address(0) will point to the original calling library instead of systemhook
 
+// TODO: Either hook fcntl instead and rework library validation bypass
+// or at least hook __ZN5dyld44APIs11dlopen_fromEPKciPv in dyld instead?
+
+char gFakeLibPathCache[PATH_MAX];
+
 void* (*dyld_dlopen_orig)(void *dyld, const char* path, int mode);
 void* dyld_dlopen_hook(void *dyld, const char* path, int mode)
 {
 	if (path && !(mode & RTLD_NOLOAD)) {
 		jbclient_trust_library(path, __builtin_return_address(0));
+		if (string_has_prefix(path, "/usr/lib") && !access(path, F_OK) && strlen(path) > 9) {
+			strlcpy(gFakeLibPathCache, JBROOT_PATH("/basebin/.fakelib"), PATH_MAX);
+			strlcat(gFakeLibPathCache, &path[8], PATH_MAX);
+			path = (const char *)gFakeLibPathCache;
+		}
 	}
 
     __attribute__((musttail)) return dyld_dlopen_orig(dyld, path, mode);
@@ -101,6 +111,11 @@ void* dyld_dlopen_from_hook(void *dyld, const char* path, int mode, void* addres
 {
 	if (path && !(mode & RTLD_NOLOAD)) {
 		jbclient_trust_library(path, addressInCaller);
+		if (string_has_prefix(path, "/usr/lib") && !access(path, F_OK) && strlen(path) > 9) {
+			strlcpy(gFakeLibPathCache, JBROOT_PATH("/basebin/.fakelib"), PATH_MAX);
+			strlcat(gFakeLibPathCache, &path[8], PATH_MAX);
+			path = (const char *)gFakeLibPathCache;
+		}
 	}
 	__attribute__((musttail)) return dyld_dlopen_from_orig(dyld, path, mode, addressInCaller);
 }
