@@ -55,6 +55,8 @@ int exec_cmd_suspended(pid_t *pidOut, const char *binary, ...);
 int exec_cmd_root(const char *binary, ...);
 int exec_cmd_env(char **envp, const char *binary, ...);
 
+int jbctl_earlyboot(mach_port_t earlyBootServer, ...);
+
 #define exec_cmd_trusted(x, args ...) ({ \
     jbclient_trust_binary(x, NULL); \
     int retval; \

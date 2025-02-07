@@ -26,6 +26,7 @@ extern char **environ;
 extern int posix_spawnattr_set_persona_np(const posix_spawnattr_t* __restrict, uid_t, uint32_t);
 extern int posix_spawnattr_set_persona_uid_np(const posix_spawnattr_t* __restrict, uid_t);
 extern int posix_spawnattr_set_persona_gid_np(const posix_spawnattr_t* __restrict, uid_t);
+int posix_spawnattr_set_registered_ports_np(posix_spawnattr_t * __restrict attr, mach_port_t portarray[], uint32_t count);
 
 const struct mach_header *get_mach_header(const char *name)
 {
@@ -660,6 +661,34 @@ int exec_cmd_env(char **envp, const char *binary, ...)
 	int r = __exec_cmd_internal_va(false, false, true, NULL, binary, argc, args, envp);
 	va_end(args);
 	return r;
+}
+
+int jbctl_earlyboot(mach_port_t earlyBootServer, ...)
+{
+	int argc = 2;
+	va_list args;
+	va_start(args, earlyBootServer);
+	while (va_arg(args, const char *)) argc++;
+	va_end(args);
+
+	const char *jbctlPath = JBROOT_PATH("/basebin/jbctl");
+	const char *argsArr[argc+1];
+	argsArr[0] = jbctlPath;
+	va_start(args, earlyBootServer);
+	for (int i = 1; i < argc-1; i++) {
+		argsArr[i] = va_arg(args, const char *);
+	}
+	argsArr[argc-1] = "earlyboot";
+	argsArr[argc] = NULL;
+
+	posix_spawnattr_t attr;
+	posix_spawnattr_init(&attr);
+	posix_spawnattr_set_registered_ports_np(&attr, (mach_port_t[]){earlyBootServer, MACH_PORT_NULL, MACH_PORT_NULL}, 3);
+	pid_t spawnedPid = 0;
+	int r = posix_spawn(&spawnedPid, jbctlPath, NULL, &attr, (char *const *)argsArr, NULL);
+	posix_spawnattr_destroy(&attr);
+	if (r != 0) return r;
+	return cmd_wait_for_exit(spawnedPid);
 }
 
 void killall(const char *executablePathToKill, bool softly)

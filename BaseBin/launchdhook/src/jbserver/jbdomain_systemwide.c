@@ -12,6 +12,12 @@
 #include <libjailbreak/primitives.h>
 #include <libjailbreak/codesign.h>
 
+bool gSystemwideDomainEnabled = true;
+void systemwide_domain_set_enabled(bool enabled)
+{
+	gSystemwideDomainEnabled = enabled;
+}
+
 extern bool string_has_prefix(const char *str, const char* prefix);
 extern bool string_has_suffix(const char* str, const char* suffix);
 
@@ -50,8 +56,26 @@ char *combine_strings(char separator, char **components, int count)
 	return outString;
 }
 
-static bool systemwide_domain_allowed(audit_token_t clientToken)
+bool systemwide_domain_allowed(audit_token_t clientToken)
 {
+	if (!gSystemwideDomainEnabled) {
+		// While the jailbreak is hidden, we need to disable the systemwide domain
+		pid_t pid = audit_token_to_pid(clientToken);
+		char procPath[4*MAXPATHLEN];
+		if (proc_pidpath(pid, procPath, sizeof(procPath)) <= 0) {
+			return false;
+		}
+
+		if (string_has_suffix(procPath, "/Dopamine.app/Dopamine")) {
+			// We still want it to be accessible by Dopamine itself though
+			// Unfortunately, there is not really a better check here since
+			// - Dopamine can be sideloaded, so no control over entitlements
+			// - App identifier could be changed by whoever installed it aswell
+			return true;
+		}
+
+		return false;
+	}
 	return true;
 }
 

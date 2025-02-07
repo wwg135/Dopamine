@@ -3,10 +3,13 @@
 #include <bsm/audit.h>
 
 int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut);
+bool systemwide_domain_allowed(audit_token_t clientToken);
 
 static int mach_msg_handler(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg)
 {
-	uint64_t callerPid = audit_token_to_pid(*auditToken);
+	// Anything implemented by the mach server is provided systemwide
+	// So we also need to honor the allowed handler of the systemwide domain
+	if (!systemwide_domain_allowed(*auditToken)) return -1;
 
 	if (jbsMachMsg->action == JBSERVER_MACH_CHECKIN) {
 		struct jbserver_mach_msg_stage1 *checkinStage1Msg = (struct jbserver_mach_msg_stage1 *)jbsMachMsg;

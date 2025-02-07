@@ -403,6 +403,20 @@ int jbclient_platform_jbsettings_set_double(const char *key, double doubleValue)
 	return r;
 }
 
+int jbclient_platform_set_systemwide_domain_enabled(bool enabled)
+{
+	xpc_object_t xargs = xpc_dictionary_create_empty();
+	xpc_dictionary_set_bool(xargs, "enabled", enabled);
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_PLATFORM, JBS_PLATFORM_SET_SYSTEMWIDE_DOMAIN_ENABLED, xargs);
+	xpc_release(xargs);
+	if (xreply) {
+		int result = xpc_dictionary_get_int64(xreply, "result");
+		xpc_release(xreply);
+		return result;
+	}
+	return -1;
+}
+
 int jbclient_watchdog_intercept_userspace_panic(const char *panicMessage)
 {
 	xpc_object_t xargs = xpc_dictionary_create_empty();

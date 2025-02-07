@@ -15,10 +15,12 @@
 #import "crashreporter.h"
 #import "boomerang.h"
 #import "update.h"
+#import "jbserver/jbserver_local.h"
 
 bool gInEarlyBoot = true;
 
 void abort_with_reason(uint32_t reason_namespace, uint64_t reason_code, const char *reason_string, uint64_t reason_flags);
+extern void systemwide_domain_set_enabled(bool enabled);
 
 __attribute__((constructor)) static void initializer(void)
 {
@@ -40,7 +42,7 @@ __attribute__((constructor)) static void initializer(void)
 		// If Dopamine was initialized before, we assume we're coming from a userspace reboot
 
 		// Stock bug: These prefs wipe themselves after a reboot (they contain a boot time and this is matched when they're loaded)
-		// But on userspace reboots, they apparently do not get wiped as boot time doesn't change
+		// But on userspace reboots, they apparently do not get wiped as the boot time doesn't change
 		// We could try to change the boot time ourselves, but I'm worried of potential side effects
 		// So we just wipe the offending preferences ourselves
 		// In practice this fixes nano launch daemons not being loaded after the userspace reboot, resulting in certain apple watch features breaking
@@ -79,6 +81,23 @@ __attribute__((constructor)) static void initializer(void)
 	initSpawnHooks();
 	initIPCHooks();
 	initJetsamHook();
+
+	if (getenv("DOPAMINE_IS_HIDDEN") != 0) {
+		// If the jailbreak is currently hidden, fakelib had to be mounted again before the userspace reboot
+		// Now that the userspace reboot is over, we can unmount it again
+
+		// Just like when we mount it inside the posix_spawn hook, the jbserver is not up at this point in time
+		// So we need to host our own here again, just so that jbctl can talk to it
+		mach_port_t serverPort = jbserver_local_start();
+		jbctl_earlyboot(serverPort, "internal", "fakelib", "unmount", NULL);
+		jbserver_local_stop();
+
+		// Also disable the systemwide domain again
+		systemwide_domain_set_enabled(false);
+
+		// No need to keep this around
+		unsetenv("DOPAMINE_IS_HIDDEN");
+	}
 
 	// This will ensure launchdhook is always reinjected after userspace reboots
 	// As this launchd will pass environ to the next launchd...
