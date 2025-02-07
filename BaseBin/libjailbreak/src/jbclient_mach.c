@@ -15,15 +15,11 @@ mach_port_t jbclient_mach_get_launchd_port(void)
 
 kern_return_t jbclient_mach_send_msg(struct jbserver_mach_msg *msg, struct jbserver_mach_msg_reply *reply)
 {
-	static mach_port_t launchdPort = MACH_PORT_NULL;
 	mach_port_t replyPort = mig_get_reply_port();
-	
 	if (!replyPort)
 		return KERN_FAILURE;
 	
-	if (!launchdPort)
-		launchdPort = jbclient_mach_get_launchd_port();
-	
+	mach_port_t launchdPort = jbclient_mach_get_launchd_port();
 	if (!launchdPort)
 		return KERN_FAILURE;
 
@@ -37,15 +33,20 @@ kern_return_t jbclient_mach_send_msg(struct jbserver_mach_msg *msg, struct jbser
 	msg->hdr.msgh_id           = 0x40000000;
 	
 	kern_return_t kr = mach_msg(&msg->hdr, MACH_SEND_MSG, msg->hdr.msgh_size, 0, 0, 0, 0);
-	if (kr != KERN_SUCCESS)
+	if (kr != KERN_SUCCESS) {
+		mach_port_deallocate(task_self_trap(), launchdPort);
 		return kr;
+	}
 	
 	kr = mach_msg(&reply->msg.hdr, MACH_RCV_MSG, 0, reply->msg.hdr.msgh_size, replyPort, 0, 0);
-	if (kr != KERN_SUCCESS)
+	if (kr != KERN_SUCCESS) {
+		mach_port_deallocate(task_self_trap(), launchdPort);
 		return kr;
+	}
 	
 	// Get rid of any rights we might have received
 	mach_msg_destroy(&reply->msg.hdr);
+	mach_port_deallocate(task_self_trap(), launchdPort);
 	return KERN_SUCCESS;
 }
 
