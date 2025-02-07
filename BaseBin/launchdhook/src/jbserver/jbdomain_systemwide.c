@@ -281,7 +281,7 @@ int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, 
 	return 0;
 }
 
-static int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid)
+int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid)
 {
 	int retval = 3;
 	uint64_t parentPid = audit_token_to_pid(*parentToken);

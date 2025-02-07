@@ -56,24 +56,44 @@ int jbclient_mach_process_checkin(char *jbRootPathOut, char *bootUUIDOut, char *
 	msg.base.action = JBSERVER_MACH_CHECKIN;
 
 	size_t replySize = sizeof(struct jbserver_mach_msg_checkin_reply) + MAX_TRAILER_SIZE;
-
 	uint8_t replyU[replySize];
 	bzero(replyU, replySize);
 	struct jbserver_mach_msg_checkin_reply *reply = (struct jbserver_mach_msg_checkin_reply *)&replyU;
 	reply->base.msg.hdr.msgh_size = replySize;
 
 	kern_return_t kr = jbclient_mach_send_msg((struct jbserver_mach_msg *)&msg, (struct jbserver_mach_msg_reply *)reply);
-	if (kr == KERN_SUCCESS) {
-		reply->jbRootPath[sizeof(reply->jbRootPath)-1] = '\0';
-		if (jbRootPathOut) strcpy(jbRootPathOut, reply->jbRootPath);
+	if (kr != KERN_SUCCESS) return kr;
 
-		reply->bootUUID[sizeof(reply->bootUUID)-1] = '\0';
-		if (bootUUIDOut) strcpy(bootUUIDOut, reply->bootUUID);
+	reply->jbRootPath[sizeof(reply->jbRootPath)-1] = '\0';
+	if (jbRootPathOut) strcpy(jbRootPathOut, reply->jbRootPath);
 
-		reply->sandboxExtensions[sizeof(reply->sandboxExtensions)-1] = '\0';
-		if(sandboxExtensionsOut) strcpy(sandboxExtensionsOut, reply->sandboxExtensions);
+	reply->bootUUID[sizeof(reply->bootUUID)-1] = '\0';
+	if (bootUUIDOut) strcpy(bootUUIDOut, reply->bootUUID);
 
-		if (fullyDebuggedOut) *fullyDebuggedOut = reply->fullyDebugged;
-	}
-	return kr;
+	reply->sandboxExtensions[sizeof(reply->sandboxExtensions)-1] = '\0';
+	if(sandboxExtensionsOut) strcpy(sandboxExtensionsOut, reply->sandboxExtensions);
+
+	if (fullyDebuggedOut) *fullyDebuggedOut = reply->fullyDebugged;
+
+	return (int)reply->base.status;
+}
+
+int jbclient_mach_fork_fix(pid_t childPid)
+{
+	struct jbserver_mach_msg_forkfix msg;
+	msg.base.hdr.msgh_size = sizeof(msg);
+	msg.base.action = JBSERVER_MACH_FORK_FIX;
+
+	msg.childPid = childPid;
+
+	size_t replySize = sizeof(struct jbserver_mach_msg_forkfix_reply) + MAX_TRAILER_SIZE;
+	uint8_t replyU[replySize];
+	bzero(replyU, replySize);
+	struct jbserver_mach_msg_forkfix_reply *reply = (struct jbserver_mach_msg_forkfix_reply *)&replyU;
+	reply->base.msg.hdr.msgh_size = replySize;
+
+	kern_return_t kr = jbclient_mach_send_msg((struct jbserver_mach_msg *)&msg, (struct jbserver_mach_msg_reply *)reply);
+	if (kr != KERN_SUCCESS) return kr;
+
+	return (int)reply->base.status;
 }

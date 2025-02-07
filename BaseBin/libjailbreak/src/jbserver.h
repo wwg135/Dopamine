@@ -46,6 +46,7 @@ int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xms
 
 #define JBSERVER_MACH_MAGIC 0x444F50414D494E45
 #define JBSERVER_MACH_CHECKIN 0
+#define JBSERVER_MACH_FORK_FIX 1
 
 struct jbserver_mach_msg {
     mach_msg_header_t hdr;
@@ -68,6 +69,15 @@ struct jbserver_mach_msg_checkin_reply {
     char jbRootPath[PATH_MAX];
     char bootUUID[37];
     char sandboxExtensions[2000];
+};
+
+struct jbserver_mach_msg_forkfix {
+    struct jbserver_mach_msg base;
+    pid_t childPid;
+};
+
+struct jbserver_mach_msg_forkfix_reply {
+    struct jbserver_mach_msg_reply base;
 };
 
 extern int (*jbserver_mach_msg_handler)(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg);
