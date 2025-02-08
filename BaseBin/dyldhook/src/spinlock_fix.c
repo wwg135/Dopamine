@@ -96,7 +96,7 @@ bool __dsc_mapping_make_private(int fd, struct dyld_cache_header *header, uintpt
 	return true;
 }
 
-void dyld_make_text_private(uintptr_t slide)
+void dyld_make_dsc_text_private(uintptr_t slide)
 {
 	__dsc_enumerate_mappings(slide, __dsc_mapping_make_private);
 }
@@ -109,7 +109,7 @@ bool HOOK(_ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLo
 	bool forcePrivate = *(bool *)(options + 8);
 	if (!forcePrivate) {
 		long slide = *(long *)(results + 8);
-		dyld_make_text_private(slide);
+		dyld_make_dsc_text_private(slide);
 	}
 
 	return r;
