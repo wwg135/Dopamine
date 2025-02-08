@@ -343,12 +343,18 @@ if let symsB = try? b.getSymbolTable(),
             relocInfo.replaceSegment(name: seg.0, isB: true, data: data)
         } else if sym.name.starts(with: "_MACHOMERGER_HOOK_") {
             let dstName = sym.name.replacingOccurrences(of: "_MACHOMERGER_HOOK", with: "")
+            let origName = "_MACHOMERGER_ORIG" + dstName
             
             var dstAddr: UInt64!
             if let d = getMagicSymbolVal(dstName) {
                 dstAddr = d.0
             } else if let d = symsA.symbol(forName: dstName) {
                 dstAddr = d.value
+            }
+
+            var origAddr: UInt64!
+            if let o = symsB.symbol(forName: origName) {
+                origAddr = o.value
             }
             
             guard dstAddr != nil else {
@@ -373,8 +379,20 @@ if let symsB = try? b.getSymbolTable(),
             let seg = relocInfo.segment(forOrigAddress: dstAddr, isB: false)!
             let off = Int(seg.3)
             var data = seg.1
+            let origInsn = data.subdata(in: off..<off+4).withUnsafeBytes { $0.load(as: UInt32.self) }
             data = data.subdata(in: 0..<off) + Data(fromObject: instr) + data.subdata(in: (off + 4)..<data.count)
             relocInfo.replaceSegment(name: seg.0, isB: false, data: data)
+
+            if origAddr != nil {
+                // Copy original first instruction to _MACHOMERGER_ORIG_* first instruction
+                // Obviously this mechanism does not work if said instruction is pc-relative, so we have to just assume it's not
+                let origSeg = relocInfo.segment(forOrigAddress: origAddr, isB: true)!
+                let origOff = Int(origSeg.3)
+                var origData = origSeg.1
+
+                origData = origData.subdata(in: 0..<origOff) + Data(fromObject: origInsn) + origData.subdata(in: (origOff + 4)..<origData.count)
+                relocInfo.replaceSegment(name: origSeg.0, isB: true, data: origData)
+            }
         }
     }
 }

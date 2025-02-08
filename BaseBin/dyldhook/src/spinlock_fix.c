@@ -13,7 +13,7 @@
 #define TARGET_OS_SIMULATOR 0
 #include <dyld_cache_format.h>
 
-#define HOOK(name) MACHOMERGER_HOOK_##name
+#include "machomerger_hook.h"
 
 char *__locate_dsc(void)
 {
@@ -101,10 +101,10 @@ void dyld_make_text_private(uintptr_t slide)
 	__dsc_enumerate_mappings(slide, __dsc_mapping_make_private);
 }
 
-extern bool real_ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE(uintptr_t options, uintptr_t results);
+extern bool ORIG(_ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE)(uintptr_t options, uintptr_t results);
 bool HOOK(_ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE)(uintptr_t options, uintptr_t results)
 {
-	bool r = real_ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE(options, results);
+	bool r = ORIG(_ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE)(options, results);
 
 	bool forcePrivate = *(bool *)(options + 8);
 	if (!forcePrivate) {

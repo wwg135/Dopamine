@@ -30,10 +30,10 @@ _MACHOMERGER_START_HOOK:
 
 #if IOS==15 && __arm64e__
 
-.global _real_ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE
+.global _MACHOMERGER_ORIG__ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE
 .global _MACHOMERGER_HOOKTRAMPOLINE__ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE
-_real_ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE:
-    pacibsp
+_MACHOMERGER_ORIG__ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE:
+    nop // Will be replaced with the original first instruction by machomerger
     // FALLTHROUGH
 _MACHOMERGER_HOOKTRAMPOLINE__ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEPNS_19SharedCacheLoadInfoE:
     b . // Will be patched by machomerger
