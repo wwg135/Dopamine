@@ -125,7 +125,7 @@ static int spawn_exec_hook_common(const char *path,
 
 	if (spawnConfig & kSpawnConfigTrust) {
 		// Upload binary to trustcache if needed
-		//trust_binary(path);
+		trust_binary(path);
 	}
 
 	const char *existingLibraryInserts = envbuf_getenv((const char **)envp, "DYLD_INSERT_LIBRARIES");
