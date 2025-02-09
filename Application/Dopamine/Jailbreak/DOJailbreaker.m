@@ -27,6 +27,7 @@
 #import <libjailbreak/jbserver_boomerang.h>
 #import <libjailbreak/signatures.h>
 #import <libjailbreak/jbclient_xpc.h>
+#import <libjailbreak/jbclient_mach.h>
 #import <libjailbreak/kcall_arm64.h>
 #import <libjailbreak/basebin_gen.h>
 #import <CoreServices/LSApplicationProxy.h>
@@ -388,7 +389,7 @@ void *boomerang_server(struct boomerang_info *info)
 
     cdhash_t *cdhashes = NULL;
     uint32_t cdhashesCount = 0;
-    macho_collect_untrusted_cdhashes(JBROOT_PATH("/basebin/.fakelib/dyld"), NULL, NULL, NULL, NULL, 0, &cdhashes, &cdhashesCount);
+    file_collect_untrusted_cdhashes_by_path(JBROOT_PATH("/basebin/.fakelib/dyld"), &cdhashes, &cdhashesCount);
     if (cdhashesCount != 1) return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedInitFakeLib userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Got unexpected number of cdhashes for dyld???: %d", cdhashesCount]}];
     
     trustcache_file_v1 *dyldTCFile = NULL;

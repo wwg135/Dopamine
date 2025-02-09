@@ -12,3 +12,5 @@ struct dyld_jbinfo {
 
 	char data[];
 };
+
+extern bool jbinfo_is_checked_in(void);

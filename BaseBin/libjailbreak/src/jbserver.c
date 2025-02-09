@@ -45,6 +45,9 @@ int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xms
 				case JBS_TYPE_UINT64:
 				args[i] = (void *)xpc_dictionary_get_uint64(xmsg, argDesc->name);
 				break;
+				case JBS_TYPE_FD:
+				args[i] = (void *)(int64_t)xpc_dictionary_dup_fd(xmsg, argDesc->name);
+				break;
 				case JBS_TYPE_STRING:
 				args[i] = (void *)xpc_dictionary_get_string(xmsg, argDesc->name);
 				break;
@@ -86,6 +89,11 @@ int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xms
 				case JBS_TYPE_UINT64:
 				xpc_dictionary_set_uint64(xreply, argDesc->name, (uint64_t)argsOut[i]);
 				break;
+				case JBS_TYPE_FD: {
+					xpc_dictionary_set_fd(xreply, argDesc->name, (int)(int64_t)argsOut[i]);
+					close((int)(int64_t)argsOut[i]);
+					break;
+				}
 				case JBS_TYPE_STRING: {
 					if (argsOut[i]) {
 						xpc_dictionary_set_string(xreply, argDesc->name, (char *)argsOut[i]);
@@ -115,19 +123,15 @@ int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xms
 				break;
 			}
 		}
+		else {
+			if (argDesc->type == JBS_TYPE_FD) {
+				close((int)(int64_t)args[i]);
+			}
+		}
 	}
 	xpc_dictionary_set_int64(xreply, "result", result);
 	xpc_pipe_routine_reply(xreply);
 	xpc_release(xreply);
 
 	return 0;
-}
-
-int (*jbserver_mach_msg_handler)(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg);
-int jbserver_received_mach_message(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg)
-{
-	if (jbserver_mach_msg_handler) {
-		return jbserver_mach_msg_handler(auditToken, jbsMachMsg);
-	}
-	return -1;
 }

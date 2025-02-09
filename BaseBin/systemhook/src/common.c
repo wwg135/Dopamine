@@ -110,7 +110,7 @@ static int spawn_exec_hook_common(const char *path,
 								  char *const argv[restrict],
 								  char *const envp[restrict],
 			   struct _posix_spawn_args_desc *desc,
-										int (*trust_binary)(const char *path, xpc_object_t preferredArchsArray),
+										int (*trust_binary)(const char *path),
 									   double jetsamMultiplier,
 									    int (^orig)(char *const envp[restrict]))
 {
@@ -124,37 +124,8 @@ static int spawn_exec_hook_common(const char *path,
 	kSpawnConfig spawnConfig = spawn_config_for_executable(path, argv);
 
 	if (spawnConfig & kSpawnConfigTrust) {
-		bool preferredArchsSet = false;
-		cpu_type_t preferredTypes[4];
-		cpu_subtype_t preferredSubtypes[4];
-		size_t sizeOut = 0;
-		if (posix_spawnattr_getarchpref_np(&attr, 4, preferredTypes, preferredSubtypes, &sizeOut) == 0) {
-			for (size_t i = 0; i < sizeOut; i++) {
-				if (preferredTypes[i] != 0 || preferredSubtypes[i] != UINT32_MAX) {
-					preferredArchsSet = true;
-					break;
-				}
-			}
-		}
-
-		xpc_object_t preferredArchsArray = NULL;
-		if (preferredArchsSet) {
-			preferredArchsArray = xpc_array_create_empty();
-			for (size_t i = 0; i < sizeOut; i++) {
-				xpc_object_t curArch = xpc_dictionary_create_empty();
-				xpc_dictionary_set_uint64(curArch, "type", preferredTypes[i]);
-				xpc_dictionary_set_uint64(curArch, "subtype", preferredSubtypes[i]);
-				xpc_array_set_value(preferredArchsArray, XPC_ARRAY_APPEND, curArch);
-				xpc_release(curArch);
-			}
-		}
-
 		// Upload binary to trustcache if needed
-		trust_binary(path, preferredArchsArray);
-
-		if (preferredArchsArray) {
-			xpc_release(preferredArchsArray);
-		}
+		//trust_binary(path);
 	}
 
 	const char *existingLibraryInserts = envbuf_getenv((const char **)envp, "DYLD_INSERT_LIBRARIES");
@@ -163,10 +134,6 @@ static int spawn_exec_hook_common(const char *path,
 		string_enumerate_components(existingLibraryInserts, ":", ^(const char *existingLibraryInsert, bool *stop) {
 			if (!strcmp(existingLibraryInsert, HOOK_DYLIB_PATH)) {
 				systemHookAlreadyInserted = true;
-			}
-			else if (spawnConfig & kSpawnConfigTrust) {
-				// Upload everything already in DYLD_INSERT_LIBRARIES to trustcache aswell
-				trust_binary(existingLibraryInsert, NULL);
 			}
 		});
 	}
@@ -303,7 +270,7 @@ int posix_spawn_hook_shared(pid_t *restrict pid,
 						  	    char *const argv[restrict],
 					   			char *const envp[restrict],
 					   				  void *orig,
-					   				  int (*trust_binary)(const char *path, xpc_object_t preferredArchsArray),
+					   				  int (*trust_binary)(const char *path),
 					   				  int (*set_process_debugged)(uint64_t pid, bool fullyDebugged),
 					   				 double jetsamMultiplier)
 {
@@ -333,7 +300,7 @@ int execve_hook_shared(const char *path,
 					   char *const argv[],
 					   char *const envp[],
 			 				 void *orig,
-			 				 int (*trust_binary)(const char *path, xpc_object_t preferredArchsArray))
+			 				 int (*trust_binary)(const char *path))
 {
 	int (*execve_orig)(const char *, char *const[], char *const[]) = orig;
 

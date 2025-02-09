@@ -12,6 +12,11 @@
 __attribute__((section("__DATA,__jbinfo"))) static char jbinfoSection[0x4000];
 #define jbInfo ((struct dyld_jbinfo *)&jbinfoSection[0])
 
+bool jbinfo_is_checked_in(void)
+{
+	return jbInfo->state == DYLD_STATE_CHECKED_IN;
+}
+
 void consume_tokenized_sandbox_extensions(char *sandboxExtensions)
 {
 	if (sandboxExtensions[0] == '\0') return;

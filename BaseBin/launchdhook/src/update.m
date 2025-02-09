@@ -217,7 +217,7 @@ void jbupdate_finalize_stage2(const char *prevVersion, const char *newVersion)
 	// Update dyld trustcache
 	cdhash_t *cdhashes = NULL;
 	uint32_t cdhashesCount = 0;
-	macho_collect_untrusted_cdhashes(JBROOT_PATH("/basebin/.fakelib/dyld"), NULL, NULL, NULL, NULL, 0, &cdhashes, &cdhashesCount);
+	file_collect_untrusted_cdhashes_by_path(JBROOT_PATH("/basebin/.fakelib/dyld"), &cdhashes, &cdhashesCount);
 
 	if (cdhashesCount > 1) {
 		char msg[4000];

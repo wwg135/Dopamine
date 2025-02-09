@@ -14,6 +14,7 @@ typedef enum {
 	JBS_TYPE_DATA,
     JBS_TYPE_ARRAY,
 	JBS_TYPE_DICTIONARY,
+    JBS_TYPE_FD,
 	JBS_TYPE_CALLER_TOKEN,
     JBS_TYPE_XPC_GENERIC,
 } jbserver_type;
@@ -47,6 +48,7 @@ int jbserver_received_xpc_message(struct jbserver_impl *server, xpc_object_t xms
 #define JBSERVER_MACH_MAGIC 0x444F50414D494E45
 #define JBSERVER_MACH_CHECKIN 0
 #define JBSERVER_MACH_FORK_FIX 1
+#define JBSERVER_MACH_TRUST_FILE 2
 
 struct jbserver_mach_msg {
     mach_msg_header_t hdr;
@@ -80,7 +82,20 @@ struct jbserver_mach_msg_forkfix_reply {
     struct jbserver_mach_msg_reply base;
 };
 
-extern int (*jbserver_mach_msg_handler)(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg);
-int jbserver_received_mach_message(audit_token_t *auditToken, struct jbserver_mach_msg *jbsMachMsg);
+struct jbserver_mach_complex_msg {
+    mach_msg_header_t hdr;
+    mach_msg_body_t body;
+};
+
+struct jbserver_mach_msg_trust_fd {
+    struct jbserver_mach_complex_msg base;
+    mach_msg_port_descriptor_t fdPort;
+    uint64_t magic;
+    uint64_t action;
+};
+
+struct jbserver_mach_msg_trust_fd_reply {
+    struct jbserver_mach_msg_reply base;
+};
 
 #endif

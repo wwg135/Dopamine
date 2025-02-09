@@ -26,9 +26,6 @@ __attribute__((constructor)) static void initializer(void)
 {
 	crashreporter_start();
 
-	extern void jbserver_mach_init(void);
-	jbserver_mach_init();
-
 	// If we performed a jbupdate before the userspace reboot, these vars will be set
 	// In that case, we want to run finalizers
 	const char *jbupdatePrevVersion = getenv("JBUPDATE_PREV_VERSION");

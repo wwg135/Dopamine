@@ -7,6 +7,22 @@
 
 #include "dyld.h"
 
+__attribute__((naked)) uint64_t msyscall_errno(uint64_t syscall, ...)
+{
+    asm(
+        "mov x16, x0\n"
+        "ldp x0, x1, [sp]\n"
+        "ldp x2, x3, [sp, 0x10]\n"
+        "ldp x4, x5, [sp, 0x20]\n"
+        "ldp x6, x7, [sp, 0x30]\n"
+        "svc 0x80\n"
+        "b.cs 20f\n"
+        "ret\n"
+        "20:\n"
+        "b _cerror\n"
+        );
+}
+
 int64_t sandbox_extension_consume(const char *extension_token)
 {
 	int64_t r = 0xAAAAAAAAAAAAAAAA;

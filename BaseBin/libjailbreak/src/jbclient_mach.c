@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <mach-o/dyld.h>
 #include <dlfcn.h>
+extern int fileport_makeport (int fd, mach_port_t * port);
 
 mach_port_t jbclient_mach_get_launchd_port(void)
 {
@@ -13,7 +14,7 @@ mach_port_t jbclient_mach_get_launchd_port(void)
 	return launchdPort;
 }
 
-kern_return_t jbclient_mach_send_msg(struct jbserver_mach_msg *msg, struct jbserver_mach_msg_reply *reply)
+kern_return_t jbclient_mach_send_msg(mach_msg_header_t *hdr, struct jbserver_mach_msg_reply *reply)
 {
 	mach_port_t replyPort = mig_get_reply_port();
 	if (!replyPort)
@@ -22,17 +23,16 @@ kern_return_t jbclient_mach_send_msg(struct jbserver_mach_msg *msg, struct jbser
 	mach_port_t launchdPort = jbclient_mach_get_launchd_port();
 	if (!launchdPort)
 		return KERN_FAILURE;
+	
+	hdr->msgh_bits |= MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND_ONCE);
 
-	msg->magic = JBSERVER_MACH_MAGIC;
-	
-	msg->hdr.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND_ONCE);
 	// size already set
-	msg->hdr.msgh_remote_port  = launchdPort;
-	msg->hdr.msgh_local_port   = replyPort;
-	msg->hdr.msgh_voucher_port = 0;
-	msg->hdr.msgh_id           = 0x40000000;
+	hdr->msgh_remote_port  = launchdPort;
+	hdr->msgh_local_port   = replyPort;
+	hdr->msgh_voucher_port = 0;
+	hdr->msgh_id           = 0x40000000;
 	
-	kern_return_t kr = mach_msg(&msg->hdr, MACH_SEND_MSG, msg->hdr.msgh_size, 0, 0, 0, 0);
+	kern_return_t kr = mach_msg(hdr, MACH_SEND_MSG, hdr->msgh_size, 0, 0, 0, 0);
 	if (kr != KERN_SUCCESS) {
 		mach_port_deallocate(task_self_trap(), launchdPort);
 		return kr;
@@ -54,7 +54,9 @@ int jbclient_mach_process_checkin(char *jbRootPathOut, char *bootUUIDOut, char *
 {
 	struct jbserver_mach_msg_checkin msg;
 	msg.base.hdr.msgh_size = sizeof(msg);
+	msg.base.hdr.msgh_bits = 0;
 	msg.base.action = JBSERVER_MACH_CHECKIN;
+	msg.base.magic = JBSERVER_MACH_MAGIC;
 
 	size_t replySize = sizeof(struct jbserver_mach_msg_checkin_reply) + MAX_TRAILER_SIZE;
 	uint8_t replyU[replySize];
@@ -62,7 +64,7 @@ int jbclient_mach_process_checkin(char *jbRootPathOut, char *bootUUIDOut, char *
 	struct jbserver_mach_msg_checkin_reply *reply = (struct jbserver_mach_msg_checkin_reply *)&replyU;
 	reply->base.msg.hdr.msgh_size = replySize;
 
-	kern_return_t kr = jbclient_mach_send_msg((struct jbserver_mach_msg *)&msg, (struct jbserver_mach_msg_reply *)reply);
+	kern_return_t kr = jbclient_mach_send_msg(&msg.base.hdr, (struct jbserver_mach_msg_reply *)reply);
 	if (kr != KERN_SUCCESS) return kr;
 
 	reply->jbRootPath[sizeof(reply->jbRootPath)-1] = '\0';
@@ -83,7 +85,9 @@ int jbclient_mach_fork_fix(pid_t childPid)
 {
 	struct jbserver_mach_msg_forkfix msg;
 	msg.base.hdr.msgh_size = sizeof(msg);
+	msg.base.hdr.msgh_bits = 0;
 	msg.base.action = JBSERVER_MACH_FORK_FIX;
+	msg.base.magic = JBSERVER_MACH_MAGIC;
 
 	msg.childPid = childPid;
 
@@ -93,7 +97,37 @@ int jbclient_mach_fork_fix(pid_t childPid)
 	struct jbserver_mach_msg_forkfix_reply *reply = (struct jbserver_mach_msg_forkfix_reply *)&replyU;
 	reply->base.msg.hdr.msgh_size = replySize;
 
-	kern_return_t kr = jbclient_mach_send_msg((struct jbserver_mach_msg *)&msg, (struct jbserver_mach_msg_reply *)reply);
+	kern_return_t kr = jbclient_mach_send_msg(&msg.base.hdr, (struct jbserver_mach_msg_reply *)reply);
+	if (kr != KERN_SUCCESS) return kr;
+
+	return (int)reply->base.status;
+}
+
+int jbclient_mach_trust_file(int fd)
+{
+	mach_port_t filePort = MACH_PORT_NULL;
+	if (fileport_makeport(fd, &filePort) < 0) {
+		return -1;
+	}
+
+	struct jbserver_mach_msg_trust_fd msg;
+	msg.base.hdr.msgh_size = sizeof(msg);
+	msg.base.hdr.msgh_bits = MACH_MSGH_BITS_COMPLEX;
+	msg.action = JBSERVER_MACH_TRUST_FILE;
+	msg.magic = JBSERVER_MACH_MAGIC;
+
+	msg.base.body.msgh_descriptor_count = 1;
+	msg.fdPort.name = filePort;
+	msg.fdPort.disposition = MACH_MSG_TYPE_MOVE_SEND;
+	msg.fdPort.type = MACH_MSG_PORT_DESCRIPTOR;
+
+	size_t replySize = sizeof(struct jbserver_mach_msg_forkfix_reply) + MAX_TRAILER_SIZE;
+	uint8_t replyU[replySize];
+	bzero(replyU, replySize);
+	struct jbserver_mach_msg_forkfix_reply *reply = (struct jbserver_mach_msg_forkfix_reply *)&replyU;
+	reply->base.msg.hdr.msgh_size = replySize;
+
+	kern_return_t kr = jbclient_mach_send_msg(&msg.base.hdr, (struct jbserver_mach_msg_reply *)reply);
 	if (kr != KERN_SUCCESS) return kr;
 
 	return (int)reply->base.status;

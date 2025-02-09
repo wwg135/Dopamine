@@ -77,6 +77,7 @@ DEF_SYSCALL(read, 3)
 DEF_SYSCALL(access, 33)
 DEF_SYSCALL(lseek, 199)
 DEF_SYSCALL(__sandbox_ms, 381)
+DEF_SYSCALL(fileport_makeport, 430)
 
 .data
 .global ___stack_chk_guard

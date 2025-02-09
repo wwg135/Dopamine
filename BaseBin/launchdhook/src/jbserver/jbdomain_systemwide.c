@@ -92,59 +92,35 @@ static int systemwide_get_boot_uuid(char **bootUUIDOut)
 	return 0;
 }
 
-static int trust_file(const char *filePath, const char *dlopenCallerImagePath, const char *dlopenCallerExecutablePath, xpc_object_t preferredArchsArray)
+int systemwide_trust_file(int fd)
 {
-	// Shared logic between client and server, implemented in client
-	// This should essentially mean these files never reach us in the first place
-	// But you know, never trust the client :D
-	extern bool can_skip_trusting_file(const char *filePath, bool isLibrary, bool isClient);
-
-	if (can_skip_trusting_file(filePath, (bool)dlopenCallerExecutablePath, false)) return -1;
-
-	size_t preferredArchCount = 0;
-	if (preferredArchsArray) preferredArchCount = xpc_array_get_count(preferredArchsArray);
-	uint32_t preferredArchTypes[preferredArchCount];
-	uint32_t preferredArchSubtypes[preferredArchCount];
-	for (size_t i = 0; i < preferredArchCount; i++) {
-		preferredArchTypes[i] = 0;
-		preferredArchSubtypes[i] = UINT32_MAX;
-		xpc_object_t arch = xpc_array_get_value(preferredArchsArray, i);
-		if (xpc_get_type(arch) == XPC_TYPE_DICTIONARY) {
-			preferredArchTypes[i] = xpc_dictionary_get_uint64(arch, "type");
-			preferredArchSubtypes[i] = xpc_dictionary_get_uint64(arch, "subtype");
+	struct statfs fsb;
+	int fsr = fstatfs(fd, &fsb);
+	if (fsr == 0) {
+		// Anything on the rootfs or fakelib mount point can be ignored as it's guaranteed to already be in trustcache
+		if (!strcmp(fsb.f_mntonname, "/") || !strcmp(fsb.f_mntonname, "/usr/lib")) {
+			return 0;
 		}
 	}
 
 	cdhash_t *cdhashes = NULL;
 	uint32_t cdhashesCount = 0;
-	macho_collect_untrusted_cdhashes(filePath, dlopenCallerImagePath, dlopenCallerExecutablePath, preferredArchTypes, preferredArchSubtypes, preferredArchCount, &cdhashes, &cdhashesCount);
+	file_collect_untrusted_cdhashes(fd, &cdhashes, &cdhashesCount);
 	if (cdhashes && cdhashesCount > 0) {
 		jb_trustcache_add_cdhashes(cdhashes, cdhashesCount);
 		free(cdhashes);
 	}
+
 	return 0;
 }
 
-// Not static because launchd will directly call this from it's posix_spawn hook
-int systemwide_trust_binary(const char *binaryPath, xpc_object_t preferredArchsArray)
+int systemwide_trust_file_by_path(const char *path)
 {
-	return trust_file(binaryPath, NULL, NULL, preferredArchsArray);
-}
-
-static int systemwide_trust_library(audit_token_t *processToken, const char *libraryPath, const char *callerLibraryPath)
-{
-	// Fetch process info
-	pid_t pid = audit_token_to_pid(*processToken);
-	char callerPath[4*MAXPATHLEN];
-	if (proc_pidpath(pid, callerPath, sizeof(callerPath)) < 0) {
-		return -1;
-	}
-
-	// When trusting a library that's dlopened at runtime, we need to pass the caller path
-	// This is to support dlopen("@executable_path/whatever", RTLD_NOW) and stuff like that
-	// (Yes that is a thing >.<)
-	// Also we need to pass the path of the image that called dlopen due to @loader_path, sigh...
-	return trust_file(libraryPath, callerLibraryPath, callerPath, NULL);
+	int fd = open(path, O_RDONLY);
+	if (fd < 0) return -1;
+	int r = systemwide_trust_file(fd);
+	close(fd);
+	return r;
 }
 
 int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
@@ -377,22 +353,11 @@ struct jbserver_domain gSystemwideDomain = {
 				{ 0 },
 			},
 		},
-		// JBS_SYSTEMWIDE_TRUST_BINARY
+		// JBS_SYSTEMWIDE_TRUST_FILE
 		{
-			.handler = systemwide_trust_binary,
+			.handler = systemwide_trust_file,
 			.args = (jbserver_arg[]){
-				{ .name = "binary-path", .type = JBS_TYPE_STRING, .out = false },
-				{ .name = "preferred-archs", .type = JBS_TYPE_ARRAY, .out = false },
-				{ 0 },
-			},
-		},
-		// JBS_SYSTEMWIDE_TRUST_LIBRARY
-		{
-			.handler = systemwide_trust_library,
-			.args = (jbserver_arg[]){
-				{ .name = "caller-token", .type = JBS_TYPE_CALLER_TOKEN, .out = false },
-				{ .name = "library-path", .type = JBS_TYPE_STRING, .out = false },
-				{ .name = "caller-library-path", .type = JBS_TYPE_STRING, .out = false },
+				{ .name = "fd", .type = JBS_TYPE_FD, .out = false },
 				{ 0 },
 			},
 		},
