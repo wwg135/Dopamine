@@ -82,20 +82,18 @@ struct jbserver_mach_msg_forkfix_reply {
     struct jbserver_mach_msg_reply base;
 };
 
-struct jbserver_mach_complex_msg {
-    mach_msg_header_t hdr;
-    mach_msg_body_t body;
-};
-
 struct jbserver_mach_msg_trust_fd {
-    struct jbserver_mach_complex_msg base;
-    mach_msg_port_descriptor_t fdPort;
-    uint64_t magic;
-    uint64_t action;
+    struct jbserver_mach_msg base;
+    int64_t fd;
 };
 
 struct jbserver_mach_msg_trust_fd_reply {
     struct jbserver_mach_msg_reply base;
+};
+
+struct jbserver_mach_complex_msg {
+    mach_msg_header_t hdr;
+    mach_msg_body_t body;
 };
 
 #endif

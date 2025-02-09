@@ -103,6 +103,8 @@ void file_collect_untrusted_cdhashes(int fd, cdhash_t **cdhashesOut, uint32_t *c
 		}
 	});
 
+	fat_free(fat);
+
 	*cdhashesOut = cdhashes;
 	*cdhashCountOut = cdhashCount;
 }

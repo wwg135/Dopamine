@@ -105,26 +105,18 @@ int jbclient_mach_fork_fix(pid_t childPid)
 
 int jbclient_mach_trust_file(int fd)
 {
-	mach_port_t filePort = MACH_PORT_NULL;
-	if (fileport_makeport(fd, &filePort) < 0) {
-		return -1;
-	}
-
 	struct jbserver_mach_msg_trust_fd msg;
 	msg.base.hdr.msgh_size = sizeof(msg);
-	msg.base.hdr.msgh_bits = MACH_MSGH_BITS_COMPLEX;
-	msg.action = JBSERVER_MACH_TRUST_FILE;
-	msg.magic = JBSERVER_MACH_MAGIC;
+	msg.base.hdr.msgh_bits = 0;
+	msg.base.action = JBSERVER_MACH_TRUST_FILE;
+	msg.base.magic = JBSERVER_MACH_MAGIC;
 
-	msg.base.body.msgh_descriptor_count = 1;
-	msg.fdPort.name = filePort;
-	msg.fdPort.disposition = MACH_MSG_TYPE_MOVE_SEND;
-	msg.fdPort.type = MACH_MSG_PORT_DESCRIPTOR;
+	msg.fd = fd;
 
-	size_t replySize = sizeof(struct jbserver_mach_msg_forkfix_reply) + MAX_TRAILER_SIZE;
+	size_t replySize = sizeof(struct jbserver_mach_msg_trust_fd_reply) + MAX_TRAILER_SIZE;
 	uint8_t replyU[replySize];
 	bzero(replyU, replySize);
-	struct jbserver_mach_msg_forkfix_reply *reply = (struct jbserver_mach_msg_forkfix_reply *)&replyU;
+	struct jbserver_mach_msg_trust_fd_reply *reply = (struct jbserver_mach_msg_trust_fd_reply *)&replyU;
 	reply->base.msg.hdr.msgh_size = replySize;
 
 	kern_return_t kr = jbclient_mach_send_msg(&msg.base.hdr, (struct jbserver_mach_msg_reply *)reply);

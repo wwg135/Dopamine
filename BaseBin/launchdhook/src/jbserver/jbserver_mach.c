@@ -2,12 +2,12 @@
 #include <mach/mach.h>
 #include <bsm/audit.h>
 #include <libproc.h>
-#include <libproc_private.h>
+#include <sys/proc_info.h>
 extern int fileport_makefd (mach_port_t port);
 
 int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut);
 int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid);
-int systemwide_trust_file(int fd);
+int systemwide_trust_file(audit_token_t *processToken, int fd);
 
 bool systemwide_domain_allowed(audit_token_t clientToken);
 
@@ -104,6 +104,24 @@ int jbserver_received_mach_message(audit_token_t *auditToken, struct jbserver_ma
 		reply->base.status = result;
 		r = 0;
 	}
+	else if (jbsMachMsg->action == JBSERVER_MACH_TRUST_FILE) {
+		if (msgSize < sizeof(struct jbserver_mach_msg_trust_fd)) return -1;
+		struct jbserver_mach_msg_trust_fd *trustMsg = (struct jbserver_mach_msg_trust_fd *)jbsMachMsg;
+
+		size_t replySize = sizeof(struct jbserver_mach_msg_trust_fd_reply);
+		replyData = malloc(replySize);
+		struct jbserver_mach_msg_trust_fd_reply *reply = (struct jbserver_mach_msg_trust_fd_reply *)replyData;
+		memset(reply, 0, replySize);
+		
+		int result = systemwide_trust_file(auditToken, trustMsg->fd);
+
+		reply->base.msg.magic         = jbsMachMsg->magic;
+		reply->base.msg.action        = jbsMachMsg->action;
+		reply->base.msg.hdr.msgh_size = replySize;
+
+		reply->base.status = result;
+		r = 0;
+	}
 
 	jbserver_send_mach_reply(&jbsMachMsg->hdr, replyData);
 
@@ -112,7 +130,7 @@ int jbserver_received_mach_message(audit_token_t *auditToken, struct jbserver_ma
 	return r;
 }
 
-int jbserver_received_complex_mach_message(audit_token_t *auditToken, uint64_t action, struct jbserver_mach_complex_msg *jbsComplexMachMsg)
+/*int jbserver_received_complex_mach_message(audit_token_t *auditToken, uint64_t action, struct jbserver_mach_complex_msg *jbsComplexMachMsg)
 {
 	int r = -1;
 
@@ -152,4 +170,4 @@ int jbserver_received_complex_mach_message(audit_token_t *auditToken, uint64_t a
 	if (replyData) free(replyData);
 
 	return r;
-}
+}*/

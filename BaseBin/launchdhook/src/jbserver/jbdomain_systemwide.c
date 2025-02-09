@@ -3,7 +3,7 @@
 #include <libjailbreak/info.h>
 #include <sandbox.h>
 #include <libproc.h>
-#include <libproc_private.h>
+#include <sys/proc_info.h>
 
 #include <libjailbreak/signatures.h>
 #include <libjailbreak/trustcache.h>
@@ -92,13 +92,31 @@ static int systemwide_get_boot_uuid(char **bootUUIDOut)
 	return 0;
 }
 
-int systemwide_trust_file(int fd)
+int systemwide_trust_file(audit_token_t *processToken, int rfd)
 {
+	pid_t pid = -1;
+	int fd = -1;
+	if (!processToken) {
+		pid = 1;
+		fd = dup(rfd);
+	}
+	else {
+		pid = audit_token_to_pid(*processToken);
+		struct vnode_fdinfowithpath vnodeInfo;
+		int ok = proc_pidfdinfo(pid, rfd, PROC_PIDFDVNODEPATHINFO, &vnodeInfo, sizeof(vnodeInfo));
+		if (ok > 0) {
+			fd = open(vnodeInfo.pvip.vip_path, O_RDONLY);
+		}
+	}
+
+	if (fd < 0) return -1;
+
 	struct statfs fsb;
 	int fsr = fstatfs(fd, &fsb);
 	if (fsr == 0) {
 		// Anything on the rootfs or fakelib mount point can be ignored as it's guaranteed to already be in trustcache
 		if (!strcmp(fsb.f_mntonname, "/") || !strcmp(fsb.f_mntonname, "/usr/lib")) {
+			close(fd);
 			return 0;
 		}
 	}
@@ -111,6 +129,7 @@ int systemwide_trust_file(int fd)
 		free(cdhashes);
 	}
 
+	close(fd);
 	return 0;
 }
 
@@ -118,7 +137,7 @@ int systemwide_trust_file_by_path(const char *path)
 {
 	int fd = open(path, O_RDONLY);
 	if (fd < 0) return -1;
-	int r = systemwide_trust_file(fd);
+	int r = systemwide_trust_file(NULL, fd);
 	close(fd);
 	return r;
 }
@@ -357,7 +376,8 @@ struct jbserver_domain gSystemwideDomain = {
 		{
 			.handler = systemwide_trust_file,
 			.args = (jbserver_arg[]){
-				{ .name = "fd", .type = JBS_TYPE_FD, .out = false },
+				{ .name = "caller-token", .type = JBS_TYPE_CALLER_TOKEN, .out = false },
+				{ .name = "fd", .type = JBS_TYPE_UINT64, .out = false },
 				{ 0 },
 			},
 		},

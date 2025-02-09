@@ -140,7 +140,7 @@ char *jbclient_get_boot_uuid(void)
 int jbclient_trust_file(int fd)
 {
 	xpc_object_t xargs = xpc_dictionary_create_empty();
-	xpc_dictionary_set_fd(xargs, "fd", fd);
+	xpc_dictionary_set_uint64(xargs, "fd", (uint64_t)fd);
 	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_TRUST_FILE, xargs);
 	xpc_release(xargs);
 	if (xreply) {
