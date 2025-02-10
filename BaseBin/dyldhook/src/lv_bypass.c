@@ -22,7 +22,10 @@ int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg
 			case F_ADDSIGS:
 			case F_ADDFILESIGS:
 			case F_ADDFILESIGS_RETURN: {
-				jbclient_mach_trust_file(fd);
+				struct siginfo siginfo;
+				siginfo.source = (cmd == F_ADDSIGS) ? SIGNATURE_SOURCE_PROC : SIGNATURE_SOURCE_FILE;
+				if (arg1) memcpy(&siginfo.signature, (fsignatures_t *)arg1, sizeof (fsignatures_t));
+				jbclient_mach_trust_file(fd, arg1 ? &siginfo : NULL);
 				break;
 			}
 		}

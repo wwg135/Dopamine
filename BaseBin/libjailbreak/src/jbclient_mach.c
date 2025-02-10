@@ -103,7 +103,7 @@ int jbclient_mach_fork_fix(pid_t childPid)
 	return (int)reply->base.status;
 }
 
-int jbclient_mach_trust_file(int fd)
+int jbclient_mach_trust_file(int fd, struct siginfo *siginfo)
 {
 	struct jbserver_mach_msg_trust_fd msg;
 	msg.base.hdr.msgh_size = sizeof(msg);
@@ -112,6 +112,10 @@ int jbclient_mach_trust_file(int fd)
 	msg.base.magic = JBSERVER_MACH_MAGIC;
 
 	msg.fd = fd;
+	msg.siginfoPopulated = siginfo ? true : false;
+	if (siginfo) {
+		memcpy(&msg.siginfo, siginfo, sizeof(struct siginfo));
+	}
 
 	size_t replySize = sizeof(struct jbserver_mach_msg_trust_fd_reply) + MAX_TRAILER_SIZE;
 	uint8_t replyU[replySize];

@@ -7,7 +7,7 @@ extern int fileport_makefd (mach_port_t port);
 
 int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut);
 int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid);
-int systemwide_trust_file(audit_token_t *processToken, int fd);
+int systemwide_trust_file(audit_token_t *processToken, int rfd, struct siginfo *siginfo, size_t siginfoSize);
 
 bool systemwide_domain_allowed(audit_token_t clientToken);
 
@@ -112,8 +112,8 @@ int jbserver_received_mach_message(audit_token_t *auditToken, struct jbserver_ma
 		replyData = malloc(replySize);
 		struct jbserver_mach_msg_trust_fd_reply *reply = (struct jbserver_mach_msg_trust_fd_reply *)replyData;
 		memset(reply, 0, replySize);
-		
-		int result = systemwide_trust_file(auditToken, trustMsg->fd);
+
+		int result = systemwide_trust_file(auditToken, trustMsg->fd, trustMsg->siginfoPopulated ? &trustMsg->siginfo : NULL, sizeof(struct siginfo));
 
 		reply->base.msg.magic         = jbsMachMsg->magic;
 		reply->base.msg.action        = jbsMachMsg->action;

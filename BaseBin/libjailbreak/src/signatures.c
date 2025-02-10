@@ -56,25 +56,34 @@ bool csd_superblob_is_adhoc_signed(CS_DecodedSuperBlob *superblob)
 	return true;
 }
 
+bool code_signature_calculate_adhoc_cdhash(CS_SuperBlob *superblob, cdhash_t cdhashOut)
+{
+	bool isAdhocSigned = false;
+
+	CS_DecodedSuperBlob *decodedSuperblob = csd_superblob_decode(superblob);
+	if (decodedSuperblob) {
+		if (csd_superblob_is_adhoc_signed(decodedSuperblob)) {
+			if (csd_superblob_calculate_best_cdhash(decodedSuperblob, cdhashOut, NULL) == 0) {
+				isAdhocSigned = true;
+			}
+		}
+		csd_superblob_free(decodedSuperblob);
+	}
+
+	return isAdhocSigned;
+}
+
 bool macho_parse_code_signature(MachO *macho, cdhash_t cdhashOut)
 {
-	bool shouldBeTrusted = false;
+	bool isAdhocSigned = false;
 
 	CS_SuperBlob *superblob = macho_read_code_signature(macho);
 	if (superblob) {
-		CS_DecodedSuperBlob *decodedSuperblob = csd_superblob_decode(superblob);
-		if (decodedSuperblob) {
-			if (csd_superblob_is_adhoc_signed(decodedSuperblob)) {
-				if (csd_superblob_calculate_best_cdhash(decodedSuperblob, cdhashOut, NULL) == 0) {
-					shouldBeTrusted = true;
-				}
-			}
-			csd_superblob_free(decodedSuperblob);
-		}
+		isAdhocSigned = code_signature_calculate_adhoc_cdhash(superblob, cdhashOut);
 		free(superblob);
 	}
 
-	return shouldBeTrusted;
+	return isAdhocSigned;
 }
 
 void file_collect_untrusted_cdhashes(int fd, cdhash_t **cdhashesOut, uint32_t *cdhashCountOut)

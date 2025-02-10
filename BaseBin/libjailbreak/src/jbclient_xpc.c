@@ -137,10 +137,11 @@ char *jbclient_get_boot_uuid(void)
 	return (char *)&bootUUID[0];
 }
 
-int jbclient_trust_file(int fd)
+int jbclient_trust_file(int fd, struct siginfo *siginfo)
 {
 	xpc_object_t xargs = xpc_dictionary_create_empty();
 	xpc_dictionary_set_uint64(xargs, "fd", (uint64_t)fd);
+	if (siginfo) xpc_dictionary_set_data(xargs, "siginfo", siginfo, sizeof(struct siginfo));
 	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_TRUST_FILE, xargs);
 	xpc_release(xargs);
 	if (xreply) {
@@ -156,7 +157,7 @@ int jbclient_trust_file_by_path(const char *path)
 	int fd = open(path, O_RDONLY);
 	if (fd < 0) return -1;
 
-	int r = jbclient_trust_file(fd);
+	int r = jbclient_trust_file(fd, NULL);
 	close(fd);
 	return r;
 }

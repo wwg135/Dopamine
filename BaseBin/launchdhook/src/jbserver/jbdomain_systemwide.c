@@ -92,8 +92,52 @@ static int systemwide_get_boot_uuid(char **bootUUIDOut)
 	return 0;
 }
 
-int systemwide_trust_file(audit_token_t *processToken, int rfd)
+CS_SuperBlob *siginfo_resolve_superblob(struct siginfo *siginfo, int pid, int fd)
 {
+	if (!siginfo) return NULL;
+	if (siginfo->signature.fs_blob_size == 0) return NULL;
+
+	size_t superblobSize = siginfo->signature.fs_blob_size;
+	CS_SuperBlob *superblob = malloc(superblobSize);
+	if (!superblob) return NULL;
+
+	bool success = false;
+
+	switch (siginfo->source) {
+		case SIGNATURE_SOURCE_FILE: {
+			uintptr_t superblobStart = siginfo->signature.fs_file_start + (uintptr_t)siginfo->signature.fs_blob_start;
+			uintptr_t superblobEnd   = superblobStart + superblobSize;
+			struct stat st = {};
+
+        	if (fstat(fd, &st) != 0) break;
+			if (superblobEnd > st.st_size) break;
+			if (lseek(fd, superblobStart, SEEK_SET) != superblobStart) break;
+			if (read(fd, superblob, superblobSize) != superblobSize) break;
+
+			success = true;
+		}
+		case SIGNATURE_SOURCE_PROC: {
+			uint64_t proc = proc_find(pid);
+
+			if (!proc) break;
+			if (proc_vreadbuf(proc, siginfo->signature.fs_blob_start, superblob, superblobSize) != 0) break;
+
+			success = true;
+		}
+	}
+
+	if (!success) {
+		free(superblob);
+		superblob = NULL;
+	}
+
+	return superblob;
+}
+
+int systemwide_trust_file(audit_token_t *processToken, int rfd, struct siginfo *siginfo, size_t siginfoSize)
+{
+	if (siginfo && siginfoSize != sizeof(struct siginfo)) return -1;
+
 	pid_t pid = -1;
 	int fd = -1;
 	if (!processToken) {
@@ -123,7 +167,27 @@ int systemwide_trust_file(audit_token_t *processToken, int rfd)
 
 	cdhash_t *cdhashes = NULL;
 	uint32_t cdhashesCount = 0;
-	file_collect_untrusted_cdhashes(fd, &cdhashes, &cdhashesCount);
+
+	if (siginfo) {
+		// If we were passed a siginfo, get the cdhash of the superblob from the siginfo
+		CS_SuperBlob *superblob = siginfo_resolve_superblob(siginfo, pid, fd);
+		if (superblob) {
+			cdhash_t cdhash;
+			if (code_signature_calculate_adhoc_cdhash(superblob, cdhash)) {
+				if (!is_cdhash_trustcached(cdhash)) {
+					cdhashes = malloc(sizeof(cdhash_t));
+					cdhashesCount = 1;
+					memcpy(&cdhashes[0], &cdhash, sizeof(cdhash_t));
+				}
+			}
+			free(superblob);
+		}
+	}
+	else {
+		// If we weren't passed a siginfo, get cdhashes of all slices
+		file_collect_untrusted_cdhashes(fd, &cdhashes, &cdhashesCount);
+	}
+	
 	if (cdhashes && cdhashesCount > 0) {
 		jb_trustcache_add_cdhashes(cdhashes, cdhashesCount);
 		free(cdhashes);
@@ -137,7 +201,7 @@ int systemwide_trust_file_by_path(const char *path)
 {
 	int fd = open(path, O_RDONLY);
 	if (fd < 0) return -1;
-	int r = systemwide_trust_file(NULL, fd);
+	int r = systemwide_trust_file(NULL, fd, NULL, 0);
 	close(fd);
 	return r;
 }
@@ -378,6 +442,7 @@ struct jbserver_domain gSystemwideDomain = {
 			.args = (jbserver_arg[]){
 				{ .name = "caller-token", .type = JBS_TYPE_CALLER_TOKEN, .out = false },
 				{ .name = "fd", .type = JBS_TYPE_UINT64, .out = false },
+				{ .name = "siginfo", .type = JBS_TYPE_DATA, .out = false },
 				{ 0 },
 			},
 		},

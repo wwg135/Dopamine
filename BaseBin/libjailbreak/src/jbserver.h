@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <xpc/xpc.h>
 #include <xpc_private.h>
+#include "signatures.h"
 #include "jbserver_domains.h"
 
 typedef enum {
@@ -85,6 +86,8 @@ struct jbserver_mach_msg_forkfix_reply {
 struct jbserver_mach_msg_trust_fd {
     struct jbserver_mach_msg base;
     int64_t fd;
+    bool siginfoPopulated;
+    struct siginfo siginfo;
 };
 
 struct jbserver_mach_msg_trust_fd_reply {
