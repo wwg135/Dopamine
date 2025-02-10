@@ -15,6 +15,10 @@
 
 #include <libjailbreak/jbclient_mach.h>
 
+// Library validation bypass
+// Dyld will call fcntl to attach a code signature to a dylib before mapping it in
+// So we hook fcntl to ensure the code signature to be attached is added to trustcache
+
 int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5, void *arg6, void *arg7, void *arg8)
 {
 	if (jbinfo_is_checked_in()) {

@@ -40,6 +40,14 @@ _MACHOMERGER_HOOKTRAMPOLINE__ZN5dyld313loadDyldCacheERKNS_18SharedCacheOptionsEP
 
 #endif
 
+.global _MACHOMERGER_ORIG__ZN5dyld44APIs11dlopen_fromEPKciPv
+.global _MACHOMERGER_HOOKTRAMPOLINE__ZN5dyld44APIs11dlopen_fromEPKciPv
+_MACHOMERGER_ORIG__ZN5dyld44APIs11dlopen_fromEPKciPv:
+    nop // Will be replaced with the original first instruction by machomerger
+    // FALLTHROUGH
+_MACHOMERGER_HOOKTRAMPOLINE__ZN5dyld44APIs11dlopen_fromEPKciPv:
+    b .
+
 MAKE_TRAMPOLINE(MACHOMERGER_REAL_START)
 MAKE_TRAMPOLINE(cerror)
 MAKE_TRAMPOLINE_ALIAS(__getpid, getpid)
@@ -56,6 +64,7 @@ MAKE_TRAMPOLINE_ALIAS(_kernelrpc_mach_vm_deallocate_trap, vm_deallocate)
 MAKE_TRAMPOLINE(vm_protect)
 MAKE_TRAMPOLINE(memcpy)
 MAKE_TRAMPOLINE(strcmp)
+MAKE_TRAMPOLINE(strncmp)
 MAKE_TRAMPOLINE(strlen)
 MAKE_TRAMPOLINE(strstr)
 MAKE_TRAMPOLINE(strcpy)

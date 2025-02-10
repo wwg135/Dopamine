@@ -17,6 +17,11 @@ bool jbinfo_is_checked_in(void)
 	return jbInfo->state == DYLD_STATE_CHECKED_IN;
 }
 
+char *jbinfo_get_jbroot(void)
+{
+	return jbInfo->jbRootPath;
+}
+
 void consume_tokenized_sandbox_extensions(char *sandboxExtensions)
 {
 	if (sandboxExtensions[0] == '\0') return;
