@@ -206,6 +206,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 					gSystemInfo.kernelStruct.proc_ro.syscall_filter_mask = 0x28;
 					gSystemInfo.kernelStruct.proc_ro.mach_trap_filter_mask = 0x68;
 					gSystemInfo.kernelStruct.proc_ro.mach_kobj_filter_mask = 0x70;
+					gSystemInfo.kernelStruct.proc_ro.t_flags_ro = 0x78;
 
 					// task
 #ifdef __arm64e__

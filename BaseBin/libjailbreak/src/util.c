@@ -541,6 +541,17 @@ void proc_allow_all_syscalls(uint64_t proc)
 	}
 }
 
+void proc_remove_msg_filter(uint64_t proc)
+{
+	if (!gSystemInfo.kernelStruct.proc_ro.exists) return;
+	uint64_t proc_ro = kread_ptr(proc + koffsetof(proc, proc_ro));
+	if (!koffsetof(proc_ro, t_flags_ro)) return;
+
+	#define TFRO_FILTER_MSG                 0x00004000
+	uint32_t t_flags = kread32(proc_ro + koffsetof(proc_ro, t_flags_ro));
+	kwrite32(proc_ro + koffsetof(proc_ro, t_flags_ro), t_flags & ~TFRO_FILTER_MSG);
+}
+
 int cmd_wait_for_exit(pid_t pid)
 {
 	int status = 0;

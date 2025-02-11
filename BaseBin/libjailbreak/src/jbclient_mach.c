@@ -30,7 +30,8 @@ kern_return_t jbclient_mach_send_msg(mach_msg_header_t *hdr, struct jbserver_mac
 	hdr->msgh_remote_port  = launchdPort;
 	hdr->msgh_local_port   = replyPort;
 	hdr->msgh_voucher_port = 0;
-	hdr->msgh_id           = 0x40000000;
+	hdr->msgh_id           = 0x40000000 | 206;
+	// 206: magic value to make WebContent work (seriously, this is the only ID that the WebContent sandbox allows)
 	
 	kern_return_t kr = mach_msg(hdr, MACH_SEND_MSG, hdr->msgh_size, 0, 0, 0, 0);
 	if (kr != KERN_SUCCESS) {

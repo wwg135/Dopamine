@@ -277,13 +277,17 @@ int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, 
 		}
 	}
 
-	// In iOS 16+ there is a super annoying security feature called Protobox
-	// Amongst other things, it allows for a process to have a syscall mask
-	// If a process calls a syscall it's not allowed to call, it immediately crashes
-	// Because for tweaks and hooking this is unacceptable, we update these masks to be 1 for all syscalls on all processes
-	// That will at least get rid of the syscall mask part of Protobox
 	if (__builtin_available(iOS 16.0, *)) {
+		// In iOS 16+ there is a super annoying security feature called Protobox
+		// Amongst other things, it allows for a process to have a syscall mask
+		// If a process calls a syscall it's not allowed to call, it immediately crashes
+		// Because for tweaks and hooking this is unacceptable, we update these masks to be 1 for all syscalls on all processes
+		// That will at least get rid of the syscall mask part of Protobox
 		proc_allow_all_syscalls(proc);
+
+		// Some processes also have a filter for mach messages, fortunately there is one allowed message id that can be used for the check-in
+		// Then we remove the filter to make other message ids accessible afterwards aswell
+		proc_remove_msg_filter(proc);
 	}
 
 	// For whatever reason after SpringBoard has restarted, AutoFill and other stuff stops working
