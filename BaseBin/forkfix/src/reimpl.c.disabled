@@ -1,3 +1,9 @@
+// This file contains reimplementations for everything that calls fork
+// This would be neccessary if we want to use DYLD_INTERPOSE instead of hooking __fork directly
+// It is no longer used for the following reasons:
+// - Spinlock panics are fixed, so there is no disadvantage of hooking __fork directly
+// - There are weird issues happening when interposing fork (Some CLI scripts start failing in weird ways)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -193,13 +199,6 @@ bool fork_reimpl_init(void *fork_ptr)
 	if (!fork_ptr) return false;
 
 	__fork_ptr = fork_ptr;
-
-	void *systemhookHandle = dlopen("systemhook.dylib", RTLD_NOLOAD);
-	if (!systemhookHandle) return false;
-
-	kern_return_t (*litehook_rebind_symbol)(const mach_header *targetHeader, void *replacee, void *replacement, bool (*exceptionFilter)(const mach_header *header)) = dlsym(systemhookHandle, "litehook_rebind_symbol");
-	void *(*litehook_find_dsc_symbol)(const char *imagePath, const char *symbolName) = dlsym(systemhookHandle, "litehook_find_dsc_symbol");
-	if (!litehook_rebind_symbol || !litehook_find_dsc_symbol) return false;
 
 	// The v2 functions take one argument, but we can still store them in the same pointer since the argument will just be discarded if the non v2 implementation is used
 	// In practice, the v2 implementation should always exist, since we're not dealing with super old versions, so all of this doesn't matter too much

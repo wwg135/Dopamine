@@ -210,8 +210,10 @@ void jbinfo_initialize_hardcoded_offsets(void)
 					// task
 #ifdef __arm64e__
 					gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x548 + taskJitboxAdjust;
+					gSystemInfo.kernelStruct.task.flags = 0x3b8 + taskJitboxAdjust;
 #else
 					gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x528;
+					gSystemInfo.kernelStruct.task.flags = 0x3a0;
 #endif
 					// vm_map
 					gSystemInfo.kernelStruct.vm_map.flags = 0xB4;
@@ -242,6 +244,10 @@ void jbinfo_initialize_hardcoded_offsets(void)
 
 					if (strcmp(xnuVersion, "22.1.0") >= 0) { // iOS 16.1+
 						gSystemInfo.kernelStruct.ipc_space.table_uses_smr = true;
+
+						// proc_ro
+						gSystemInfo.kernelStruct.proc_ro.t_flags_ro = 0x78;
+
 						if (strcmp(xnuVersion, "22.3.0") >= 0) { // iOS 16.3+
 							gSystemInfo.kernelConstant.smrBase = 2;
 							if (strcmp(xnuVersion, "22.4.0") >= 0) { // iOS 16.4+

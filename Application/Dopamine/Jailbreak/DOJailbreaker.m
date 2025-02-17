@@ -27,7 +27,9 @@
 #import <libjailbreak/jbserver_boomerang.h>
 #import <libjailbreak/signatures.h>
 #import <libjailbreak/jbclient_xpc.h>
+#import <libjailbreak/jbclient_mach.h>
 #import <libjailbreak/kcall_arm64.h>
+#import <libjailbreak/basebin_gen.h>
 #import <CoreServices/LSApplicationProxy.h>
 #import <sys/utsname.h>
 #import "spawn.h"
@@ -371,7 +373,7 @@ void *boomerang_server(struct boomerang_info *info)
 
 - (NSError *)applyProtection
 {
-    int r = exec_cmd(JBROOT_PATH("/basebin/jbctl"), "internal", "protection_init", NULL);
+    int r = [[DOEnvironmentManager sharedManager] setPrivatePrebootProtected:YES];
     if (r != 0) {
         return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedInitProtection userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed initializing protection with error: %d", r]}];
     }
@@ -380,14 +382,14 @@ void *boomerang_server(struct boomerang_info *info)
 
 - (NSError *)createFakeLib
 {
-    int r = exec_cmd(JBROOT_PATH("/basebin/jbctl"), "internal", "fakelib_init", NULL);
+    int r = basebin_generate(false);
     if (r != 0) {
         return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedInitFakeLib userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Creating fakelib failed with error: %d", r]}];
     }
 
     cdhash_t *cdhashes = NULL;
     uint32_t cdhashesCount = 0;
-    macho_collect_untrusted_cdhashes(JBROOT_PATH("/basebin/.fakelib/dyld"), NULL, NULL, NULL, NULL, 0, &cdhashes, &cdhashesCount);
+    file_collect_untrusted_cdhashes_by_path(JBROOT_PATH("/basebin/.fakelib/dyld"), &cdhashes, &cdhashesCount);
     if (cdhashesCount != 1) return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedInitFakeLib userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Got unexpected number of cdhashes for dyld???: %d", cdhashesCount]}];
     
     trustcache_file_v1 *dyldTCFile = NULL;
@@ -402,7 +404,7 @@ void *boomerang_server(struct boomerang_info *info)
         return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedInitFakeLib userInfo:@{NSLocalizedDescriptionKey : @"Failed to build dyld trustcache"}];
     }
     
-    r = exec_cmd(JBROOT_PATH("/basebin/jbctl"), "internal", "fakelib_mount", NULL);
+    r = [[DOEnvironmentManager sharedManager] setFakelibMounted:YES];
     if (r != 0) {
         return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedInitFakeLib userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Mounting fakelib failed with error: %d", r]}];
     }

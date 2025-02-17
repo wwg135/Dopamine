@@ -26,6 +26,7 @@ extern char **environ;
 extern int posix_spawnattr_set_persona_np(const posix_spawnattr_t* __restrict, uid_t, uint32_t);
 extern int posix_spawnattr_set_persona_uid_np(const posix_spawnattr_t* __restrict, uid_t);
 extern int posix_spawnattr_set_persona_gid_np(const posix_spawnattr_t* __restrict, uid_t);
+int posix_spawnattr_set_registered_ports_np(posix_spawnattr_t * __restrict attr, mach_port_t portarray[], uint32_t count);
 
 const struct mach_header *get_mach_header(const char *name)
 {
@@ -540,6 +541,26 @@ void proc_allow_all_syscalls(uint64_t proc)
 	}
 }
 
+void proc_remove_msg_filter(uint64_t proc)
+{
+	if (__builtin_available(iOS 16.0, *)) {
+		#define TFRO_FILTER_MSG                 0x00004000
+
+		if (koffsetof(proc_ro, t_flags_ro)) {
+			// iOS 16.1+
+			uint64_t proc_ro = kread_ptr(proc + koffsetof(proc, proc_ro));
+			uint32_t t_flags = kread32(proc_ro + koffsetof(proc_ro, t_flags_ro));
+			kwrite32(proc_ro + koffsetof(proc_ro, t_flags_ro), t_flags & ~TFRO_FILTER_MSG);
+		}
+		else if (koffsetof(task, flags)) {
+			// iOS 16.0.x
+			uint64_t task = proc_task(proc);
+			uint32_t t_flags = kread32(task + koffsetof(task, flags));
+			kwrite32(task + koffsetof(task, flags), t_flags & ~TFRO_FILTER_MSG);
+		}
+	}
+}
+
 int cmd_wait_for_exit(pid_t pid)
 {
 	int status = 0;
@@ -551,7 +572,7 @@ int cmd_wait_for_exit(pid_t pid)
 	return status;
 }
 
-int __exec_cmd_internal_va(bool suspended, bool root, bool waitForExit, pid_t *pidOut, const char *binary, int argc, va_list va_args)
+int __exec_cmd_internal_va(bool suspended, bool root, bool waitForExit, pid_t *pidOut, const char *binary, int argc, va_list va_args, char **envp)
 {
 	const char *argv[argc+1];
 	argv[0] = binary;
@@ -571,8 +592,15 @@ int __exec_cmd_internal_va(bool suspended, bool root, bool waitForExit, pid_t *p
 		posix_spawnattr_set_persona_gid_np(&attr, 0);
 	}
 
+	char **envToUse = envp;
+	if (!envToUse && getpid() != 1) {
+		// We NEVER want to pass launchd's environment to any process whatsoever
+		// This is because, amongst other things, it has DYLD_INSERT_LIBRARIES set to launchdhook which is NO good
+		envToUse = environ;
+	}
+
 	pid_t spawnedPid = 0;
-	int spawnError = posix_spawn(&spawnedPid, binary, NULL, &attr, (char *const *)argv, environ);
+	int spawnError = posix_spawn(&spawnedPid, binary, NULL, &attr, (char *const *)argv, envToUse);
 	if (attr) posix_spawnattr_destroy(&attr);
 	if (spawnError != 0) return spawnError;
 
@@ -594,7 +622,7 @@ int exec_cmd(const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(false, false, true, NULL, binary, argc, args);
+	int r = __exec_cmd_internal_va(false, false, true, NULL, binary, argc, args, NULL);
 	va_end(args);
 	return r;
 }
@@ -608,7 +636,7 @@ int exec_cmd_nowait(pid_t *pidOut, const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(false, false, false, pidOut, binary, argc, args);
+	int r = __exec_cmd_internal_va(false, false, false, pidOut, binary, argc, args, NULL);
 	va_end(args);
 	return r;
 }
@@ -622,7 +650,7 @@ int exec_cmd_suspended(pid_t *pidOut, const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(true, false, false, pidOut, binary, argc, args);
+	int r = __exec_cmd_internal_va(true, false, false, pidOut, binary, argc, args, NULL);
 	va_end(args);
 	return r;
 }
@@ -636,9 +664,51 @@ int exec_cmd_root(const char *binary, ...)
 	va_end(args);
 
 	va_start(args, binary);
-	int r = __exec_cmd_internal_va(false, true, true, NULL, binary, argc, args);
+	int r = __exec_cmd_internal_va(false, true, true, NULL, binary, argc, args, NULL);
 	va_end(args);
 	return r;
+}
+
+int exec_cmd_env(char **envp, const char *binary, ...)
+{
+	int argc = 1;
+	va_list args;
+	va_start(args, binary);
+	while (va_arg(args, const char *)) argc++;
+	va_end(args);
+
+	va_start(args, binary);
+	int r = __exec_cmd_internal_va(false, false, true, NULL, binary, argc, args, envp);
+	va_end(args);
+	return r;
+}
+
+int jbctl_earlyboot(mach_port_t earlyBootServer, ...)
+{
+	int argc = 2;
+	va_list args;
+	va_start(args, earlyBootServer);
+	while (va_arg(args, const char *)) argc++;
+	va_end(args);
+
+	const char *jbctlPath = JBROOT_PATH("/basebin/jbctl");
+	const char *argsArr[argc+1];
+	argsArr[0] = jbctlPath;
+	va_start(args, earlyBootServer);
+	for (int i = 1; i < argc-1; i++) {
+		argsArr[i] = va_arg(args, const char *);
+	}
+	argsArr[argc-1] = "earlyboot";
+	argsArr[argc] = NULL;
+
+	posix_spawnattr_t attr;
+	posix_spawnattr_init(&attr);
+	posix_spawnattr_set_registered_ports_np(&attr, (mach_port_t[]){earlyBootServer, MACH_PORT_NULL, MACH_PORT_NULL}, 3);
+	pid_t spawnedPid = 0;
+	int r = posix_spawn(&spawnedPid, jbctlPath, NULL, &attr, (char *const *)argsArr, NULL);
+	posix_spawnattr_destroy(&attr);
+	if (r != 0) return r;
+	return cmd_wait_for_exit(spawnedPid);
 }
 
 void killall(const char *executablePathToKill, bool softly)

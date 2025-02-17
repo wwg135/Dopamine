@@ -1,4 +1,6 @@
 #import <libjailbreak/libjailbreak.h>
+#import <libjailbreak/jbclient_xpc.h>
+#import <libjailbreak/jbclient_mach.h>
 #import "internal.h"
 
 #import <Foundation/Foundation.h>
@@ -21,6 +23,20 @@ Available commands:\n\
 
 int main(int argc, char* argv[])
 {
+	if (!strcmp(argv[argc-1], "earlyboot")) {
+		// If jbctl is spawned in "early boot" state, the jbserver port needs to be obtained from registeredPorts[0] instead
+		mach_port_t *registeredPorts;
+		mach_msg_type_number_t registeredPortsCount = 0;
+		if (mach_ports_lookup(mach_task_self(), &registeredPorts, &registeredPortsCount) == KERN_SUCCESS) {
+			jbclient_xpc_set_custom_port(registeredPorts[0]);
+
+			for(mach_msg_type_number_t i = 1; i < registeredPortsCount; i++) {
+				mach_port_deallocate(mach_task_self(), registeredPorts[i]);
+			}
+			vm_deallocate(mach_task_self(), (vm_address_t)registeredPorts, registeredPortsCount * sizeof(mach_port_t));
+		}
+	}
+
 	setvbuf(stdout, NULL, _IOLBF, 0);
 	if (argc < 2) {
 		print_usage();
@@ -168,8 +184,8 @@ int main(int argc, char* argv[])
 		}
 	}
 	else if (!strcmp(cmd, "internal")) {
-		if (getuid() != 0) return -1;
-		if (argc < 3) return -1;
+		if (getuid() != 0) return 41;
+		if (argc < 3) return 42;
 
 		const char *internalCmd = argv[2];
 		return jbctl_handle_internal(internalCmd, argc-2, &argv[2]);
