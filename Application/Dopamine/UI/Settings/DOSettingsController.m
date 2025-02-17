@@ -603,7 +603,7 @@
     NSMutableArray *paths = [plist[@"path"] mutableCopy];
     
     // 设置富文本标题
-    NSString *titleText = DOLocalizedString(@"Select_Mount_Title");
+    NSString *titleText = DOLocalizedString(@"选择需要操作的路径");
     NSMutableAttributedString *attrTitle = [[NSMutableAttributedString alloc] initWithString:titleText];
     [attrTitle addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:24] range:NSMakeRange(0, titleText.length)];
     
@@ -647,7 +647,7 @@
                 [plist writeToFile:plistPath atomically:YES];
             }];
             
-            UIAlertAction *viewAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_View") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UIAlertAction *viewAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Filza查看") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"filza://"]]) {
                     NSURL *filzaURL = [NSURL URLWithString:[@"filza://view" stringByAppendingString:targetMountPath]];
                     [[UIApplication sharedApplication] openURL:filzaURL options:@{} completionHandler:nil];
@@ -657,7 +657,7 @@
                 }
             }];
             
-            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil];
 
             [actionAlertController addAction:deleteAction];
             [actionAlertController addAction:viewAction];
@@ -670,7 +670,7 @@
         [listAlertController addAction:pathAction];
     }
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Button_Cancel") style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil];
     [listAlertController addAction:cancelAction];
     [self presentViewController:listAlertController animated:YES completion:nil];
 }
