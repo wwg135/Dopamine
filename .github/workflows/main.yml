@@ -3,12 +3,12 @@ name: build_Release
 on:
   push:
     branches:
-      - 2.3
+      - 2.4.1
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - 2.3
+      - 2.4.1
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
@@ -21,12 +21,12 @@ permissions:
   contents: write
 
 env:
-  VERSION: '2.3'
+  VERSION: '2.4.1'
   BUNDLEID: 'com.wwg135.Dopamine'
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-15
     environment: Auto Build And Release
     steps:
       - name: Checkout
@@ -44,7 +44,10 @@ jobs:
           set -x
           git clone https://github.com/CRKatri/trustcache
           cd trustcache
-          gmake -j$(sysctl -n hw.physicalcpu) OPENSSL=1
+          awk 'BEGIN {print "CFLAGS += -arch arm64"; print "LDFLAGS += -arch arm64"} {print}' Makefile > temp && mv temp Makefile
+          export CFLAGS="-I$(brew --prefix openssl)/include -Wno-deprecated-declarations"
+          export LDFLAGS="-L$(brew --prefix openssl)/lib"
+          gmake OPENSSL=1
           sudo cp trustcache /opt/procursus/bin/
 
       - name: Pre theos
