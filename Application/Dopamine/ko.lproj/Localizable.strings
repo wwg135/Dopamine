@@ -76,6 +76,7 @@
 "Button_Cancel" = "취소";
 "Button_Continue" = "계속";
 
+
 // Duplicate Apps Errors
 "Duplicate_Apps_Error_Dopamine_App" = "Dopamine 앱 디렉터리(\"%@\")에 동일한 식별자(\"%@\")를 가진 앱이 여러 개 있습니다. 진행할 수 없습니다.";
 "Duplicate_Apps_Error_User_App" = "Dopamine 앱 디렉터리(\"%@\")에 식별자 \"%@\"를 가진 앱이 있지만, 시스템에 동일한 앱이 별도로 설치되어 있습니다. 진행할 수 없습니다.";
