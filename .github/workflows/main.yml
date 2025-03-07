@@ -27,7 +27,6 @@ env:
 jobs:
   build:
     runs-on: macos-15
-    environment: Auto Build And Release
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
@@ -39,18 +38,12 @@ jobs:
         with:
           packages: ldid findutils coreutils make sed
 
-      - name: Pre trustcache
+      - name: Install better GNU Make
         run: |
-          set -x
-          git clone https://github.com/CRKatri/trustcache
-          cd trustcache
-          awk 'BEGIN {print "CFLAGS += -arch arm64"; print "LDFLAGS += -arch arm64"} {print}' Makefile > temp && mv temp Makefile
-          export CFLAGS="-I$(brew --prefix openssl)/include -Wno-deprecated-declarations"
-          export LDFLAGS="-L$(brew --prefix openssl)/lib"
-          gmake OPENSSL=1
-          sudo cp trustcache /opt/procursus/bin/
+          brew install make
+          echo "PATH=$(brew --prefix make)/libexec/gnubin:$PATH" >> $GITHUB_ENV
 
-      - name: Pre theos
+      - name: Install THEOS
         run: |
           set -x
           export BASEDIR="$(pwd)"
@@ -67,6 +60,13 @@ jobs:
 
       - name: Pre Bundleid
         run: |
+          set -x
+          git clone https://github.com/CRKatri/trustcache
+          cd trustcache
+          export CFLAGS="$CFLAGS -I$(brew --prefix openssl)/include -arch arm64"
+          export LDFLAGS="$LDFLAGS -L$(brew --prefix openssl)/lib -arch arm64"
+          gmake -j$(sysctl -n hw.logicalcpu) OPENSSL=1
+          sudo cp trustcache /opt/procursus/bin/
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Application/Dopamine/Jailbreak/DOPreferenceManager.m
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Application/Dopamine.xcodeproj/project.pbxproj
           sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./BaseBin/jbctl/src/main.m 
