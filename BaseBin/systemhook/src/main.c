@@ -316,13 +316,6 @@ __attribute__((constructor)) static void initializer(void)
 		}
 	}
 
-
-	// Hook the dyld_shared_cache __fcntl to jump to the dyld __fcntl instead
-	// This makes it so that library validation is also bypassed if someone calls fcntl in userspace to attach a signature manually
-	void *dyld___fcntl = litehook_find_symbol(get_dyld_mach_header(), "___fcntl");
-	extern int __fcntl(int fd, int op, ... /* arg */ );
-	litehook_hook_function(__fcntl, dyld___fcntl);
-
 	// Apply posix_spawn / execve hooks
 	if (__builtin_available(iOS 16.0, *)) {
 		litehook_hook_function(__posix_spawn, __posix_spawn_hook);
@@ -330,8 +323,7 @@ __attribute__((constructor)) static void initializer(void)
 	}
 	else {
 		// On iOS 15 there is a way to hook posix_spawn and execve without doing instruction replacements
-		// This is fairly convenient due to instruction replacements being presumed to be the primary trigger for spinlock panics on iOS 15 arm64e
-		// Unfortunately Apple decided to remove these in iOS 16 :( Doesn't matter too much though because spinlock panics are fixed there
+		// Unfortunately Apple decided to remove these in iOS 16 :(
 
 		void **posix_spawn_with_filter = litehook_find_dsc_symbol("/usr/lib/system/libsystem_kernel.dylib", "_posix_spawn_with_filter");
 		void **execve_with_filter      = litehook_find_dsc_symbol("/usr/lib/system/libsystem_kernel.dylib", "_execve_with_filter");
@@ -339,6 +331,12 @@ __attribute__((constructor)) static void initializer(void)
 		*posix_spawn_with_filter = __posix_spawn_hook_with_filter;
 		*execve_with_filter      = __execve_hook;
 	}
+
+	// Hook the dyld_shared_cache __fcntl to jump to the dyld __fcntl instead
+	// This makes it so that library validation is also bypassed if someone calls fcntl in userspace to attach a signature manually
+	void *dyld___fcntl = litehook_find_symbol(get_dyld_mach_header(), "___fcntl");
+	extern int __fcntl(int fd, int op, ... /* arg */ );
+	litehook_hook_function(__fcntl, dyld___fcntl);
 
 	// Initialize stuff neccessary for sandbox_apply hook
 	gLibSandboxHandle = dlopen("/usr/lib/libsandbox.1.dylib", RTLD_FIRST | RTLD_LOCAL | RTLD_LAZY);
