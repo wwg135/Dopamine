@@ -248,12 +248,18 @@ int __execve_hook(const char *path, char *const argv[], char *const envp[])
 
 const struct mach_header_64 *get_dyld_mach_header(void)
 {
-	task_dyld_info_data_t dyldInfo;
-	uint32_t count = TASK_DYLD_INFO_COUNT;
-	kern_return_t kr = task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t)&dyldInfo, &count);
-	if (kr != KERN_SUCCESS) return NULL;
-	struct dyld_all_image_infos *infos = (struct dyld_all_image_infos *)dyldInfo.all_image_info_addr;
-	return (const struct mach_header_64 *)infos->dyldImageLoadAddress;
+	static const struct mach_header_64 *dyldMachHeader = NULL;
+	static dispatch_once_t onceToken;
+	dispatch_once (&onceToken, ^{
+		task_dyld_info_data_t dyldInfo;
+		uint32_t count = TASK_DYLD_INFO_COUNT;
+		kern_return_t kr = task_info(mach_task_self_, TASK_DYLD_INFO, (task_info_t)&dyldInfo, &count);
+		if (kr == KERN_SUCCESS) {
+			struct dyld_all_image_infos *infos = (struct dyld_all_image_infos *)dyldInfo.all_image_info_addr;
+			dyldMachHeader = (const struct mach_header_64 *)infos->dyldImageLoadAddress;
+		}
+	});
+	return dyldMachHeader;
 }
 
 int parse_dyldhook_jbinfo(char **jbRootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
@@ -309,6 +315,13 @@ __attribute__((constructor)) static void initializer(void)
 			unsetenv("DYLD_INSERT_LIBRARIES");
 		}
 	}
+
+
+	// Hook the dyld_shared_cache __fcntl to jump to the dyld __fcntl instead
+	// This makes it so that library validation is also bypassed if someone calls fcntl in userspace to attach a signature manually
+	void *dyld___fcntl = litehook_find_symbol(get_dyld_mach_header(), "___fcntl");
+	extern int __fcntl(int fd, int op, ... /* arg */ );
+	litehook_hook_function(__fcntl, dyld___fcntl);
 
 	// Apply posix_spawn / execve hooks
 	if (__builtin_available(iOS 16.0, *)) {
