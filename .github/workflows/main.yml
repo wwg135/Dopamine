@@ -53,6 +53,11 @@ jobs:
           gmake -j$(sysctl -n hw.physicalcpu) OPENSSL=1
           sudo cp trustcache /opt/procursus/bin/
 
+      - name: Install better GNU Make
+        run: |
+          brew install make
+          echo "PATH=$(brew --prefix make)/libexec/gnubin:$PATH" >> $GITHUB_ENV
+
       - name: Install THEOS
         run: |
           set -x
