@@ -1,5 +1,5 @@
-#ifndef INFO_H
-#define INFO_H
+#ifndef __INFO_H
+#define __INFO_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -119,6 +119,7 @@ struct system_info {
 			uint32_t syscall_filter_mask;
 			uint32_t mach_trap_filter_mask;
 			uint32_t mach_kobj_filter_mask;
+			uint32_t t_flags_ro;
 		} proc_ro;
 
 		struct {
@@ -139,6 +140,7 @@ struct system_info {
 			uint32_t map;
 			uint32_t threads;
 			uint32_t itk_space;
+			uint32_t flags;
 			uint32_t task_can_transfer_memory_ownership;
 			uint32_t mach_trap_filter_mask;
 			uint32_t mach_kobj_filter_mask;
@@ -326,6 +328,7 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.proc_ro.syscall_filter_mask); \
 	iterator(ctx, kernelStruct.proc_ro.mach_trap_filter_mask); \
 	iterator(ctx, kernelStruct.proc_ro.mach_kobj_filter_mask); \
+	iterator(ctx, kernelStruct.proc_ro.t_flags_ro); \
 	\
 	iterator(ctx, kernelStruct.filedesc.ofiles_start); \
 	\
@@ -340,6 +343,7 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.task.map); \
 	iterator(ctx, kernelStruct.task.threads); \
 	iterator(ctx, kernelStruct.task.itk_space); \
+	iterator(ctx, kernelStruct.task.flags); \
 	iterator(ctx, kernelStruct.task.task_can_transfer_memory_ownership); \
 	iterator(ctx, kernelStruct.task.mach_trap_filter_mask); \
 	iterator(ctx, kernelStruct.task.mach_kobj_filter_mask); \

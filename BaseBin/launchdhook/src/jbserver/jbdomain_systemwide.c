@@ -1,10 +1,9 @@
 #include "jbserver_global.h"
 #include "jbsettings.h"
-#import "../oldabi.h"
 #include <libjailbreak/info.h>
 #include <sandbox.h>
 #include <libproc.h>
-#include <libproc_private.h>
+#include <sys/proc_info.h>
 
 #include <libjailbreak/signatures.h>
 #include <libjailbreak/trustcache.h>
@@ -12,6 +11,12 @@
 #include <libjailbreak/util.h>
 #include <libjailbreak/primitives.h>
 #include <libjailbreak/codesign.h>
+
+bool gSystemwideDomainEnabled = true;
+void systemwide_domain_set_enabled(bool enabled)
+{
+	gSystemwideDomainEnabled = enabled;
+}
 
 extern bool string_has_prefix(const char *str, const char* prefix);
 extern bool string_has_suffix(const char* str, const char* suffix);
@@ -51,8 +56,26 @@ char *combine_strings(char separator, char **components, int count)
 	return outString;
 }
 
-static bool systemwide_domain_allowed(audit_token_t clientToken)
+bool systemwide_domain_allowed(audit_token_t clientToken)
 {
+	if (!gSystemwideDomainEnabled) {
+		// While the jailbreak is hidden, we need to disable the systemwide domain
+		pid_t pid = audit_token_to_pid(clientToken);
+		char procPath[4*MAXPATHLEN];
+		if (proc_pidpath(pid, procPath, sizeof(procPath)) <= 0) {
+			return false;
+		}
+
+		if (string_has_suffix(procPath, "/Dopamine.app/Dopamine")) {
+			// We still want it to be accessible by Dopamine itself though
+			// Unfortunately, there is not really a better check here since
+			// - Dopamine can be sideloaded, so no control over entitlements
+			// - App identifier could be changed by whoever installed it aswell
+			return true;
+		}
+
+		return false;
+	}
 	return true;
 }
 
@@ -69,62 +92,121 @@ static int systemwide_get_boot_uuid(char **bootUUIDOut)
 	return 0;
 }
 
-static int trust_file(const char *filePath, const char *dlopenCallerImagePath, const char *dlopenCallerExecutablePath, xpc_object_t preferredArchsArray)
+CS_SuperBlob *siginfo_resolve_superblob(struct siginfo *siginfo, int pid, int fd)
 {
-	// Shared logic between client and server, implemented in client
-	// This should essentially mean these files never reach us in the first place
-	// But you know, never trust the client :D
-	extern bool can_skip_trusting_file(const char *filePath, bool isLibrary, bool isClient);
+	if (!siginfo) return NULL;
+	if (siginfo->signature.fs_blob_size == 0) return NULL;
 
-	if (can_skip_trusting_file(filePath, (bool)dlopenCallerExecutablePath, false)) return -1;
+	size_t superblobSize = siginfo->signature.fs_blob_size;
+	CS_SuperBlob *superblob = malloc(superblobSize);
+	if (!superblob) return NULL;
 
-	size_t preferredArchCount = 0;
-	if (preferredArchsArray) preferredArchCount = xpc_array_get_count(preferredArchsArray);
-	uint32_t preferredArchTypes[preferredArchCount];
-	uint32_t preferredArchSubtypes[preferredArchCount];
-	for (size_t i = 0; i < preferredArchCount; i++) {
-		preferredArchTypes[i] = 0;
-		preferredArchSubtypes[i] = UINT32_MAX;
-		xpc_object_t arch = xpc_array_get_value(preferredArchsArray, i);
-		if (xpc_get_type(arch) == XPC_TYPE_DICTIONARY) {
-			preferredArchTypes[i] = xpc_dictionary_get_uint64(arch, "type");
-			preferredArchSubtypes[i] = xpc_dictionary_get_uint64(arch, "subtype");
+	bool success = false;
+
+	switch (siginfo->source) {
+		case SIGNATURE_SOURCE_FILE: {
+			uintptr_t superblobStart = siginfo->signature.fs_file_start + (uintptr_t)siginfo->signature.fs_blob_start;
+			uintptr_t superblobEnd   = superblobStart + superblobSize;
+			struct stat st = {};
+
+        	if (fstat(fd, &st) != 0) break;
+			if (superblobEnd > st.st_size) break;
+			if (lseek(fd, superblobStart, SEEK_SET) != superblobStart) break;
+			if (read(fd, superblob, superblobSize) != superblobSize) break;
+
+			success = true;
+		}
+		case SIGNATURE_SOURCE_PROC: {
+			uint64_t proc = proc_find(pid);
+
+			if (!proc) break;
+			if (proc_vreadbuf(proc, siginfo->signature.fs_blob_start, superblob, superblobSize) != 0) break;
+
+			success = true;
+		}
+	}
+
+	if (!success) {
+		free(superblob);
+		superblob = NULL;
+	}
+
+	return superblob;
+}
+
+int systemwide_trust_file(audit_token_t *processToken, int rfd, struct siginfo *siginfo, size_t siginfoSize)
+{
+	if (siginfo && siginfoSize != sizeof(struct siginfo)) return -1;
+
+	pid_t pid = -1;
+	int fd = -1;
+	if (!processToken) {
+		pid = 1;
+		fd = dup(rfd);
+	}
+	else {
+		pid = audit_token_to_pid(*processToken);
+		struct vnode_fdinfowithpath vnodeInfo;
+		int ok = proc_pidfdinfo(pid, rfd, PROC_PIDFDVNODEPATHINFO, &vnodeInfo, sizeof(vnodeInfo));
+		if (ok > 0) {
+			fd = open(vnodeInfo.pvip.vip_path, O_RDONLY);
+		}
+	}
+
+	if (fd < 0) return -1;
+
+	struct statfs fsb;
+	int fsr = fstatfs(fd, &fsb);
+	if (fsr == 0) {
+		// Anything on the rootfs or fakelib mount point can be ignored as it's guaranteed to already be in trustcache
+		if (!strcmp(fsb.f_mntonname, "/") || !strcmp(fsb.f_mntonname, "/usr/lib")) {
+			close(fd);
+			return 0;
 		}
 	}
 
 	cdhash_t *cdhashes = NULL;
 	uint32_t cdhashesCount = 0;
-	macho_collect_untrusted_cdhashes(filePath, dlopenCallerImagePath, dlopenCallerExecutablePath, preferredArchTypes, preferredArchSubtypes, preferredArchCount, &cdhashes, &cdhashesCount);
+
+	if (siginfo) {
+		// If we were passed a siginfo, get the cdhash of the superblob from the siginfo
+		CS_SuperBlob *superblob = siginfo_resolve_superblob(siginfo, pid, fd);
+		if (superblob) {
+			cdhash_t cdhash;
+			if (code_signature_calculate_adhoc_cdhash(superblob, cdhash)) {
+				if (!is_cdhash_trustcached(cdhash)) {
+					cdhashes = malloc(sizeof(cdhash_t));
+					cdhashesCount = 1;
+					memcpy(&cdhashes[0], &cdhash, sizeof(cdhash_t));
+				}
+			}
+			free(superblob);
+		}
+	}
+	else {
+		// If we weren't passed a siginfo, get cdhashes of all slices
+		file_collect_untrusted_cdhashes(fd, &cdhashes, &cdhashesCount);
+	}
+	
 	if (cdhashes && cdhashesCount > 0) {
 		jb_trustcache_add_cdhashes(cdhashes, cdhashesCount);
 		free(cdhashes);
 	}
+
+	close(fd);
 	return 0;
 }
 
-// Not static because launchd will directly call this from it's posix_spawn hook
-int systemwide_trust_binary(const char *binaryPath, xpc_object_t preferredArchsArray)
+int systemwide_trust_file_by_path(const char *path)
 {
-	return trust_file(binaryPath, NULL, NULL, preferredArchsArray);
+	int fd = open(path, O_RDONLY);
+	if (fd < 0) return -1;
+	int r = systemwide_trust_file(NULL, fd, NULL, 0);
+	close(fd);
+	return r;
 }
 
-static int systemwide_trust_library(audit_token_t *processToken, const char *libraryPath, const char *callerLibraryPath)
-{
-	// Fetch process info
-	pid_t pid = audit_token_to_pid(*processToken);
-	char callerPath[4*MAXPATHLEN];
-	if (proc_pidpath(pid, callerPath, sizeof(callerPath)) < 0) {
-		return -1;
-	}
-
-	// When trusting a library that's dlopened at runtime, we need to pass the caller path
-	// This is to support dlopen("@executable_path/whatever", RTLD_NOW) and stuff like that
-	// (Yes that is a thing >.<)
-	// Also we need to pass the path of the image that called dlopen due to @loader_path, sigh...
-	return trust_file(libraryPath, callerLibraryPath, callerPath, NULL);
-}
-
-static int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
+int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
 {
 	// Fetch process info
 	pid_t pid = audit_token_to_pid(*processToken);
@@ -195,13 +277,17 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 		}
 	}
 
-	// In iOS 16+ there is a super annoying security feature called Protobox
-	// Amongst other things, it allows for a process to have a syscall mask
-	// If a process calls a syscall it's not allowed to call, it immediately crashes
-	// Because for tweaks and hooking this is unacceptable, we update these masks to be 1 for all syscalls on all processes
-	// That will at least get rid of the syscall mask part of Protobox
 	if (__builtin_available(iOS 16.0, *)) {
+		// In iOS 16+ there is a super annoying security feature called Protobox
+		// Amongst other things, it allows for a process to have a syscall mask
+		// If a process calls a syscall it's not allowed to call, it immediately crashes
+		// Because for tweaks and hooking this is unacceptable, we update these masks to be 1 for all syscalls on all processes
+		// That will at least get rid of the syscall mask part of Protobox
 		proc_allow_all_syscalls(proc);
+
+		// Some processes also have a filter for mach messages, fortunately there is one allowed message id that can be used for the check-in
+		// Then we remove the filter to make other message ids accessible afterwards aswell
+		proc_remove_msg_filter(proc);
 	}
 
 	// For whatever reason after SpringBoard has restarted, AutoFill and other stuff stops working
@@ -258,7 +344,7 @@ static int systemwide_process_checkin(audit_token_t *processToken, char **rootPa
 	return 0;
 }
 
-static int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid)
+int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid)
 {
 	int retval = 3;
 	uint64_t parentPid = audit_token_to_pid(*parentToken);
@@ -319,7 +405,7 @@ static int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid)
 	if (childProc)  proc_rele(childProc);
 	if (parentProc) proc_rele(parentProc);
 
-	return 0;
+	return retval;
 }
 
 static int systemwide_cs_revalidate(audit_token_t *callerToken)
@@ -354,22 +440,13 @@ struct jbserver_domain gSystemwideDomain = {
 				{ 0 },
 			},
 		},
-		// JBS_SYSTEMWIDE_TRUST_BINARY
+		// JBS_SYSTEMWIDE_TRUST_FILE
 		{
-			.handler = systemwide_trust_binary,
-			.args = (jbserver_arg[]){
-				{ .name = "binary-path", .type = JBS_TYPE_STRING, .out = false },
-				{ .name = "preferred-archs", .type = JBS_TYPE_ARRAY, .out = false },
-				{ 0 },
-			},
-		},
-		// JBS_SYSTEMWIDE_TRUST_LIBRARY
-		{
-			.handler = systemwide_trust_library,
+			.handler = systemwide_trust_file,
 			.args = (jbserver_arg[]){
 				{ .name = "caller-token", .type = JBS_TYPE_CALLER_TOKEN, .out = false },
-				{ .name = "library-path", .type = JBS_TYPE_STRING, .out = false },
-				{ .name = "caller-library-path", .type = JBS_TYPE_STRING, .out = false },
+				{ .name = "fd", .type = JBS_TYPE_UINT64, .out = false },
+				{ .name = "siginfo", .type = JBS_TYPE_DATA, .out = false },
 				{ 0 },
 			},
 		},

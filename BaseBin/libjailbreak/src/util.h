@@ -38,6 +38,7 @@ uint64_t kpacda(uint64_t pointer, uint64_t modifier);
 uint64_t kptr_sign(uint64_t kaddr, uint64_t pointer, uint16_t salt);
 
 void proc_allow_all_syscalls(uint64_t proc);
+void proc_remove_msg_filter(uint64_t proc);
 
 void killall(const char *executablePathToKill, bool softly);
 int libarchive_unarchive(const char *fileToExtract, const char *extractionPath);
@@ -53,9 +54,12 @@ int exec_cmd(const char *binary, ...);
 int exec_cmd_nowait(pid_t *pidOut, const char *binary, ...);
 int exec_cmd_suspended(pid_t *pidOut, const char *binary, ...);
 int exec_cmd_root(const char *binary, ...);
+int exec_cmd_env(char **envp, const char *binary, ...);
+
+int jbctl_earlyboot(mach_port_t earlyBootServer, ...);
 
 #define exec_cmd_trusted(x, args ...) ({ \
-    jbclient_trust_binary(x, NULL); \
+    jbclient_trust_file_by_path(x); \
     int retval; \
     retval = exec_cmd(x, args); \
     retval; \

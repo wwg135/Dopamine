@@ -8,15 +8,8 @@
 #include <util.h>
 #include "syscall.h"
 #include "litehook.h"
-#include "reimpl.h"
-#include <libjailbreak/jbclient_xpc.h>
+#include <libjailbreak/jbclient_mach.h>
 
-extern void _malloc_fork_prepare(void);
-extern void _malloc_fork_parent(void);
-extern void xpc_atfork_prepare(void);
-extern void xpc_atfork_parent(void);
-extern void dispatch_atfork_prepare(void);
-extern void dispatch_atfork_parent(void);
 extern void __fork(void);
 
 int childToParentPipe[2];
@@ -46,19 +39,13 @@ void child_fixup(void)
 
 void parent_fixup(pid_t childPid)
 {
-	// Reenable some system functionality that XPC is dependent on and XPC itself
-	// (Normally unavailable during __fork)
-	_malloc_fork_parent();
-	dispatch_atfork_parent();
-	xpc_atfork_parent();
-
 	// Wait until the child is ready and waiting
 	char msg = ' ';
 	read(childToParentPipe[0], &msg, sizeof(msg));
 
 	// Child is waiting for wx_allowed + permission fixups now
 	// Apply fixup
-	int64_t fix_ret = jbclient_fork_fix(childPid);
+	int64_t fix_ret = jbclient_mach_fork_fix(childPid);
 	if (fix_ret != 0) {
 		kill(childPid, SIGKILL);
 		abort();
@@ -66,11 +53,6 @@ void parent_fixup(pid_t childPid)
 
 	// Tell child we are done, this will make it resume
 	write(parentToChildPipe[1], &msg, sizeof(msg));
-
-	// Disable system functionality related to XPC again
-	_malloc_fork_prepare();
-	dispatch_atfork_prepare();
-	xpc_atfork_prepare();
 }
 
 __attribute__((visibility ("default"))) pid_t forkfix___fork(void)
@@ -98,22 +80,11 @@ void apply_fork_hook(void)
 {
 	static dispatch_once_t onceToken;
 	dispatch_once (&onceToken, ^{
-		void *systemhookHandle = dlopen("systemhook.dylib", RTLD_NOLOAD);
-		if (systemhookHandle) {
-			kern_return_t (*litehook_hook_function)(void *source, void *target) = dlsym(systemhookHandle, "litehook_hook_function");
-			if (litehook_hook_function) {
-				litehook_hook_function((void *)__fork, (void *)forkfix___fork);
-			}
-		}
+		litehook_hook_function((void *)__fork, (void *)forkfix___fork);
 	});
 }
 
 __attribute__((constructor)) static void initializer(void)
 {
-#ifdef __arm64e__
-	if (__builtin_available(iOS 16.0, *) || getenv("FORKFIX_DISABLE_REBIND")) { /* fall through */ }
-	else if (fork_reimpl_init(forkfix___fork)) return;
-#endif
-
 	apply_fork_hook();
 }

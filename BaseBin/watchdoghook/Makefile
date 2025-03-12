@@ -7,7 +7,7 @@ LDFLAGS = -dynamiclib -rpath /var/jb/Library/Frameworks -rpath @loader_path/fall
 sign: $(TARGET)
 	@ldid -S $^
 
-$(TARGET): $(wildcard src/*.m src/*.c ../libjailbreak/src/jbclient_xpc.c)
+$(TARGET): $(wildcard src/*.m src/*.c ../libjailbreak/src/jbclient_*.c)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 clean:

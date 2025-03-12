@@ -20,16 +20,15 @@ permissions:
   contents: write
 
 env:
-  VERSION: '2.3'
+  VERSION: '2.4.2'
   BUNDLEID: 'com.wwg135.Dopamine'
 
 jobs:
   build:
-    runs-on: macos-13
-    environment: Auto Build And Release
+    runs-on: macos-15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@main
         with:
             submodules: recursive
 
@@ -43,10 +42,17 @@ jobs:
           set -x
           git clone https://github.com/CRKatri/trustcache
           cd trustcache
-          gmake -j$(sysctl -n hw.physicalcpu) OPENSSL=1
+          export CFLAGS="$CFLAGS -I$(brew --prefix openssl)/include -arch arm64"
+          export LDFLAGS="$LDFLAGS -L$(brew --prefix openssl)/lib -arch arm64"
+          gmake -j$(sysctl -n hw.logicalcpu) OPENSSL=1
           sudo cp trustcache /opt/procursus/bin/
 
-      - name: Pre theos
+      - name: Install better GNU Make
+        run: |
+          brew install make
+          echo "PATH=$(brew --prefix make)/libexec/gnubin:$PATH" >> $GITHUB_ENV
+
+      - name: Install THEOS
         run: |
           set -x
           export BASEDIR="$(pwd)"
@@ -85,7 +91,6 @@ jobs:
         run: |
           echo "${{ env.VERSION }}" >./BaseBin/_external/basebin/.version
           sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
-          #sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/Settings/DOSettingsController.m
 
       - name: Install libarchive
         run: |
@@ -104,27 +109,6 @@ jobs:
           export THEOS="${BASEDIR}/theos"
           gmake -j$(sysctl -n hw.physicalcpu) NIGHTLY=1
           mv Application/Dopamine.tipa Dopamine.ipa
-
-      #- name: Release Logs
-        #run: |
-          #set -x
-          #echo -e "更新时间：${{ env.logT }}" >> body.txt
-          #echo "" >> ./release.md
-          #cat body.txt > release.txt
-          #echo "" >> release.txt
-          #cat ./release.md >> release.txt
-          
-      #- name: Release ipa
-        #uses: softprops/action-gh-release@v2.2.1
-        #with:
-          #name: ${{ env.VERSION }}
-          #tag_name: ${{ env.VERSION }}
-          #target_commitish: 2.x
-          #body_path: release.txt
-          #latest: true
-          #token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          #files: |
-           #*.ipa
 
       - name: Upload Artifact
         id: dopamine-latest-upload
