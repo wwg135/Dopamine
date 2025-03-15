@@ -559,6 +559,15 @@
     [self presentViewController:confirmationAlertController animated:YES completion:nil];
 }
 
+- (NSString *)ensureAbsolutePath:(NSString *)path {
+     NSString *trimmedPath = [path stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+     
+     if (![trimmedPath hasPrefix:@"/"]) 
+         trimmedPath = [@"/" stringByAppendingString:trimmedPath];
+ 
+     return [trimmedPath stringByStandardizingPath];
+ }
+
 - (void)mountPressed
 {
     UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:@"新增挂载" message:@"输入原始路径" preferredStyle:UIAlertControllerStyleAlert];
@@ -568,7 +577,20 @@
 
     UIAlertAction *mountAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {        // 获取用户输入的Jailbreak路径
         UITextField *inputTextField = inputAlertController.textFields.firstObject;
-        NSString *mountPath = inputTextField.text;
+        NSString *mountPath = [self ensureAbsolutePath:inputTextField.text];
+ 
+        BOOL isDirectory = NO;
+        BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:mountPath isDirectory:&isDirectory];
+        if (!isExist || !isDirectory) {
+             UIAlertController *errorAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"错误提示") message:DOLocalizedString(@"目标文件夹不存在") preferredStyle:UIAlertControllerStyleAlert];
+             UIAlertAction *okAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"确定") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                 [self mountPressed];
+             }];
+             [errorAlertController addAction:okAction];
+             [self presentViewController:errorAlertController animated:YES completion:nil];
+             return;
+         }
+
         if (mountPath.length > 1) {
             NSString *plistFilePath = @"/var/mobile/newFakePath.plist";
             NSMutableDictionary *plistDictionary = [NSMutableDictionary dictionaryWithContentsOfFile:plistFilePath];
