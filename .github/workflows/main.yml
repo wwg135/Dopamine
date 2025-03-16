@@ -1,27 +1,28 @@
-name: "Dopamine: build and upload"
+name: build_Release
 
 on:
   push:
     branches:
-      - '*'
+      - 2.4.3
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - '*'
+      - 2.4.3
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 1 1 *'
-    - cron: '0 0 1 4 *'
-    - cron: '0 0 30 6 *'
-    - cron: '0 0 28 9 *'
-    - cron: '0 0 27 12 *'
-
+  
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  VERSION: '2.4.3'
+  BUNDLEID: 'com.wwg135.Dopamine'
 
 jobs:
   build:
@@ -32,10 +33,20 @@ jobs:
         with:
             submodules: recursive
 
-      - name: Install Procursus
-        uses: dhinakg/procursus-action@main
+      - name: Pre Procursus
+        uses: wwg135/procursus-action@main
         with:
-          packages: ldid findutils sed coreutils make
+          packages: ldid findutils coreutils make sed
+
+      - name: Install better GNU Make
+        run: |
+          brew install make
+          echo "PATH=$(brew --prefix make)/libexec/gnubin:$PATH" >> $GITHUB_ENV
+
+      - name: Install better GNU Make
+        run: |
+          brew install make
+          echo "PATH=$(brew --prefix make)/libexec/gnubin:$PATH" >> $GITHUB_ENV
 
       - name: Install better GNU Make
         run: |
@@ -67,15 +78,31 @@ jobs:
           gmake -j$(sysctl -n hw.logicalcpu) OPENSSL=1
           sudo cp trustcache /opt/procursus/bin/
 
-      - name: Set Environment Variables
+      - name: Pre Bundleid
         run: |
-          set -x
-          T2=$(TZ=UTC-2 date +'%Y%m%d_%H%M%S')
-          TS=$(date -j -f "%Y%m%d_%H%M%S" "${T2}" +%s)
-          SHASH=$(git rev-parse --short HEAD)
-          echo "ctime=${T2}" >> $GITHUB_ENV
-          echo "ctimestamp=${TS}" >> $GITHUB_ENV
-          echo "shorthash=${SHASH}" >> $GITHUB_ENV
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Application/Dopamine/Jailbreak/DOPreferenceManager.m
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./Application/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/com.opa334.Dopamine/${{ env.BUNDLEID }}/g" ./BaseBin/jbctl/src/main.m
+
+      - name: Set env
+        run: |
+          sT=$(TZ=UTC-8 date +'%S')
+          echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
+          echo "shT=$(TZ=UTC-8 date +'%Y-%m-%d'' ''%H:%M:%S')" >> $GITHUB_ENV
+          echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
+          
+      - name: Print env
+        run: |
+          echo ${{ env.VERSION }}
+          echo ${{ env.msT }}
+          echo ${{ env.shT }}
+          echo ${{ env.logT }}
+
+      - name: Pre Version
+        run: |
+          echo "${{ env.VERSION }}" >./BaseBin/_external/basebin/.version
+          sed -i '' 's/MARKETING_VERSION = .*;/MARKETING_VERSION = ${{ env.VERSION }};/g' ./Application/Dopamine.xcodeproj/project.pbxproj
+          sed -i '' "s/AAA/更新时间：${{ env.shT }} 由M哥编译/g" ./Application/Dopamine/UI/DOMainViewController.m
 
       - name: Install libarchive
         run: |
@@ -83,20 +110,42 @@ jobs:
 
       - name: Download Bootstraps
         run: |
-            set -x
-            cd Application/Dopamine/Resources
-            ./download_bootstraps.sh
+          set -x
+          cd Application/Dopamine/Resources
+          ./download_bootstraps.sh
 
-      - name: Build
+      - name: Build ipa
         run: |
           set -x
           export BASEDIR="$(pwd)"
           export THEOS="${BASEDIR}/theos"
-          gmake -j$(sysctl -n hw.logicalcpu) NIGHTLY=1
+          gmake -j$(sysctl -n hw.physicalcpu) NIGHTLY=1
+          mv Application/Dopamine.tipa Dopamine.ipa
+
+      - name: Release Logs
+        run: |
+          set -x
+          echo -e "更新时间：${{ env.logT }}" >> body.txt
+          echo "" >> ./release.md
+          cat body.txt > release.txt
+          echo "" >> release.txt
+          cat ./release.md >> release.txt
+          
+      - name: Release ipa
+        uses: softprops/action-gh-release@v2.2.1
+        with:
+          name: ${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}
+          target_commitish: 2.x
+          body_path: release.txt
+          latest: true
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          files: |
+           *.ipa
 
       - name: Upload Artifact
         id: dopamine-latest-upload
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: Dopamine
           path: |
