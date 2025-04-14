@@ -17,8 +17,8 @@ ChOma: .build .include
 	@cp -r ChOma/output/ios/include/choma .include
 
 XPF: .build .include ChOma
-	@$(MAKE) -C XPF libxpf.dylib CHOMA_DYLIB_PATH="../.build"
-	@cp XPF/libxpf.dylib .build
+	@$(MAKE) -C XPF libxpf_ios.dylib CHOMA_PATH=$(shell pwd)/ChOma DYNLINK_CHOMA=1 CHOMA_DYLIB_PATH="../.build"
+	@cp XPF/libxpf_ios.dylib .build/libxpf.dylib
 	@mkdir -p .include/xpf
 	@cp XPF/src/xpf.h .include/xpf
 
