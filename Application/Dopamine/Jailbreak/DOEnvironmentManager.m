@@ -71,13 +71,13 @@ int reboot3(uint64_t flags, ...);
 
 - (NSString *)appVersionDisplayString
 {
-    NSString *nightlyHash = [self nightlyHash];
-    if (nightlyHash) {
-        return [NSString stringWithFormat:@"%@~%@", self.appVersion, [nightlyHash substringToIndex:6]];
-    }
-    else {
+//    NSString *nightlyHash = [self nightlyHash];
+//    if (nightlyHash) {
+//        return [NSString stringWithFormat:@"%@~%@", self.appVersion, [nightlyHash substringToIndex:6]];
+//    }
+//    else {
         return [self appVersion];
-    }
+//    }
 }
 
 - (NSData *)bootManifestHash
