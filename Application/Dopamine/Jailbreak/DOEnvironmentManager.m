@@ -313,7 +313,7 @@ int reboot3(uint64_t flags, ...);
             if (cmd_wait_for_exit(pid) != 0) {
                 // Fallback
                 [self runUnsandboxed:^{
-                    killall("/usr/libexec/backboardd", true);
+                    killall("/usr/libexec/backboardd", SIGTERM);
                 }];
             }
         }
