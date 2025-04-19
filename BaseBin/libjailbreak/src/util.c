@@ -743,8 +743,8 @@ void killall(const char *executablePath, int signal)
 		size_t size = maxArgumentSize;
 		char* buffer = (char *)malloc(length);
 		if (sysctl((int[]){ CTL_KERN, KERN_PROCARGS2, pid }, 3, buffer, &size, NULL, 0) == 0) {
-			char *executablePath = buffer + sizeof(int);
-			if (strcmp(executablePath, executablePath) == 0) {
+			char *cExecutablePath = buffer + sizeof(int);
+			if (strcmp(cExecutablePath, executablePath) == 0) {
 				kill(pid, signal);
 			}
 		}
