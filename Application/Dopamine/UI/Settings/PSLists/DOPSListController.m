@@ -50,5 +50,4 @@
     return UIStatusBarStyleLightContent;
 }
 
-
 @end
