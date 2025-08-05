@@ -301,13 +301,14 @@ int pmap_expand_range(uint64_t pmap, uint64_t vaStart, uint64_t size)
 		}
 	}
 	else {
-		uint64_t vaEnd = vaStart + size;
-		for (uint64_t va = vaStart; va < vaEnd; va += vm_real_kernel_page_size) {
+		uint64_t l2Start = (vaStart & ~L2_BLOCK_MASK);
+		uint64_t l2End   = (((vaStart + size) + (L2_BLOCK_SIZE-1)) & ~L2_BLOCK_MASK);
+		for (uint64_t va = l2Start; va < l2End; va += L2_BLOCK_SIZE) {
 			uint64_t leafLevel;
 			do {
 				leafLevel = PMAP_TT_L3_LEVEL;
-				uint64_t pt = 0;
-				vtophys_lvl(ttep, va, &leafLevel, &pt);
+				uint64_t pte = 0;
+				vtophys_lvl(ttep, va, &leafLevel, &pte);
 				if (leafLevel != PMAP_TT_L3_LEVEL) {
 					uint64_t pt_va = 0;
 					switch (leafLevel) {
@@ -320,9 +321,10 @@ int pmap_expand_range(uint64_t pmap, uint64_t vaStart, uint64_t size)
 							break;
 						}
 					}
+					leafLevel++;
 					uint64_t newTable = pmap_alloc_page_table(pmap, pt_va);
 					if (newTable) {
-						physwrite64(pt, newTable | ARM_TTE_VALID | ARM_TTE_TYPE_TABLE);
+						physwrite64(pte, newTable | ARM_TTE_VALID | ARM_TTE_TYPE_TABLE);
 					}
 					else {
 						return -2;
@@ -370,22 +372,26 @@ int pmap_map_in(uint64_t pmap, uint64_t uaStart, uint64_t paStart, uint64_t size
 
 	// Allocate all page tables that need to be allocated
 	if (pmap_expand_range(pmap, uaStart, size) != 0) return -1;
-	
+
 	// Insert entries into L3 pages
+	uint64_t curPA = paStart;
 	for (uint64_t i = 0; i < l2Count; i++) {
 		uint64_t uaL2Cur = uaL2Start + (i * L2_BLOCK_SIZE);
-		uint64_t paL2Cur = paL2Start + (i * L2_BLOCK_SIZE);
+
+		// Current L2 range
+		uint64_t uaL2CurStart = uaL2Cur;
+		uint64_t uaL2CurEnd = uaL2Cur + L2_BLOCK_SIZE;
+
+		// Round to passed boundary if neccessary
+		if (uaStart > uaL2CurStart) uaL2CurStart = uaStart;
+		if (uaEnd < uaL2CurEnd) uaL2CurEnd = uaEnd;
 
 		// Create full table for this mapping
 		uint64_t tableToWrite[L2_BLOCK_COUNT];
-		for (int k = 0; k < L2_BLOCK_COUNT; k++) {
-			uint64_t curMappingPage = paL2Cur + (k * vm_real_kernel_page_size);
-			if (curMappingPage >= paStart && curMappingPage < paEnd) {
-				tableToWrite[k] = curMappingPage | PERM_TO_PTE(PERM_KRW_URW) | PTE_NON_GLOBAL | PTE_OUTER_SHAREABLE | PTE_LEVEL3_ENTRY;
-			}
-			else {
-				tableToWrite[k] = 0;
-			}
+		memset(tableToWrite, 0, sizeof(tableToWrite));
+		for (uint64_t curUA = uaL2CurStart; curUA < uaL2CurEnd; curUA += 0x4000, curPA += 0x4000) {
+			int idx = (curUA - uaL2Cur) / 0x4000;
+			tableToWrite[idx] = curPA | PERM_TO_PTE(PERM_KRW_URW) | PTE_NON_GLOBAL | PTE_OUTER_SHAREABLE | PTE_LEVEL3_ENTRY;
 		}
 
 		// Replace table with the entries we generated
@@ -398,8 +404,8 @@ int pmap_map_in(uint64_t pmap, uint64_t uaStart, uint64_t paStart, uint64_t size
 	return 0;
 }
 
-
 #ifdef __arm64e__
+
 uint64_t pmap_find_main_binary_code_dir(uint64_t pmap)
 {
 	uint64_t mainCodeDir = 0;
