@@ -7,7 +7,7 @@ typedef enum {
 	kCrashReporterStatePaused = 2
 } crash_reporter_state;
 
-void crashreporter_start();
+void crashreporter_start(void);
 void crashreporter_pause(void);
 void crashreporter_resume(void);
 
