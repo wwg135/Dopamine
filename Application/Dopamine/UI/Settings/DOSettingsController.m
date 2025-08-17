@@ -626,7 +626,6 @@
  
     UIAlertController *inputAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Input_Mmount_Title") message:DOLocalizedString(@"Input_Mount_Title") preferredStyle:UIAlertControllerStyleAlert];
     
-
     [inputAlertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.placeholder = DOLocalizedString(@"Input_Mount_Title");
     }];
@@ -666,9 +665,8 @@
                 pathArray = [NSMutableArray array];
             }
             if (![pathArray containsObject:mountPath]) {
-			          [pathArray addObject:mountPath];
-								[plistDictionary setObject:pathArray forKey:@"path"];
-						 
+				[pathArray addObject:mountPath]; 
+				[plistDictionary setObject:pathArray forKey:@"path"];
                 [plistDictionary writeToFile:mountFilePath atomically:YES];
             } 
 
