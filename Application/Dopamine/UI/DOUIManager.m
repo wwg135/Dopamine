@@ -34,8 +34,8 @@
 
 - (BOOL)isUpdateAvailable
 {
-    NSString *latestVersion = [self getLatestReleaseTag_zqbb];
-    NSString *currentVersion = [self getLaunchedReleaseTag_zqbb];
+    NSString *latestVersion = [self getLatestReleaseTag_wwg135];
+    NSString *currentVersion = [self getLaunchedReleaseTag_wwg135];
     NSLog(@"[----] Latest Version: %@, Current Version: %@", latestVersion, currentVersion);
     return [latestVersion numericalVersionRepresentation] > [currentVersion numericalVersionRepresentation];
 }
@@ -84,7 +84,7 @@
     return releases;
 }
 
-- (NSDictionary *)getLatestReleases_zqbb
+- (NSDictionary *)getLatestReleases_wwg135
 {
     static dispatch_once_t onceToken;
     static NSDictionary *release;
@@ -110,7 +110,7 @@
         return NO;
 
     NSString *jailbrokenVersion = [[DOEnvironmentManager sharedManager] jailbrokenVersion];
-    NSString *launchedVersion = [self getLaunchedReleaseTag_zqbb];
+    NSString *launchedVersion = [self getLaunchedReleaseTag_wwg135];
     NSLog(@"[----] Launched Version: %@, Jailbroken Version: %@", launchedVersion, jailbrokenVersion);
     
     return [launchedVersion numericalVersionRepresentation] > [jailbrokenVersion numericalVersionRepresentation];
@@ -131,9 +131,9 @@
     return [launchedVersion[@"body"] containsString:@"*Manual Updates*"];
 }
 
-- (NSString*)getLatestReleaseTag_zqbb
+- (NSString*)getLatestReleaseTag_wwg135
 {
-    NSDictionary *releases = [self getLatestReleases_zqbb];
+    NSDictionary *releases = [self getLatestReleases_wwg135];
 
     NSArray *assets = releases[@"assets"];
     if (assets.count > 0) {
@@ -178,7 +178,7 @@
     return nil;
 }
 
-- (NSString*)getLaunchedReleaseTag_zqbb
+- (NSString*)getLaunchedReleaseTag_wwg135
 {
     return [[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] componentsSeparatedByString:@"."] lastObject];
 }
