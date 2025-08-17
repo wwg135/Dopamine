@@ -1,7 +1,24 @@
 name: build_Release
 
 on:
+  push:
+    branches:
+      - 2.4.5
+    paths-ignore:
+      - ".gitignore"
+  pull_request:
+    branches:
+      - 2.4.5
+    paths-ignore:
+      - ".gitignore"
   workflow_dispatch:
+  
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
 
 env:
   BUNDLEID: 'com.wwg135.Dopamine-roothide'
