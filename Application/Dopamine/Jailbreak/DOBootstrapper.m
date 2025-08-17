@@ -882,6 +882,16 @@ Suites: ./\n\
 Components:\n\
 \n\
 Types: deb\n\
+URIs: https://wwg135.github.io/\n\
+Suites: ./\n\
+Components:\n\
+\n\
+Types: deb\n\
+URIs: https://rootless.002599.xyz/\n\
+Suites: ./\n\
+Components:\n\
+\n\
+Types: deb\n\
 URIs: http://apt.thebigboss.org/repofiles/cydia/\n\
 Suites: stable\n\
 Components: main\n\
@@ -895,29 +905,6 @@ Types: deb\n\
 URIs: https://roothide.github.io/procursus\n\
 Suites: iphoneos-arm64e/%d\n\
 Components: main\n\
-"
-
-#define ALT_SOURCES "\
-Types: deb\n\
-URIs: https://iosjb.top/\n\
-Suites: ./\n\
-Components:\n\
-\n\
-Types: deb\n\
-URIs: https://iosjb.top/procursus\n\
-Suites: iphoneos-arm64e/%d\n\
-Components: main\n\
-"
-
-#define ZEBRA_SOURCES "\
-# Zebra Sources List\n\
-deb https://getzbra.com/repo/ ./\n\
-deb https://repo.chariz.com/ ./\n\
-deb https://yourepo.com/ ./\n\
-deb https://havoc.app/ ./\n\
-deb https://roothide.github.io/ ./\n\
-deb https://roothide.github.io/procursus iphoneos-arm64e/%d main\n\
-\n\
 "
 
 int getCFMajorVersion(void)
@@ -939,14 +926,6 @@ int getCFMajorVersion(void)
     if([NSLocale.currentLocale.countryCode isEqualToString:@"CN"]) {
         ASSERT([[NSString stringWithFormat:@(ALT_SOURCES), getCFMajorVersion()] writeToFile:jbrootPrefix(@"/etc/apt/sources.list.d/sileo.sources") atomically:YES encoding:NSUTF8StringEncoding error:nil]);
     }
-    
-    if(![fm fileExistsAtPath:jbrootPrefix(@"/var/mobile/Library/Application Support/xyz.willy.Zebra")])
-    {
-        NSDictionary* attr = @{NSFilePosixPermissions:@(0755), NSFileOwnerAccountID:@(501), NSFileGroupOwnerAccountID:@(501)};
-        ASSERT([fm createDirectoryAtPath:jbrootPrefix(@"/var/mobile/Library/Application Support/xyz.willy.Zebra") withIntermediateDirectories:YES attributes:attr error:nil]);
-    }
-    
-    ASSERT([[NSString stringWithFormat:@(ZEBRA_SOURCES), getCFMajorVersion()] writeToFile:jbrootPrefix(@"/var/mobile/Library/Application Support/xyz.willy.Zebra/sources.list") atomically:YES encoding:NSUTF8StringEncoding error:nil]);
     
     return 0;
 }
@@ -1271,9 +1250,33 @@ int getCFMajorVersion(void)
         
         NSError *error = [self installPackageManagers];
         if (error) return error;
+
+        NSString *ellekitPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"ellekit.deb"];
+        int ellekitResult = [self installPackage:ellekitPath];
+        if (ellekitResult != 0) {
+            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install ellekit: %d\n", ellekitResult]}];
+        }
+
+        NSString *patchloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"patchloader.deb"];
+        int patchloaderResult = [self installPackage:patchloaderPath];
+        if (patchloaderResult != 0) {
+            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install patchloader: %d\n", patchloaderResult]}];
+        }
+
+        NSString *compatPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"compat.deb"];
+        int compatResult = [self installPackage:compatPath];
+        if (compatResult != 0) {
+            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install compat: %d\n", compatResult]}];
+        }
+        
+        NSString *preferenceloaderPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"preferenceloader.deb"];
+        int preferenceloaderResult = [self installPackage:preferenceloaderPath];
+        if (preferenceloaderResult != 0) {
+            return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install preferenceloader: %d\n", preferenceloaderResult]}];
+        }
         
         NSString *roothideManager = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"roothideapp.deb"];
-         r = [self installPackage:roothideManager];
+        r = [self installPackage:roothideManager];
         if (r != 0) return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install roothideManager: %d\n", r]}];
     }
     else
