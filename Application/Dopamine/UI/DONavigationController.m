@@ -143,10 +143,6 @@
             }]];
         }
 
-        [alertController addAction:[UIAlertAction actionWithTitle:[self showUpTimetitle] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-             [self showUpTime]; 
-        }]];
-
         [alertController addAction:[UIAlertAction actionWithTitle:@"自定义主题背景" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self deleteAppTmpDirectory];
             UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
