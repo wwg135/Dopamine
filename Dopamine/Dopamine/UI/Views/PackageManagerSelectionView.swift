@@ -26,8 +26,7 @@ struct PackageManagerSelectionView: View {
     var onContinue: () -> Void
     
     var packageManagers: [(String, String)] = [
-        ("Sileo", "Sileo"),
-        ("Zebra", "Zebra")
+        ("Sileo", "Sileo")
     ]
     
     var body: some View {
@@ -92,9 +91,6 @@ struct PackageManagerSelectionView: View {
                             if dpkgPath != nil {
                                 if selectedNames.contains("Sileo") {
                                     _ = execCmd(args: [dpkgPath!, "-i", Bundle.main.bundlePath + "/sileo.deb"])
-                                }
-                                if selectedNames.contains("Zebra") {
-                                    _ = execCmd(args: [dpkgPath!, "-i", Bundle.main.bundlePath + "/zebra.deb"])
                                 }
                             }
                             
