@@ -10,14 +10,9 @@
 #import "DOGlobalAppearance.h"
 #import "DOUIManager.h"
 
-@interface DOButtonCell () {
-    BOOL _hasFooter;
-}
-@end
-
 @implementation DOButtonCell
 
-- (id)initWithSpecifier:(PSSpecifier*)specifier
+- (id)initWithStyle:(long long)arg1 reuseIdentifier:(id)arg2 specifier:(PSSpecifier *)specifier
 {
     self = [super init];
     if (self)
@@ -44,19 +39,11 @@
         [NSLayoutConstraint activateConstraints:@[
             [button.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20],
             [button.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20],
-            [button.topAnchor constraintEqualToAnchor:self.topAnchor constant:0],
-            [button.heightAnchor constraintEqualToConstant:38]
+            [button.topAnchor constraintEqualToAnchor:self.topAnchor constant:4],
+            [button.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-4],
         ]];
-
-        _hasFooter = [specifier propertyForKey:@"footerText"] != nil;
-        
     }
     return self;
-}
-
-- (CGFloat)preferredHeightForWidth:(CGFloat)width
-{
-	return 30 + (_hasFooter ? 9 : 0);
 }
 
 @end

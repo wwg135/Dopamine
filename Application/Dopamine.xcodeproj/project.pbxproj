@@ -185,6 +185,7 @@
 		8C9E46292ACA1CC700B5456A /* UIImage+Blur.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C9E46282ACA1CC700B5456A /* UIImage+Blur.m */; };
 		8CB94F042B59E17A0098BAFD /* basebin.tc in Resources */ = {isa = PBXBuildFile; fileRef = 8CB94F022B59E17A0098BAFD /* basebin.tc */; };
 		8CB94F052B59E17A0098BAFD /* basebin.tar in Resources */ = {isa = PBXBuildFile; fileRef = 8CB94F032B59E17A0098BAFD /* basebin.tar */; };
+		8CBF1A4A2EC3B71700EB2308 /* UIImage+JPEG2000.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBF1A492EC3B71700EB2308 /* UIImage+JPEG2000.m */; };
 		8CC139822B53DE6C00230143 /* NSData+Hex.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CC139812B53DE6C00230143 /* NSData+Hex.m */; };
 		8CC139832B53E05300230143 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CDD08372B4F682500A32B61 /* IOKit.framework */; };
 		8CCD2FC42B77AAA000F9C5DA /* basebin-link.deb in Resources */ = {isa = PBXBuildFile; fileRef = 8CCD2FC32B77AA9200F9C5DA /* basebin-link.deb */; };
@@ -523,6 +524,8 @@
 		8C9E46282ACA1CC700B5456A /* UIImage+Blur.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Blur.m"; sourceTree = "<group>"; };
 		8CB94F022B59E17A0098BAFD /* basebin.tc */ = {isa = PBXFileReference; lastKnownFileType = file; name = basebin.tc; path = ../../../BaseBin/basebin.tc; sourceTree = "<group>"; };
 		8CB94F032B59E17A0098BAFD /* basebin.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; name = basebin.tar; path = ../../../BaseBin/basebin.tar; sourceTree = "<group>"; };
+		8CBF1A482EC3B71700EB2308 /* UIImage+JPEG2000.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+JPEG2000.h"; sourceTree = "<group>"; };
+		8CBF1A492EC3B71700EB2308 /* UIImage+JPEG2000.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+JPEG2000.m"; sourceTree = "<group>"; };
 		8CC139802B53DE6C00230143 /* NSData+Hex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Hex.h"; sourceTree = "<group>"; };
 		8CC139812B53DE6C00230143 /* NSData+Hex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Hex.m"; sourceTree = "<group>"; };
 		8CCD2FC32B77AA9200F9C5DA /* basebin-link.deb */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "basebin-link.deb"; path = "../../../Packages/basebin-link/basebin-link.deb"; sourceTree = "<group>"; };
@@ -1090,6 +1093,8 @@
 				8C9E46282ACA1CC700B5456A /* UIImage+Blur.m */,
 				8C609C9D2C19AEE70023DD12 /* NSString+Version.h */,
 				8C609C9C2C19AECF0023DD12 /* NSString+Version.m */,
+				8CBF1A482EC3B71700EB2308 /* UIImage+JPEG2000.h */,
+				8CBF1A492EC3B71700EB2308 /* UIImage+JPEG2000.m */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1679,6 +1684,7 @@
 				8C029F432B4DFD5D0071DE58 /* DOExploitManager.m in Sources */,
 				042479B02B66916B0082581B /* DOLoadingIndicator.m in Sources */,
 				042479AC2B66916B0082581B /* DOJailbreakButton.m in Sources */,
+				8CBF1A4A2EC3B71700EB2308 /* UIImage+JPEG2000.m in Sources */,
 				8C4ABEBE2B52274300B43C9B /* DOPreferenceManager.m in Sources */,
 				04DD0B472B7CBEEA0055DE4F /* DOTheme.m in Sources */,
 				04DD0B442B7CBE2E0055DE4F /* DOThemeManager.m in Sources */,

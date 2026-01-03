@@ -16,15 +16,14 @@
     CIImage *ciImage = [CIImage imageWithCGImage:self.CGImage];
     CIFilter *filter = [CIFilter filterWithName:@"CIGaussianBlur"];
     [filter setDefaults];
-    [filter setValue:ciImage forKey:kCIInputImageKey];
+    [filter setValue:[ciImage imageByClampingToExtent] forKey:kCIInputImageKey];
     [filter setValue:@(radius) forKey:kCIInputRadiusKey];
     
-    CIImage *outputImage = [filter outputImage];
+    CIImage *outputImage = [[filter outputImage] imageByCroppingToRect:[ciImage extent]];
     CIContext *context   = [CIContext contextWithOptions:nil];
     CGImageRef cgImg     = [context createCGImage:outputImage fromRect:[ciImage extent]];
     
     return [UIImage imageWithCGImage:cgImg];
-
 }
 
 - (instancetype)imageWithHue:(float)hue
@@ -41,6 +40,5 @@
     
     return [UIImage imageWithCGImage:cgImg];
 }
-
 
 @end

@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DOButtonCell : UITableViewCell
+@interface DOButtonCell : PSTableCell
 
 @end
 
