@@ -44,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetSettings;
 - (void)setPackageManager:(NSString*)key enabled:(BOOL)enabled;
 - (NSString *)localizedStringForKey:(NSString*)key;
+- (UIImage *)renderBootLogo;
 
 @end
 

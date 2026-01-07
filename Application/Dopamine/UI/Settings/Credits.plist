@@ -12,11 +12,13 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>headerCellClass</key>
+			<string>PSStaticTextCell</string>
+			<key>cellClass</key>
 			<string>DOButtonCell</string>
 			<key>title</key>
 			<string>Credits_Button_Source_Code</string>
+			<key>buttonHeight</key>
+			<integer>44</integer>
 			<key>key</key>
 			<string>src</string>
 			<key>image</key>
@@ -26,11 +28,13 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>headerCellClass</key>
+			<string>PSStaticTextCell</string>
+			<key>cellClass</key>
 			<string>DOButtonCell</string>
 			<key>title</key>
 			<string>Credits_Button_Discord</string>
+			<key>buttonHeight</key>
+			<integer>44</integer>
 			<key>key</key>
 			<string>discord</string>
 			<key>image</key>
@@ -40,11 +44,13 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>headerCellClass</key>
+			<string>PSStaticTextCell</string>
+			<key>cellClass</key>
 			<string>DOButtonCell</string>
 			<key>title</key>
 			<string>Credits_Button_License</string>
+			<key>buttonHeight</key>
+			<integer>44</integer>
 			<key>key</key>
 			<string>license</string>
 			<key>image</key>

@@ -33,12 +33,12 @@
 #define CPUFAMILY_ARM_LIGHTNING_THUNDER     0x462504d2
 #endif
 
-/* A14 */
+/* A14, M1 */
 #ifndef CPUFAMILY_ARM_FIRESTORM_ICESTORM
 #define CPUFAMILY_ARM_FIRESTORM_ICESTORM    0x1b588bb3
 #endif
 
-/* A15 */
+/* A15, M2 */
 #ifndef CPUFAMILY_ARM_BLIZZARD_AVALANCHE
 #define CPUFAMILY_ARM_BLIZZARD_AVALANCHE    0xda33d83d
 #endif
@@ -51,6 +51,26 @@
 /* A17 */
 #ifndef CPUFAMILY_ARM_COLL
 #define CPUFAMILY_ARM_COLL                  0x2876f5b5
+#endif
+
+/* A18 */
+#ifndef CPUFAMILY_ARM_TUPAI
+#define CPUFAMILY_ARM_TUPAI                 0x204526d0
+#endif
+
+/* A18 Pro */
+#ifndef CPUFAMILY_ARM_TAHITI
+#define CPUFAMILY_ARM_TAHITI                0x75d4acb9
+#endif
+
+/* M3 */
+#ifndef CPUFAMILY_ARM_IBIZA
+#define CPUFAMILY_ARM_IBIZA                 0xfa33415e
+#endif
+
+/* M4 */
+#ifndef CPUFAMILY_ARM_DONAN
+#define CPUFAMILY_ARM_DONAN                 0x6f5129ac
 #endif
 
 #endif /* MACHINE_INFO_H */

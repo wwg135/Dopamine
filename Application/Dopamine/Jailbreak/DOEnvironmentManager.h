@@ -66,6 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSError *)finalizeBootstrap;
 - (NSError *)deleteBootstrap;
 - (NSError *)reinstallPackageManagers;
+- (NSError *)updateBootLogo;
 @end
 
 NS_ASSUME_NONNULL_END

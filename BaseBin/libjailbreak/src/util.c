@@ -389,8 +389,8 @@ int pmap_map_in(uint64_t pmap, uint64_t uaStart, uint64_t paStart, uint64_t size
 		// Create full table for this mapping
 		uint64_t tableToWrite[L2_BLOCK_COUNT];
 		memset(tableToWrite, 0, sizeof(tableToWrite));
-		for (uint64_t curUA = uaL2CurStart; curUA < uaL2CurEnd; curUA += 0x4000, curPA += 0x4000) {
-			int idx = (curUA - uaL2Cur) / 0x4000;
+		for (uint64_t curUA = uaL2CurStart; curUA < uaL2CurEnd; curUA += vm_real_kernel_page_size, curPA += vm_real_kernel_page_size) {
+			int idx = (curUA - uaL2Cur) / vm_real_kernel_page_size;
 			tableToWrite[idx] = curPA | PERM_TO_PTE(PERM_KRW_URW) | PTE_NON_GLOBAL | PTE_OUTER_SHAREABLE | PTE_LEVEL3_ENTRY;
 		}
 
