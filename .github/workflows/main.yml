@@ -29,17 +29,17 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Xcode Setup
-        uses: maxim-lobanov/setup-xcode@v1
+        uses: maxim-lobanov/setup-xcode@v1.6.0
         with:
           xcode-version: latest-stable
 
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v6.0.1
         with:
             submodules: recursive
 
       - name: Pre Procursus
-        uses: wwg135/procursus-action@main
+        uses: dhinakg/procursus-action@main
         with:
           packages: ldid findutils coreutils make sed
 
@@ -127,20 +127,20 @@ jobs:
           cat ./release.md >> release.txt
           
       - name: Release ipa
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v2.5.0
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.VERSION }}
           target_commitish: 2.x
           body_path: release.txt
-          latest: true
+          prerelease: false
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
 
       - name: Upload Artifact
         id: dopamine-latest-upload
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: Dopamine
           path: |
