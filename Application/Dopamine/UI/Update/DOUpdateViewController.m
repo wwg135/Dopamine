@@ -119,7 +119,7 @@
                     return;
                 }
             }
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/opa334/Dopamine/releases"] options:@{} completionHandler:nil];
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/wwg135/Dopamine/releases"] options:@{} completionHandler:nil];
             return;
         }
 
@@ -162,7 +162,8 @@
 
     if (releases.count == 0)
     {
-        [changelogText appendAttributedString:[[NSAttributedString alloc] initWithString:DOLocalizedString(@"Changelog_Unavailable_Text") attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor], NSParagraphStyleAttributeName:paragraphStyle}]];
+        BOOL envUpdate = [[DOUIManager sharedInstance] environmentUpdateAvailable];
+        [changelogText appendAttributedString:[[NSAttributedString alloc] initWithString:DOLocalizedString(envUpdate ? @"Mismatching_Environment_Version_Update_Body" : @"Changelog_Unavailable_Text") attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:18], NSForegroundColorAttributeName : [UIColor whiteColor], NSParagraphStyleAttributeName:paragraphStyle}]];
         dispatch_async(dispatch_get_main_queue(), ^{
             self.changelog.attributedText = changelogText;
         });

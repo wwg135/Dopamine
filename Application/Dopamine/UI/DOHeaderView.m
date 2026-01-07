@@ -11,6 +11,7 @@
 @interface DOHeaderView ()
 
 @property (nonatomic) UIImageView *logoView;
+@property (nonatomic) UILabel *timerLabel;
 
 @end
 
@@ -50,6 +51,9 @@
             label.attributedText = formatedText;
             label.translatesAutoresizingMaskIntoConstraints = NO;
             [stackView addArrangedSubview:label];
+            if (idx == 3) {
+		self.timerLabel = label;
+            }
         }];
 
         self.translatesAutoresizingMaskIntoConstraints = NO;
@@ -63,8 +67,34 @@
             self.layer.shadowOpacity = 0.3;
         }
 
+        [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateLabel) userInfo:nil repeats:YES];
     }
     return self;
+}
+
+- (void)updateLabel {
+    self.timerLabel.text = [self formatUptime];
+}
+
+- (NSString *)formatUptime {
+    NSString *formatted;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    int uptimeInt = ts.tv_sec;
+    int seconds = uptimeInt % 60;
+    int minutes = (uptimeInt / 60) % 60;
+    int hours = (uptimeInt / 3600) % 24;
+    int days = uptimeInt / 86400;
+    if (days > 0) {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 天 %d 时 %d 分 %d 秒", days, hours, minutes, seconds];
+    } else if (hours > 0) {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 时 %d 分 %d 秒", hours, minutes, seconds];
+    } else if (minutes > 0) {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 分 %d 秒", minutes, seconds];
+    } else {
+        formatted = [NSString stringWithFormat:@"系统已运行：%d 秒", seconds];
+    }
+    return formatted;
 }
 
 @end
