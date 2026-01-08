@@ -131,9 +131,9 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           tag_name: ${{ env.VERSION }}
-          target_commitish: 2.4.6
+          target_commitish: ${{ github.ref_name }}
           body_path: release.txt
-          prerelease: false
+          latest: true
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           files: |
            *.ipa
