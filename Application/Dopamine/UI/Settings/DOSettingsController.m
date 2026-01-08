@@ -606,8 +606,14 @@
         chosenImage = info[UIImagePickerControllerOriginalImage];
     }
 
-    NSString *customBootlogoPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/bootlogo.png"];
-    [UIImagePNGRepresentation(chosenImage) writeToFile:customBootlogoPath atomically:YES];
+    // Force correct the orientation
+    // For some reason without rerendering the image, the stored file will have a wrong orientation for photos taken with the camera‚
+    UIGraphicsBeginImageContextWithOptions(chosenImage.size, NO, 1.0);
+    [chosenImage drawInRect:CGRectMake(0,0, chosenImage.size.width, chosenImage.size.height)];
+    chosenImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    [UIImagePNGRepresentation(chosenImage) writeToFile:[DOUIManager sharedInstance].bootlogoPath atomically:YES];
 
     if ([DOEnvironmentManager sharedManager].isJailbroken) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
