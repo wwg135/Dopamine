@@ -3,12 +3,12 @@ name: build_Release
 on:
   push:
     branches:
-      - ${{ github.ref_name }}
+      - 2.4.6
     paths-ignore:
       - ".gitignore"
   pull_request:
     branches:
-      - ${{ github.ref_name }}
+      - 2.4.6
     paths-ignore:
       - ".gitignore"
   workflow_dispatch:
