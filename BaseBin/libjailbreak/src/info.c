@@ -19,6 +19,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	struct utsname name;
 	uname(&name);
 	char *xnuVersion = name.release;
+	char *xnuBuild = strstr(name.version, "root:");
 
 	cpu_subtype_t cpuFamily = 0;
 	size_t cpuFamilySize = sizeof(cpuFamily);
@@ -242,7 +243,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 					gSystemInfo.kernelStruct.pmap_cs_code_directory.trust       = 0x1DC;
 #endif
 
-					if (strcmp(xnuVersion, "22.1.0") >= 0) { // iOS 16.1+
+					if (strcmp(xnuVersion, "22.1.0") >= 0 && strcmp(xnuBuild, "root:xnu-8792.42") >= 0) { // iOS 16.1+ (Exluding 16.1b1 - 16.1b3 on iOS and 16.1b1 - 16.1b4 on iPadOS)
 						gSystemInfo.kernelStruct.ipc_space.table_uses_smr = true;
 
 						// proc_ro
