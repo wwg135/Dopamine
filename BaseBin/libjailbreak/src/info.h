@@ -175,6 +175,7 @@ struct system_info {
 
 		struct {
 			uint32_t links;
+			uint32_t nentries;
 		} vm_map_header;
 
 		struct {
@@ -366,6 +367,7 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.vm_map.flags); \
 	\
 	iterator(ctx, kernelStruct.vm_map_header.links); \
+	iterator(ctx, kernelStruct.vm_map_header.nentries); \
 	\
 	iterator(ctx, kernelStruct.vm_map_entry.links); \
 	iterator(ctx, kernelStruct.vm_map_entry.flags); \
