@@ -18,8 +18,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 {
 	struct utsname name;
 	uname(&name);
-	char *xnuVersion = name.release;
-	char *xnuBuild = strstr(name.version, "root:");
+	char *darwinVersion = name.release;
+	uint64_t xnuMajor = 0, xnuMinor = 0;
+	sscanf(strstr(name.version, "xnu-"), "xnu-%llu.%llu.%*s", &xnuMajor, &xnuMinor);
 
 	cpu_subtype_t cpuFamily = 0;
 	size_t cpuFamilySize = sizeof(cpuFamily);
@@ -32,7 +33,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	uint32_t taskJitboxAdjust = 0x0;
 	if (hasJitbox) {
 		taskJitboxAdjust = 0x10;
-		if (strcmp(xnuVersion, "22.0.0") >= 0) {
+		if (strcmp(darwinVersion, "22.0.0") >= 0) {
 			// In iOS 16, there is a new jitbox related attribute
 			taskJitboxAdjust = 0x18;
 		}
@@ -43,9 +44,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 #ifndef __arm64e__
 	uint32_t pmapA11Adjust = 0;
 	if (cpuFamily == CPUFAMILY_ARM_MONSOON_MISTRAL) {
-		if (strcmp(xnuVersion, "21.0.0") >= 0) { // iOS 15+
+		if (strcmp(darwinVersion, "21.0.0") >= 0) { // iOS 15+
 			pmapA11Adjust = 1;
-			if (strcmp(xnuVersion, "22.0.0") >= 0) { // iOS 16+
+			if (strcmp(darwinVersion, "22.0.0") >= 0) { // iOS 16+
 				pmapA11Adjust = 2;
 			}
 		}
@@ -131,7 +132,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	gSystemInfo.kernelStruct.ucred.svgid  = ucred_cr_posix + 0x54;
 	gSystemInfo.kernelStruct.ucred.label  = 0x78;
 
-	if (strcmp(xnuVersion, "21.0.0") >= 0) { // iOS 15+
+	if (strcmp(darwinVersion, "21.0.0") >= 0) { // iOS 15+
 		// proc
 		gSystemInfo.kernelStruct.proc.svuid   =  0x3C;
 		gSystemInfo.kernelStruct.proc.svgid   =  0x40;
@@ -159,7 +160,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 		gSystemInfo.kernelStruct.trustcache.fileptr        =  0x8;
 		gSystemInfo.kernelStruct.trustcache.struct_size = 0x10;
 
-		if (strcmp(xnuVersion, "21.2.0") >= 0) { // iOS 15.2+
+		if (strcmp(darwinVersion, "21.2.0") >= 0) { // iOS 15.2+
 			// proc
 			gSystemInfo.kernelStruct.proc.ucred   =   0x0; // Moved to proc_ro
 			gSystemInfo.kernelStruct.proc.csflags =   0x0; // Moved to proc_ro
@@ -181,7 +182,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 #else
 			gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x560;
 #endif
-			if (strcmp(xnuVersion, "21.4.0") >= 0) { // iOS 15.4+
+			if (strcmp(darwinVersion, "21.4.0") >= 0) { // iOS 15.4+
 				// proc
 				gSystemInfo.kernelStruct.proc.textvp = 0x350;
 
@@ -191,7 +192,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 				// ipc_port
 				gSystemInfo.kernelStruct.ipc_port.kobject = 0x48;
 
-				if (strcmp(xnuVersion, "22.0.0") >= 0) { // iOS 16+
+				if (strcmp(darwinVersion, "22.0.0") >= 0) { // iOS 16+
 					gSystemInfo.kernelConstant.smrBase = 3;
 
 					// proc
@@ -244,15 +245,15 @@ void jbinfo_initialize_hardcoded_offsets(void)
 					gSystemInfo.kernelStruct.pmap_cs_code_directory.trust       = 0x1DC;
 #endif
 
-					if (strcmp(xnuVersion, "22.1.0") >= 0 && strcmp(xnuBuild, "root:xnu-8792.42") >= 0) { // iOS 16.1+ (Exluding 16.1b1 - 16.1b3 on iOS and 16.1b1 - 16.1b4 on iPadOS)
+					if (strcmp(darwinVersion, "22.1.0") >= 0 && (xnuMajor > 8792 || (xnuMajor == 8792 && xnuMinor >= 42))) { // iOS 16.1+ (Exluding 16.1b1 - 16.1b3 on iOS and 16.1b1 - 16.1b4 on iPadOS)
 						gSystemInfo.kernelStruct.ipc_space.table_uses_smr = true;
 
 						// proc_ro
 						gSystemInfo.kernelStruct.proc_ro.t_flags_ro = 0x78;
 
-						if (strcmp(xnuVersion, "22.3.0") >= 0) { // iOS 16.3+
+						if (strcmp(darwinVersion, "22.3.0") >= 0) { // iOS 16.3+
 							gSystemInfo.kernelConstant.smrBase = 2;
-							if (strcmp(xnuVersion, "22.4.0") >= 0) { // iOS 16.4+
+							if (strcmp(darwinVersion, "22.4.0") >= 0) { // iOS 16.4+
 								// proc
 								gSystemInfo.kernelStruct.proc.flag   = 0x454;
 								gSystemInfo.kernelStruct.proc.textvp = 0x548;
@@ -262,7 +263,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 								gSystemInfo.kernelStruct.pmap_cs_code_directory.trust = 0x1EC;
 #endif
 
-								if (strcmp(xnuVersion, "22.4.0") == 0) { // iOS 16.4 ONLY 
+								if (strcmp(darwinVersion, "22.4.0") == 0) { // iOS 16.4 ONLY 
 									// iOS 16.4 beta 1-3 use the old proc struct, 16.4b4+ use new
 									if (gSystemInfo.kernelStruct.proc.struct_size != 0x730) {
 										gSystemInfo.kernelStruct.proc.flag    = 0x25C;
