@@ -228,9 +228,19 @@ struct system_info {
 		struct {
 			uint32_t list_next;
 			uint32_t list_prev;
+			uint32_t pcbinfo;
 			uint32_t socket;
 			uint32_t icmp6filt;
+			uint32_t chksum;
 		} inpcb;
+
+		struct {
+			uint32_t ipi_zone;
+		} inpcbinfo;
+
+		struct {
+			uint32_t kt_zv_zv_name;
+		} kalloc_type_view;
 
 		struct {
 			uint32_t usecount;
@@ -419,8 +429,14 @@ extern struct system_info gSystemInfo;
 	\
 	iterator(ctx, kernelStruct.inpcb.list_next); \
 	iterator(ctx, kernelStruct.inpcb.list_prev); \
+	iterator(ctx, kernelStruct.inpcb.pcbinfo); \
 	iterator(ctx, kernelStruct.inpcb.socket); \
 	iterator(ctx, kernelStruct.inpcb.icmp6filt); \
+	iterator(ctx, kernelStruct.inpcb.chksum); \
+	\
+	iterator(ctx, kernelStruct.inpcbinfo.ipi_zone); \
+	\
+	iterator(ctx, kernelStruct.kalloc_type_view.kt_zv_zv_name); \
 	\
 	iterator(ctx, kernelStruct.socket.usecount); \
 	iterator(ctx, kernelStruct.socket.proto); \

@@ -163,8 +163,16 @@ void jbinfo_initialize_hardcoded_offsets(void)
 		// inpcb
 		gSystemInfo.kernelStruct.inpcb.list_next = 0x20;
 		gSystemInfo.kernelStruct.inpcb.list_prev = 0x28;
+		gSystemInfo.kernelStruct.inpcb.pcbinfo	 = 0x38;
 		gSystemInfo.kernelStruct.inpcb.socket    = 0x40;
 		gSystemInfo.kernelStruct.inpcb.icmp6filt = (0x138 + 0x18);
+		gSystemInfo.kernelStruct.inpcb.chksum 	 = 0x158;
+
+		// inpcbinfo
+		gSystemInfo.kernelStruct.inpcbinfo.ipi_zone = 0x68;
+
+		// kalloc_type_view
+		gSystemInfo.kernelStruct.kalloc_type_view.kt_zv_zv_name = 0x10;
 
 		// socket
 		gSystemInfo.kernelStruct.socket.proto    = 0x18;
@@ -285,6 +293,26 @@ void jbinfo_initialize_hardcoded_offsets(void)
 									if (gSystemInfo.kernelStruct.proc.struct_size != 0x730) {
 										gSystemInfo.kernelStruct.proc.flag    = 0x25C;
 										gSystemInfo.kernelStruct.proc.textvp  = 0x350;
+									}
+								}
+
+								if (strcmp(darwinVersion, "23.1.0") >= 0) {	// iOS 17.1+
+									// inpcb
+									gSystemInfo.kernelStruct.inpcb.icmp6filt = 0x148;
+									gSystemInfo.kernelStruct.inpcb.chksum 	 = 0x150;
+
+									// socket
+									gSystemInfo.kernelStruct.socket.usecount = 0x24c;
+
+									if(strcmp(darwinVersion, "23.4.0") >= 0) {	// iOS 17.4+
+										// socket
+										gSystemInfo.kernelStruct.socket.proto    = 0x20;
+										gSystemInfo.kernelStruct.socket.usecount = 0x254;
+
+										if(strcmp(darwinVersion, "25.0.0") >= 0) {	// iOS 26.0+
+											// socket
+											gSystemInfo.kernelStruct.socket.usecount = 0x23c;
+										}
 									}
 								}
 							}
