@@ -357,19 +357,17 @@ int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid)
 		if (kread_ptr(childProc + koffsetof(proc, pptr)) == parentProc) {
 			cs_allow_invalid(childProc, false);
 
-			uint64_t childTask  = proc_task(childProc);
-			uint64_t childVmMap = kread_ptr(childTask + koffsetof(task, map));
-
-			uint64_t parentTask  = proc_task(parentProc);
-			uint64_t parentVmMap = kread_ptr(parentTask + koffsetof(task, map));
-
-			uint64_t parentHeader   = parentVmMap + koffsetof(vm_map, hdr);
-			uint32_t parentNentries = kread32(parentHeader + koffsetof(vm_map_header, nentries));
-			uint64_t parentEntry    = kread_ptr(parentHeader + koffsetof(vm_map_header, links) + koffsetof(vm_map_links, next));
-
+			uint64_t childTask     = proc_task(childProc);
+			uint64_t childVmMap    = kread_ptr(childTask + koffsetof(task, map));
 			uint64_t childHeader   = childVmMap + koffsetof(vm_map, hdr);
 			uint32_t childNentries = kread32(childHeader + koffsetof(vm_map_header, nentries));
 			uint64_t childEntry    = kread_ptr(childHeader + koffsetof(vm_map_header, links) + koffsetof(vm_map_links, next));
+
+			uint64_t parentTask     = proc_task(parentProc);
+			uint64_t parentVmMap    = kread_ptr(parentTask + koffsetof(task, map));
+			uint64_t parentHeader   = parentVmMap + koffsetof(vm_map, hdr);
+			uint32_t parentNentries = kread32(parentHeader + koffsetof(vm_map_header, nentries));
+			uint64_t parentEntry    = kread_ptr(parentHeader + koffsetof(vm_map_header, links) + koffsetof(vm_map_links, next));
 
 			uint64_t childFirstEntry = childEntry, parentFirstEntry = parentEntry;
 			uint32_t childIdx = 0, parentIdx = 0;
