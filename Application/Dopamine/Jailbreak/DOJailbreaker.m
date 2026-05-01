@@ -88,7 +88,9 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             NULL,
         };
 
-        uint32_t idx = 6;
+        uint32_t idx = 0;
+        while(sets[++idx]);
+
         if (xpf_set_is_supported("devmode")) {
             sets[idx++] = "devmode"; 
         }
