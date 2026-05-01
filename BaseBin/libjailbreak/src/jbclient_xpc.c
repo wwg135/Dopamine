@@ -243,6 +243,22 @@ double jbclient_jbsettings_get_double(const char *key)
 	return 0;
 }
 
+int jbclient_persona_fix(int childPid, uid_t overwriteUid, gid_t overwriteGid)
+{
+	xpc_object_t xargs = xpc_dictionary_create_empty();
+	xpc_dictionary_set_uint64(xargs, "child-pid", childPid);
+	xpc_dictionary_set_uint64(xargs, "overwrite-uid", overwriteUid);
+	xpc_dictionary_set_uint64(xargs, "overwrite-gid", overwriteGid);
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_PERSONA_FIX, xargs);
+	xpc_release(xargs);
+	if (xreply) {
+		int result = xpc_dictionary_get_int64(xreply, "result");
+		xpc_release(xreply);
+		return result;
+	}
+	return -1;
+}
+
 int jbclient_platform_set_process_debugged(uint64_t pid, bool fullyDebugged)
 {
 	xpc_object_t xargs = xpc_dictionary_create_empty();

@@ -173,6 +173,18 @@ void dyldhook_init(uintptr_t kernelParams)
 		setuid(uid);
 		setreuid(ruid, -1);
 
+		// if (gDyldHookLog) {
+		// 	uid_t uid  = getuid();
+		// 	uid_t euid = geteuid();
+		// 	gid_t gid  = getgid();
+		// 	gid_t egid = getegid();
+
+		// 	_simple_dprintf(2, "PID  : %d\n", (int)getpid());
+		// 	_simple_dprintf(2, "PPID : %d\n", (int)getppid());
+		// 	_simple_dprintf(2, "uid  : real=%d  effective=%d\n", (int)uid,  (int)euid);
+		// 	_simple_dprintf(2, "gid  : real=%d  effective=%d\n", (int)gid,  (int)egid);
+		// }
+
 		char r = 0x42;
 		write(fd, &r, sizeof(r));
 

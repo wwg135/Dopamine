@@ -31,6 +31,22 @@ int posix_spawnattr_getprocesstype_np(const posix_spawnattr_t * __restrict, int 
 #define POSIX_SPAWNATTR_OFF_MEMLIMIT_INACTIVE 0x4C
 #define POSIX_SPAWNATTR_OFF_LAUNCH_TYPE 0xA8
 
+#define POSIX_SPAWN_POSIX_CRED_UID          0x00010000
+#define POSIX_SPAWN_POSIX_CRED_GID          0x00020000
+#define POSIX_SPAWN_PERSONA_UID             POSIX_SPAWN_POSIX_CRED_UID
+#define POSIX_SPAWN_PERSONA_GID             POSIX_SPAWN_POSIX_CRED_GID
+#define POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE 1
+#define POSIX_SPAWNATTR_OFF_PERSONA 0xD8
+struct _posix_spawn_persona_info {
+	uid_t    pspi_id;       /* persona ID (unix UID) */
+	uint32_t pspi_flags;    /* spawn persona flags */
+	uid_t    pspi_uid;      /* alternate posix/unix UID  */
+	gid_t    pspi_gid;      /* alternate posix/unix GID */
+	uint32_t pspi_ngroups;  /* alternate advisory groups */
+	gid_t    pspi_groups[NGROUPS];
+	uid_t    pspi_gmuid;    /* group membership UID */
+};
+
 extern char **environ;
 
 struct _posix_spawn_args_desc {

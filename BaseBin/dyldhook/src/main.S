@@ -97,6 +97,13 @@ DEF_SYSCALL(setgid, 181)
 DEF_SYSCALL(setregid, 127)
 DEF_SYSCALL(setgroups, 80)
 
+// DEF_SYSCALL(getuid, 24)
+// DEF_SYSCALL(geteuid, 25)
+// DEF_SYSCALL(getgid, 47)
+// DEF_SYSCALL(getegid, 43)
+// DEF_SYSCALL(getppid, 39)
+
+
 .data
 .global ___stack_chk_guard
 ___stack_chk_guard:

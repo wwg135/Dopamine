@@ -91,18 +91,22 @@ int __execve_orig(const char *path, char *const argv[], char *const envp[])
 // 2. Insert "DYLD_INSERT_LIBRARIES=/usr/lib/systemhook.dylib" into all binaries spawned
 // 3. Increase Jetsam limit to more sane value (Multipler defined as JETSAM_MULTIPLIER)
 
-static int spawn_exec_hook_common(const char *path,
-								  char *const argv[restrict],
-								  char *const envp[restrict],
-			   struct _posix_spawn_args_desc *desc,
-										int (*trust_binary)(const char *path),
-									   double jetsamMultiplier,
-									    int (^orig)(char *const envp[restrict]))
+static int spawn_exec_hook_common(bool isExec,
+						   const char *path,
+						   char *const argv[restrict],
+						   char *const envp[restrict],
+		struct _posix_spawn_args_desc *desc,
+								 int (*trust_binary)(const char *path),
+								double jetsamMultiplier,
+								 int (^orig)(pid_t *pid, char *const envp[restrict]))
 {
 	if (!path) {
-		return orig(envp);
+		return orig(NULL, envp);
 	}
 
+	bool personaFixNeedsResume = true;
+	int personaFixUid = -1;
+	int personaFixGid = -1;
 	posix_spawnattr_t attr = NULL;
 	if (desc) attr = desc->attrp;
 
@@ -170,10 +174,10 @@ static int spawn_exec_hook_common(const char *path,
 		}
 	} while (0);
 
-	// If systemhook is being injected and jetsam limits are set, increase them by a factor of jetsamMultiplier
-	if (shouldInsertJBEnv) {
-		uint8_t *attrStruct = (uint8_t *)attr;
-		if (attrStruct) {
+	uint8_t *attrStruct = (uint8_t *)attr;
+	if (attrStruct) {
+		// If systemhook is being injected and jetsam limits are set, increase them by a factor of jetsamMultiplier
+		if (shouldInsertJBEnv) {
 			if (jetsamMultiplier == 0 || isnan(jetsamMultiplier)) jetsamMultiplier = 3; // default value (3x)
 			if (jetsamMultiplier > 1) {
 				int memlimit_active = *(int*)(attrStruct + POSIX_SPAWNATTR_OFF_MEMLIMIT_ACTIVE);
@@ -186,13 +190,56 @@ static int spawn_exec_hook_common(const char *path,
 				}
 			}
 		}
+
+		// On iOS 17.6 and up Apple neutered persona overwrites to block going from (non root) -> (root)
+		// Since jailbreak infra relies on this, we need to reenable it via our patches
+		// To do this we will spawn the process as suspended, modify the ucred to the desired uid/gid and resume it
+		// POSIX_SPAWN_SETEXEC is not a concern since using it together with POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE is not supported anyways
+		if (__builtin_available(iOS 17.6, *)) {
+			bool hasExecFlag = false;
+			short flags = 0;
+			if (posix_spawnattr_getflags(&attr, &flags) == 0) {
+				if (flags & POSIX_SPAWN_SETEXEC) {
+					hasExecFlag = true;
+				}
+			}
+			if (!hasExecFlag && !isExec) {
+				struct _posix_spawn_persona_info *personaInfo = *(struct _posix_spawn_persona_info **)(attrStruct + POSIX_SPAWNATTR_OFF_PERSONA);
+				if (personaInfo) {
+					if (personaInfo->pspi_id == 99 && (personaInfo->pspi_flags & POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE)) {
+						if (personaInfo->pspi_flags & POSIX_SPAWN_PERSONA_UID) {
+							personaFixUid = personaInfo->pspi_uid;
+						}
+						if (personaInfo->pspi_flags & POSIX_SPAWN_PERSONA_GID) {
+							personaFixGid = personaInfo->pspi_gid;
+						}
+					}
+				}
+
+				if (personaFixUid == 0 || personaFixGid == 0) {
+					// Revert any request to become root back to mobile
+					// Otherwise posix_spawn will straight up fail
+					if (personaFixUid == 0) personaInfo->pspi_uid = 501;
+					if (personaFixGid == 0) personaInfo->pspi_gid = 501;
+
+					if (flags & POSIX_SPAWN_START_SUSPENDED) {
+						personaFixNeedsResume = false;
+					}
+					else {
+						posix_spawnattr_setflags(&attr, flags | POSIX_SPAWN_START_SUSPENDED);
+					}
+				}
+			}
+		}
 	}
 
 	int r = -1;
 
+	pid_t childPid = -1;
+
 	if ((shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 1) || (!shouldInsertJBEnv && JBEnvAlreadyInsertedCount == 0 && !hasSafeModeVariable)) {
 		// we're already good, just call orig
-		r = orig(envp);
+		r = orig(&childPid, envp);
 	}
 	else {
 		// the state we want to be in is not the state we are in right now
@@ -241,9 +288,16 @@ static int spawn_exec_hook_common(const char *path,
 			envbuf_unsetenv(&envc, "_MSSafeMode");
 		}
 
-		r = orig(envc);
+		r = orig(&childPid, envc);
 
 		envbuf_free(envc);
+	}
+
+	if (personaFixUid == 0 || personaFixGid == 0 && childPid != -1) {
+		jbclient_persona_fix(childPid, personaFixUid, personaFixGid);
+		if (personaFixNeedsResume) {
+			kill(childPid, SIGCONT);
+		}
 	}
 
 	return r;
@@ -261,8 +315,12 @@ int posix_spawn_hook_shared(pid_t *restrict pid,
 {
 	int (*posix_spawn_orig)(pid_t *restrict, const char *restrict, struct _posix_spawn_args_desc *, char *const[restrict], char *const[restrict]) = orig;
 
-	int r = spawn_exec_hook_common(path, argv, envp, desc, trust_binary, jetsamMultiplier, ^int(char *const envp_patched[restrict]) {
-		return posix_spawn_orig(pid, path, desc, argv, envp_patched);
+	int r = spawn_exec_hook_common(false, path, argv, envp, desc, trust_binary, jetsamMultiplier, ^int(pid_t *pidOut, char *const envp_patched[restrict]) {
+		int rr = posix_spawn_orig(pid ?: pidOut, path, desc, argv, envp_patched);
+		if (rr == 0 && pid && pidOut) {
+			*pidOut = *pid;
+		}
+		return rr;
 	});
 
 	if (r == 0 && pid && desc) {
@@ -273,7 +331,7 @@ int posix_spawn_hook_shared(pid_t *restrict pid,
 				// If something spawns a process as suspended, ensure mapping invalid pages in it is possible
 				// Normally it would only be possible after systemhook.dylib enables it
 				// Fixes Frida issues
-				int r = set_process_debugged(*pid, false);
+				set_process_debugged(*pid, false);
 			}
 		}
 	}
@@ -289,7 +347,7 @@ int execve_hook_shared(const char *path,
 {
 	int (*execve_orig)(const char *, char *const[], char *const[]) = orig;
 
-	int r = spawn_exec_hook_common(path, argv, envp, NULL, trust_binary, 0, ^int(char *const envp_patched[restrict]){
+	int r = spawn_exec_hook_common(true, path, argv, envp, NULL, trust_binary, 0, ^int(pid_t *pidOut, char *const envp_patched[restrict]){
 		return execve_orig(path, argv, envp_patched);
 	});
 
