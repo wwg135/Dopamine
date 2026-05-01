@@ -57,6 +57,14 @@ int physrw_physwritebuf(uint64_t pa, const void* input, size_t size)
 	return 0;
 }
 
+int physrw_physaccess_mapped(uint64_t pa, uint64_t size, kernel_map_accessor accessorBlock)
+{
+	void *ptr = physrw_phystouaddr(pa);
+	if (!ptr) return -1;
+	accessorBlock(ptr);
+	return 0;
+}
+
 int physrw_handoff(pid_t pid)
 {
 	if (!pid) return -1;
@@ -91,6 +99,7 @@ int libjailbreak_physrw_init(bool receivedHandoff)
 	}
 	gPrimitives.physreadbuf = physrw_physreadbuf;
 	gPrimitives.physwritebuf = physrw_physwritebuf;
+	gPrimitives.physaccess_mapped = physrw_physaccess_mapped;
 	gPrimitives.kreadbuf = NULL;
 	gPrimitives.kwritebuf = NULL;
 

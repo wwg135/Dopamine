@@ -25,6 +25,7 @@ struct system_info {
 		uint64_t PT_INDEX_MAX;
 		uint64_t nsysent;
 		uint64_t mach_trap_count;
+		uint64_t PVH_HIGH_FLAGS;
 	} kernelConstant;
 
 	struct {
@@ -127,6 +128,8 @@ struct system_info {
 		} filedesc;
 
 		struct {
+			uint32_t rw;
+			uint32_t ref;
 			uint32_t uid;
 			uint32_t ruid;
 			uint32_t svuid;
@@ -135,6 +138,11 @@ struct system_info {
 			uint32_t svgid;
 			uint32_t label;
 		} ucred;
+
+		struct {
+			bool exists;
+			uint32_t weak_ref;
+		} ucred_rw;
 
 		struct {
 			uint32_t map;
@@ -181,6 +189,9 @@ struct system_info {
 		struct {
 			uint32_t links;
 			uint32_t flags;
+			uint32_t flags_prot;
+			uint32_t flags_maxprot;
+			uint32_t flags_xnu_user_debug;
 		} vm_map_entry;
 
 		struct {
@@ -271,7 +282,8 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelConstant.smrBase); \
 	iterator(ctx, kernelConstant.PT_INDEX_MAX); \
 	iterator(ctx, kernelConstant.nsysent); \
-	iterator(ctx, kernelConstant.mach_trap_count);
+	iterator(ctx, kernelConstant.mach_trap_count); \
+	iterator(ctx, kernelConstant.PVH_HIGH_FLAGS);
 
 #define JAILBREAK_INFO_ITERATE(ctx, iterator) \
 	iterator(ctx, jailbreakInfo.usesPACBypass); \
@@ -359,6 +371,8 @@ extern struct system_info gSystemInfo;
 	\
 	iterator(ctx, kernelStruct.filedesc.ofiles_start); \
 	\
+	iterator(ctx, kernelStruct.ucred.rw); \
+	iterator(ctx, kernelStruct.ucred.ref); \
 	iterator(ctx, kernelStruct.ucred.uid); \
 	iterator(ctx, kernelStruct.ucred.ruid); \
 	iterator(ctx, kernelStruct.ucred.svuid); \
@@ -366,6 +380,9 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.ucred.rgid); \
 	iterator(ctx, kernelStruct.ucred.svgid); \
 	iterator(ctx, kernelStruct.ucred.label); \
+	\
+	iterator(ctx, kernelStruct.ucred_rw.exists); \
+	iterator(ctx, kernelStruct.ucred_rw.weak_ref); \
 	\
 	iterator(ctx, kernelStruct.task.map); \
 	iterator(ctx, kernelStruct.task.threads); \
@@ -397,6 +414,9 @@ extern struct system_info gSystemInfo;
 	\
 	iterator(ctx, kernelStruct.vm_map_entry.links); \
 	iterator(ctx, kernelStruct.vm_map_entry.flags); \
+	iterator(ctx, kernelStruct.vm_map_entry.flags_prot); \
+	iterator(ctx, kernelStruct.vm_map_entry.flags_maxprot); \
+	iterator(ctx, kernelStruct.vm_map_entry.flags_xnu_user_debug); \
 	\
 	iterator(ctx, kernelStruct.vm_map_links.prev); \
 	iterator(ctx, kernelStruct.vm_map_links.next); \

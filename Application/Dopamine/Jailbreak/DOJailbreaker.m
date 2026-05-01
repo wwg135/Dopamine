@@ -23,6 +23,7 @@
 #import <libjailbreak/info.h>
 #import <libjailbreak/util.h>
 #import <libjailbreak/trustcache.h>
+#import <libjailbreak/trustcache_fs.h>
 #import <libjailbreak/kalloc_pt.h>
 #import <libjailbreak/jbserver_boomerang.h>
 #import <libjailbreak/signatures.h>
@@ -80,14 +81,14 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             "physmap",
             "struct",
             "physrw",
-            "perfkrw",
+            NULL,
             NULL,
             NULL,
             NULL,
             NULL,
         };
 
-        uint32_t idx = 7;
+        uint32_t idx = 6;
         if (xpf_set_is_supported("devmode")) {
             sets[idx++] = "devmode"; 
         }
@@ -96,6 +97,9 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
         }
         if (xpf_set_is_supported("arm64kcall")) {
             sets[idx++] = "arm64kcall"; 
+        }
+        if (xpf_set_is_supported("perfkrw")) {
+            sets[idx++] = "perfkrw";
         }
 
         _systemInfoXdict = xpf_construct_offset_dictionary((const char **)sets);
@@ -552,7 +556,7 @@ void *boomerang_server(struct boomerang_info *info)
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Loading BaseBin TrustCache") debug:NO];
     *errOut = [self loadBasebinTrustcache];
     if (*errOut) return;
-    
+
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Initializing Environment") debug:NO];
     *errOut = [self injectLaunchdHook];
     if (*errOut) return;
@@ -582,8 +586,9 @@ void *boomerang_server(struct boomerang_info *info)
         *showLogs = NO;
         return;
     }
-    
+
     //printf("Starting launch daemons...\n");
+    //exec_cmd_trusted(JBROOT_PATH("/usr/bin/uicache"), "-a", NULL);
     //exec_cmd_trusted(JBROOT_PATH("/usr/bin/launchctl"), "bootstrap", "system", JBROOT_PATH("/Library/LaunchDaemons"), NULL);
     //exec_cmd_trusted(JBROOT_PATH("/usr/bin/launchctl"), "bootstrap", "system", JBROOT_PATH("/basebin/LaunchDaemons"), NULL);
     // Note: This causes the app to freeze in some instances due to launchd only having physrw_pte, we might want to only do it when neccessary

@@ -373,32 +373,41 @@ void *crashreporter_listen(void *arg)
 
 void crashreporter_pause(void)
 {
-	if (gCrashReporterState == kCrashReporterStateActive) {
-		task_set_exception_ports(mach_task_self_, EXC_MASK_CRASH_RELATED, 0, EXCEPTION_DEFAULT, ARM_THREAD_STATE64);
-		NSSetUncaughtExceptionHandler(defaultNSExceptionHandler);
-		defaultNSExceptionHandler = nil;
-		gCrashReporterState = kCrashReporterStatePaused;
+	if (@available(iOS 17.0, *)) {}
+	else {
+		if (gCrashReporterState == kCrashReporterStateActive) {
+			task_set_exception_ports(mach_task_self_, EXC_MASK_CRASH_RELATED, 0, EXCEPTION_DEFAULT, ARM_THREAD_STATE64);
+			NSSetUncaughtExceptionHandler(defaultNSExceptionHandler);
+			defaultNSExceptionHandler = nil;
+			gCrashReporterState = kCrashReporterStatePaused;
+		}
 	}
 }
 
 void crashreporter_resume(void)
 {
-	if (gCrashReporterState == kCrashReporterStatePaused) {
-		task_set_exception_ports(mach_task_self_, EXC_MASK_CRASH_RELATED, gExceptionPort, EXCEPTION_DEFAULT, ARM_THREAD_STATE64);
-		defaultNSExceptionHandler = NSGetUncaughtExceptionHandler();
-		NSSetUncaughtExceptionHandler(crashreporter_catch_objc);
-		gCrashReporterState = kCrashReporterStateActive;
+	if (@available(iOS 17.0, *)) {}
+	else {
+		if (gCrashReporterState == kCrashReporterStatePaused) {
+			task_set_exception_ports(mach_task_self_, EXC_MASK_CRASH_RELATED, gExceptionPort, EXCEPTION_DEFAULT, ARM_THREAD_STATE64);
+			defaultNSExceptionHandler = NSGetUncaughtExceptionHandler();
+			NSSetUncaughtExceptionHandler(crashreporter_catch_objc);
+			gCrashReporterState = kCrashReporterStateActive;
+		}
 	}
 }
 
 void crashreporter_start(void)
 {
-	if (gCrashReporterState == kCrashReporterStateNotActive) {
-		mach_port_allocate(mach_task_self_, MACH_PORT_RIGHT_RECEIVE, &gExceptionPort);
-		mach_port_insert_right(mach_task_self_, gExceptionPort, gExceptionPort, MACH_MSG_TYPE_MAKE_SEND);
-		pthread_create(&gExceptionThread, NULL, crashreporter_listen, "crashreporter");
-		gCrashReporterState = kCrashReporterStatePaused;
-		crashreporter_resume();
+	if (@available(iOS 17.0, *)) {}
+	else {
+		if (gCrashReporterState == kCrashReporterStateNotActive) {
+			mach_port_allocate(mach_task_self_, MACH_PORT_RIGHT_RECEIVE, &gExceptionPort);
+			mach_port_insert_right(mach_task_self_, gExceptionPort, gExceptionPort, MACH_MSG_TYPE_MAKE_SEND);
+			pthread_create(&gExceptionThread, NULL, crashreporter_listen, "crashreporter");
+			gCrashReporterState = kCrashReporterStatePaused;
+			crashreporter_resume();
+		}
 	}
 }
 

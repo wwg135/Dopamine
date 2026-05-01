@@ -717,6 +717,144 @@ int jbctl_earlyboot(mach_port_t earlyBootServer, ...)
 	return cmd_wait_for_exit(spawnedPid);
 }
 
+void proc_ucred_update(uint64_t proc, uint64_t newUcred)
+{
+	if (gSystemInfo.kernelStruct.proc_ro.exists) {
+		uint64_t proc_ro = kread_ptr(proc + koffsetof(proc, proc_ro));
+		kwrite64(proc_ro + koffsetof(proc_ro, ucred), newUcred);
+	}
+	else {
+		kwrite_ptr(proc + koffsetof(proc, ucred), newUcred, 0x84E8);
+	}
+}
+
+// NOTE: This functions assumes both processes to be in a somewhat paused state
+// Right now, in practice this is
+// procCopyTo: dyldhook or systemhook checking in (paused, waiting for response from launchd)
+// procCopyFrom: child process of target binary spawned as root (paused, waiting for us to kill it)
+void proc_copy_ucred(uint64_t procCopyFrom, uint64_t procCopyTo)
+{
+	uint64_t ucredToCopy = proc_ucred(procCopyFrom);
+	uint64_t origUcred   = proc_ucred(procCopyTo);
+
+	// Every process and every thread holds a lock on both ucred and ucred_rw
+
+	// Since we replace the ucred of procCopyTo, we need to decrement the refcnt of it's original ucred
+	// Then it will be freed by the system as soon as all threads have switched 
+	// to the new ucred via current_cached_proc_cred_update
+	kauth_cred_drop(origUcred);
+	kauth_cred_unref(origUcred);
+
+	// Since ucredToCopy will now be active on a new process, we need to bump it's refcount
+	kauth_cred_ref(ucredToCopy);
+	kauth_cred_hold(ucredToCopy);
+
+	// TODO: do we need to preserve mac_label to retain entitlements?
+
+	proc_ucred_update(procCopyTo, ucredToCopy);
+}
+
+int target_proc_with_ucred(const char *procPath, uid_t uid, gid_t gid, uid_t ruid, gid_t rgid, gid_t groups[NGROUPS_MAX])
+{
+	int comPipe[2];
+	pipe(comPipe);
+
+	posix_spawn_file_actions_t act;
+	posix_spawn_file_actions_init(&act);
+	posix_spawn_file_actions_adddup2(&act, comPipe[1], 3);
+
+	char uidString[12];
+	snprintf(uidString, sizeof(uidString), "%d", uid);
+
+	char gidString[12];
+	snprintf(gidString, sizeof(gidString), "%d", gid);
+
+	char ruidString[12];
+	snprintf(ruidString, sizeof(ruidString), "%d", ruid);
+
+	char rgidString[12];
+	snprintf(rgidString, sizeof(rgidString), "%d", rgid);
+
+	char groupsStrings[NGROUPS_MAX][12];
+	for (int i = 0; i < NGROUPS_MAX; i++) {
+		snprintf(groupsStrings[i], sizeof(groupsStrings[i]), "%d", groups[i]);
+	}
+
+	// exec_path
+	// 6 options
+	// 5 options with one arg
+	// 1 option with NGROUPS_MAX args
+	// NULL
+	const char *argv[1 + 6 + (5 * 1) + (1 * NGROUPS_MAX) + 1];
+	int idx = 0;
+	argv[idx++] = procPath;
+	argv[idx++] = "--fd";
+	argv[idx++] = "3";
+	argv[idx++] = "--uid";
+	argv[idx++] = uidString;
+	argv[idx++] = "--ruid";
+	argv[idx++] = ruidString;
+	argv[idx++] = "--gid";
+	argv[idx++] = gidString;
+	argv[idx++] = "--rgid";
+	argv[idx++] = rgidString;
+	argv[idx++] = "--groups";
+	for (int i = 0; i < NGROUPS_MAX; i++) {
+		argv[idx++] = groupsStrings[i];
+	}
+	argv[idx++] = NULL;
+
+	// In order to speed things up, skip any injection into the child process we spawn
+	const char *envp[] = {
+		"_SafeMode=1",
+		"DYLD_HOOK_SETUID=1",
+		NULL,
+	};
+
+	pid_t pid = 0;
+	int r = posix_spawn(&pid, procPath, &act, NULL, (char *const *)argv, (char *const *)envp);
+	posix_spawn_file_actions_destroy(&act);
+	if (r == 0) {
+		int r = 0;
+		read(comPipe[0], &r, sizeof(r));
+		close(comPipe[0]);
+		close(comPipe[1]);
+		return pid;
+	}
+
+	close(comPipe[0]);
+	close(comPipe[1]);
+
+	return -1;
+}
+
+int proc_ucred_update_content(uint64_t proc, const char *procPath, uid_t uid, gid_t gid, uid_t ruid, gid_t rgid, gid_t groups[NGROUPS_MAX])
+{
+	if (__builtin_available(iOS 17.0, *)) {
+		int childPid = target_proc_with_ucred(procPath, uid, gid, ruid, rgid, groups);
+		if (childPid == -1) {
+			return -1;
+		}
+
+		uint64_t childProc = proc_find(childPid);
+		proc_copy_ucred(childProc, proc);
+
+		kill(childPid, SIGKILL);
+		cmd_wait_for_exit(childPid);
+	}
+	else {
+		uint64_t ucred = proc_ucred(proc);
+
+		kwrite32(ucred + koffsetof(ucred, svuid), uid);
+		kwrite32(ucred + koffsetof(ucred, uid), uid);
+
+		kwrite32(ucred + koffsetof(ucred, svgid), gid);
+		kwrite32(ucred + koffsetof(ucred, groups), gid);
+	}
+
+	return 0;
+}
+
 void killall(const char *executablePath, int signal)
 {
 	static int maxArgumentSize = 0;

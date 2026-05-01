@@ -10,7 +10,19 @@ extern int fileport_makeport (int fd, mach_port_t * port);
 mach_port_t jbclient_mach_get_launchd_port(void)
 {
 	mach_port_t launchdPort = MACH_PORT_NULL;
-	task_get_bootstrap_port(task_self_trap(), &launchdPort);
+	task_get_bootstrap_port(mach_task_self(), &launchdPort);
+	if (launchdPort == MACH_PORT_NULL) {
+		mach_port_t *registeredPorts;
+		mach_msg_type_number_t registeredPortsCount = 0;
+		if (mach_ports_lookup(mach_task_self(), &registeredPorts, &registeredPortsCount) == KERN_SUCCESS) {
+			launchdPort = registeredPorts[0];
+			for (mach_msg_type_number_t i = 1; i < registeredPortsCount; i++) {
+				mach_port_deallocate(mach_task_self(), registeredPorts[i]);
+			}
+			vm_deallocate(mach_task_self(), (vm_address_t)registeredPorts, registeredPortsCount * sizeof(mach_port_t));
+		}
+	}
+
 	return launchdPort;
 }
 
@@ -35,19 +47,19 @@ kern_return_t jbclient_mach_send_msg(mach_msg_header_t *hdr, struct jbserver_mac
 	
 	kern_return_t kr = mach_msg(hdr, MACH_SEND_MSG, hdr->msgh_size, 0, 0, 0, 0);
 	if (kr != KERN_SUCCESS) {
-		mach_port_deallocate(task_self_trap(), launchdPort);
+		mach_port_deallocate(mach_task_self(), launchdPort);
 		return kr;
 	}
 	
 	kr = mach_msg(&reply->msg.hdr, MACH_RCV_MSG, 0, reply->msg.hdr.msgh_size, replyPort, 0, 0);
 	if (kr != KERN_SUCCESS) {
-		mach_port_deallocate(task_self_trap(), launchdPort);
+		mach_port_deallocate(mach_task_self(), launchdPort);
 		return kr;
 	}
 	
 	// Get rid of any rights we might have received
 	mach_msg_destroy(&reply->msg.hdr);
-	mach_port_deallocate(task_self_trap(), launchdPort);
+	mach_port_deallocate(mach_task_self(), launchdPort);
 	return KERN_SUCCESS;
 }
 

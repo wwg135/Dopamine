@@ -5,6 +5,7 @@
 #include "util.h"
 #include "codesign.h"
 #include <dispatch/dispatch.h>
+#include <stdatomic.h>
 
 uint64_t proc_find(pid_t pidToFind)
 {
@@ -111,7 +112,7 @@ uint64_t pai_to_pvh(uint64_t pai)
 
 uint64_t pvh_ptd(uint64_t pvh)
 {
-	return ((kread64(pvh) & PVH_LIST_MASK) | PVH_HIGH_FLAGS);
+	return ((kread64(pvh) & PVH_LIST_MASK) | kconstant(PVH_HIGH_FLAGS));
 }
 
 void task_set_memory_ownership_transfer(uint64_t task, bool value)
@@ -139,6 +140,72 @@ void mac_label_set(uint64_t label, int slot, uint64_t value)
 	}
 #endif
 	kwrite64(label + ((slot + 1) * sizeof(uint64_t)), value);
+}
+
+uint64_t kauth_cred_rw(uint64_t cred)
+{
+	if (gSystemInfo.kernelStruct.ucred_rw.exists) {
+		return kread_ptr(cred + koffsetof(ucred, rw));
+	}
+	return 0;
+}
+
+void kauth_cred_ref(uint64_t ucred)
+{
+	uint64_t refcntPtr = 0;
+	if (gSystemInfo.kernelStruct.ucred_rw.exists) {
+		uint64_t ucred_rw = kauth_cred_rw(ucred);
+		refcntPtr = ucred_rw + koffsetof(ucred_rw, weak_ref);
+	}
+	else {
+		refcntPtr = ucred + koffsetof(ucred, ref);
+	}
+
+	kaccess_mapped(refcntPtr, sizeof(uint64_t), ^(void *ptr){
+		_Atomic(uint64_t) *uintPtr = ptr;
+		atomic_fetch_add(uintPtr, 1);
+	});
+}
+
+void kauth_cred_unref(uint64_t ucred)
+{
+	uint64_t refcntPtr = 0;
+	if (gSystemInfo.kernelStruct.ucred_rw.exists) {
+		uint64_t ucred_rw = kauth_cred_rw(ucred);
+		refcntPtr = ucred_rw + koffsetof(ucred_rw, weak_ref);
+	}
+	else {
+		refcntPtr = ucred + koffsetof(ucred, ref);
+	}
+
+	kaccess_mapped(refcntPtr, sizeof(uint64_t), ^(void *ptr){
+		_Atomic(uint64_t) *uintPtr = ptr;
+		atomic_fetch_sub(uintPtr, 1);
+	});
+}
+
+void kauth_cred_hold(uint64_t ucred)
+{
+	if (gSystemInfo.kernelStruct.ucred_rw.exists) {
+		uint64_t refcntPtr = ucred + koffsetof(ucred, ref);
+
+		kaccess_mapped(refcntPtr, sizeof(uint64_t), ^(void *ptr){
+			_Atomic(uint64_t) *uintPtr = ptr;
+			atomic_fetch_add(uintPtr, 1);
+		});
+	}
+}
+
+void kauth_cred_drop(uint64_t ucred)
+{
+	if (gSystemInfo.kernelStruct.ucred_rw.exists) {
+		uint64_t refcntPtr = ucred + koffsetof(ucred, ref);
+		
+		kaccess_mapped(refcntPtr, sizeof(uint64_t), ^(void *ptr){
+			_Atomic(uint64_t) *uintPtr = ptr;
+			atomic_fetch_sub(uintPtr, 1);
+		});
+	}
 }
 
 #ifdef __arm64e__

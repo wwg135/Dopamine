@@ -13,6 +13,8 @@ typedef struct {
     uint64_t other[70];
 } kRegisterState;
 
+typedef void (^kernel_map_accessor)(void *ptr);
+
 struct kernel_primitives {
 	int (*kreadbuf)(uint64_t kaddr, void* output, size_t size);
 	int (*kwritebuf)(uint64_t kaddr, const void* input, size_t size);
@@ -25,6 +27,7 @@ struct kernel_primitives {
 	int (*kalloc_local)(uint64_t *addr, uint64_t size);
 	int (*kfree_global)(uint64_t addr, uint64_t size);
 	int (*kmap)(uint64_t pa, uint64_t size, void **uaddr);
+	int (*physaccess_mapped)(uint64_t pa, uint64_t size, kernel_map_accessor accessorBlock);
 	uint64_t (*vtophys)(uint64_t ttep, uint64_t va);
 	uint64_t (*phystokv)(uint64_t pa);
 };

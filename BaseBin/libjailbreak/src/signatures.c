@@ -86,17 +86,8 @@ bool macho_parse_code_signature(MachO *macho, cdhash_t cdhashOut)
 	return isAdhocSigned;
 }
 
-void file_collect_untrusted_cdhashes(int fd, cdhash_t **cdhashesOut, uint32_t *cdhashCountOut)
+void fat_collect_untrusted_cdhashes(Fat *fat, cdhash_t **cdhashesOut, uint32_t *cdhashCountOut)
 {
-	MemoryStream *s = file_stream_init_from_file_descriptor(fd, 0, FILE_STREAM_SIZE_AUTO, 0);
-	if (!s) return;
-
-	Fat *fat = fat_init_from_memory_stream(s);
-	if (!fat) {
-		memory_stream_free(s);
-		return;
-	}
-
 	__block cdhash_t *cdhashes = NULL;
 	__block uint32_t cdhashCount = 0;
 	fat_enumerate_slices(fat, ^(MachO *macho, bool *stop) {
@@ -112,10 +103,24 @@ void file_collect_untrusted_cdhashes(int fd, cdhash_t **cdhashesOut, uint32_t *c
 		}
 	});
 
-	fat_free(fat);
-
 	*cdhashesOut = cdhashes;
 	*cdhashCountOut = cdhashCount;
+}
+
+void file_collect_untrusted_cdhashes(int fd, cdhash_t **cdhashesOut, uint32_t *cdhashCountOut)
+{
+	MemoryStream *s = file_stream_init_from_file_descriptor(fd, 0, FILE_STREAM_SIZE_AUTO, 0);
+	if (!s) return;
+
+	Fat *fat = fat_init_from_memory_stream(s);
+	if (!fat) {
+		memory_stream_free(s);
+		return;
+	}
+
+	fat_collect_untrusted_cdhashes(fat, cdhashesOut, cdhashCountOut);
+
+	fat_free(fat);
 }
 
 void file_collect_untrusted_cdhashes_by_path(const char *path, cdhash_t **cdhashesOut, uint32_t *cdhashCountOut)

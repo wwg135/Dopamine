@@ -101,6 +101,19 @@ int physrw_pte_physwritebuf(uint64_t pa, const void* input, size_t size)
 	return r;
 }
 
+int physrw_pte_physaccess_mapped(uint64_t pa, uint64_t size, kernel_map_accessor accessorBlock)
+{
+	if ((pa & ~vm_real_kernel_page_mask) != ((pa + ((size != 0) ? (size - 1) : size)) & ~vm_real_kernel_page_mask)) {
+		// access would cross page boundary, unsupported
+		return -1;
+	}
+
+	acquire_window(pa & ~vm_real_kernel_page_mask, ^(void *ua) {
+		accessorBlock((void *)(((uintptr_t)ua) + (pa & vm_real_kernel_page_mask)));
+	});
+	return 0;
+}
+
 int physrw_pte_handoff(pid_t pid, uint64_t *swAsidPtr)
 {
 	if (!pid) return -1;
@@ -160,6 +173,7 @@ int libjailbreak_physrw_pte_init(bool receivedHandoff, uint64_t asidPtr)
 	}
 	gPrimitives.physreadbuf = physrw_pte_physreadbuf;
 	gPrimitives.physwritebuf = physrw_pte_physwritebuf;
+	gPrimitives.physaccess_mapped = physrw_pte_physaccess_mapped;
 	gPrimitives.kreadbuf = NULL;
 	gPrimitives.kwritebuf = NULL;
 

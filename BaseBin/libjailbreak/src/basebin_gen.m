@@ -62,16 +62,22 @@ NSString *dyldhook_dylib_for_platform(void)
 	size_t len = sizeof(cpusubtype);
 	if (sysctlbyname("hw.cpusubtype", &cpusubtype, &len, NULL, 0) == -1) { return nil; }
 	if ((cpusubtype & ~CPU_SUBTYPE_MASK) == CPU_SUBTYPE_ARM64E) {
-		if (@available(iOS 16.0, *)) {
-			return @"dyldhook_merge.arm64e.dylib"; 
+		if (@available(iOS 18.0, *)) {
+			return @"dyldhook_merge.arm64e.iOS18+.dylib"; 
+		}
+		else if (@available(iOS 16.0, *)) {
+			return @"dyldhook_merge.arm64e.iOS16-17.dylib"; 
 		}
 		else {
 			return @"dyldhook_merge.arm64e.iOS15.dylib"; 
 		}
 	}
 	else {
-		if (@available(iOS 16.0, *)) {
-			return @"dyldhook_merge.arm64.dylib"; 
+		if (@available(iOS 18.0, *)) {
+			return @"dyldhook_merge.arm64.iOS18+.dylib"; 
+		}
+		else if (@available(iOS 16.0, *)) {
+			return @"dyldhook_merge.arm64.iOS16-17.dylib"; 
 		}
 		else {
 			return @"dyldhook_merge.arm64.iOS15.dylib"; 

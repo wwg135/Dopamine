@@ -53,6 +53,8 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	}
 #endif
 
+	gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7F40000000000000LL;
+
 	// proc
 	gSystemInfo.kernelStruct.proc.list_next =  0x0;
 	gSystemInfo.kernelStruct.proc.list_prev =  0x8;
@@ -113,8 +115,10 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	gSystemInfo.kernelStruct.vm_map_header.nentries =  0x20;
 
 	// vm_map_entry
-	gSystemInfo.kernelStruct.vm_map_entry.links = 0x0;
-	gSystemInfo.kernelStruct.vm_map_entry.flags = 0x48;
+	gSystemInfo.kernelStruct.vm_map_entry.links         = 0x0;
+	gSystemInfo.kernelStruct.vm_map_entry.flags         = 0x48;
+	gSystemInfo.kernelStruct.vm_map_entry.flags_prot    = 7;
+	gSystemInfo.kernelStruct.vm_map_entry.flags_maxprot = 11;
 
 	// vm_map_links
 	gSystemInfo.kernelStruct.vm_map_links.prev =  0x0;
@@ -123,6 +127,8 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	gSystemInfo.kernelStruct.vm_map_links.max  = 0x18;
 
 	// ucred
+	gSystemInfo.kernelStruct.ucred.rw     = 0x0;
+	gSystemInfo.kernelStruct.ucred.ref    = 0x10;
 	uint32_t ucred_cr_posix = 0x18;
 	gSystemInfo.kernelStruct.ucred.uid    = ucred_cr_posix +  0x0;
 	gSystemInfo.kernelStruct.ucred.ruid   = ucred_cr_posix +  0x4;
@@ -197,6 +203,10 @@ void jbinfo_initialize_hardcoded_offsets(void)
 			gSystemInfo.kernelStruct.proc_ro.csflags = 0x1C;
 			gSystemInfo.kernelStruct.proc_ro.ucred   = 0x20;
 
+			// ucred_rw
+			gSystemInfo.kernelStruct.ucred_rw.exists = true;
+			gSystemInfo.kernelStruct.ucred_rw.weak_ref = 0x18;
+
 			// task
 #ifdef __arm64e__
 			gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x580 + taskJitboxAdjust;
@@ -245,6 +255,12 @@ void jbinfo_initialize_hardcoded_offsets(void)
 #endif
 					// vm_map
 					gSystemInfo.kernelStruct.vm_map.flags = 0xB4;
+
+					// vm_map_entry
+					gSystemInfo.kernelStruct.vm_map_entry.flags_xnu_user_debug = 28;
+
+					// ucred_rw
+					gSystemInfo.kernelStruct.ucred_rw.weak_ref = 0x0;
 
 					// trustcache
 					gSystemInfo.kernelStruct.trustcache.nextptr = 0x0;
@@ -296,22 +312,81 @@ void jbinfo_initialize_hardcoded_offsets(void)
 									}
 								}
 
-								if (strcmp(darwinVersion, "23.1.0") >= 0) {	// iOS 17.1+
-									// inpcb
-									gSystemInfo.kernelStruct.inpcb.icmp6filt = 0x148;
-									gSystemInfo.kernelStruct.inpcb.chksum 	 = 0x150;
+								if (strcmp(darwinVersion, "23.0.0") >= 0) { // iOS 17+
+									// pmap
+									gSystemInfo.kernelStruct.pmap.sw_asid    = 0xBE + pmapEl2Adjust;
+									gSystemInfo.kernelStruct.pmap.wx_allowed = 0xC2 + pmapEl2Adjust;
+									gSystemInfo.kernelStruct.pmap.type       = 0xC9 + pmapEl2Adjust;
 
-									// socket
-									gSystemInfo.kernelStruct.socket.usecount = 0x24c;
+									// vm_map
+									gSystemInfo.kernelStruct.vm_map.flags = 0xC8;
 
-									if(strcmp(darwinVersion, "23.4.0") >= 0) {	// iOS 17.4+
-										// socket
-										gSystemInfo.kernelStruct.socket.proto    = 0x20;
-										gSystemInfo.kernelStruct.socket.usecount = 0x254;
+									// ucred_rw
+									gSystemInfo.kernelStruct.ucred_rw.weak_ref = 0x0;
 
-										if(strcmp(darwinVersion, "25.0.0") >= 0) {	// iOS 26.0+
+									if (strcmp(darwinVersion, "23.1.0") >= 0) {	// iOS 17.1+
+										// inpcb
+										gSystemInfo.kernelStruct.inpcb.icmp6filt = 0x148;
+										gSystemInfo.kernelStruct.inpcb.chksum 	 = 0x150;
+
+										if (strcmp(darwinVersion, "23.4.0") >= 0) { // iOS 17.4+
 											// socket
-											gSystemInfo.kernelStruct.socket.usecount = 0x23c;
+											gSystemInfo.kernelStruct.socket.proto    = 0x20;
+											gSystemInfo.kernelStruct.socket.usecount = 0x254;
+
+											if (strcmp(darwinVersion, "24.0.0") >= 0) { // iOS 18+
+												gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7F10000000000000LL;
+
+												// vm_map
+												gSystemInfo.kernelStruct.vm_map.flags = 0xD8;
+
+												// task
+#ifdef __arm64e__
+												gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x568 + taskJitboxAdjust;
+#else
+												gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x548;
+#endif
+												if (strcmp(darwinVersion, "24.1.0") >= 0) { // iOS 18.1+
+													// No more size
+													gSystemInfo.kernelStruct.trustcache.size        = 0x0;
+													gSystemInfo.kernelStruct.trustcache.fileptr     = 0x18;
+													gSystemInfo.kernelStruct.trustcache.struct_size = 0x28;
+
+													if (strcmp(darwinVersion, "24.4.0") >= 0) { // iOS 18.4+
+														gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7F90000000000000LL;
+
+														// task
+#ifdef __arm64e__
+														gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x588 + taskJitboxAdjust;
+#else
+														gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x568;
+#endif
+														// No more prev (Fully back to iOS 15 format, lol)
+														gSystemInfo.kernelStruct.trustcache.prevptr = 0x0;
+
+														// p_original_ppid was removed from proc
+														gSystemInfo.kernelStruct.proc.svuid  = 0x38;
+														gSystemInfo.kernelStruct.proc.svgid  = 0x3C;
+														// starting at p_puniqueid, everything is the same as before again
+
+														// pid_t p_orig_ppid;
+														// int p_orig_ppidversion;
+														// ^ Was added right before csflags, so everything after it shifted by 0x8
+														gSystemInfo.kernelStruct.proc_ro.csflags               += 0x8;
+														gSystemInfo.kernelStruct.proc_ro.ucred                 += 0x8;
+														gSystemInfo.kernelStruct.proc_ro.syscall_filter_mask   += 0x8;
+														gSystemInfo.kernelStruct.proc_ro.mach_trap_filter_mask += 0x8;
+														gSystemInfo.kernelStruct.proc_ro.mach_kobj_filter_mask += 0x8;
+														gSystemInfo.kernelStruct.proc_ro.t_flags_ro            += 0x8;
+
+														// iOS 26.0+
+														if (strcmp(darwinVersion, "25.0.0") >= 0) {
+															// socket
+															gSystemInfo.kernelStruct.socket.usecount = 0x23c;
+														}
+													}
+												}
+											}
 										}
 									}
 								}

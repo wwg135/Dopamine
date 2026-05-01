@@ -1,6 +1,7 @@
 #import <libjailbreak/libjailbreak.h>
 #import <libjailbreak/jbclient_xpc.h>
 #import <libjailbreak/jbclient_mach.h>
+#import <libjailbreak/stock_fixes.h>
 #import "internal.h"
 
 #import <Foundation/Foundation.h>

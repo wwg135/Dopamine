@@ -39,6 +39,8 @@ uint64_t kptr_sign(uint64_t kaddr, uint64_t pointer, uint16_t salt);
 
 void proc_allow_all_syscalls(uint64_t proc);
 void proc_remove_msg_filter(uint64_t proc);
+void proc_ucred_update(uint64_t proc, uint64_t newUcred);
+int proc_ucred_update_content(uint64_t proc, const char *procPath, uid_t uid, gid_t gid, uid_t ruid, gid_t rgid, gid_t groups[NGROUPS_MAX]);
 
 void killall(const char *executablePath, int signal);
 int libarchive_unarchive(const char *fileToExtract, const char *extractionPath);
@@ -75,10 +77,13 @@ char *boot_manifest_hash(void);
 	(outPath); \
 })
 
-#define VM_FLAGS_GET_PROT(x)    ((x >>  7) & 0xFULL)
-#define VM_FLAGS_GET_MAXPROT(x) ((x >> 11) & 0xFULL);
-#define VM_FLAGS_SET_PROT(x, p)    x = ((x & ~(0xFULL <<  7)) | (((uint64_t)p) <<  7))
-#define VM_FLAGS_SET_MAXPROT(x, p) x = ((x & ~(0xFULL << 11)) | (((uint64_t)p) << 11))
+#define VM_FLAGS_GET_PROT(x)    ((x >> koffsetof(vm_map_entry, flags_prot))    & 0xFULL)
+#define VM_FLAGS_GET_MAXPROT(x) ((x >> koffsetof(vm_map_entry, flags_maxprot)) & 0xFULL);
+#define VM_FLAGS_SET_PROT(x, p)    x = ((x & ~(0xFULL <<    koffsetof(vm_map_entry, flags_prot))) | (((uint64_t)p) <<    koffsetof(vm_map_entry, flags_prot)))
+#define VM_FLAGS_SET_MAXPROT(x, p) x = ((x & ~(0xFULL << koffsetof(vm_map_entry, flags_maxprot))) | (((uint64_t)p) << koffsetof(vm_map_entry, flags_maxprot)))
+#define VM_FLAGS_GET_XNU_USER_DEBUG(x) ((bool)((x >> koffsetof(vm_map_entry, flags_xnu_user_debug)) & 0x1))
+#define VM_FLAGS_SET_XNU_USER_DEBUG(x, b) x = (x & ~(0x1 << koffsetof(vm_map_entry, flags_xnu_user_debug))) | (((uint64_t)b) << koffsetof(vm_map_entry, flags_xnu_user_debug))
+
 
 #ifdef __OBJC__
 NSString *NSPrebootUUIDPath(NSString *relativePath);
