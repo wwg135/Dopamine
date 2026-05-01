@@ -22,10 +22,6 @@ extern char **environ;
 
 #define FAKE_PHYSPAGE_TO_MAP 0x13370000
 
-#define POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE 1
-extern int posix_spawnattr_set_persona_np(const posix_spawnattr_t* __restrict, uid_t, uint32_t);
-extern int posix_spawnattr_set_persona_uid_np(const posix_spawnattr_t* __restrict, uid_t);
-extern int posix_spawnattr_set_persona_gid_np(const posix_spawnattr_t* __restrict, uid_t);
 int posix_spawnattr_set_registered_ports_np(posix_spawnattr_t * __restrict attr, mach_port_t portarray[], uint32_t count);
 
 const struct mach_header *get_mach_header(const char *name)

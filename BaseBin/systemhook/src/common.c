@@ -12,6 +12,7 @@
 #include "private.h"
 #include <libjailbreak/jbclient_xpc.h>
 #include <libjailbreak/jbserver_domains.h>
+#include <libjailbreak/util.h>
 
 bool string_has_prefix(const char *str, const char* prefix)
 {
@@ -203,7 +204,7 @@ static int spawn_exec_hook_common(bool isExec,
 					hasExecFlag = true;
 				}
 			}
-			if (!hasExecFlag && !isExec) {
+			if (!hasExecFlag && !isExec && getuid() != 0) {
 				struct _posix_spawn_persona_info *personaInfo = *(struct _posix_spawn_persona_info **)(attrStruct + POSIX_SPAWNATTR_OFF_PERSONA);
 				if (personaInfo) {
 					if (personaInfo->pspi_id == 99 && (personaInfo->pspi_flags & POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE)) {
@@ -228,6 +229,17 @@ static int spawn_exec_hook_common(bool isExec,
 					else {
 						posix_spawnattr_setflags(&attr, flags | POSIX_SPAWN_START_SUSPENDED);
 					}
+				}
+			}
+		}
+
+		// In iOS 17.0+ we can't give Dopamine root on check-in anymore, so we have to give it root at spawn
+		if (__builtin_available(iOS 17.0, *)) {
+			if (getpid() == 1 && path) {
+				if (string_has_suffix(path, "/Dopamine.app/Dopamine")) {
+					posix_spawnattr_set_persona_np(&attr, 99, POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE);
+					posix_spawnattr_set_persona_uid_np(&attr, 0);
+					posix_spawnattr_set_persona_gid_np(&attr, 0);
 				}
 			}
 		}
