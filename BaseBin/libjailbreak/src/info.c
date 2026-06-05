@@ -328,6 +328,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 										// inpcb
 										gSystemInfo.kernelStruct.inpcb.icmp6filt = 0x148;
 										gSystemInfo.kernelStruct.inpcb.chksum 	 = 0x150;
+										
+										// socket
+										gSystemInfo.kernelStruct.socket.usecount = 0x24c;
 
 										if (strcmp(darwinVersion, "23.4.0") >= 0) { // iOS 17.4+
 											// socket
