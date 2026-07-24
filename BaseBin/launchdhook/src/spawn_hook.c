@@ -1,5 +1,5 @@
 #include <spawn.h>
-#include "../systemhook/src/common.h"
+#include "../systemhook/src/common/common.h"
 #include "boomerang.h"
 #include "crashreporter.h"
 #include "update.h"
@@ -8,7 +8,9 @@
 #include <mach-o/dyld.h>
 #include <sys/param.h>
 #include <sys/mount.h>
+#include <litehook.h>
 #include "jbserver/jbserver_local.h"
+#include "hookd_provider.h"
 extern char **environ;
 
 void abort_with_reason(uint32_t reason_namespace, uint64_t reason_code, const char *reason_string, uint64_t reason_flags);
@@ -29,8 +31,8 @@ void early_boot_done(void)
 void ensure_fakelib_mounted(void)
 {
 	struct statfs fsb;
-    if (statfs("/usr/lib", &fsb) != 0) return;
-    if (strcmp(fsb.f_mntonname, "/usr/lib") != 0) {
+	if (statfs("/usr/lib", &fsb) != 0) return;
+	if (strcmp(fsb.f_mntonname, "/usr/lib") != 0) {
 		systemwide_domain_set_enabled(true);
 
 		// The jailbreak server is not reachable at this point in the launchd lifecycle
@@ -54,7 +56,7 @@ int __posix_spawn_orig_wrapper(pid_t *restrict pid, const char *restrict path,
 	// otherwise the child process inherits the exception ports
 	// and this would trip jailbreak detections
 	crashreporter_pause();	
-	int r = __posix_spawn_orig(pid, path, desc, argv, envp);
+	int r = __posix_spawn_inline(pid, path, desc, argv, envp);
 	crashreporter_resume();
 
 	return r;
@@ -77,6 +79,8 @@ int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 			// We are back in "early boot" for the remainder of this launchd instance
 			// Mainly so we don't lock up while spawning boomerang
 			gInEarlyBoot = true;
+
+			hookd_provider_teardown();
 
 			// If the jailbreak is currently hidden, fakelib is not mounted
 			// It needs to be mounted to regain launchd code execution after the userspace reboot
@@ -169,5 +173,5 @@ int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 
 void initSpawnHooks(void)
 {
-	MSHookFunction(&__posix_spawn, (void *)__posix_spawn_hook, NULL);
+	litehook_hook_function(__posix_spawn, __posix_spawn_hook);
 }

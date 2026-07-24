@@ -30,10 +30,9 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 
 int reboot3(uint64_t flags, ...);
+CFPropertyListRef MGCopyAnswer(CFStringRef);
 
 @implementation DOEnvironmentManager
-
-@synthesize bootManifestHash = _bootManifestHash;
 
 + (instancetype)sharedManager
 {
@@ -86,20 +85,15 @@ int reboot3(uint64_t flags, ...);
     }
 }
 
-- (NSData *)bootManifestHash
+- (NSString *)privatePrebootPath
 {
-    if (!_bootManifestHash) {
-        io_registry_entry_t registryEntry = IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen");
-        if (registryEntry) {
-            _bootManifestHash = (__bridge NSData *)IORegistryEntryCreateCFProperty(registryEntry, CFSTR("boot-manifest-hash"), NULL, 0);
-        }
-    }
-    return _bootManifestHash;
+    return @"/private/preboot";
 }
 
 - (NSString *)activePrebootPath
 {
-    return [@"/private/preboot" stringByAppendingPathComponent:[self bootManifestHash].hexString];
+    NSString *bootManifestString = [NSString stringWithUTF8String:boot_manifest_hash()];
+    return [[self privatePrebootPath] stringByAppendingPathComponent:bootManifestString];
 }
 
 - (void)locateJailbreakRoot
@@ -250,6 +244,11 @@ int reboot3(uint64_t flags, ...);
         }];
     }];
     return version;
+}
+
+- (NSString *)systemVersion
+{
+    return (__bridge NSString *)MGCopyAnswer((__bridge CFStringRef)@"ProductVersion");
 }
 
 - (BOOL)isBootstrapped
@@ -571,7 +570,7 @@ int reboot3(uint64_t flags, ...);
 
 - (NSString *)accessibleKernelPath
 {
-    if ([self isInstalledThroughTrollStore]) {
+    if ([self isInstalledThroughTrollStore] || getuid() == 0) {
         NSString *kernelcachePath = [[self activePrebootPath] stringByAppendingPathComponent:@"System/Library/Caches/com.apple.kernelcaches/kernelcache"];
         if ([[NSFileManager defaultManager] fileExistsAtPath:kernelcachePath]) {
             return kernelcachePath;
@@ -592,6 +591,41 @@ int reboot3(uint64_t flags, ...);
         return kernelcachePath;
     }
 }
+
+- (NSString *)accessibleSPTMPath
+{
+    NSString *sptmInAppPath = [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:@"sptm.img4"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:sptmInAppPath]) {
+        return sptmInAppPath;
+    }
+
+    if ([self isInstalledThroughTrollStore] || getuid() == 0) {
+        NSString *sptmPath = [[self activePrebootPath] stringByAppendingPathComponent:@"/usr/standalone/firmware/FUD/Ap,SecurePageTableMonitor.img4"];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:sptmPath]) {
+            return sptmPath;
+        }
+    }
+
+    return nil;
+}
+
+- (NSString *)accessibleTXMPath
+{
+    NSString *txmInAppPath = [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:@"txm.img4"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:txmInAppPath]) {
+        return txmInAppPath;
+    }
+
+    if ([self isInstalledThroughTrollStore] || getuid() == 0) {
+        NSString *txmPath = [[self activePrebootPath] stringByAppendingPathComponent:@"/usr/standalone/firmware/FUD/Ap,TrustedExecutionMonitor.img4"];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:txmPath]) {
+            return txmPath;
+        }
+    }
+
+    return nil;
+}
+
 
 - (BOOL)isPACBypassRequired
 {
@@ -710,7 +744,7 @@ int reboot3(uint64_t flags, ...);
         UIImage *bootLogoImage;
 
         if ([[DOPreferenceManager sharedManager] boolPreferenceValueForKey:@"customBootlogoEnabled" fallback:NO]) {
-            bootLogoImage = [UIImage imageWithContentsOfFile:[DOUIManager sharedInstance].bootlogoPath];
+            bootLogoImage = [NSClassFromString(@"UIImage") imageWithContentsOfFile:[DOUIManager sharedInstance].bootlogoPath];
         }
 
         if (!bootLogoImage) {

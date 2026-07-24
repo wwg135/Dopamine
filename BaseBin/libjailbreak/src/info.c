@@ -2,6 +2,7 @@
 #include "kernel.h"
 #include "machine_info.h"
 #include "primitives.h"
+#include "util.h"
 #include <sys/utsname.h>
 #include <xpc/xpc.h>
 #include <sys/types.h>
@@ -22,26 +23,37 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	uint64_t xnuMajor = 0, xnuMinor = 0;
 	sscanf(strstr(name.version, "xnu-"), "xnu-%llu.%llu.%*s", &xnuMajor, &xnuMinor);
 
+	bool isArm64e = host_is_arm64e();
+
 	cpu_subtype_t cpuFamily = 0;
 	size_t cpuFamilySize = sizeof(cpuFamily);
 	sysctlbyname("hw.cpufamily", &cpuFamily, &cpuFamilySize, NULL, 0);
 
-	bool hasJitbox = (cpuFamily == CPUFAMILY_ARM_BLIZZARD_AVALANCHE || // A15
-					  cpuFamily == CPUFAMILY_ARM_EVEREST_SAWTOOTH || // A16
-					  cpuFamily == CPUFAMILY_ARM_COLL); // A17
+	bool hasJitbox = (cpuFamily == CPUFAMILY_ARM_BLIZZARD_AVALANCHE || 	// A15 / M2
+					  cpuFamily == CPUFAMILY_ARM_EVEREST_SAWTOOTH || 	// A16
+					  cpuFamily == CPUFAMILY_ARM_COLL || 				// A17
+					  cpuFamily == CPUFAMILY_ARM_TUPAI ||   			// A18
+					  cpuFamily == CPUFAMILY_ARM_TAHITI ||  			// A18 Pro
+					  cpuFamily == CPUFAMILY_ARM_IBIZA ||   			// M3
+					  cpuFamily == CPUFAMILY_ARM_DONAN);				// M4
+
+	bool hasSPTM = ksymbol(SPTMArgs) != 0;
 
 	uint32_t taskJitboxAdjust = 0x0;
 	if (hasJitbox) {
 		taskJitboxAdjust = 0x10;
 		if (strcmp(darwinVersion, "22.0.0") >= 0) {
-			// In iOS 16, there is a new jitbox related attribute
+			// In iOS 16+, there is a new jitbox related attribute
 			taskJitboxAdjust = 0x18;
+			if (strcmp(darwinVersion, "24.4.0") >= 0) {
+				// In iOS 18.4+, there is yet another new jitbox related attribute
+				taskJitboxAdjust = 0x20;
+			}
 		}
 	}
 
 	uint32_t pmapEl2Adjust = ((kconstant(kernel_el) == 2) ? 8 : 0);
 
-#ifndef __arm64e__
 	uint32_t pmapA11Adjust = 0;
 	if (cpuFamily == CPUFAMILY_ARM_MONSOON_MISTRAL) {
 		if (strcmp(darwinVersion, "21.0.0") >= 0) { // iOS 15+
@@ -51,9 +63,20 @@ void jbinfo_initialize_hardcoded_offsets(void)
 			}
 		}
 	}
-#endif
 
-	gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7F40000000000000LL;
+	int pmapA13A14TXMiOS27Adjust = 0;
+	if (cpuFamily == CPUFAMILY_ARM_LIGHTNING_THUNDER || /* A13 */
+		cpuFamily == CPUFAMILY_ARM_FIRESTORM_ICESTORM)  /* A14 */ {
+		if (strcmp(darwinVersion, "27.0.0") >= 0) {
+			pmapA13A14TXMiOS27Adjust = -8;
+		}
+	}
+
+	gSystemInfo.kernelConstant.PVH_TYPE_MASK  = 0x3;
+	gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7F40000000000000;
+
+	gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_SHIFT = 6;
+	gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_BASE  = 0xFFFFFFE000000000;
 
 	// proc
 	gSystemInfo.kernelStruct.proc.list_next =  0x0;
@@ -83,27 +106,28 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	// pmap
 	gSystemInfo.kernelStruct.pmap.tte        = 0x0;
 	gSystemInfo.kernelStruct.pmap.ttep       = 0x8;
-#ifdef __arm64e__
-	gSystemInfo.kernelStruct.pmap.pmap_cs_main = 0x90;
-	gSystemInfo.kernelStruct.pmap.sw_asid      = 0xBE + pmapEl2Adjust;
-	gSystemInfo.kernelStruct.pmap.wx_allowed   = 0xC2 + pmapEl2Adjust;
-	gSystemInfo.kernelStruct.pmap.type         = 0xC8 + pmapEl2Adjust;
-#else
-	gSystemInfo.kernelStruct.pmap.sw_asid    = 0x96;
-	gSystemInfo.kernelStruct.pmap.wx_allowed = 0;
-	gSystemInfo.kernelStruct.pmap.type       = 0x9c + pmapA11Adjust;
-#endif
+	if (isArm64e) {
+		gSystemInfo.kernelStruct.pmap.pmap_cs_main = 0x90;
+		gSystemInfo.kernelStruct.pmap.sw_asid      = 0xBE + pmapEl2Adjust;
+		gSystemInfo.kernelStruct.pmap.wx_allowed   = 0xC2 + pmapEl2Adjust;
+		gSystemInfo.kernelStruct.pmap.type         = 0xC8 + pmapEl2Adjust;
+	}
+	else {
+		gSystemInfo.kernelStruct.pmap.sw_asid    = 0x96;
+		gSystemInfo.kernelStruct.pmap.wx_allowed = 0;
+		gSystemInfo.kernelStruct.pmap.type       = 0x9c + pmapA11Adjust;
+	}
 
-#ifdef __arm64e__
-	// pmap_cs_region
-	gSystemInfo.kernelStruct.pmap_cs_region.pmap_cs_region_next = 0x0;
-	gSystemInfo.kernelStruct.pmap_cs_region.cd_entry            = 0x28;
+	if (isArm64e) {
+		// pmap_cs_region
+		gSystemInfo.kernelStruct.pmap_cs_region.pmap_cs_region_next = 0x0;
+		gSystemInfo.kernelStruct.pmap_cs_region.cd_entry            = 0x28;
 
-	// pmap_cs_code_directory
-	gSystemInfo.kernelStruct.pmap_cs_code_directory.pmap_cs_code_directory_next = 0x0;
-	gSystemInfo.kernelStruct.pmap_cs_code_directory.main_binary                 = 0x50;
-	gSystemInfo.kernelStruct.pmap_cs_code_directory.trust                       = 0x9C;
-#endif
+		// pmap_cs_code_directory
+		gSystemInfo.kernelStruct.pmap_cs_code_directory.pmap_cs_code_directory_next = 0x0;
+		gSystemInfo.kernelStruct.pmap_cs_code_directory.main_binary                 = 0x50;
+		gSystemInfo.kernelStruct.pmap_cs_code_directory.trust                       = 0x9C;
+	}
 
 	// pt_desc
 	gSystemInfo.kernelStruct.pt_desc.pmap     = 0x10;
@@ -111,20 +135,20 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	gSystemInfo.kernelStruct.pt_desc.ptd_info = koffsetof(pt_desc, va) + (kconstant(PT_INDEX_MAX) * sizeof(uint64_t));
 
 	// vm_map_header
-	gSystemInfo.kernelStruct.vm_map_header.links    =  0x0;
-	gSystemInfo.kernelStruct.vm_map_header.nentries =  0x20;
+	gSystemInfo.kernelStruct.vm_map_header.last       = 0x0;
+	gSystemInfo.kernelStruct.vm_map_header.first      = 0x8;
+	gSystemInfo.kernelStruct.vm_map_header.min_offset = 0x10;
+	gSystemInfo.kernelStruct.vm_map_header.max_offset = 0x18;
+	gSystemInfo.kernelStruct.vm_map_header.nentries   = 0x20;
 
 	// vm_map_entry
-	gSystemInfo.kernelStruct.vm_map_entry.links         = 0x0;
+	gSystemInfo.kernelStruct.vm_map_entry.prev          = 0x0;
+	gSystemInfo.kernelStruct.vm_map_entry.next          = 0x8;
+	gSystemInfo.kernelStruct.vm_map_entry.start         = 0x10;
+	gSystemInfo.kernelStruct.vm_map_entry.end           = 0x18;
 	gSystemInfo.kernelStruct.vm_map_entry.flags         = 0x48;
 	gSystemInfo.kernelStruct.vm_map_entry.flags_prot    = 7;
 	gSystemInfo.kernelStruct.vm_map_entry.flags_maxprot = 11;
-
-	// vm_map_links
-	gSystemInfo.kernelStruct.vm_map_links.prev =  0x0;
-	gSystemInfo.kernelStruct.vm_map_links.next =  0x8;
-	gSystemInfo.kernelStruct.vm_map_links.min  = 0x10;
-	gSystemInfo.kernelStruct.vm_map_links.max  = 0x18;
 
 	// ucred
 	gSystemInfo.kernelStruct.ucred.rw     = 0x0;
@@ -138,6 +162,11 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	gSystemInfo.kernelStruct.ucred.svgid  = ucred_cr_posix + 0x54;
 	gSystemInfo.kernelStruct.ucred.label  = 0x78;
 
+	// RBLink
+	gSystemInfo.kernelStruct.RBLink.rbe_left   = 0x0;
+	gSystemInfo.kernelStruct.RBLink.rbe_right  = 0x8;
+	gSystemInfo.kernelStruct.RBLink.rbe_parent = 0x10;
+
 	if (strcmp(darwinVersion, "21.0.0") >= 0) { // iOS 15+
 		// proc
 		gSystemInfo.kernelStruct.proc.svuid   =  0x3C;
@@ -149,11 +178,12 @@ void jbinfo_initialize_hardcoded_offsets(void)
 		gSystemInfo.kernelStruct.proc.csflags = 0x300;
 
 		// task
-#ifdef __arm64e__
-		gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x5B0 + taskJitboxAdjust;
-#else
-		gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x590;
-#endif
+		if (isArm64e) {
+			gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x5B0 + taskJitboxAdjust;
+		}
+		else {
+			gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x590;
+		}
 
 		// ipc_port
 		gSystemInfo.kernelStruct.ipc_port.kobject = 0x58;
@@ -208,11 +238,13 @@ void jbinfo_initialize_hardcoded_offsets(void)
 			gSystemInfo.kernelStruct.ucred_rw.weak_ref = 0x18;
 
 			// task
-#ifdef __arm64e__
-			gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x580 + taskJitboxAdjust;
-#else
-			gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x560;
-#endif
+			if (isArm64e) {
+				gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x580 + taskJitboxAdjust;
+			}
+			else {
+				gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x560;
+			}
+
 			if (strcmp(darwinVersion, "21.4.0") >= 0) { // iOS 15.4+
 				// proc
 				gSystemInfo.kernelStruct.proc.textvp = 0x350;
@@ -246,13 +278,13 @@ void jbinfo_initialize_hardcoded_offsets(void)
 					gSystemInfo.kernelStruct.socket.usecount = 0x22c;
 
 					// task
-#ifdef __arm64e__
-					gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x548 + taskJitboxAdjust;
-					gSystemInfo.kernelStruct.task.flags = 0x3b8 + taskJitboxAdjust;
-#else
-					gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x528;
-					gSystemInfo.kernelStruct.task.flags = 0x3a0;
-#endif
+					if (isArm64e) {
+						gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x548 + taskJitboxAdjust;
+						gSystemInfo.kernelStruct.task.flags = 0x3b8 + taskJitboxAdjust;
+					} else {
+						gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x528;
+						gSystemInfo.kernelStruct.task.flags = 0x3a0;
+					}
 					// vm_map
 					gSystemInfo.kernelStruct.vm_map.flags = 0xB4;
 
@@ -265,28 +297,29 @@ void jbinfo_initialize_hardcoded_offsets(void)
 					// trustcache
 					gSystemInfo.kernelStruct.trustcache.nextptr = 0x0;
 					gSystemInfo.kernelStruct.trustcache.prevptr = 0x8;
-					gSystemInfo.kernelStruct.trustcache.size = 0x18;
+					gSystemInfo.kernelStruct.trustcache.type    = 0x10;
+					gSystemInfo.kernelStruct.trustcache.size    = 0x18;
 					gSystemInfo.kernelStruct.trustcache.fileptr = 0x20;
 					gSystemInfo.kernelStruct.trustcache.struct_size = 0x28;
 
 					// pmap
-#ifdef __arm64e__
-					gSystemInfo.kernelStruct.pmap.sw_asid    = 0xB6 + pmapEl2Adjust;
-					gSystemInfo.kernelStruct.pmap.wx_allowed = 0xBA + pmapEl2Adjust;
-					gSystemInfo.kernelStruct.pmap.type       = 0xC0 + pmapEl2Adjust;
-#else
-					gSystemInfo.kernelStruct.pmap.sw_asid    = 0x8e;
-					gSystemInfo.kernelStruct.pmap.wx_allowed = 0;
-					gSystemInfo.kernelStruct.pmap.type       = 0x94 + pmapA11Adjust;
-#endif
+					if (isArm64e) {
+						gSystemInfo.kernelStruct.pmap.sw_asid    = 0xB6 + pmapEl2Adjust;
+						gSystemInfo.kernelStruct.pmap.wx_allowed = 0xBA + pmapEl2Adjust;
+						gSystemInfo.kernelStruct.pmap.type       = 0xC0 + pmapEl2Adjust;
+					} else {
+						gSystemInfo.kernelStruct.pmap.sw_asid    = 0x8e;
+						gSystemInfo.kernelStruct.pmap.wx_allowed = 0;
+						gSystemInfo.kernelStruct.pmap.type       = 0x94 + pmapA11Adjust;
+					}
 
-#ifdef __arm64e__
-					// pmap_cs_code_directory
-					gSystemInfo.kernelStruct.pmap_cs_code_directory.main_binary = 0x190;
-					gSystemInfo.kernelStruct.pmap_cs_code_directory.trust       = 0x1DC;
-#endif
+					if (isArm64e) {
+						// pmap_cs_code_directory
+						gSystemInfo.kernelStruct.pmap_cs_code_directory.main_binary = 0x190;
+						gSystemInfo.kernelStruct.pmap_cs_code_directory.trust       = 0x1DC;
+					}
 
-					if (strcmp(darwinVersion, "22.1.0") >= 0 && (xnuMajor > 8792 || (xnuMajor == 8792 && xnuMinor >= 42))) { // iOS 16.1+ (Exluding 16.1b1 - 16.1b3 on iOS and 16.1b1 - 16.1b4 on iPadOS)
+					if (strcmp(darwinVersion, "22.1.0") >= 0 && (xnuMajor > 8792 || (xnuMajor == 8792 && xnuMinor >= 42))) { // iOS 16.1+
 						gSystemInfo.kernelStruct.ipc_space.table_uses_smr = true;
 
 						// proc_ro
@@ -294,15 +327,17 @@ void jbinfo_initialize_hardcoded_offsets(void)
 
 						if (strcmp(darwinVersion, "22.3.0") >= 0) { // iOS 16.3+
 							gSystemInfo.kernelConstant.smrBase = 2;
+							gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_BASE = 0xFFFFFFDC00000000ULL;
+
 							if (strcmp(darwinVersion, "22.4.0") >= 0) { // iOS 16.4+
 								// proc
 								gSystemInfo.kernelStruct.proc.flag   = 0x454;
 								gSystemInfo.kernelStruct.proc.textvp = 0x548;
 
-#ifdef __arm64e__
-								// pmap_cs_code_directory
-								gSystemInfo.kernelStruct.pmap_cs_code_directory.trust = 0x1EC;
-#endif
+								if (isArm64e) {
+									// pmap_cs_code_directory
+									gSystemInfo.kernelStruct.pmap_cs_code_directory.trust = 0x1EC;
+								}
 
 								if (strcmp(darwinVersion, "22.4.0") == 0) { // iOS 16.4 ONLY 
 									// iOS 16.4 beta 1-3 use the old proc struct, 16.4b4+ use new
@@ -312,11 +347,41 @@ void jbinfo_initialize_hardcoded_offsets(void)
 									}
 								}
 
-								if (strcmp(darwinVersion, "23.0.0") >= 0) { // iOS 17+
-									// pmap
-									gSystemInfo.kernelStruct.pmap.sw_asid    = 0xBE + pmapEl2Adjust;
-									gSystemInfo.kernelStruct.pmap.wx_allowed = 0xC2 + pmapEl2Adjust;
-									gSystemInfo.kernelStruct.pmap.type       = 0xC9 + pmapEl2Adjust;
+								// iOS 17+
+								if (strcmp(darwinVersion, "23.0.0") >= 0) {
+									if (hasSPTM) {
+										gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7400000000000000LL;
+
+										gSystemInfo.kernelStruct.sptm_frame.type           = 0x2;
+										gSystemInfo.kernelStruct.sptm_frame.level          = 0x4;
+										gSystemInfo.kernelStruct.sptm_frame.nested_refcnt  = 0x6;
+										gSystemInfo.kernelStruct.sptm_frame.mapping_refcnt = 0x8;
+
+										gSystemInfo.kernelStruct.pt_desc.pmap = 0x0;
+										gSystemInfo.kernelStruct.pt_desc.va   = 0x8;
+
+										gSystemInfo.kernelStruct.TXMAddressSpace.allowsInvalidCode = 0x20;
+										gSystemInfo.kernelStruct.TXMAddressSpace.codeRegions       = 0x30;
+
+										gSystemInfo.kernelStruct.TXMCodeRegion.active        = 0x11;
+										gSystemInfo.kernelStruct.TXMCodeRegion.type          = 0x12;
+										gSystemInfo.kernelStruct.TXMCodeRegion.nestedSpace   = 0x18;
+										gSystemInfo.kernelStruct.TXMCodeRegion.codeSignature = 0x20;
+										gSystemInfo.kernelStruct.TXMCodeRegion.startAddr     = 0x28;
+										gSystemInfo.kernelStruct.TXMCodeRegion.endAddr       = 0x30;
+										gSystemInfo.kernelStruct.TXMCodeRegion.RBLink        = 0x38;
+
+										gSystemInfo.kernelStruct.pmap.sw_asid           = 0;
+										gSystemInfo.kernelStruct.pmap.txm_address_space = 0xB0;
+										gSystemInfo.kernelStruct.pmap.asid              = 0x90;
+										gSystemInfo.kernelStruct.pmap.type              = 0x9C;
+									}
+									else {
+										// pmap
+										gSystemInfo.kernelStruct.pmap.sw_asid    = 0xBE + pmapEl2Adjust;
+										gSystemInfo.kernelStruct.pmap.wx_allowed = 0xC2 + pmapEl2Adjust;
+										gSystemInfo.kernelStruct.pmap.type       = 0xC9 + pmapEl2Adjust;
+									}
 
 									// vm_map
 									gSystemInfo.kernelStruct.vm_map.flags = 0xC8;
@@ -336,36 +401,61 @@ void jbinfo_initialize_hardcoded_offsets(void)
 											// socket
 											gSystemInfo.kernelStruct.socket.proto    = 0x20;
 											gSystemInfo.kernelStruct.socket.usecount = 0x254;
+											if (hasSPTM) {
+												gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7440000000000000LL;
+											}
 
-											if (strcmp(darwinVersion, "24.0.0") >= 0) { // iOS 18+
-												gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7F10000000000000LL;
+											// iOS 18+
+											if (strcmp(darwinVersion, "24.0.0") >= 0) {
+												if (hasSPTM) {
+													gSystemInfo.kernelStruct.pmap.txm_address_space = 0xA8;
+													gSystemInfo.kernelStruct.pmap.asid              = 0x88;
+													gSystemInfo.kernelStruct.pmap.type              = 0x94;
+												}
+												else {
+													gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7F10000000000000LL;
+												}
 
 												// vm_map
 												gSystemInfo.kernelStruct.vm_map.flags = 0xD8;
 
 												// task
-#ifdef __arm64e__
-												gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x568 + taskJitboxAdjust;
-#else
-												gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x548;
-#endif
-												if (strcmp(darwinVersion, "24.1.0") >= 0) { // iOS 18.1+
+												if (isArm64e) {
+													gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x568 + taskJitboxAdjust;
+												}
+												else {
+													gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x548;
+												}
+												
+												// iOS 18.1+
+												if (strcmp(darwinVersion, "24.1.0") >= 0) {
 													// No more size
 													gSystemInfo.kernelStruct.trustcache.size        = 0x0;
 													gSystemInfo.kernelStruct.trustcache.fileptr     = 0x18;
 													gSystemInfo.kernelStruct.trustcache.struct_size = 0x28;
 
-													if (strcmp(darwinVersion, "24.4.0") >= 0) { // iOS 18.4+
-														gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7F90000000000000LL;
+													// iOS 18.4+
+													if (strcmp(darwinVersion, "24.4.0") >= 0) {
+														if (hasSPTM) {
+															gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x74C0000000000000LL;
+														}
+														else {
+															gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7F90000000000000LL;
+														}
 
 														// task
-#ifdef __arm64e__
-														gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x588 + taskJitboxAdjust;
-#else
-														gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x568;
-#endif
+														if (isArm64e) {
+															gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x588 + taskJitboxAdjust;
+														}
+														else {
+															gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x568;
+														}
+											
 														// No more prev (Fully back to iOS 15 format, lol)
 														gSystemInfo.kernelStruct.trustcache.prevptr = 0x0;
+
+														// sptm_frame_type_descriptor
+														gSystemInfo.kernelStruct.sptm_frame_type_descriptor.type = 0x1;
 
 														// p_original_ppid was removed from proc
 														gSystemInfo.kernelStruct.proc.svuid  = 0x38;
@@ -386,6 +476,88 @@ void jbinfo_initialize_hardcoded_offsets(void)
 														if (strcmp(darwinVersion, "25.0.0") >= 0) {
 															// socket
 															gSystemInfo.kernelStruct.socket.usecount = 0x23c;
+
+															// task
+															gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x560 + taskJitboxAdjust;
+											
+															if (hasSPTM) {
+																// pmap
+																gSystemInfo.kernelStruct.pmap.txm_address_space = 0x98;
+
+																// TXMAddressSpace
+																gSystemInfo.kernelStruct.TXMAddressSpace.codeRegions       = 0x28;
+																gSystemInfo.kernelStruct.TXMAddressSpace.allowsInvalidCode = 0x30;
+															}
+															else {
+																gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x7FC0000000000000LL;
+															}
+
+															// ipc_space
+															gSystemInfo.kernelStruct.ipc_space.table = 0x48;
+
+															// ipc_port
+															gSystemInfo.kernelStruct.ipc_port.kobject = 0x50;
+
+															// vm_map_entry
+															gSystemInfo.kernelStruct.vm_map_entry.flags_xnu_user_debug = 27;
+
+															// iOS 26.4+
+															if (strcmp(darwinVersion, "25.4.0") >= 0) {
+																if (hasSPTM) {
+																	// pmap
+																	gSystemInfo.kernelStruct.pmap.asid = 0x6c + pmapA13A14TXMiOS27Adjust;
+																	gSystemInfo.kernelStruct.pmap.txm_address_space = 0x88 + pmapA13A14TXMiOS27Adjust;
+																}
+
+																// vm_map
+																gSystemInfo.kernelStruct.vm_map.hdr   = 0x18;
+																gSystemInfo.kernelStruct.vm_map.flags = 0xE8;
+
+																// vm_map_header
+																gSystemInfo.kernelStruct.vm_map_header.first    = 0x0;
+																gSystemInfo.kernelStruct.vm_map_header.last     = 0x8;
+																gSystemInfo.kernelStruct.vm_map_header.nentries = 0x28;
+																
+																// vm_map_entry
+																gSystemInfo.kernelStruct.vm_map_entry.next =  0x0;
+																gSystemInfo.kernelStruct.vm_map_entry.prev =  0x8;
+																gSystemInfo.kernelStruct.vm_map_entry.flags = 0x38;
+
+																// iOS 27.0+
+																if (strcmp(darwinVersion, "27.0.0") >= 0) {
+																	gSystemInfo.kernelConstant.PVH_TYPE_MASK = 0x7;
+																	gSystemInfo.kernelConstant.PVH_HIGH_FLAGS = 0x64C0000000000000;
+
+																	// vm_map
+																	gSystemInfo.kernelStruct.vm_map.hdr   = 0x0;
+																	gSystemInfo.kernelStruct.vm_map.flags = 0xB0;
+
+																	// vm_map_entry
+																	gSystemInfo.kernelStruct.vm_map_entry.prev                 = 0x4;
+																	gSystemInfo.kernelStruct.vm_map_entry.next                 = 0x8;
+																	gSystemInfo.kernelStruct.vm_map_entry.start                = 0x10;
+																	gSystemInfo.kernelStruct.vm_map_entry.end                  = 0x18;
+																	gSystemInfo.kernelStruct.vm_map_entry.flags_prot           = 4;
+																	gSystemInfo.kernelStruct.vm_map_entry.flags_maxprot        = 8;
+																	gSystemInfo.kernelStruct.vm_map_entry.flags_xnu_user_debug = 23;
+
+																	// proc
+																	gSystemInfo.kernelStruct.proc.flag = 0x444;
+
+																	// proc_ro
+																	gSystemInfo.kernelStruct.proc_ro.ucred                 += 0x8;
+																	gSystemInfo.kernelStruct.proc_ro.syscall_filter_mask   += 0x8;
+																	gSystemInfo.kernelStruct.proc_ro.mach_trap_filter_mask += 0x8;
+																	gSystemInfo.kernelStruct.proc_ro.mach_kobj_filter_mask += 0x8;
+																	gSystemInfo.kernelStruct.proc_ro.t_flags_ro            += 0x8;
+
+																	if (hasSPTM) {
+																		// vm_page
+																		gSystemInfo.kernelStruct.vm_page.pv_head = 0x30;
+																		gSystemInfo.kernelStruct.vm_page.struct_size = 0x40;
+																	}
+																}
+															}
 														}
 													}
 												}
@@ -410,6 +582,15 @@ void jbinfo_initialize_boot_constants(void)
 	gSystemInfo.kernelConstant.physBase = kread64(ksymbol(gPhysBase));
 	gSystemInfo.kernelConstant.physSize = kread64(ksymbol(gPhysSize));
 	gSystemInfo.kernelConstant.cpuTTEP  = kread64(ksymbol(cpu_ttep));
+
+	if (ksymbol(SPTMArgs)) {
+		uint64_t args = kread64(ksymbol(SPTMArgs));
+		uint64_t debugHeaderAddr = kread64(args + 0x60);
+		gSystemInfo.kernelConstant.sptmBase = kread64(debugHeaderAddr + 0x10);
+		gSystemInfo.kernelConstant.txmBase = kread64(debugHeaderAddr + 0x20);
+		gSystemInfo.kernelConstant.sptmSlide = kconstant(sptmBase) - kconstant(staticSptmBase);
+		gSystemInfo.kernelConstant.txmSlide = kconstant(txmBase) - kconstant(staticTxmBase);
+	}
 }
 
 xpc_object_t jbinfo_get_serialized(void)

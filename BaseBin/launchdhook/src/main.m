@@ -10,7 +10,15 @@
 #import <pthread.h>
 #import <sys/sysctl.h>
 #import <substrate.h>
+#include <sys/param.h>
+#include <sys/mount.h>
+#include <kern_memorystatus.h>
 
+#import "hookd_provider.h"
+#import <libjailbreak/hookd.h>
+#import <litehook.h>
+#import "../systemhook/src/common/common.h"
+#import "../systemhook/src/common/hookd_external.h"
 #import "spawn_hook.h"
 #import "xpc_hook.h"
 #import "daemon_hook.h"
@@ -126,12 +134,22 @@ __attribute__((constructor)) static void initializer(void)
 
 	cs_allow_invalid(proc_self(), false);
 
+	if (__builtin_available(iOS 26.0, *)) {
+		// On iOS 26+, hooks have to be applied through hookd
+		hookd_provider_init();
+		litehook_hook_memory = litehook_hook_memory_hookd;
+		litehook_hook_function(mach_vm_protect, mach_vm_protect_fixed);
+		init_hookd_external_support();
+	}
+
 	initXPCHooks();
 	initDaemonHooks();
 	initSpawnHooks();
 	initIPCHooks();
 	initJetsamHook();
-	MSHookFunction((void *)sysctlbyname, (void *)sysctlbyname_hook, (void **)&sysctlbyname_orig);
+
+	sysctlbyname_orig = sysctlbyname;
+	litehook_rebind_symbol(LITEHOOK_REBIND_GLOBAL, (void *)sysctlbyname, (void *)sysctlbyname_hook, NULL);
 
 	if (getenv("DOPAMINE_IS_HIDDEN") != 0) {
 		// If the jailbreak is currently hidden, fakelib had to be mounted again before the userspace reboot

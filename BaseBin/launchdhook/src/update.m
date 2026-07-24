@@ -42,9 +42,6 @@ int jbupdate_basebin(const char *basebinTarPath)
 			[[NSFileManager defaultManager] removeItemAtPath:tmpExtractionPath error:nil];
 			return 5;
 		}
-		else {
-			[[NSFileManager defaultManager] removeItemAtPath:trustcachePath error:nil];
-		}
 
 		// Replace basebin content
 		NSArray *newBasebinContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpBasebinPath error:nil];
@@ -99,7 +96,7 @@ void jbupdate_update_system_info(void)
 			abort_with_reason(7, 1, msg, 0);
 			return;
 		}
-		int (*xpf_start_with_kernel_path)(const char *kernelPath) = dlsym(xpfHandle, "xpf_start_with_kernel_path");
+		int (*xpf_start_with_kernel_path)(const char *kernelPath, const char *optSptmPath, const char *optTxmPath) = dlsym(xpfHandle, "xpf_start_with_kernel_path");
 		const char *(*xpf_get_error)(void) = dlsym(xpfHandle, "xpf_get_error");
 		bool (*xpf_set_is_supported)(const char *name) = dlsym(xpfHandle, "xpf_set_is_supported");
 		void (*xpf_stop)(void) = dlsym(xpfHandle, "xpf_stop");
@@ -108,8 +105,13 @@ void jbupdate_update_system_info(void)
 		const char *kernelPath = prebootUUIDPath("/System/Library/Caches/com.apple.kernelcaches/kernelcache");
 		xpc_object_t newSystemInfoXdict = NULL;
 
+		const char *sptmPath = prebootUUIDPath("/usr/standalone/firmware/FUD/Ap,SecurePageTableMonitor.img4");
+		if (access(sptmPath, F_OK) != 0) sptmPath = NULL;
+		const char *txmPath = prebootUUIDPath("/usr/standalone/firmware/FUD/Ap,TrustedExecutionMonitor.img4");
+		if (access(txmPath, F_OK) != 0) txmPath = NULL;
+
 		// Rerun patchfinder
-		int r = xpf_start_with_kernel_path(kernelPath);
+		int r = xpf_start_with_kernel_path(kernelPath, sptmPath, txmPath);
 		const char *error = NULL;
 		if (r == 0) {
 			char *sets[] = {
@@ -205,10 +207,10 @@ void jbupdate_finalize_stage2(const char *prevVersion, const char *newVersion)
 		// Set it during jbupdate if prev version is <2.1 and new version is >=2.1
 		gSystemInfo.jailbreakSettings.markAppsAsDebugged = true;
 
-#ifndef __arm64e__
-		// Initialize kcall only after we have the offsets required for it
-		arm64_kcall_init();
-#endif
+		if (!host_is_arm64e()) {
+			// Initialize kcall only after we have the offsets required for it
+			arm64_kcall_init();
+		}
 	}
 
 	// Update patched dyld

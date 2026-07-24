@@ -11,11 +11,17 @@ struct system_info {
 	struct {
 		uint64_t slide;
 		uint64_t staticBase;
+		uint64_t staticSptmBase;
+		uint64_t staticTxmBase;
 		uint64_t base;
 		uint64_t virtBase;
 		uint64_t virtSize;
 		uint64_t physBase;
 		uint64_t physSize;
+		uint64_t sptmBase;
+		uint64_t sptmSlide;
+		uint64_t txmBase;
+		uint64_t txmSlide;
 		uint64_t cpuTTEP;
 		uint64_t kernel_el;
 		uint64_t pointer_mask;
@@ -26,6 +32,9 @@ struct system_info {
 		uint64_t nsysent;
 		uint64_t mach_trap_count;
 		uint64_t PVH_HIGH_FLAGS;
+		uint64_t PVH_TYPE_MASK;
+		uint64_t VM_PAGE_PACKED_PTR_SHIFT;
+		uint64_t VM_PAGE_PACKED_PTR_BASE;
 	} kernelConstant;
 
 	struct {
@@ -66,7 +75,6 @@ struct system_info {
 		uint64_t gPhysSize;
 		uint64_t gVirtBase;
 		uint64_t cpu_ttep;
-		uint64_t ptov_table;
 		uint64_t vm_first_phys;
 		uint64_t vm_first_phys_ppnum;
 		uint64_t vm_last_phys;
@@ -75,9 +83,25 @@ struct system_info {
 		uint64_t vm_page_array_beginning_addr;
 		uint64_t vm_page_array_ending_addr;
 		uint64_t pmap_image4_trust_caches;
-		uint64_t ppl_trust_cache_rt;
 		uint64_t mach_kobj_count;
+		uint64_t pmap_first_pnum;
+		uint64_t vm_pages_radix_root;
+
+		// Non-SPTM only
+		uint64_t ptov_table;
 		uint64_t developer_mode_enabled;
+		uint64_t ppl_trust_cache_rt;
+
+		// SPTM-only
+		uint64_t SPTMArgs;
+		uint64_t libsptm_n_papt_ranges;
+		uint64_t libsptm_papt_ranges;
+		uint64_t libsptm_frame_table;
+		uint64_t n_papt_ranges_compressed;
+		uint64_t papt_ranges_compressed;
+		uint64_t libsptm_frame_type_params;
+		uint64_t txm_developer_mode_storage;
+		uint64_t txm_trustcache_root;
 	} kernelSymbol;
 
 	struct {
@@ -150,8 +174,8 @@ struct system_info {
 			uint32_t itk_space;
 			uint32_t flags;
 			uint32_t task_can_transfer_memory_ownership;
-			uint32_t mach_trap_filter_mask;
-			uint32_t mach_kobj_filter_mask;
+			uint32_t mach_trap_filter_mask; // ???
+			uint32_t mach_kobj_filter_mask; // ???
 		} task;
 
 		struct {
@@ -182,12 +206,18 @@ struct system_info {
 		} vm_map;
 
 		struct {
-			uint32_t links;
+			uint32_t first;
+			uint32_t last;
+			uint32_t min_offset;
+			uint32_t max_offset;
 			uint32_t nentries;
 		} vm_map_header;
 
 		struct {
-			uint32_t links;
+			uint32_t prev;
+			uint32_t next;
+			uint32_t start;
+			uint32_t end;
 			uint32_t flags;
 			uint32_t flags_prot;
 			uint32_t flags_maxprot;
@@ -195,19 +225,23 @@ struct system_info {
 		} vm_map_entry;
 
 		struct {
-			uint32_t prev;
-			uint32_t next;
-			uint32_t min;
-			uint32_t max;
-		} vm_map_links;
+			uint32_t pv_head;
+			uint32_t struct_size;
+		} vm_page;
 
 		struct {
 			uint32_t tte;
 			uint32_t ttep;
 			uint32_t pmap_cs_main;
-			uint32_t sw_asid;
 			uint32_t wx_allowed;
 			uint32_t type;
+			
+			// Non SPTM/TXM only
+			uint32_t sw_asid;
+
+			// SPTM/TXM only
+			uint32_t asid; 
+			uint32_t txm_address_space;
 		} pmap;
 
 		struct {
@@ -230,6 +264,7 @@ struct system_info {
 		struct {
 			uint32_t nextptr;
 			uint32_t prevptr;
+			uint32_t type;
 			uint32_t size;
 			uint32_t fileptr;
 
@@ -261,6 +296,40 @@ struct system_info {
 		struct {
 			uint32_t input;
 		} protosw;
+
+		struct {
+			uint32_t type;
+			uint32_t level;
+			uint32_t nested_refcnt;
+			uint32_t mapping_refcnt;
+		} sptm_frame;
+
+		struct {
+			uint32_t allowsInvalidCode;
+			uint32_t codeRegions;
+		} TXMAddressSpace;
+
+		struct {
+			uint32_t active;
+			uint32_t type;
+			uint32_t nestedSpace;
+			uint32_t codeSignature;
+			uint32_t startAddr;
+			uint32_t endAddr;
+			uint32_t RBLink;
+		} TXMCodeRegion;
+
+		struct {
+			uint32_t rbe_left;
+			uint32_t rbe_right;
+			uint32_t rbe_parent;
+		} RBLink;
+
+		struct {
+			uint32_t type;
+
+			uint32_t struct_size;
+		} sptm_frame_type_descriptor;
 	} kernelStruct;
 };
 
@@ -269,11 +338,17 @@ extern struct system_info gSystemInfo;
 #define KERNEL_CONSTANTS_ITERATE(ctx, iterator) \
 	iterator(ctx, kernelConstant.slide); \
 	iterator(ctx, kernelConstant.staticBase); \
+	iterator(ctx, kernelConstant.staticSptmBase); \
+	iterator(ctx, kernelConstant.staticTxmBase); \
 	iterator(ctx, kernelConstant.base); \
 	iterator(ctx, kernelConstant.virtBase); \
 	iterator(ctx, kernelConstant.virtSize); \
 	iterator(ctx, kernelConstant.physBase); \
 	iterator(ctx, kernelConstant.physSize); \
+	iterator(ctx, kernelConstant.sptmBase); \
+	iterator(ctx, kernelConstant.sptmSlide); \
+	iterator(ctx, kernelConstant.txmBase); \
+	iterator(ctx, kernelConstant.txmSlide); \
 	iterator(ctx, kernelConstant.cpuTTEP); \
 	iterator(ctx, kernelConstant.kernel_el); \
 	iterator(ctx, kernelConstant.pointer_mask); \
@@ -283,7 +358,10 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelConstant.PT_INDEX_MAX); \
 	iterator(ctx, kernelConstant.nsysent); \
 	iterator(ctx, kernelConstant.mach_trap_count); \
-	iterator(ctx, kernelConstant.PVH_HIGH_FLAGS);
+	iterator(ctx, kernelConstant.PVH_HIGH_FLAGS); \
+	iterator(ctx, kernelConstant.PVH_TYPE_MASK); \
+	iterator(ctx, kernelConstant.VM_PAGE_PACKED_PTR_SHIFT); \
+	iterator(ctx, kernelConstant.VM_PAGE_PACKED_PTR_BASE);
 
 #define JAILBREAK_INFO_ITERATE(ctx, iterator) \
 	iterator(ctx, jailbreakInfo.usesPACBypass); \
@@ -319,7 +397,6 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelSymbol.gPhysSize); \
 	iterator(ctx, kernelSymbol.gVirtBase); \
 	iterator(ctx, kernelSymbol.cpu_ttep); \
-	iterator(ctx, kernelSymbol.ptov_table); \
 	iterator(ctx, kernelSymbol.vm_first_phys); \
 	iterator(ctx, kernelSymbol.vm_first_phys_ppnum); \
 	iterator(ctx, kernelSymbol.vm_last_phys); \
@@ -328,9 +405,21 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelSymbol.vm_page_array_beginning_addr); \
 	iterator(ctx, kernelSymbol.vm_page_array_ending_addr); \
 	iterator(ctx, kernelSymbol.pmap_image4_trust_caches); \
-	iterator(ctx, kernelSymbol.ppl_trust_cache_rt); \
 	iterator(ctx, kernelSymbol.mach_kobj_count); \
-	iterator(ctx, kernelSymbol.developer_mode_enabled);
+	iterator(ctx, kernelSymbol.pmap_first_pnum); \
+	iterator(ctx, kernelSymbol.vm_pages_radix_root); \
+	iterator(ctx, kernelSymbol.ptov_table); \
+	iterator(ctx, kernelSymbol.developer_mode_enabled); \
+	iterator(ctx, kernelSymbol.ppl_trust_cache_rt); \
+	iterator(ctx, kernelSymbol.SPTMArgs); \
+	iterator(ctx, kernelSymbol.libsptm_n_papt_ranges); \
+	iterator(ctx, kernelSymbol.libsptm_papt_ranges); \
+	iterator(ctx, kernelSymbol.libsptm_frame_table); \
+	iterator(ctx, kernelSymbol.n_papt_ranges_compressed); \
+	iterator(ctx, kernelSymbol.papt_ranges_compressed); \
+	iterator(ctx, kernelSymbol.libsptm_frame_type_params); \
+	iterator(ctx, kernelSymbol.txm_developer_mode_storage); \
+	iterator(ctx, kernelSymbol.txm_trustcache_root);
 
 #define KERNEL_GADGETS_ITERATE(ctx, iterator) \
 	iterator(ctx, kernelGadget.pacda); \
@@ -409,26 +498,32 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.vm_map.pmap); \
 	iterator(ctx, kernelStruct.vm_map.flags); \
 	\
-	iterator(ctx, kernelStruct.vm_map_header.links); \
+	iterator(ctx, kernelStruct.vm_map_header.first); \
+	iterator(ctx, kernelStruct.vm_map_header.last); \
+	iterator(ctx, kernelStruct.vm_map_header.min_offset); \
+	iterator(ctx, kernelStruct.vm_map_header.max_offset); \
 	iterator(ctx, kernelStruct.vm_map_header.nentries); \
 	\
-	iterator(ctx, kernelStruct.vm_map_entry.links); \
+	iterator(ctx, kernelStruct.vm_map_entry.prev); \
+	iterator(ctx, kernelStruct.vm_map_entry.next); \
+	iterator(ctx, kernelStruct.vm_map_entry.start); \
+	iterator(ctx, kernelStruct.vm_map_entry.end); \
 	iterator(ctx, kernelStruct.vm_map_entry.flags); \
 	iterator(ctx, kernelStruct.vm_map_entry.flags_prot); \
 	iterator(ctx, kernelStruct.vm_map_entry.flags_maxprot); \
 	iterator(ctx, kernelStruct.vm_map_entry.flags_xnu_user_debug); \
 	\
-	iterator(ctx, kernelStruct.vm_map_links.prev); \
-	iterator(ctx, kernelStruct.vm_map_links.next); \
-	iterator(ctx, kernelStruct.vm_map_links.min); \
-	iterator(ctx, kernelStruct.vm_map_links.max); \
+	iterator(ctx, kernelStruct.vm_page.pv_head); \
+	iterator(ctx, kernelStruct.vm_page.struct_size); \
 	\
 	iterator(ctx, kernelStruct.pmap.tte); \
 	iterator(ctx, kernelStruct.pmap.ttep); \
 	iterator(ctx, kernelStruct.pmap.pmap_cs_main); \
-	iterator(ctx, kernelStruct.pmap.sw_asid); \
 	iterator(ctx, kernelStruct.pmap.wx_allowed); \
 	iterator(ctx, kernelStruct.pmap.type); \
+	iterator(ctx, kernelStruct.pmap.sw_asid); \
+	iterator(ctx, kernelStruct.pmap.asid); \
+	iterator(ctx, kernelStruct.pmap.txm_address_space); \
 	\
 	iterator(ctx, kernelStruct.pmap_cs_region.pmap_cs_region_next); \
 	iterator(ctx, kernelStruct.pmap_cs_region.cd_entry); \
@@ -443,6 +538,7 @@ extern struct system_info gSystemInfo;
 	\
 	iterator(ctx, kernelStruct.trustcache.nextptr); \
 	iterator(ctx, kernelStruct.trustcache.prevptr); \
+	iterator(ctx, kernelStruct.trustcache.type); \
 	iterator(ctx, kernelStruct.trustcache.size); \
 	iterator(ctx, kernelStruct.trustcache.fileptr); \
 	iterator(ctx, kernelStruct.trustcache.struct_size); \
@@ -461,7 +557,30 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.socket.usecount); \
 	iterator(ctx, kernelStruct.socket.proto); \
 	\
-	iterator(ctx, kernelStruct.protosw.input);
+	iterator(ctx, kernelStruct.protosw.input); \
+	\
+	iterator(ctx, kernelStruct.sptm_frame.type); \
+	iterator(ctx, kernelStruct.sptm_frame.level); \
+	iterator(ctx, kernelStruct.sptm_frame.nested_refcnt); \
+	iterator(ctx, kernelStruct.sptm_frame.mapping_refcnt); \
+	\
+	iterator(ctx, kernelStruct.TXMAddressSpace.allowsInvalidCode); \
+	iterator(ctx, kernelStruct.TXMAddressSpace.codeRegions); \
+	\
+	iterator(ctx, kernelStruct.TXMCodeRegion.active); \
+	iterator(ctx, kernelStruct.TXMCodeRegion.type); \
+	iterator(ctx, kernelStruct.TXMCodeRegion.nestedSpace); \
+	iterator(ctx, kernelStruct.TXMCodeRegion.codeSignature); \
+	iterator(ctx, kernelStruct.TXMCodeRegion.startAddr); \
+	iterator(ctx, kernelStruct.TXMCodeRegion.endAddr); \
+	iterator(ctx, kernelStruct.TXMCodeRegion.RBLink); \
+	\
+	iterator(ctx, kernelStruct.sptm_frame_type_descriptor.type); \
+	iterator(ctx, kernelStruct.sptm_frame_type_descriptor.struct_size); \
+	\
+	iterator(ctx, kernelStruct.RBLink.rbe_left); \
+	iterator(ctx, kernelStruct.RBLink.rbe_right); \
+	iterator(ctx, kernelStruct.RBLink.rbe_parent);
 
 
 #define SYSTEM_INFO_ITERATE(ctx, iterator) \
@@ -516,6 +635,8 @@ __attribute__((__unused__)) static void _safe_xpc_dictionary_set_string(xpc_obje
 #define jbinfo(name) (gSystemInfo.jailbreakInfo.name)
 #define jbsetting(name) (gSystemInfo.jailbreakSettings.name)
 #define ksymbol(name) (gSystemInfo.kernelSymbol.name ? (gSystemInfo.kernelConstant.slide + gSystemInfo.kernelSymbol.name) : 0)
+#define ksymbol_sptm(name) (gSystemInfo.kernelSymbol.name ? (gSystemInfo.kernelConstant.sptmSlide + gSystemInfo.kernelSymbol.name) : 0)
+#define ksymbol_txm(name) (gSystemInfo.kernelSymbol.name ? (gSystemInfo.kernelConstant.txmSlide + gSystemInfo.kernelSymbol.name) : 0)
 #define kgadget(name) (gSystemInfo.kernelGadget.name ? (gSystemInfo.kernelConstant.slide + gSystemInfo.kernelGadget.name) : 0)
 #define koffsetof(structname, member) (gSystemInfo.kernelStruct.structname.member)
 #define ksizeof(structname) (gSystemInfo.kernelStruct.structname.struct_size)

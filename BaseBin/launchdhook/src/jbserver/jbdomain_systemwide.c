@@ -5,12 +5,14 @@
 #include <libproc.h>
 #include <sys/proc_info.h>
 
+#include <libjailbreak/hookd.h>
 #include <libjailbreak/signatures.h>
 #include <libjailbreak/trustcache.h>
 #include <libjailbreak/kernel.h>
 #include <libjailbreak/util.h>
 #include <libjailbreak/primitives.h>
 #include <libjailbreak/codesign.h>
+#include <libjailbreak/txm.h>
 
 bool gSystemwideDomainEnabled = true;
 void systemwide_domain_set_enabled(bool enabled)
@@ -334,27 +336,62 @@ int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, 
 		proc_csflags_set(proc, CS_PLATFORM_BINARY);
 	}
 
-#ifdef __arm64e__
-	// On arm64e every image has a trust level associated with it
-	// "In trust cache" trust levels have higher runtime enforcements, this can be a problem for some tools as Dopamine trustcaches everything that's adhoc signed
-	// So we add the ability for a binary to get a different trust level using the "jb.pmap_cs.custom_trust" entitlement
-	// This is for binaries that rely on weaker PMAP_CS checks (e.g. Lua trampolines need it)
-	xpc_object_t customTrustObj = xpc_copy_entitlement_for_token("jb.pmap_cs.custom_trust", processToken);
-	if (customTrustObj) {
-		if (xpc_get_type(customTrustObj) == XPC_TYPE_STRING) {
-			const char *customTrustStr = xpc_string_get_string_ptr(customTrustObj);
-			uint32_t customTrust = pmap_cs_trust_string_to_int(customTrustStr);
-			if (customTrust >= 2) {
-				uint64_t mainCodeDir = proc_find_main_binary_code_dir(proc);
-				if (mainCodeDir) {
-					kwrite32(mainCodeDir + koffsetof(pmap_cs_code_directory, trust), customTrust);
+	if (host_is_arm64e()) {
+		// On arm64e every image has a trust level associated with it
+		// "In trust cache" trust levels have higher runtime enforcements, this can be a problem for some tools as Dopamine trustcaches everything that's adhoc signed
+		// So we add the ability for a binary to get a different trust level using the "jb.pmap_cs_custom_trust" entitlement
+		// This is for binaries that rely on weaker PMAP_CS checks (e.g. Lua trampolines need it)
+		xpc_object_t customTrustObj = xpc_copy_entitlement_for_token("jb.pmap_cs.custom_trust", processToken);
+		if (customTrustObj) {
+			if (xpc_get_type(customTrustObj) == XPC_TYPE_STRING) {
+				const char *customTrustStr = xpc_string_get_string_ptr(customTrustObj);
+				uint32_t customTrust = pmap_cs_trust_string_to_int(customTrustStr);
+				if (customTrust >= 2) {
+					uint64_t mainCodeDir = proc_find_main_binary_code_dir(proc);
+					if (mainCodeDir) {
+						kwrite32(mainCodeDir + koffsetof(pmap_cs_code_directory, trust), customTrust);
+					}
 				}
 			}
 		}
 	}
-#endif
 
 	proc_rele(proc);
+	return 0;
+}
+
+int txm_fork_fix(uint64_t parentAddressSpace, uint64_t childAddressSpace)
+{
+	uint64_t parentHead = parentAddressSpace + koffsetof(TXMAddressSpace, codeRegions);
+	uint64_t childHead  =  childAddressSpace + koffsetof(TXMAddressSpace, codeRegions);
+
+	uint64_t curCodeRegion = 0, nextCodeRegion = 0;
+	for (curCodeRegion = RB_MIN(TXMCodeRegionRBTree, parentHead); curCodeRegion; curCodeRegion = nextCodeRegion) {
+		nextCodeRegion = RB_NEXT(TXMCodeRegionRBTree, parentHead, curCodeRegion);
+
+		uint8_t  curRegionType      =    kread8(curCodeRegion + koffsetof(TXMCodeRegion, type));
+		uint64_t curRegionStartAddr =   kread64(curCodeRegion + koffsetof(TXMCodeRegion, startAddr));
+		uint64_t curRegionEndAddr   =   kread64(curCodeRegion + koffsetof(TXMCodeRegion, endAddr));
+		uint64_t curRegionCodeSig   = kread_ptr(curCodeRegion + koffsetof(TXMCodeRegion, codeSignature));
+
+		uint64_t childCodeRegion = RB_FIND(TXMCodeRegionRBTree, childHead, CodeRegionRBTree_KEY(curRegionStartAddr));
+		if (!childCodeRegion && !curRegionCodeSig) {
+			// If no region exists in the child yet, allocate a new one
+			// But only if the parent region does not have a code signature
+			childCodeRegion = allocateCodeRegionObject();
+
+			kwrite64(childCodeRegion + koffsetof(TXMCodeRegion, startAddr), curRegionStartAddr);
+			kwrite64(childCodeRegion + koffsetof(TXMCodeRegion, endAddr),   curRegionEndAddr);
+
+			RB_INSERT(TXMCodeRegionRBTree, childHead, childCodeRegion);
+		}
+
+		if (childCodeRegion) {
+			// Copy type from parent to child
+			kwrite8(childCodeRegion + koffsetof(TXMCodeRegion, type), curRegionType);
+		}
+	}
+
 	return 0;
 }
 
@@ -369,34 +406,38 @@ int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid)
 		retval = 2;
 		// Safety check to ensure we are actually coming from fork
 		if (kread_ptr(childProc + koffsetof(proc, pptr)) == parentProc) {
+			uint64_t parentTask  = proc_task(parentProc);
+			uint64_t parentVmMap = kread_ptr(parentTask + koffsetof(task, map));
+			uint64_t parentPmap  = kread_ptr(parentVmMap + koffsetof(vm_map, pmap));
+
+			uint64_t childTask  = proc_task(childProc);
+			uint64_t childVmMap = kread_ptr(childTask + koffsetof(task, map));
+			uint64_t childPmap  = kread_ptr(childVmMap + koffsetof(vm_map, pmap));
+
 			cs_allow_invalid(childProc, false);
 
-			uint64_t childTask     = proc_task(childProc);
-			uint64_t childVmMap    = kread_ptr(childTask + koffsetof(task, map));
-			uint64_t childHeader   = childVmMap + koffsetof(vm_map, hdr);
-			uint32_t childNentries = kread32(childHeader + koffsetof(vm_map_header, nentries));
-			uint64_t childEntry    = kread_ptr(childHeader + koffsetof(vm_map_header, links) + koffsetof(vm_map_links, next));
-
-			uint64_t parentTask     = proc_task(parentProc);
-			uint64_t parentVmMap    = kread_ptr(parentTask + koffsetof(task, map));
 			uint64_t parentHeader   = parentVmMap + koffsetof(vm_map, hdr);
 			uint32_t parentNentries = kread32(parentHeader + koffsetof(vm_map_header, nentries));
-			uint64_t parentEntry    = kread_ptr(parentHeader + koffsetof(vm_map_header, links) + koffsetof(vm_map_links, next));
+			uint64_t parentEntry    = kread_ptr(parentHeader + koffsetof(vm_map_header, first));
+
+			uint64_t childHeader   = childVmMap + koffsetof(vm_map, hdr);
+			uint32_t childNentries = kread32(childHeader + koffsetof(vm_map_header, nentries));
+			uint64_t childEntry    = kread_ptr(childHeader + koffsetof(vm_map_header, first));
 
 			uint64_t childFirstEntry = childEntry, parentFirstEntry = parentEntry;
 			uint32_t childIdx = 0, parentIdx = 0;
 			do {
-				uint64_t childStart  = kread_ptr(childEntry  + koffsetof(vm_map_entry, links) + koffsetof(vm_map_links, min));
-				uint64_t childEnd    = kread_ptr(childEntry  + koffsetof(vm_map_entry, links) + koffsetof(vm_map_links, max));
-				uint64_t parentStart = kread_ptr(parentEntry + koffsetof(vm_map_entry, links) + koffsetof(vm_map_links, min));
-				uint64_t parentEnd   = kread_ptr(parentEntry + koffsetof(vm_map_entry, links) + koffsetof(vm_map_links, max));
+				uint64_t childStart  = kread_ptr(childEntry  + koffsetof(vm_map_entry, start));
+				uint64_t childEnd    = kread_ptr(childEntry  + koffsetof(vm_map_entry, end));
+				uint64_t parentStart = kread_ptr(parentEntry + koffsetof(vm_map_entry, start));
+				uint64_t parentEnd   = kread_ptr(parentEntry + koffsetof(vm_map_entry, end));
 
 				if (parentStart < childStart) {
-					parentEntry = kread_ptr(parentEntry + koffsetof(vm_map_entry, links) + koffsetof(vm_map_links, next));
+					parentEntry = kread_ptr(parentEntry + koffsetof(vm_map_entry, next));
 					parentIdx++;
 				}
 				else if (parentStart > childStart) {
-					childEntry = kread_ptr(childEntry + koffsetof(vm_map_entry, links) + koffsetof(vm_map_links, next));
+					childEntry = kread_ptr(childEntry + koffsetof(vm_map_entry, next));
 					childIdx++;
 				}
 				else {
@@ -428,13 +469,20 @@ int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid)
 						kwrite64(childEntry + koffsetof(vm_map_entry, flags), childFlags);
 					}
 
-					parentEntry = kread_ptr(parentEntry + koffsetof(vm_map_entry, links) + koffsetof(vm_map_links, next));
+					parentEntry = kread_ptr(parentEntry + koffsetof(vm_map_entry, next));
 					parentIdx++;
-					childEntry  = kread_ptr(childEntry  + koffsetof(vm_map_entry, links) + koffsetof(vm_map_links, next));
+					childEntry  = kread_ptr(childEntry  + koffsetof(vm_map_entry, next));
 					childIdx++;
 				}
 			} while (parentEntry != 0 && childEntry != 0 && parentEntry != parentFirstEntry && childEntry != childFirstEntry && parentIdx < parentNentries && childIdx < childNentries);
+
 			retval = 0;
+			// On TXM devices, fix up the TXM address space aswell
+			if (koffsetof(pmap, txm_address_space)) {
+				uint64_t parentAddressSpace = kread_ptr(parentPmap + koffsetof(pmap, txm_address_space));
+				uint64_t childAddressSpace  = kread_ptr(childPmap  + koffsetof(pmap, txm_address_space));
+				retval = txm_fork_fix(parentAddressSpace, childAddressSpace);
+			}
 		}
 	}
 	if (childProc)  proc_rele(childProc);
@@ -569,7 +617,7 @@ struct jbserver_domain gSystemwideDomain = {
 		// JBS_SYSTEMWIDE_JBSETTINGS_GET
 		{
 			.handler = jbsettings_get,
-			.args = (jbserver_arg[]){
+			.args = (jbserver_arg[]) {
 				{ .name = "key", .type = JBS_TYPE_STRING, .out = false },
 				{ .name = "value", .type = JBS_TYPE_XPC_GENERIC, .out = true },
 			},
@@ -577,7 +625,7 @@ struct jbserver_domain gSystemwideDomain = {
 		// JBS_SYSTEMWIDE_PERSONA_FIX
 		{
 			.handler = systemwide_persona_fix,
-			.args = (jbserver_arg[]){
+			.args = (jbserver_arg[]) {
 				{ .name = "caller-token", .type = JBS_TYPE_CALLER_TOKEN, .out = false },
 				{ .name = "child-pid", .type = JBS_TYPE_UINT64, .out = false },
 				{ .name = "overwrite-uid", .type = JBS_TYPE_UINT64, .out = false },

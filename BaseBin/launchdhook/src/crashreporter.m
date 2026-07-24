@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <mach-o/dyld.h>
+#include <libjailbreak/util.h>
 extern CFStringRef CFCopySystemVersionString(void);
 
 void abort_with_reason(uint32_t reason_namespace, uint64_t reason_code, const char *reason_string, uint64_t reason_flags);
@@ -179,11 +180,12 @@ FILE *crashreporter_open_outfile(const char *source, char **nameOut)
 			CFRelease(deviceVersion);
 		}
 
-	#ifdef __arm64e__
-		fprintf(f, "Architecture:   arm64e\n");
-	#else
-		fprintf(f, "Architecture:   arm64\n");
-	#endif
+		if (host_is_arm64e()) {
+			fprintf(f, "Architecture:   arm64e\n");
+		}
+		else {
+			fprintf(f, "Architecture:   arm64\n");
+		}
 		fprintf(f, "\n");
 	}
 

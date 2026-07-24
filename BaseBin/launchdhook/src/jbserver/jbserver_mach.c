@@ -122,6 +122,50 @@ int jbserver_received_mach_message(audit_token_t *auditToken, struct jbserver_ma
 		reply->base.status = result;
 		r = 0;
 	}
+	else if (jbsMachMsg->action == JBSERVER_MACH_HOOKD_SEND_MSG) {
+		if (msgSize < sizeof(struct jbserver_mach_msg_hookd_send_msg)) return -1;
+		if (msgSize > (sizeof(struct jbserver_mach_msg_hookd_send_msg) + HOOKD_MSG_MAX_SIZE)) return -1;
+		
+		struct jbserver_mach_msg_hookd_send_msg *hookdMsgToRedirect = (struct jbserver_mach_msg_hookd_send_msg *)jbsMachMsg;
+		struct hookd_mach_msg *hookdMsg = (struct hookd_mach_msg *)&hookdMsgToRedirect->hookdMsg[0];
+		if ((hookdMsg->hdr.msgh_size + offsetof(struct jbserver_mach_msg_hookd_send_msg, hookdMsg)) > msgSize) return -1;
+
+		size_t hookdMsgSize = hookdMsg->hdr.msgh_size;
+		
+		// Make sure message header is clean except for the size
+		memset(&hookdMsg->hdr, 0, sizeof(hookdMsg->hdr));
+		hookdMsg->hdr.msgh_size = hookdMsgSize;
+
+		// Always set clientPid to the correct value
+		hookdMsg->clientPid = audit_token_to_pid(*auditToken);
+
+		size_t hookdReplySize = HOOKD_MSG_MAX_SIZE + MAX_TRAILER_SIZE;
+		uint8_t hookdReplyBuf[hookdReplySize];
+		memset(hookdReplyBuf, 0, sizeof(hookdReplyBuf));
+		struct hookd_mach_msg_reply *hookdReply = (struct hookd_mach_msg_reply *)hookdReplyBuf;
+		hookdReply->hdr.msgh_size = hookdReplySize;
+
+		int result = hookd_send_msg(hookdMsg, hookdReply);
+
+		size_t replySize = sizeof(struct jbserver_mach_msg_hookd_send_msg_reply);
+		if (result == 0) {
+			replySize += hookdReply->hdr.msgh_size;
+		}
+		replyData = malloc(replySize);
+		memset(replyData, 0, replySize);
+		struct jbserver_mach_msg_hookd_send_msg_reply *reply = (struct jbserver_mach_msg_hookd_send_msg_reply *)replyData;
+		if (result == 0) {
+			memcpy(reply->hookdReply, hookdReply, hookdReply->hdr.msgh_size);
+		}
+
+		reply->base.msg.magic         = jbsMachMsg->magic;
+		reply->base.msg.action        = jbsMachMsg->action;
+		reply->base.msg.hdr.msgh_size = replySize;
+
+		reply->base.status = result;
+
+		r = 0;
+	}
 
 	jbserver_send_mach_reply(&jbsMachMsg->hdr, replyData);
 

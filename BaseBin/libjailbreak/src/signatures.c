@@ -18,6 +18,15 @@ bool macho_is_mappable(MachO *macho)
 {
 	// Determine if there is any case in which the macho could be mapped
 
+	static cpu_type_t hostCpuType;
+	static cpu_subtype_t hostCpuSubtype;
+	static dispatch_once_t onceToken = 0;
+	dispatch_once(&onceToken, ^{
+		host_get_cpu_information(&hostCpuType, &hostCpuSubtype);
+	});
+
+	bool hostIsArm64e = (hostCpuType == CPU_TYPE_ARM64) && ((hostCpuSubtype & ~0xff000000) == CPU_SUBTYPE_ARM64E);
+
 	struct mach_header *header = macho_get_mach_header(macho);
 
 	cpu_type_t cputype = header->cputype;
@@ -26,18 +35,16 @@ bool macho_is_mappable(MachO *macho)
 
 	if (cputype != CPU_TYPE_ARM64) return false;
 
-#ifdef __arm64e__
-
-	if (cpusubtype == (CPU_SUBTYPE_ARM64E | CPU_SUBTYPE_ARM64E_ABI_V2)) {
-		// New arm64e ABI always mappable on arm64e
-		return true;
+	if (hostIsArm64e) {
+		if (cpusubtype == (CPU_SUBTYPE_ARM64E | CPU_SUBTYPE_ARM64E_ABI_V2)) {
+			// New arm64e ABI always mappable on arm64e
+			return true;
+		}
+		else if (cpusubtype == CPU_SUBTYPE_ARM64E && isLibrary) {
+			// Old arm64e ABI only mappable for libraries on arm64e iOS 14.6+
+			return true;
+		}
 	}
-	else if (cpusubtype == CPU_SUBTYPE_ARM64E && isLibrary) {
-		// Old arm64e ABI only mappable for libraries on arm64e iOS 14.6+
-		return true;
-	}
-
-#endif
 
 	// Anything arm64 is always mappable on all dvices
 	if ((cpusubtype == CPU_SUBTYPE_ARM64_V8) || (cpusubtype == CPU_SUBTYPE_ARM64_ALL)) return true;

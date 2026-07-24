@@ -1,6 +1,6 @@
 #include "common.h"
 #include <xpc/xpc.h>
-#include "launchd.h"
+#include <xpc_private.h>
 #include <mach-o/dyld.h>
 #include <sys/param.h>
 #include <sys/mount.h>
@@ -13,6 +13,9 @@
 #include <libjailbreak/jbclient_xpc.h>
 #include <libjailbreak/jbserver_domains.h>
 #include <libjailbreak/util.h>
+#include <libjailbreak/jbroot.h>
+#include <libjailbreak/hookd.h>
+#include <libkern/OSCacheControl.h>
 
 bool string_has_prefix(const char *str, const char* prefix)
 {
@@ -59,6 +62,62 @@ void string_enumerate_components(const char *string, const char *separator, void
 	free(stringCopy);
 }
 
+int timespec_compare(struct timespec *t1, struct timespec *t2)
+{
+	if (t1->tv_sec == t2->tv_sec && t1->tv_nsec == t2->tv_nsec) return 0;
+
+	if (t1->tv_sec == t2->tv_sec) {
+		return t1->tv_nsec > t2->tv_nsec ? 1 : -1;
+	}
+	else {
+		return t1->tv_sec > t2->tv_sec ? 1 : -1;
+	}
+}
+
+xpc_object_t xpc_object_from_plist(const char *path)
+{
+	xpc_object_t xObj = NULL;
+	int ldFd = open(path, O_RDONLY);
+	if (ldFd >= 0) {
+		struct stat s = {};
+		if(fstat(ldFd, &s) != 0) {
+			close(ldFd);
+			return NULL;
+		}
+		size_t len = s.st_size;
+		void *addr = mmap(NULL, len, PROT_READ, MAP_FILE | MAP_PRIVATE, ldFd, 0);
+		if (addr != MAP_FAILED) {
+			close(ldFd);
+
+			xObj = xpc_create_from_plist(addr, len);
+			munmap(addr, len);
+		}
+	}
+	return xObj;
+}
+
+xpc_object_t jbuserconfig_get_value(const char *key)
+{
+	const char *configPath = JBROOT_PATH("/basebin/config.plist");
+	if (!access(configPath, R_OK)) {
+		static xpc_object_t configDict = NULL;
+		static struct timespec lastConfigWrite = { .tv_sec=0, .tv_nsec = 0 };
+
+		struct stat configStat;
+		if (stat(configPath, &configStat) == 0) {
+			if (timespec_compare(&configStat.st_mtimespec, &lastConfigWrite) > 0) {
+				lastConfigWrite = configStat.st_mtimespec;
+				if (configDict) xpc_release(configDict);
+				configDict = xpc_object_from_plist(configPath);
+			}
+		}
+
+		return xpc_dictionary_get_value(configDict, key);
+	}
+
+	return NULL;
+}
+
 static kSpawnConfig spawn_config_for_executable(const char* path, char *const argv[restrict])
 {
 	// Blacklist to ensure general system stability
@@ -75,22 +134,21 @@ static kSpawnConfig spawn_config_for_executable(const char* path, char *const ar
 		if (!strcmp(processBlacklist[i], path)) return 0;
 	}
 
+	xpc_object_t userBlacklist = jbuserconfig_get_value("ProcessBlacklist");
+	if (userBlacklist && xpc_get_type(userBlacklist) == XPC_TYPE_ARRAY) {
+		size_t userBlacklistCount = xpc_array_get_count(userBlacklist);
+		for (size_t i = 0; i < userBlacklistCount; i++) {
+			if (!strcmp(xpc_array_get_string(userBlacklist, i), path)) return kSpawnConfigTrust;
+		}
+	}
+
 	return (kSpawnConfigInject | kSpawnConfigTrust);
-}
-
-int __posix_spawn_orig(pid_t *restrict pid, const char *restrict path, struct _posix_spawn_args_desc *desc, char *const argv[restrict], char * const envp[restrict])
-{
-	return syscall(SYS_posix_spawn, pid, path, desc, argv, envp);
-}
-
-int __execve_orig(const char *path, char *const argv[], char *const envp[])
-{
-	return syscall(SYS_execve, path, argv, envp);
 }
 
 // 1. Ensure the binary about to be spawned and all of it's dependencies are trust cached
 // 2. Insert "DYLD_INSERT_LIBRARIES=/usr/lib/systemhook.dylib" into all binaries spawned
 // 3. Increase Jetsam limit to more sane value (Multipler defined as JETSAM_MULTIPLIER)
+// 4. Fix spawning as root via persona entitlement on iOS 17.6+
 
 static int spawn_exec_hook_common(bool isExec,
 						   const char *path,
@@ -351,6 +409,32 @@ int posix_spawn_hook_shared(pid_t *restrict pid,
 	return r;
 }
 
+kern_return_t vm_allocate_nearby(vm_map_t target_task, vm_address_t from_area, vm_size_t from_area_size, vm_address_t *address, vm_size_t size, uint64_t limit)
+{
+	if (from_area != 0 && from_area_size > 0 && address) {
+		// Make sure allocation is within limit for every single page in the area
+		uint64_t realLimit = limit - (from_area_size / 2);
+
+		for (uint64_t off = 0; off < realLimit; off += vm_page_size) {
+			vm_address_t tmp = (from_area + from_area_size) + off;
+			kern_return_t kr = vm_allocate(target_task, &tmp, size, VM_FLAGS_FIXED);
+			if (kr == KERN_SUCCESS) {
+				*address = tmp;
+				return kr;
+			}
+
+			tmp = (from_area - size) - off;
+			kr = vm_allocate(target_task, &tmp, size, VM_FLAGS_FIXED);
+			if (kr == KERN_SUCCESS) {
+				*address = tmp;
+				return kr;
+			}
+		}
+	}
+
+	return KERN_NO_SPACE;
+}
+
 int execve_hook_shared(const char *path,
 					   char *const argv[],
 					   char *const envp[],
@@ -364,4 +448,39 @@ int execve_hook_shared(const char *path,
 	});
 
 	return r;
+}
+
+__attribute__((noinline, naked)) volatile void *get_tpidrr0_el0(void)
+{
+	asm("MRS X0, TPIDRRO_EL0");
+	asm("RET");
+}
+
+kern_return_t litehook_hook_memory_hookd(void *target, void *source, size_t sourceSize)
+{
+	kern_return_t kr = hookd_hook(mach_task_self_, (uint64_t)target, source, sourceSize);
+	if (kr == KERN_SUCCESS) {
+		sys_icache_invalidate(target, sourceSize);
+	}
+	return kr;
+}
+
+kern_return_t mach_vm_protect_fixed(mach_port_name_t task, mach_vm_address_t address, mach_vm_size_t size, boolean_t set_maximum, vm_prot_t new_protection)
+{
+	kern_return_t rv;
+
+	bool skipped = false;
+	if (!skipped) {
+		if ((new_protection & VM_PROT_EXECUTE) || (new_protection & VM_PROT_COPY)) {
+			rv = hookd_vm_protect(task, address, size, set_maximum, new_protection);
+		}
+		else {
+			rv = _kernelrpc_mach_vm_protect_trap(task, address, size, set_maximum, new_protection);
+			if (rv == MACH_SEND_INVALID_DEST) {
+				rv = _kernelrpc_mach_vm_protect(task, address, size, set_maximum, new_protection);
+			}
+		}
+	}
+
+	return rv;
 }

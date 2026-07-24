@@ -18,21 +18,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedManager;
 
-@property (nonatomic, readonly) NSData *bootManifestHash;
-
 - (NSString *)appVersion;
 - (NSString *)appVersionDisplayString;
 - (NSString *)nightlyHash;
+
+- (NSString *)privatePrebootPath;
+- (NSString *)activePrebootPath;
 
 - (BOOL)isInstalledThroughTrollStore;
 - (BOOL)isJailbroken;
 - (BOOL)isBootstrapped;
 - (NSString *)jailbrokenVersion;
+- (NSString *)systemVersion;
 
 - (BOOL)isSupported;
 - (BOOL)isArm64e;
 - (NSString *)versionSupportString;
 - (NSString *)accessibleKernelPath;
+- (NSString *)accessibleSPTMPath;
+- (NSString *)accessibleTXMPath;
 - (void)locateJailbreakRoot;
 - (NSError *)ensureJailbreakRootExists;
 
