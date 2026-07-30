@@ -375,7 +375,7 @@ __attribute__((constructor)) static void initializer(void)
 	}
 
 	// On iOS 26+, hooks have to be applied through hookd
-	if (__builtin_available(iOS 26.0, *)) {
+	if (__builtin_available(iOS 19.0, *)) {
 
 		// If available, use jbclient_mach_hookd_send_msg inside dyld instead...
 		// The reason for this is that dyldhook in itself is fully self contained without calling any external code

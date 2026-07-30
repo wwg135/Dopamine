@@ -160,7 +160,7 @@ uint64_t pa_to_sptm_root_frame(uint64_t user_root_pt)
 uint64_t pa_to_sptm_frame(uint64_t pa)
 {
 	uint64_t candidate = kread64(ksymbol(libsptm_frame_table)) + (pa_index(pa) * 16);
-	if (__builtin_available(iOS 26.0, *)) {
+	if (__builtin_available(iOS 19.0, *)) {
 		uint8_t type = kread8(candidate + koffsetof(sptm_frame, type));
 		// root frames (type 41 on >= 27.0, type 40 on 26.4-26.5, type 17 and 38 on 26.0-26.3.1) need specialized logic
 

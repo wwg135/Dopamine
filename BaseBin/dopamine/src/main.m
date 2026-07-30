@@ -266,7 +266,7 @@ void install_builtin_packages(void)
 			}
 		}
 		[[NSFileManager defaultManager] removeItemAtURL:packageDirURL error:nil];
-		if (@available(iOS 26.0, *)) {
+		if (@available(iOS 19.0, *)) {
 			// If we just installed prep packages on iOS 26+, load daemons now
 			// This wasn't working before, since launchctl had to be updated first
 			load_var_jb_daemons();

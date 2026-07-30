@@ -134,7 +134,7 @@ __attribute__((constructor)) static void initializer(void)
 
 	cs_allow_invalid(proc_self(), false);
 
-	if (__builtin_available(iOS 26.0, *)) {
+	if (__builtin_available(iOS 19.0, *)) {
 		// On iOS 26+, hooks have to be applied through hookd
 		hookd_provider_init();
 		litehook_hook_memory = litehook_hook_memory_hookd;
