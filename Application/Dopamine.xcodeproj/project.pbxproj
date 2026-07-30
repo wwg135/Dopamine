@@ -49,6 +49,7 @@
 		04DD0B472B7CBEEA0055DE4F /* DOTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DD0B462B7CBEEA0055DE4F /* DOTheme.m */; };
 		04DD0B592B7D19E60055DE4F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 04DD0B5B2B7D19E60055DE4F /* Localizable.strings */; };
 		51F19D052BBF456200896361 /* libpartial.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 51AB98D92BBF44390042EA7B /* libpartial.a */; };
+		8614E357301AB63E00B1B88C /* DOBootstrapper+zstd.m in Sources */ = {isa = PBXBuildFile; fileRef = 8614E356301AB63E00B1B88C /* DOBootstrapper+zstd.m */; };
 		8C029F432B4DFD5D0071DE58 /* DOExploitManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C029F422B4DFD5D0071DE58 /* DOExploitManager.m */; };
 		8C029F462B4DFD910071DE58 /* DOBootstrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C029F452B4DFD910071DE58 /* DOBootstrapper.m */; };
 		8C029F4E2B4E1FF30071DE58 /* DOExploit.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C029F4D2B4E1FF30071DE58 /* DOExploit.m */; };
@@ -391,6 +392,8 @@
 		04DD0B5C2B7D1A210055DE4F /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		04DD0B5D2B7D1A210055DE4F /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		51AB98D92BBF44390042EA7B /* libpartial.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpartial.a; path = Dopamine/Dependencies/libpartial.a; sourceTree = "<group>"; };
+		8614E355301AB63E00B1B88C /* DOBootstrapper+zstd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DOBootstrapper+zstd.h"; sourceTree = "<group>"; };
+		8614E356301AB63E00B1B88C /* DOBootstrapper+zstd.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "DOBootstrapper+zstd.m"; sourceTree = "<group>"; };
 		8C029F412B4DFD5D0071DE58 /* DOExploitManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DOExploitManager.h; sourceTree = "<group>"; };
 		8C029F422B4DFD5D0071DE58 /* DOExploitManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DOExploitManager.m; sourceTree = "<group>"; };
 		8C029F442B4DFD910071DE58 /* DOBootstrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DOBootstrapper.h; sourceTree = "<group>"; };
@@ -813,6 +816,8 @@
 			children = (
 				8C029F442B4DFD910071DE58 /* DOBootstrapper.h */,
 				8C029F452B4DFD910071DE58 /* DOBootstrapper.m */,
+				8614E355301AB63E00B1B88C /* DOBootstrapper+zstd.h */,
+				8614E356301AB63E00B1B88C /* DOBootstrapper+zstd.m */,
 				8C029F612B4E2E140071DE58 /* DOJailbreaker.h */,
 				8C029F622B4E2E140071DE58 /* DOJailbreaker.m */,
 				8C029F4C2B4E1FF30071DE58 /* DOExploit.h */,
@@ -1810,6 +1815,7 @@
 				0443A9B12B79D9C10014C933 /* DOPSListItemsController.m in Sources */,
 				8C71982B2ABF0E84003C6658 /* main.m in Sources */,
 				04DD0B3D2B7C88210055DE4F /* DOLogCrashViewController.m in Sources */,
+				8614E357301AB63E00B1B88C /* DOBootstrapper+zstd.m in Sources */,
 				8C029F602B4E25350071DE58 /* DOEnvironmentManager.m in Sources */,
 				04C246A12B73225800E17924 /* DODownloadViewController.m in Sources */,
 				042479B52B66916B0082581B /* DOLyricsLogItemView.m in Sources */,
