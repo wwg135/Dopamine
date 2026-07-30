@@ -142,7 +142,8 @@ int IOSurface_map_withCacheMode(uint64_t pa, uint64_t size, void **uaddr, uint32
 		fakeRanges[0] = pa;
 		fakeRanges[1] = size;
 
-		IOMemoryDescriptor_set_ranges(desc, phystokv(vtophys(ttep_self(), (uint64_t)fakeRanges)));
+		uint64_t fakeRanges_kva = phystokv(vtophys(ttep_self(), (uint64_t)fakeRanges));
+		IOMemoryDescriptor_set_ranges(desc, fakeRanges_kva);
 		cleanups = realloc(cleanups, ++cleanupsCount * sizeof(struct IOSurface_toCleanup));
 		cleanups[cleanupsCount-1].descriptor = desc;
 		cleanups[cleanupsCount-1].origRanges = ranges;
@@ -177,18 +178,18 @@ int IOSurface_map(uint64_t pa, uint64_t size, void **uaddr) {
 
 void IOSurface_map_cleanup(void)
 {
-	if (gPrimitives.krwMinSafeReadSize > 0x10) return;
+	if (cleanupsCount == 0) return;
 
 	for (unsigned i = 0; i < cleanupsCount; i++) {
 		uint64_t desc = cleanups[i].descriptor;
 		uint64_t origRanges = cleanups[i].origRanges;
 		uint64_t *fakeRangesUA = cleanups[i].fakeRangesUA;
 
-		kwrite64(origRanges, fakeRangesUA[0]);
-		kwrite64(origRanges + 8, fakeRangesUA[1]);
 		IOMemoryDescriptor_set_ranges(desc, origRanges);
 		free(fakeRangesUA);
 	}
+
+	free(cleanups);
 	cleanups = NULL;
 	cleanupsCount = 0;
 }
