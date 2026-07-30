@@ -78,6 +78,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_SHIFT = 6;
 	gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_BASE  = 0xFFFFFFE000000000;
 
+	gSystemInfo.kernelStruct.IOSurface.get_memoryDescriptor = 0x38;
+	gSystemInfo.kernelStruct.IOMachPort.object = 0;
+
 	// proc
 	gSystemInfo.kernelStruct.proc.list_next =  0x0;
 	gSystemInfo.kernelStruct.proc.list_prev =  0x8;
@@ -500,6 +503,12 @@ void jbinfo_initialize_hardcoded_offsets(void)
 
 															// vm_map_entry
 															gSystemInfo.kernelStruct.vm_map_entry.flags_xnu_user_debug = 27;
+
+															// IOSurface
+															gSystemInfo.kernelStruct.IOSurface.get_memoryDescriptor = 0x30;
+
+															// IOMachPort
+															gSystemInfo.kernelStruct.IOMachPort.object = 0x20;
 
 															// iOS 26.4+
 															if (strcmp(darwinVersion, "25.4.0") >= 0) {

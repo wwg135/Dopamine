@@ -36,7 +36,7 @@ void IOSurface_set_ranges(uint64_t surface, uint64_t ranges)
 
 uint64_t IOSurface_get_memoryDescriptor(uint64_t surface)
 {
-	return kread_ptr(surface + 0x38);
+	return kread_ptr(surface + koffsetof(IOSurface, get_memoryDescriptor));
 }
 
 uint64_t IOMemoryDescriptor_get_ranges(uint64_t memoryDescriptor)
@@ -119,6 +119,9 @@ int IOSurface_map(uint64_t pa, uint64_t size, void **uaddr)
 	mach_port_t surfaceMachPort = IOSurface_map_getSurfacePort(1337);
 
 	uint64_t surfaceSendRight = task_get_ipc_port_kobject(task_self(), surfaceMachPort);
+	if (koffsetof(IOMachPort, object)) {
+		surfaceSendRight = kread_ptr(surfaceSendRight + koffsetof(IOMachPort, object));
+	}
 	uint64_t surface = IOSurfaceSendRight_get_surface(surfaceSendRight);
 	uint64_t desc = IOSurface_get_memoryDescriptor(surface);
 	uint64_t ranges = IOMemoryDescriptor_get_ranges(desc);

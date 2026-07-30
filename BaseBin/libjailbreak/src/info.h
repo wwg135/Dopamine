@@ -298,6 +298,14 @@ struct system_info {
 		} protosw;
 
 		struct {
+			uint32_t get_memoryDescriptor;
+		} IOSurface;
+
+		struct {
+			uint32_t object;
+		} IOMachPort;
+
+		struct {
 			uint32_t type;
 			uint32_t level;
 			uint32_t nested_refcnt;
@@ -558,6 +566,10 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.socket.proto); \
 	\
 	iterator(ctx, kernelStruct.protosw.input); \
+	\
+	iterator(ctx, kernelStruct.IOSurface.get_memoryDescriptor); \
+	\
+	iterator(ctx, kernelStruct.IOMachPort.object); \
 	\
 	iterator(ctx, kernelStruct.sptm_frame.type); \
 	iterator(ctx, kernelStruct.sptm_frame.level); \
