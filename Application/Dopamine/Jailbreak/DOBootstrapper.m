@@ -20,11 +20,13 @@
 #define LIBKRW_DOPAMINE_BUNDLED_VERSION @"2.0.3"
 #define LIBROOT_DOPAMINE_BUNDLED_VERSION @"1.0.1"
 #define BASEBIN_LINK_BUNDLED_VERSION @"1.0.0"
+#define LAUNCHCTL_BUNDLED_VERSION @"1:1.2.0"
 
 static NSDictionary *gBundledPackages = @{
     @"libkrw0-dopamine" : LIBKRW_DOPAMINE_BUNDLED_VERSION,
     @"libroot-dopamine" : LIBROOT_DOPAMINE_BUNDLED_VERSION,
     @"dopamine-basebin-link" : BASEBIN_LINK_BUNDLED_VERSION,
+    @"launchctl" : LAUNCHCTL_BUNDLED_VERSION,
 };
 
 struct hfs_mount_args {
@@ -515,9 +517,20 @@ NSString *const bootstrapErrorDomain = @"BootstrapErrorDomain";
     BOOL shouldInstallLibroot = [self shouldInstallPackage:@"libroot-dopamine"];
     BOOL shouldInstallLibkrw = [self shouldInstallPackage:@"libkrw0-dopamine"];
     BOOL shouldInstallBasebinLink = [self shouldInstallPackage:@"dopamine-basebin-link"];
+    BOOL shouldInstallLaunchctl = NO;
+    if (__builtin_available(iOS 19.0, *)) {
+        shouldInstallLaunchctl = [self shouldInstallPackage:@"launchctl"];
+    }
     
-    if (shouldInstallLibroot || shouldInstallLibkrw || shouldInstallBasebinLink) {
+    if (shouldInstallLibroot || shouldInstallLibkrw || shouldInstallBasebinLink || shouldInstallLaunchctl) {
         [[DOUIManager sharedInstance] sendLog:@"Updating Bundled Packages" debug:NO];
+
+        if (shouldInstallLaunchctl) {
+            NSString *launchctlPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"launchctl_1_1.2.0_iphoneos-arm64.deb"];
+            int r = [self installPackage:launchctlPath];
+            if (r != 0) return [NSError errorWithDomain:bootstrapErrorDomain code:BootstrapErrorCodeFailedFinalising userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Failed to install launchctl: %d\n", r]}];
+        }
+
         if (shouldInstallLibroot) {
             NSString *librootPath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"libroot.deb"];
             int r = [self installPackage:librootPath];
