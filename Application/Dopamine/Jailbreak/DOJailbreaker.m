@@ -387,7 +387,7 @@ void *boomerang_server(struct boomerang_info *info)
     int status = 0;
     do {
         if (waitpid(spawnedPid, &status, 0) == -1) {
-            return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedLaunchdInjection userInfo:@{NSLocalizedDescriptionKey : @"Waiting for jbctl failed"}];;
+            return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedLaunchdInjection userInfo:@{NSLocalizedDescriptionKey : @"Waiting for jbctl failed"}];
         }
     } while (!WIFEXITED(status) && !WIFSIGNALED(status));
 
