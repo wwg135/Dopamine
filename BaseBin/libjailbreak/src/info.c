@@ -386,6 +386,12 @@ void jbinfo_initialize_hardcoded_offsets(void)
 										gSystemInfo.kernelStruct.pmap.type       = 0xC9 + pmapEl2Adjust;
 									}
 
+									// IOSurface
+									gSystemInfo.kernelStruct.IOSurface.get_memoryDescriptor = 0x40;
+
+									// IOMachPort
+									gSystemInfo.kernelStruct.IOMachPort.object = 0x30;
+
 									// vm_map
 									gSystemInfo.kernelStruct.vm_map.flags = 0xC8;
 
@@ -393,6 +399,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 									gSystemInfo.kernelStruct.ucred_rw.weak_ref = 0x0;
 
 									if (strcmp(darwinVersion, "23.1.0") >= 0) {	// iOS 17.1+
+										// IOSurface
+										gSystemInfo.kernelStruct.IOSurface.get_memoryDescriptor = 0x30;
+
 										// inpcb
 										gSystemInfo.kernelStruct.inpcb.icmp6filt = 0x148;
 										gSystemInfo.kernelStruct.inpcb.chksum 	 = 0x150;
