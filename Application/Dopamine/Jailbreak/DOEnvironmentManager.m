@@ -598,6 +598,11 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
     if ([[NSFileManager defaultManager] fileExistsAtPath:sptmInAppPath]) {
         return sptmInAppPath;
     }
+    
+    NSString *sptmInDocsPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/sptm.img4"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:sptmInDocsPath]) {
+        return sptmInDocsPath;
+    }
 
     if ([self isInstalledThroughTrollStore] || getuid() == 0) {
         NSString *sptmPath = [[self activePrebootPath] stringByAppendingPathComponent:@"/usr/standalone/firmware/FUD/Ap,SecurePageTableMonitor.img4"];
@@ -614,6 +619,11 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
     NSString *txmInAppPath = [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:@"txm.img4"];
     if ([[NSFileManager defaultManager] fileExistsAtPath:txmInAppPath]) {
         return txmInAppPath;
+    }
+    
+    NSString *txmInDocsPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/txm.img4"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:txmInDocsPath]) {
+        return txmInDocsPath;
     }
 
     if ([self isInstalledThroughTrollStore] || getuid() == 0) {
