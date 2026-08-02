@@ -208,7 +208,13 @@
                     [pacBypassSpecifier setProperty:([envManager isPACBypassRequired] ? _availablePACBypasses.firstObject.identifier : @"none") forKey:@"recommendedExploitIdentifier"];
                     [specifiers addObject:pacBypassSpecifier];
                     
-                    PSSpecifier *pplBypassSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(@"PPL Bypass") target:self set:defSetter get:expGetter detail:nil cell:PSLinkListCell edit:nil];
+                    NSString *pplBypassName = @"PPL Bypass";
+                    if ([DOEnvironmentManager sharedManager].isSPTM) {
+                        // SPTM bypasses are also handled as PPL bypasses in the code, we just change the name of the setting in the UI
+                        pplBypassName = @"SPTM Bypass";
+                    }
+
+                    PSSpecifier *pplBypassSpecifier = [PSSpecifier preferenceSpecifierNamed:DOLocalizedString(pplBypassName) target:self set:defSetter get:expGetter detail:nil cell:PSLinkListCell edit:nil];
                     [pplBypassSpecifier setProperty:@YES forKey:@"enabled"];
                     [pplBypassSpecifier setProperty:exploitManager.preferredPPLBypass.identifier forKey:@"default"];
                     pplBypassSpecifier.detailControllerClass = [DOPSExploitListItemsController class];

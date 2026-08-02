@@ -196,14 +196,34 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 {
     cpu_subtype_t cpusubtype = 0;
     size_t len = sizeof(cpusubtype);
-    if (sysctlbyname("hw.cpusubtype", &cpusubtype, &len, NULL, 0) == -1) { return NO; }
+    if (sysctlbyname("hw.cpusubtype", &cpusubtype, &len, NULL, 0) == -1) return NO;
     return (cpusubtype & ~CPU_SUBTYPE_MASK) == CPU_SUBTYPE_ARM64E;
+}
+
+- (BOOL)isSPTM
+{
+    int page_protection_type;
+    size_t len = sizeof(page_protection_type);
+    if (sysctlbyname("kern.page_protection_type", &page_protection_type, &len, NULL, 0) == -1) return NO;
+    return page_protection_type == 2;
 }
 
 - (NSString *)versionSupportString
 {
+    cpu_subtype_t cpuFamily = 0;
+    size_t cpuFamilySize = sizeof(cpuFamily);
+    sysctlbyname("hw.cpufamily", &cpuFamily, &cpuFamilySize, NULL, 0);
+    
     if ([self isArm64e]) {
-        return @"iOS 15.0 - 16.5.1 (arm64e)";
+        if (cpuFamily == CPUFAMILY_ARM_VORTEX_TEMPEST || cpuFamily == CPUFAMILY_ARM_LIGHTNING_THUNDER) {
+            return @"iOS 15.0 - 18.7.1, 26.0 - 26.0.1 (A12/A13)";
+        }
+        else if (![self isSPTM]) {
+            return @"iOS 15.0 - 17.3.1 (PPL)";
+        }
+        else {
+            return @"iOS 17.0 - 17.3.1 (SPTM)";
+        }
     }
     else {
         return @"iOS 15.0 - 18.7.1 (arm64)";

@@ -86,6 +86,7 @@
 "Theme" = "Tema";
 "Kernel Exploit" = "Exploit del kernel";
 "PPL Bypass" = "PPL Bypass";
+"SPTM Bypass" = "SPTM Bypass";
 "PAC Bypass" = "PAC Bypass";
 "None" = "Ninguno";
 "Recommended" = "Recomendado";
@@ -109,6 +110,7 @@
 "Exploiting Kernel (%@)" = "Explotando Kernel (%@)";
 "Bypassing PAC (%@)" = "Saltando PAC (%@)";
 "Bypassing PPL (%@)" = "Saltando PPL (%@)";
+"Bypassing SPTM (%@)" = "Saltando SPTM (%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "Seleccione gestor(es) de paquetes";

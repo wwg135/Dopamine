@@ -86,6 +86,7 @@
 "Theme" = "主题";
 "Kernel Exploit" = "内核漏洞";
 "PPL Bypass" = "PPL 绕过";
+"SPTM Bypass" = "SPTM 绕过";
 "PAC Bypass" = "PAC 绕过";
 "None" = "无";
 "Recommended" = "推荐";
@@ -109,6 +110,7 @@
 "Exploiting Kernel (%@)" = "正在利用内核 (%@)";
 "Bypassing PAC (%@)" = "正在绕过 PAC (%@)";
 "Bypassing PPL (%@)" = "正在绕过 PPL (%@)";
+"Bypassing SPTM (%@)" = "正在绕过 SPTM (%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "请选择包管理器";

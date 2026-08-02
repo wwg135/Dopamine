@@ -84,6 +84,7 @@
 "Theme" = "السمة";
 "Kernel Exploit" = "ثغرة الـ Kernel";
 "PPL Bypass" = "تجاوز PPL";
+"SPTM Bypass" = "تجاوز SPTM";
 "PAC Bypass" = "تجاوز PAC";
 /*None*/
 /*Recommended*/
@@ -107,6 +108,7 @@
 "Exploiting Kernel (%@)" = "ثغرة الـ Kernel (%@)";
 "Bypassing PAC (%@)" = "تجاوز PAC (%@)";
 "Bypassing PPL (%@)" = "تجاوز PPL (%@)";
+"Bypassing SPTM (%@)" = "تجاوز SPTM (%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "اختر مدير الحزمة";

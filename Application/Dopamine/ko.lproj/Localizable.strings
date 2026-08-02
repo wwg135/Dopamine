@@ -86,6 +86,7 @@
 "Theme" = "테마";
 "Kernel Exploit" = "커널 익스플로잇";
 "PPL Bypass" = "PPL 우회";
+"SPTM Bypass" = "SPTM 우회";
 "PAC Bypass" = "PAC 우회";
 "None" = "없음";
 "Recommended" = "권장됨";
@@ -109,6 +110,7 @@
 "Exploiting Kernel (%@)" = "커널 익스플로잇(%@) 실행 중";
 "Bypassing PAC (%@)" = "PAC 우회 중 (%@)";
 "Bypassing PPL (%@)" = "PPL 우회 중 (%@)";
+"Bypassing SPTM (%@)" = "SPTM 우회 중 (%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "패키지 매니저 선택";

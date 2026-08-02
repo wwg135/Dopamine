@@ -84,6 +84,7 @@
 "Theme" = "テーマ";
 "Kernel Exploit" = "Kernel Exploit";
 "PPL Bypass" = "PPL Bypass";
+"SPTM Bypass" = "SPTM Bypass";
 "PAC Bypass" = "PAC Bypass";
 /*None*/
 /*Recommended*/
@@ -107,6 +108,7 @@
 "Exploiting Kernel (%@)" = "Exploiting Kernel (%@)";
 "Bypassing PAC (%@)" = "Bypassing PAC (%@)";
 "Bypassing PPL (%@)" = "Bypassing PPL (%@)";
+"Bypassing SPTM (%@)" = "Bypassing SPTM (%@)";
 
 // Package Manager selection
 "Status_Title_Select_Package_Managers" = "パッケージマネージャーを選択";
