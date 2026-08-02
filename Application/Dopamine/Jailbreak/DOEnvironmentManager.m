@@ -261,7 +261,7 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
     if ([self isInstalledThroughTrollStore]) {
         unsandboxBlock();
     }
-    else if([self isJailbroken]) {
+    else if ([self isJailbroken]) {
         uint64_t labelBackup = 0;
         jbclient_root_set_mac_label(1, -1, &labelBackup);
         unsandboxBlock();
@@ -275,21 +275,22 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 
 - (void)runAsRoot:(void (^)(void))rootBlock
 {
-    uint32_t orgUser = getuid();
-    uint32_t orgGroup = getgid();
-    if (geteuid() == 0 && orgGroup == 0) {
+    uint32_t orgUser = geteuid();
+    uint32_t orgGroup = getegid();
+    
+    if (orgUser == 0 && orgGroup == 0) {
         rootBlock();
         return;
     }
 
     int ur = 0, gr = 0;
-    if (orgUser != 0) ur = setuid(0);
-    if (orgGroup != 0) gr = setgid(0);
+    if (orgUser != 0) ur = seteuid(0);
+    if (orgGroup != 0) gr = setegid(0);
     if (ur == 0 && gr == 0) {
         rootBlock();
     }
     
-    if (gr == 0 && orgGroup != 0) setgid(orgGroup);
+    if (gr == 0 && orgGroup != 0) setegid(orgGroup);
     if (ur == 0 && orgUser != 0) seteuid(orgUser);
 }
 
