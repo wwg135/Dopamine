@@ -22,6 +22,8 @@ extern void systemwide_domain_set_enabled(bool enabled);
 #define LOG_PROCESS_LAUNCHES 0
 
 extern bool gInEarlyBoot;
+extern bool gFreeBootLogoBeforeBackboardd;
+void free_boot_logo(void);
 
 void early_boot_done(void)
 {
@@ -165,6 +167,20 @@ int __posix_spawn_hook(pid_t *restrict pid, const char *restrict path,
 		}
 		else {
 			return __posix_spawn_orig_wrapper(pid, path, desc, argv, envp);
+		}
+	}
+
+	// If we're drawing a boot logo, free up it's resources before backboardd starts
+	if (gFreeBootLogoBeforeBackboardd) {
+		if (!strcmp(path, "/usr/libexec/xpcproxy")) {
+			if (argv[0]) {
+				if (argv[1]) {
+					if (!strcmp(argv[1], "com.apple.backboardd\n")) {
+						free_boot_logo();
+						gFreeBootLogoBeforeBackboardd = false;
+					}
+				}
+			}
 		}
 	}
 

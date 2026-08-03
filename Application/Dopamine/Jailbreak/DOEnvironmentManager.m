@@ -243,14 +243,16 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 
 - (BOOL)isJailbroken
 {
-    static BOOL jailbroken = NO;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        uint32_t csFlags = 0;
-        csops(getpid(), CS_OPS_STATUS, &csFlags, sizeof(csFlags));
-        jailbroken = csFlags & CS_PLATFORM_BINARY;
+        _isJailbroken = jbclient_dopamine_is_jailbroken();
     });
-    return jailbroken;
+    return _isJailbroken;
+}
+
+- (void)setJailbroken:(BOOL)jailbroken
+{
+    _isJailbroken = jailbroken;
 }
 
 - (NSString *)jailbrokenVersion
@@ -303,15 +305,12 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
         return;
     }
 
-    int ur = 0, gr = 0;
-    if (orgUser != 0) ur = seteuid(0);
-    if (orgGroup != 0) gr = setegid(0);
-    if (ur == 0 && gr == 0) {
-        rootBlock();
+    if (self.isJailbroken) {
+        if (jbclient_dopamine_get_root() == 0) {
+            rootBlock();
+            jbclient_dopamine_drop_root();
+        }
     }
-    
-    if (gr == 0 && orgGroup != 0) setegid(orgGroup);
-    if (ur == 0 && orgUser != 0) seteuid(orgUser);
 }
 
 - (int)runTrollStoreAction:(NSString *)action
@@ -328,38 +327,27 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 {
     [self runAsRoot:^{
         __block int pid = 0;
-        __block int r = 0;
         [self runUnsandboxed:^{
-            r = exec_cmd_suspended(&pid, JBROOT_PATH("/usr/bin/sbreload"), NULL);
+            int r = exec_cmd_suspended(&pid, JBROOT_PATH("/basebin/jbctl"), "respring", NULL);
             if (r == 0) {
                 kill(pid, SIGCONT);
             }
         }];
-        if (r == 0) {
-            if (cmd_wait_for_exit(pid) != 0) {
-                // Fallback
-                [self runUnsandboxed:^{
-                    killall("/usr/libexec/backboardd", SIGTERM);
-                }];
-            }
-        }
+        // We *NEED* to leave this block on iOS 17+ to avoid a panic, I added a usleep(10000) in jbctl to make sure this always happens
     }];
 }
 
 - (void)rebootUserspace
 {
-    [self runUnsandboxed:^{
-        int pid = -1;
-        int r = exec_cmd_suspended(&pid, JBROOT_PATH("/basebin/jbctl"), "reboot_userspace", NULL);
-        if (r == 0) {
-            // the original plan was to have the process continue outside of this block
-            // unfortunately sandbox blocks kill aswell, so it's a bit racy but works
-
-            // we assume we leave this unsandbox block before the userspace reboot starts
-            // to avoid leaking the label, this seems to work in practice
-            // and even if it doesn't work, leaking the label is no big deal
-            kill(pid, SIGCONT);
-        }
+    [self runAsRoot:^{
+        [self runUnsandboxed:^{
+            int pid = -1;
+            int r = exec_cmd_suspended(&pid, JBROOT_PATH("/basebin/jbctl"), "reboot_userspace", NULL);
+            if (r == 0) {
+                kill(pid, SIGCONT);
+            }
+        }];
+        // We *NEED* to leave this block on iOS 17+ to avoid a panic, I added a usleep(10000) in jbctl to make sure this always happens
     }];
 }
 

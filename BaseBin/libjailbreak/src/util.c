@@ -25,10 +25,6 @@ extern char **environ;
 
 #define FAKE_PHYSPAGE_TO_MAP 0x13370000
 
-#define POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE 1
-extern int posix_spawnattr_set_persona_np(const posix_spawnattr_t* __restrict, uid_t, uint32_t);
-extern int posix_spawnattr_set_persona_uid_np(const posix_spawnattr_t* __restrict, uid_t);
-extern int posix_spawnattr_set_persona_gid_np(const posix_spawnattr_t* __restrict, uid_t);
 int posix_spawnattr_set_registered_ports_np(posix_spawnattr_t * __restrict attr, mach_port_t portarray[], uint32_t count);
 
 const struct mach_header *get_mach_header(const char *name)
@@ -1057,6 +1053,18 @@ int proc_ucred_update_content(uint64_t proc, const char *procPath, uid_t uid, gi
 
 		kwrite32(ucred + koffsetof(ucred, svgid), gid);
 		kwrite32(ucred + koffsetof(ucred, groups), gid);
+	}
+
+	if (gSystemInfo.kernelStruct.proc_ro.exists) {
+		uint64_t proc_ro = kread_ptr(proc + koffsetof(proc, proc_ro));
+
+		if (koffsetof(proc_ro, task_tokens)) {
+			uint64_t auditToken = proc_ro + koffsetof(proc_ro, task_tokens) + koffsetof(task_token_ro_data, audit_token);
+			kwrite32(auditToken + 4, uid); // uid
+			kwrite32(auditToken + 8, gid); // gid
+			kwrite32(auditToken + 12, ruid); // ruid
+			kwrite32(auditToken + 16, rgid); // rgid
+		}
 	}
 
 	return 0;

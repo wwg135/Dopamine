@@ -41,5 +41,8 @@ int jbclient_root_trustcache_info(xpc_object_t *infoOut);
 int jbclient_root_trustcache_add_cdhash(uint8_t *cdhashData, size_t cdhashLen);
 int jbclient_root_trustcache_clear(void);
 int jbclient_boomerang_done(void);
+bool jbclient_dopamine_is_jailbroken(void);
+int jbclient_dopamine_get_root(void);
+int jbclient_dopamine_drop_root(void);
 
 #endif

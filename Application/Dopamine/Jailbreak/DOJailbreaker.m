@@ -621,6 +621,9 @@ void *boomerang_server(struct boomerang_info *info)
     *errOut = [self injectLaunchdHook];
     if (*errOut) return;
     
+    // After the launchd hook is initialized, we need to make the app believe the device is jailbroken
+    [[DOEnvironmentManager sharedManager] setJailbroken:YES];
+    
     // Now that we can, protect important system files by bind mounting on top of them
     // This will be always be done during the userspace reboot
     // We also do it now though in case there is a failure between the now step and the userspace reboot

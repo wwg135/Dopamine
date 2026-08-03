@@ -46,20 +46,33 @@ void exec_with_asl_disabled(void (^block)(void))
 	aslCtx->asl_enabled = true;
 }
 
+struct drawctx *gBootLogoDrawCtx = NULL;
+bool gFreeBootLogoBeforeBackboardd = NO;
+
 void draw_boot_logo(const char *bootLogoPath)
 {
-	if (bootLogoPath) {
-		if (!access(bootLogoPath, R_OK)) {
-			// When launchd tears down the userspace, it will do so in no particular order
-			// If SpringBoard gets unloaded before backboardd, backboardd will draw a spinning wheel to the framebuffer
-			// If this happens after we wrote the boot logo to the framebuffer, it will be replaced by that
-			// Therefore, we kill backboardd early so that this race does not happen
-			killall("/usr/libexec/backboardd", SIGTERM);
-			exec_with_asl_disabled(^{
-				display_draw_image_path(bootLogoPath);
-			});
+	exec_with_asl_disabled(^{
+		if (!gBootLogoDrawCtx) {
+			gBootLogoDrawCtx = drawctx_init();
 		}
-	}
+
+		if (bootLogoPath) {
+			if (!access(bootLogoPath, R_OK)) {
+				// When launchd tears down the userspace, it will do so in no particular order
+				// If SpringBoard gets unloaded before backboardd, backboardd will draw a spinning wheel to the framebuffer
+				// If this happens after we wrote the boot logo to the framebuffer, it will be replaced by that
+				// Therefore, we kill backboardd early so that this race does not happen
+				killall("/usr/libexec/backboardd", SIGTERM);
+				drawctx_draw_image_path(gBootLogoDrawCtx, bootLogoPath);
+			}
+		}
+	});
+}
+
+void free_boot_logo(void)
+{
+	drawctx_free(gBootLogoDrawCtx);
+	gBootLogoDrawCtx = NULL;
 }
 
 int (*sysctlbyname_orig)(const char *name, void *oldp, size_t *oldlenp, void *newp, size_t newlen) = NULL;
@@ -110,6 +123,7 @@ __attribute__((constructor)) static void initializer(void)
 		}
 
 		draw_boot_logo(JBROOT_PATH("/basebin/bootlogo.jp2"));
+		gFreeBootLogoBeforeBackboardd = YES;
 	}
 	else {
 		// Here we should have been injected into a live launchd on the fly

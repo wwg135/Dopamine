@@ -145,7 +145,12 @@ struct system_info {
 			uint32_t mach_trap_filter_mask;
 			uint32_t mach_kobj_filter_mask;
 			uint32_t t_flags_ro;
+			uint32_t task_tokens;
 		} proc_ro;
+
+		struct {
+			uint32_t audit_token;
+		} task_token_ro_data;
 
 		struct {
 			uint64_t ofiles_start;
@@ -467,6 +472,9 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.proc_ro.mach_trap_filter_mask); \
 	iterator(ctx, kernelStruct.proc_ro.mach_kobj_filter_mask); \
 	iterator(ctx, kernelStruct.proc_ro.t_flags_ro); \
+	iterator(ctx, kernelStruct.proc_ro.task_tokens); \
+	\
+	iterator(ctx, kernelStruct.task_token_ro_data.audit_token); \
 	\
 	iterator(ctx, kernelStruct.filedesc.ofiles_start); \
 	\

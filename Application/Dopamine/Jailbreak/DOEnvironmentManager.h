@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DOEnvironmentManager : NSObject
 {
     DOBootstrapper *_bootstrapper;
+    BOOL _isJailbroken;
     BOOL _bootstrapNeedsMigration;
 }
 
@@ -40,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)accessibleTXMPath;
 - (void)locateJailbreakRoot;
 - (NSError *)ensureJailbreakRootExists;
+
+- (void)setJailbroken:(BOOL)jailbroken;
 
 
 - (void)runUnsandboxed:(void (^)(void))unsandboxBlock;

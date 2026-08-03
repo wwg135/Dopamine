@@ -496,3 +496,36 @@ int jbclient_boomerang_done(void)
 	}
 	return -1;
 }
+
+bool jbclient_dopamine_is_jailbroken(void)
+{
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_DOPAMINE, JBS_DOPAMINE_IS_JAILBROKEN, NULL);
+	if (xreply) {
+		int64_t result = xpc_dictionary_get_int64(xreply, "result");
+		xpc_release(xreply);
+		return (bool)result;
+	}
+	return false;
+}
+
+int jbclient_dopamine_get_root(void)
+{
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_DOPAMINE, JBS_DOPAMINE_GET_ROOT, NULL);
+	if (xreply) {
+		int64_t result = xpc_dictionary_get_int64(xreply, "result");
+		xpc_release(xreply);
+		return (bool)result;
+	}
+	return -1;
+}
+
+int jbclient_dopamine_drop_root(void)
+{
+	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_DOPAMINE, JBS_DOPAMINE_DROP_ROOT, NULL);
+	if (xreply) {
+		int64_t result = xpc_dictionary_get_int64(xreply, "result");
+		xpc_release(xreply);
+		return (bool)result;
+	}
+	return -1;
+}

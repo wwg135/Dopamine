@@ -234,9 +234,13 @@ void jbinfo_initialize_hardcoded_offsets(void)
 			gSystemInfo.kernelStruct.proc.textvp  = 0x358;
 
 			// proc_ro
-			gSystemInfo.kernelStruct.proc_ro.exists  = true;
-			gSystemInfo.kernelStruct.proc_ro.csflags = 0x1C;
-			gSystemInfo.kernelStruct.proc_ro.ucred   = 0x20;
+			gSystemInfo.kernelStruct.proc_ro.exists      = true;
+			gSystemInfo.kernelStruct.proc_ro.csflags     = 0x1C;
+			gSystemInfo.kernelStruct.proc_ro.ucred       = 0x20;
+			gSystemInfo.kernelStruct.proc_ro.task_tokens = 0x40;
+
+			// task_token_ro_data
+			gSystemInfo.kernelStruct.task_token_ro_data.audit_token = 0x8;
 
 			// ucred_rw
 			gSystemInfo.kernelStruct.ucred_rw.exists = true;
@@ -487,6 +491,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 														gSystemInfo.kernelStruct.proc_ro.mach_trap_filter_mask += 0x8;
 														gSystemInfo.kernelStruct.proc_ro.mach_kobj_filter_mask += 0x8;
 														gSystemInfo.kernelStruct.proc_ro.t_flags_ro            += 0x8;
+														gSystemInfo.kernelStruct.proc_ro.task_tokens           += 0x8;
 
 														// iOS 26.0+
 														if (strcmp(darwinVersion, "25.0.0") >= 0) {
@@ -572,6 +577,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 																	gSystemInfo.kernelStruct.proc_ro.mach_trap_filter_mask += 0x8;
 																	gSystemInfo.kernelStruct.proc_ro.mach_kobj_filter_mask += 0x8;
 																	gSystemInfo.kernelStruct.proc_ro.t_flags_ro            += 0x8;
+																	gSystemInfo.kernelStruct.proc_ro.task_tokens           = 0;
 
 																	if (hasSPTM) {
 																		// vm_page
