@@ -78,7 +78,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_SHIFT = 6;
 	gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_BASE  = 0xFFFFFFE000000000;
 
-	gSystemInfo.kernelStruct.IOSurface.get_memoryDescriptor = 0x38;
+	gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x38;
+	gSystemInfo.kernelStruct.IOSurface.ranges = 0x3E0;
+	gSystemInfo.kernelStruct.IOSurface.rangeCount = 0x3E8;
 	gSystemInfo.kernelStruct.IOMachPort.object = 0;
 
 	// proc
@@ -387,7 +389,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 									}
 
 									// IOSurface
-									gSystemInfo.kernelStruct.IOSurface.get_memoryDescriptor = 0x40;
+									gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x40;
+									gSystemInfo.kernelStruct.IOSurface.ranges = 0x420;
+									gSystemInfo.kernelStruct.IOSurface.rangeCount = 0x428;
 
 									// IOMachPort
 									gSystemInfo.kernelStruct.IOMachPort.object = 0x30;
@@ -400,7 +404,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 
 									if (strcmp(darwinVersion, "23.1.0") >= 0) {	// iOS 17.1+
 										// IOSurface
-										gSystemInfo.kernelStruct.IOSurface.get_memoryDescriptor = 0x30;
+										gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x30;
 
 										// inpcb
 										gSystemInfo.kernelStruct.inpcb.icmp6filt = 0x148;
@@ -514,7 +518,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 															gSystemInfo.kernelStruct.vm_map_entry.flags_xnu_user_debug = 27;
 
 															// IOSurface
-															gSystemInfo.kernelStruct.IOSurface.get_memoryDescriptor = 0x30;
+															gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x30;
 
 															// IOMachPort
 															gSystemInfo.kernelStruct.IOMachPort.object = 0x20;

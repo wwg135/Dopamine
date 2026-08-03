@@ -298,7 +298,9 @@ struct system_info {
 		} protosw;
 
 		struct {
-			uint32_t get_memoryDescriptor;
+			uint32_t memoryDescriptor;
+			uint32_t ranges;
+			uint32_t rangeCount;
 		} IOSurface;
 
 		struct {
@@ -567,7 +569,9 @@ extern struct system_info gSystemInfo;
 	\
 	iterator(ctx, kernelStruct.protosw.input); \
 	\
-	iterator(ctx, kernelStruct.IOSurface.get_memoryDescriptor); \
+	iterator(ctx, kernelStruct.IOSurface.memoryDescriptor); \
+	iterator(ctx, kernelStruct.IOSurface.ranges); \
+	iterator(ctx, kernelStruct.IOSurface.rangeCount); \
 	\
 	iterator(ctx, kernelStruct.IOMachPort.object); \
 	\
