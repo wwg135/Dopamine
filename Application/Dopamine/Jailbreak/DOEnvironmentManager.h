@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isInstalledThroughTrollStore;
 - (BOOL)isJailbroken;
+- (BOOL)isJailbrokenWithOtherJailbreak;
 - (BOOL)isBootstrapped;
 - (NSString *)jailbrokenVersion;
 - (NSString *)systemVersion;

@@ -121,7 +121,7 @@
     ]];
     
     //Jailbreak Button
-    BOOL isJailbroken = [[DOEnvironmentManager sharedManager] isJailbroken];
+    BOOL isJailbroken = [[DOEnvironmentManager sharedManager] isJailbroken] || [[DOEnvironmentManager sharedManager] isJailbrokenWithOtherJailbreak];
     BOOL isSupported = [[DOEnvironmentManager sharedManager] isSupported];
 
     NSString *jailbreakButtonTitle = [self jailbreakButtonTitle];

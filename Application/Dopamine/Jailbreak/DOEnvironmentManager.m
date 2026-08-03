@@ -255,6 +255,16 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
     _isJailbroken = jailbroken;
 }
 
+- (BOOL)isJailbrokenWithOtherJailbreak
+{
+    if (![self isJailbroken]) {
+        uint32_t csFlags = 0;
+        csops(getpid(), CS_OPS_STATUS, &csFlags, sizeof(csFlags));
+        return csFlags & CS_PLATFORM_BINARY;
+    }
+    return NO;
+}
+
 - (NSString *)jailbrokenVersion
 {
     if (!self.isJailbroken) return nil;
