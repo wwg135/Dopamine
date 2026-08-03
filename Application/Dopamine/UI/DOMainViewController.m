@@ -202,6 +202,25 @@
     [[DOUIManager sharedInstance] startLogCapture];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        if ([jailbreaker contiguousMappingWorkaroundNeeded]) {
+            UIAlertController *contiguousMappingWorkaroundAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Respring Required") message:DOLocalizedString(@"The selected Kernel exploit requires a creating a contiguous memory mapping which on this device is only possible with a special workaround that performs a respring. After the respring is done, reopen the Dopamine app and press \"Jailbreak\" again") preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Cancel") style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+                exit(0);
+            }];
+            
+            UIAlertAction *workaroundAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Apply Workaround") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [jailbreaker applyContiguousMappingWorkaround];
+            }];
+            
+            [contiguousMappingWorkaroundAlertController addAction:cancelAction];
+            [contiguousMappingWorkaroundAlertController addAction:workaroundAction];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self presentViewController:contiguousMappingWorkaroundAlertController animated:YES completion:nil];
+            });
+            return;
+        }
 
         //We need to get the preconfig mutex to start the jailbreak (self.jailbreakBtn.canStartJailbreak)
         [self.jailbreakBtn lockMutex];

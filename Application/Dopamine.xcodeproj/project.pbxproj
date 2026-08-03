@@ -198,6 +198,7 @@
 		8C7198282ABF0E84003C6658 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C7198262ABF0E84003C6658 /* LaunchScreen.storyboard */; };
 		8C71982B2ABF0E84003C6658 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C71982A2ABF0E84003C6658 /* main.m */; };
 		8C9E46292ACA1CC700B5456A /* UIImage+Blur.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C9E46282ACA1CC700B5456A /* UIImage+Blur.m */; };
+		8CB4087D301FFB130097E18B /* clock_alarm.c in Sources */ = {isa = PBXBuildFile; fileRef = 8CB4087C301FFB050097E18B /* clock_alarm.c */; };
 		8CB94F042B59E17A0098BAFD /* basebin.tc in Resources */ = {isa = PBXBuildFile; fileRef = 8CB94F022B59E17A0098BAFD /* basebin.tc */; };
 		8CB94F052B59E17A0098BAFD /* basebin.tar in Resources */ = {isa = PBXBuildFile; fileRef = 8CB94F032B59E17A0098BAFD /* basebin.tar */; };
 		8CBF1A4A2EC3B71700EB2308 /* UIImage+JPEG2000.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBF1A492EC3B71700EB2308 /* UIImage+JPEG2000.m */; };
@@ -599,6 +600,9 @@
 		8C71982A2ABF0E84003C6658 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		8C9E46272ACA1C8D00B5456A /* UIImage+Blur.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Blur.h"; sourceTree = "<group>"; };
 		8C9E46282ACA1CC700B5456A /* UIImage+Blur.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Blur.m"; sourceTree = "<group>"; };
+		8CB4087C301FFB050097E18B /* clock_alarm.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = clock_alarm.c; sourceTree = "<group>"; };
+		8CB4087F301FFB220097E18B /* clock_alarm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = clock_alarm.h; sourceTree = "<group>"; };
+		8CB408803020101D0097E18B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8CB94F022B59E17A0098BAFD /* basebin.tc */ = {isa = PBXFileReference; lastKnownFileType = file; name = basebin.tc; path = ../../../BaseBin/basebin.tc; sourceTree = "<group>"; };
 		8CB94F032B59E17A0098BAFD /* basebin.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; name = basebin.tar; path = ../../../BaseBin/basebin.tar; sourceTree = "<group>"; };
 		8CBF1A482EC3B71700EB2308 /* UIImage+JPEG2000.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+JPEG2000.h"; sourceTree = "<group>"; };
@@ -617,7 +621,6 @@
 		8CDD08432B4F6DD800A32B61 /* libchoma.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libchoma.dylib; path = ../BaseBin/.build/libchoma.dylib; sourceTree = "<group>"; };
 		8CDD08442B4F6DD800A32B61 /* libxpf.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxpf.dylib; path = ../BaseBin/.build/libxpf.dylib; sourceTree = "<group>"; };
 		8CF3E8582F72D45800931CA8 /* DarkSword.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DarkSword.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8CF3E8592F72D45900931CA8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = /Users/opa334/Desktop/Research/Projekte/Dopamine/Source/Dopamine/Application/Dopamine/Exploits/DarkSword/Info.plist; sourceTree = "<absolute>"; };
 		8CF3E85B2F72D50200931CA8 /* DarkSword.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DarkSword.m; sourceTree = "<group>"; };
 		8CF3E85E2F72D51200931CA8 /* DarkSword.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DarkSword.h; sourceTree = "<group>"; };
 		C075B0CB2B8F2BCE009A26BB /* th */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = th; path = th.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -944,6 +947,8 @@
 		8C029F402B4DFCFE0071DE58 /* Jailbreak */ = {
 			isa = PBXGroup;
 			children = (
+				8CB4087F301FFB220097E18B /* clock_alarm.h */,
+				8CB4087C301FFB050097E18B /* clock_alarm.c */,
 				8C029F442B4DFD910071DE58 /* DOBootstrapper.h */,
 				8C029F452B4DFD910071DE58 /* DOBootstrapper.m */,
 				8614E355301AB63E00B1B88C /* DOBootstrapper+zstd.h */,
@@ -1324,7 +1329,7 @@
 			children = (
 				8CF3E85E2F72D51200931CA8 /* DarkSword.h */,
 				8CF3E85B2F72D50200931CA8 /* DarkSword.m */,
-				8CF3E8592F72D45900931CA8 /* Info.plist */,
+				8CB408803020101D0097E18B /* Info.plist */,
 			);
 			path = DarkSword;
 			sourceTree = "<group>";
@@ -2091,6 +2096,7 @@
 				2F11A325301BFE9200C1C9F0 /* momentarius.c in Sources */,
 				04DD0B352B7BA38C0055DE4F /* DOLicenseViewController.m in Sources */,
 				042479AA2B66916B0082581B /* DOModalTransitionPush.m in Sources */,
+				8CB4087D301FFB130097E18B /* clock_alarm.c in Sources */,
 				0443A9B12B79D9C10014C933 /* DOPSListItemsController.m in Sources */,
 				8C71982B2ABF0E84003C6658 /* main.m in Sources */,
 				04DD0B3D2B7C88210055DE4F /* DOLogCrashViewController.m in Sources */,
@@ -2787,7 +2793,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3Z56NQJ65R;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
@@ -2825,7 +2831,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3Z56NQJ65R;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",

