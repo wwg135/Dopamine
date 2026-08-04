@@ -409,6 +409,8 @@ void jbinfo_initialize_hardcoded_offsets(void)
 									if (strcmp(darwinVersion, "23.1.0") >= 0) {	// iOS 17.1+
 										// IOSurface
 										gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x30;
+										gSystemInfo.kernelStruct.IOSurface.ranges = 0x350;
+										gSystemInfo.kernelStruct.IOSurface.rangeCount = 0x358;
 
 										// inpcb
 										gSystemInfo.kernelStruct.inpcb.icmp6filt = 0x148;
@@ -495,6 +497,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 
 														// iOS 26.0+
 														if (strcmp(darwinVersion, "25.0.0") >= 0) {
+															// IOSurface
+															gSystemInfo.kernelStruct.IOSurface.ranges = 0x360;
+															gSystemInfo.kernelStruct.IOSurface.rangeCount = 0x368;
 															// socket
 															gSystemInfo.kernelStruct.socket.usecount = 0x23c;
 
