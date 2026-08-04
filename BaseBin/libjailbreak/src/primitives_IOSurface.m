@@ -225,7 +225,8 @@ static mach_port_t IOSurface_kalloc_getSurfacePort(uint64_t size) {
 uint64_t IOSurface_kalloc(uint64_t size, bool leak)
 {
 	while (true) {
-		uint64_t allocSize = max(size, 0x10000);
+		uint64_t alignedSize = ((size + 0xF) & ~0xF);
+		uint64_t allocSize = max(alignedSize, 0x10000);
 		mach_port_t surfaceMachPort = IOSurface_kalloc_getSurfacePort(allocSize);
 
 		uint64_t surfaceSendRight = task_get_ipc_port_kobject(task_self(), surfaceMachPort);
@@ -247,7 +248,7 @@ uint64_t IOSurface_kalloc(uint64_t size, bool leak)
 			IOSurface_set_rangeCount(surface, 0);
 		}
 
-		return va + (allocSize - size);
+		return va + (allocSize - alignedSize);
 	}
 
 	return 0;

@@ -79,8 +79,6 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_BASE  = 0xFFFFFFE000000000;
 
 	gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x38;
-	gSystemInfo.kernelStruct.IOSurface.ranges = 0x3E0;
-	gSystemInfo.kernelStruct.IOSurface.rangeCount = 0x3E8;
 	gSystemInfo.kernelStruct.IOMachPort.object = 0;
 
 	// proc
@@ -394,8 +392,6 @@ void jbinfo_initialize_hardcoded_offsets(void)
 
 									// IOSurface
 									gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x40;
-									gSystemInfo.kernelStruct.IOSurface.ranges = 0x420;
-									gSystemInfo.kernelStruct.IOSurface.rangeCount = 0x428;
 
 									// IOMachPort
 									gSystemInfo.kernelStruct.IOMachPort.object = 0x30;
@@ -407,11 +403,6 @@ void jbinfo_initialize_hardcoded_offsets(void)
 									gSystemInfo.kernelStruct.ucred_rw.weak_ref = 0x0;
 
 									if (strcmp(darwinVersion, "23.1.0") >= 0) {	// iOS 17.1+
-										// IOSurface
-										gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x30;
-										gSystemInfo.kernelStruct.IOSurface.ranges = 0x350;
-										gSystemInfo.kernelStruct.IOSurface.rangeCount = 0x358;
-
 										// inpcb
 										gSystemInfo.kernelStruct.inpcb.icmp6filt = 0x148;
 										gSystemInfo.kernelStruct.inpcb.chksum 	 = 0x150;
@@ -420,6 +411,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 										gSystemInfo.kernelStruct.socket.usecount = 0x24c;
 
 										if (strcmp(darwinVersion, "23.4.0") >= 0) { // iOS 17.4+
+											// IOSurface
+											gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x30;
+											
 											// socket
 											gSystemInfo.kernelStruct.socket.proto    = 0x20;
 											gSystemInfo.kernelStruct.socket.usecount = 0x254;
@@ -497,9 +491,6 @@ void jbinfo_initialize_hardcoded_offsets(void)
 
 														// iOS 26.0+
 														if (strcmp(darwinVersion, "25.0.0") >= 0) {
-															// IOSurface
-															gSystemInfo.kernelStruct.IOSurface.ranges = 0x360;
-															gSystemInfo.kernelStruct.IOSurface.rangeCount = 0x368;
 															// socket
 															gSystemInfo.kernelStruct.socket.usecount = 0x23c;
 
@@ -526,9 +517,6 @@ void jbinfo_initialize_hardcoded_offsets(void)
 
 															// vm_map_entry
 															gSystemInfo.kernelStruct.vm_map_entry.flags_xnu_user_debug = 27;
-
-															// IOSurface
-															gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x30;
 
 															// IOMachPort
 															gSystemInfo.kernelStruct.IOMachPort.object = 0x20;

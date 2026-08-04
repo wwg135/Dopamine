@@ -93,6 +93,7 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
             "physmap",
             "struct",
             "physrw",
+            "IOSurface",
             NULL,
             NULL,
             NULL,
