@@ -78,6 +78,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_SHIFT = 6;
 	gSystemInfo.kernelConstant.VM_PAGE_PACKED_PTR_BASE  = 0xFFFFFFE000000000;
 
+	gSystemInfo.kernelConstant.TFRO_PLATFORM            = 0x400;
+	gSystemInfo.kernelConstant.TFRO_HARDENED            = 0x0;
+
 	gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x38;
 	gSystemInfo.kernelStruct.IOMachPort.object = 0;
 
@@ -411,6 +414,8 @@ void jbinfo_initialize_hardcoded_offsets(void)
 										gSystemInfo.kernelStruct.socket.usecount = 0x24c;
 
 										if (strcmp(darwinVersion, "23.4.0") >= 0) { // iOS 17.4+
+											gSystemInfo.kernelConstant.TFRO_HARDENED = 0x100;
+
 											// IOSurface
 											gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x30;
 											
@@ -491,6 +496,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 
 														// iOS 26.0+
 														if (strcmp(darwinVersion, "25.0.0") >= 0) {
+															gSystemInfo.kernelConstant.TFRO_HARDENED = 0x0;
+															gSystemInfo.kernelConstant.TFRO_PLATFORM = 0x80;
+															
 															// socket
 															gSystemInfo.kernelStruct.socket.usecount = 0x23c;
 

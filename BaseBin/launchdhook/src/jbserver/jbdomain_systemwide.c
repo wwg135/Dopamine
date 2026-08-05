@@ -326,20 +326,38 @@ int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, 
 		proc_csflags_set(proc, CS_PLATFORM_BINARY);
 	}
 
-	if (host_is_arm64e()) {
-		// On arm64e every image has a trust level associated with it
-		// "In trust cache" trust levels have higher runtime enforcements, this can be a problem for some tools as Dopamine trustcaches everything that's adhoc signed
-		// So we add the ability for a binary to get a different trust level using the "jb.pmap_cs_custom_trust" entitlement
-		// This is for binaries that rely on weaker PMAP_CS checks (e.g. Lua trampolines need it)
-		xpc_object_t customTrustObj = xpc_copy_entitlement_for_token("jb.pmap_cs.custom_trust", processToken);
-		if (customTrustObj) {
-			if (xpc_get_type(customTrustObj) == XPC_TYPE_STRING) {
-				const char *customTrustStr = xpc_string_get_string_ptr(customTrustObj);
-				uint32_t customTrust = pmap_cs_trust_string_to_int(customTrustStr);
+	xpc_object_t customTrustObj = xpc_copy_entitlement_for_token("jb.pmap_cs.custom_trust", processToken);
+	if (customTrustObj) {
+		if (xpc_get_type(customTrustObj) == XPC_TYPE_STRING) {
+			const char *customTrustStr = xpc_string_get_string_ptr(customTrustObj);
+			uint32_t customTrust = pmap_cs_trust_string_to_int(customTrustStr);
+
+			if (host_is_arm64e()) {
 				if (customTrust >= 2) {
 					uint64_t mainCodeDir = proc_find_main_binary_code_dir(proc);
 					if (mainCodeDir) {
 						kwrite32(mainCodeDir + koffsetof(pmap_cs_code_directory, trust), customTrust);
+					}
+				}
+			}
+
+			if (__builtin_available(iOS 17.4, *)) {
+				if (customTrust <= pmap_cs_trust_string_to_int("PMAP_CS_APP_STORE")) {
+					proc_csflags_clear(proc, CS_PLATFORM_BINARY);
+
+					uint64_t proc_ro = kread_ptr(proc + koffsetof(proc, proc_ro));
+					uint32_t t_flags = kread32(proc_ro + koffsetof(proc_ro, t_flags_ro));
+					
+					t_flags &= ~(kconstant(TFRO_PLATFORM));
+					if (kconstant(TFRO_HARDENED)) {
+						t_flags &= ~(kconstant(TFRO_HARDENED));
+					}
+
+					kwrite32(proc_ro + koffsetof(proc_ro, t_flags_ro), t_flags);
+
+					if (koffsetof(task, security_config)) {
+						uint64_t task = proc_task(proc);
+						kwrite8(task + koffsetof(task, security_config), kread8(task + koffsetof(task, security_config)) & ~(0b111 << 3));
 					}
 				}
 			}

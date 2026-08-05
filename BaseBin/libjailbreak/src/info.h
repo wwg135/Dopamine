@@ -35,6 +35,8 @@ struct system_info {
 		uint64_t PVH_TYPE_MASK;
 		uint64_t VM_PAGE_PACKED_PTR_SHIFT;
 		uint64_t VM_PAGE_PACKED_PTR_BASE;
+		uint64_t TFRO_PLATFORM;
+		uint64_t TFRO_HARDENED;
 	} kernelConstant;
 
 	struct {
@@ -181,6 +183,7 @@ struct system_info {
 			uint32_t task_can_transfer_memory_ownership;
 			uint32_t mach_trap_filter_mask; // ???
 			uint32_t mach_kobj_filter_mask; // ???
+			uint32_t security_config;
 		} task;
 
 		struct {
@@ -376,7 +379,9 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelConstant.PVH_HIGH_FLAGS); \
 	iterator(ctx, kernelConstant.PVH_TYPE_MASK); \
 	iterator(ctx, kernelConstant.VM_PAGE_PACKED_PTR_SHIFT); \
-	iterator(ctx, kernelConstant.VM_PAGE_PACKED_PTR_BASE);
+	iterator(ctx, kernelConstant.VM_PAGE_PACKED_PTR_BASE); \
+	iterator(ctx, kernelConstant.TFRO_PLATFORM); \
+	iterator(ctx, kernelConstant.TFRO_HARDENED);
 
 #define JAILBREAK_INFO_ITERATE(ctx, iterator) \
 	iterator(ctx, jailbreakInfo.usesPACBypass); \
@@ -498,6 +503,7 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.task.task_can_transfer_memory_ownership); \
 	iterator(ctx, kernelStruct.task.mach_trap_filter_mask); \
 	iterator(ctx, kernelStruct.task.mach_kobj_filter_mask); \
+	iterator(ctx, kernelStruct.task.security_config); \
 	\
 	iterator(ctx, kernelStruct.thread.recover); \
 	iterator(ctx, kernelStruct.thread.machine_kstackptr); \
