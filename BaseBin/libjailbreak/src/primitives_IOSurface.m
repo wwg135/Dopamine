@@ -199,35 +199,46 @@ static CFNumberRef CFNUM64(uint64_t value) {
 }
 
 static mach_port_t IOSurface_kalloc_getSurfacePort(uint64_t size) {
-    uint64_t allocSize = 0x4000;
-    uint64_t* pageAlloc = (uint64_t*)malloc(allocSize);
-    uint64_t* addressRangesBuf = (uint64_t*)malloc(size);
-    memset(addressRangesBuf, 0, size);
+	uint64_t rangesAlignedSize = ((size + 0xf) & ~0xf);
 
-    for (int i = 0; i < (size / sizeof(uint64_t)); i += 2) {
-        addressRangesBuf[i] = (uint64_t)pageAlloc;
-        addressRangesBuf[i + 1] = allocSize;
-    }
+	static vm_size_t dummyPageSize = 0x4000;
+	static vm_address_t dummyPage = 0;
+	if (dummyPage == 0) {
+		vm_allocate(mach_task_self(), &dummyPage, dummyPageSize, VM_FLAGS_ANYWHERE);
+	}
 
-    CFDataRef addressRanges = CFDataCreate(kCFAllocatorDefault, (const UInt8 *)addressRangesBuf, size);
-    free(addressRangesBuf);
+	uint64_t *userspaceRanges = malloc(rangesAlignedSize);
+	for (int i = 0; i < (size / sizeof(uint64_t)); i += 2) {
+		userspaceRanges[i] = dummyPage;
+		userspaceRanges[i+1] = dummyPageSize;
+	}
+
+    CFDataRef userspaceRangesData = CFDataCreate(kCFAllocatorDefault, (const UInt8 *)userspaceRanges, rangesAlignedSize);
+    free(userspaceRanges);
 
     CFMutableDictionaryRef dict = CFDictionaryCreateMutable(NULL, 0, NULL, NULL);
-    CFDictionarySetValue(dict, CFSTR("IOSurfaceAllocSize"), CFNUM64(allocSize));
-    CFDictionarySetValue(dict, CFSTR("IOSurfaceAddressRanges"), addressRanges);
+	CFNumberRef dummyPageSizeNum = CFNUM64(dummyPageSize);
+    CFDictionarySetValue(dict, CFSTR("IOSurfaceAllocSize"),     (const void *)dummyPageSizeNum);
+    CFDictionarySetValue(dict, CFSTR("IOSurfaceAddressRanges"), (const void *)userspaceRangesData);
 
     IOSurfaceRef surfaceRef = IOSurfaceCreate(dict);
     mach_port_t port = IOSurfaceCreateMachPort(surfaceRef);
     IOSurfaceDecrementUseCount(surfaceRef);
+
+	CFRelease(userspaceRangesData);
+	CFRelease(dummyPageSizeNum);
+	CFRelease(dict);
+
+    return port;
     return port;
 }
 
 uint64_t IOSurface_kalloc(uint64_t size, bool leak)
 {
+	if (size > 0x10000) return -1; // 0x10000 is max
+
 	while (true) {
-		uint64_t alignedSize = ((size + 0xF) & ~0xF);
-		uint64_t allocSize = max(alignedSize, 0x10000);
-		mach_port_t surfaceMachPort = IOSurface_kalloc_getSurfacePort(allocSize);
+		mach_port_t surfaceMachPort = IOSurface_kalloc_getSurfacePort(size);
 
 		uint64_t surfaceSendRight = task_get_ipc_port_kobject(task_self(), surfaceMachPort);
 		if (koffsetof(IOMachPort, object)) {
@@ -235,20 +246,19 @@ uint64_t IOSurface_kalloc(uint64_t size, bool leak)
 		}
 		uint64_t surface = IOSurfaceSendRight_get_surface(surfaceSendRight);
 		uint64_t va = IOSurface_get_ranges(surface);
+		uint64_t vaSize = IOSurface_get_rangeCount(surface) * 0x10;
 
-		if (kvtophys(va + allocSize) != 0) {
+		if (vaSize < size) {
 			mach_port_deallocate(mach_task_self(), surfaceMachPort);
 			continue;
 		}
-
-		if (va == 0) continue;
 
 		if (leak) {
 			IOSurface_set_ranges(surface, 0);
 			IOSurface_set_rangeCount(surface, 0);
 		}
 
-		return va + (allocSize - alignedSize);
+		return va;
 	}
 
 	return 0;
