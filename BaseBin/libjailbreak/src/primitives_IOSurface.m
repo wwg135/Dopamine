@@ -208,7 +208,7 @@ static mach_port_t IOSurface_kalloc_getSurfacePort(uint64_t size) {
 	}
 
 	uint64_t *userspaceRanges = malloc(rangesAlignedSize);
-	for (int i = 0; i < (size / sizeof(uint64_t)); i += 2) {
+	for (int i = 0; i < (rangesAlignedSize / sizeof(uint64_t)); i += 2) {
 		userspaceRanges[i] = dummyPage;
 		userspaceRanges[i+1] = dummyPageSize;
 	}
