@@ -230,7 +230,6 @@ static mach_port_t IOSurface_kalloc_getSurfacePort(uint64_t size) {
 	CFRelease(dict);
 
     return port;
-    return port;
 }
 
 uint64_t IOSurface_kalloc(uint64_t size, bool leak)
