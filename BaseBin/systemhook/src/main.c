@@ -433,6 +433,11 @@ __attribute__((constructor)) static void initializer(void)
 	if (gDyldPtr) {
 		// TODO: Maybe we can just rebind sandbox_apply instead?
 		dyld_hook_routine(*gDyldPtr, 17, (void *)&dyld_dlsym_hook, (void **)&dyld_dlsym_orig, 0x839D);
+	} else {
+		void ***gAPIsPtr = litehook_find_dsc_symbol("/usr/lib/system/libdyld.dylib", "__ZN5dyld45gAPIsE");
+		if (gAPIsPtr) {
+			dyld_hook_routine(*gAPIsPtr, 16, (void *)&dyld_dlsym_hook, (void **)&dyld_dlsym_orig, 0x839D);
+		}
 	}
 
 #ifdef __arm64e__
