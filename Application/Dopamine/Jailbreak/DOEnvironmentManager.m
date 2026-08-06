@@ -202,10 +202,19 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 
 - (BOOL)isSPTM
 {
-    int page_protection_type;
-    size_t len = sizeof(page_protection_type);
-    if (sysctlbyname("kern.page_protection_type", &page_protection_type, &len, NULL, 0) == -1) return NO;
-    return page_protection_type == 2;
+    io_registry_entry_t memory_map = IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen/memory-map");
+    if (memory_map == IO_OBJECT_NULL)   return NO;
+
+    CFArrayRef keys = (CFArrayRef)IORegistryEntryCreateCFProperty(memory_map, CFSTR(kIORegistryEntryPropertyKeysKey), kCFAllocatorDefault, 0);
+    IOObjectRelease(memory_map);
+    if (!keys)  return NO;
+
+    CFRange range = CFRangeMake(0, CFArrayGetCount(keys));
+
+    bool isSPTM = CFArrayContainsValue(keys, range, CFSTR("SPTM")) && CFArrayContainsValue(keys, range, CFSTR("TXM"));
+    CFRelease(keys);
+
+    return isSPTM;
 }
 
 - (NSString *)versionSupportString
