@@ -574,14 +574,21 @@ void *boomerang_server(struct boomerang_info *info)
     *errOut = [self gatherSystemInformation];
     if (*errOut) return;
     *errOut = [self doExploitation];
-    if (*errOut) return;
+    if (*errOut) {
+        // We don't care about the return value of cleanup at this point, we just need to prevent a panic on exit
+        [self cleanUpExploits];
+        return;
+    }
     
     gSystemInfo.jailbreakSettings.markAppsAsDebugged = appJITEnabled;
     gSystemInfo.jailbreakSettings.jetsamMultiplier = jetsamMultiplierOption ? (jetsamMultiplierOption.doubleValue / 2) : 0;
     
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Building Phys R/W Primitive") debug:NO];
     *errOut = [self buildPhysRWPrimitive];
-    if (*errOut) return;
+    if (*errOut) {
+        [self cleanUpExploits];
+        return;
+    }
     [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Cleaning Up Exploits") debug:NO];
     *errOut = [self cleanUpExploits];
     if (*errOut) return;
