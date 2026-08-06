@@ -89,6 +89,25 @@ void IOSurface_set_rangeCount(uint64_t surface, uint32_t rangeCount)
 	kwrite32(surface + koffsetof(IOSurface, rangeCount), rangeCount);
 }
 
+uint64_t IOSurface_port_getSendRight(mach_port_t surfaceMachPort)
+{
+	uint64_t surfaceSendRight = task_get_ipc_port_kobject(task_self(), surfaceMachPort);
+	if (koffsetof(IOMachPort, object)) {
+		// make sure we read inside the zone bounds
+		if (gPrimitives.krwMinSafeReadSize > 0x8) {
+			uint32_t zoneSize = koffsetof(IOMachPort, object) + 0x8; // object is the last field in IOMachPort
+			uint64_t readOffset = zoneSize - gPrimitives.krwMinSafeReadSize;
+
+			uint8_t buf[gPrimitives.krwMinSafeReadSize];
+			kreadbuf(surfaceSendRight + readOffset, &buf[0], gPrimitives.krwMinSafeReadSize);
+			surfaceSendRight = UNSIGN_PTR(*(uint64_t *)(&buf[gPrimitives.krwMinSafeReadSize - 0x8]));
+		} else {
+			surfaceSendRight = kread_ptr(surfaceSendRight + koffsetof(IOMachPort, object));
+		}
+	}
+	return surfaceSendRight;
+}
+
 static mach_port_t IOSurface_map_getSurfacePort(uint64_t magic, uint32_t cacheMode)
 {
 	IOSurfaceRef surfaceRef = NULL;
@@ -127,10 +146,7 @@ int IOSurface_map_withCacheMode(uint64_t pa, uint64_t size, void **uaddr, uint32
 {
 	mach_port_t surfaceMachPort = IOSurface_map_getSurfacePort(1337, cacheMode);
 
-	uint64_t surfaceSendRight = task_get_ipc_port_kobject(task_self(), surfaceMachPort);
-	if (koffsetof(IOMachPort, object)) {
-		surfaceSendRight = kread_ptr(surfaceSendRight + koffsetof(IOMachPort, object));
-	}
+	uint64_t surfaceSendRight = IOSurface_port_getSendRight(surfaceMachPort);
 	uint64_t surface = IOSurfaceSendRight_get_surface(surfaceSendRight);
 	uint64_t desc = IOSurface_get_memoryDescriptor(surface);
 	uint64_t ranges = IOMemoryDescriptor_get_ranges(desc);
@@ -239,10 +255,7 @@ uint64_t IOSurface_kalloc(uint64_t size, bool leak)
 	while (true) {
 		mach_port_t surfaceMachPort = IOSurface_kalloc_getSurfacePort(size);
 
-		uint64_t surfaceSendRight = task_get_ipc_port_kobject(task_self(), surfaceMachPort);
-		if (koffsetof(IOMachPort, object)) {
-			surfaceSendRight = kread_ptr(surfaceSendRight + koffsetof(IOMachPort, object));
-		}
+		uint64_t surfaceSendRight = IOSurface_port_getSendRight(surfaceMachPort);
 		uint64_t surface = IOSurfaceSendRight_get_surface(surfaceSendRight);
 		uint64_t va = IOSurface_get_ranges(surface);
 		uint64_t vaSize = IOSurface_get_rangeCount(surface) * 0x10;
