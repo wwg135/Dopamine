@@ -42,6 +42,7 @@ struct system_info {
 	struct {
 		uint64_t usesPACBypass;
 		char *rootPath;
+		char *appIdentifier;
 	} jailbreakInfo;
 
 	struct {
@@ -385,7 +386,8 @@ extern struct system_info gSystemInfo;
 
 #define JAILBREAK_INFO_ITERATE(ctx, iterator) \
 	iterator(ctx, jailbreakInfo.usesPACBypass); \
-	iterator(ctx, jailbreakInfo.rootPath);
+	iterator(ctx, jailbreakInfo.rootPath); \
+	iterator(ctx, jailbreakInfo.appIdentifier);
 
 #define JAILBREAK_SETTINGS_ITERATE(ctx, iterator) \
 	iterator(ctx, jailbreakSettings.markAppsAsDebugged); \

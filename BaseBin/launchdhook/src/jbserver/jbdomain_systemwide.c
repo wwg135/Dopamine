@@ -68,13 +68,8 @@ bool systemwide_domain_allowed(audit_token_t clientToken)
 			return false;
 		}
 
-		if (string_has_suffix(procPath, "/Dopamine.app/Dopamine")) {
-			// We still want it to be accessible by Dopamine itself though
-			// Unfortunately, there is not really a better check here since
-			// - Dopamine can be sideloaded, so no control over entitlements
-			// - App identifier could be changed by whoever installed it aswell
-			return true;
-		}
+		// We still want it to be accessible by Dopamine itself though
+		if (is_dopamine_app(procPath)) return true;
 
 		return false;
 	}
@@ -321,7 +316,7 @@ int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, 
 	}
 	// For the Dopamine app itself we want to give it a saved uid/gid of 0, unsandbox it and give it CS_PLATFORM_BINARY
 	// This is so that the buttons inside it can work when jailbroken, even if the app was not installed by TrollStore
-	else if (string_has_suffix(procPath, "/Dopamine.app/Dopamine")) {
+	else if (is_dopamine_app(procPath)) {
 		// platformize
 		proc_csflags_set(proc, CS_PLATFORM_BINARY);
 	}

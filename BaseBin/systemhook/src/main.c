@@ -208,12 +208,16 @@ bool should_enable_tweaks(void)
 		}
 	}
 
+	if (jbclient_dopamine_is_jailbroken()) {
+		// Probe whether we are the Dopamine app
+		// Only the Dopamine app is allowed to contact this domain
+		// In this case we want to disable tweak injection to prevent jailbreak detections etc messing with the app functionality
+		return false;
+	}
+
 	const char *tweaksDisabledPathSuffixes[] = {
 		// System binaries
 		"/usr/libexec/xpcproxy",
-
-		// Dopamine app itself (jailbreak detection bypass tweaks can break it)
-		"Dopamine.app/Dopamine",
 	};
 	for (size_t i = 0; i < sizeof(tweaksDisabledPathSuffixes) / sizeof(const char*); i++) {
 		if (string_has_suffix(gExecutablePath, tweaksDisabledPathSuffixes[i])) return false;

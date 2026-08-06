@@ -5,13 +5,11 @@
 #include <libjailbreak/libjailbreak.h>
 #include <libproc.h>
 
-bool string_has_suffix(const char* str, const char* suffix);
-
-static bool dopamine_domain_allowed(audit_token_t clientToken)
+bool dopamine_domain_allowed(audit_token_t clientToken)
 {
 	char path[PATH_MAX];
 	if (proc_pidpath_audittoken(&clientToken, path, PATH_MAX) <= 0) return false;
-	return string_has_suffix(path, "/Dopamine.app/Dopamine");
+	return is_dopamine_app(path);
 }
 
 bool dopamine_is_jailbroken(void)
