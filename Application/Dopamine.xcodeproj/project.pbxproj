@@ -62,8 +62,6 @@
 		7CD8FC403022AADF00AF864E /* momentarius_a12.c in Sources */ = {isa = PBXBuildFile; fileRef = 7CD8FC373022AADF00AF864E /* momentarius_a12.c */; };
 		7CD8FC413022AADF00AF864E /* momentarius_a13.c in Sources */ = {isa = PBXBuildFile; fileRef = 7CD8FC393022AADF00AF864E /* momentarius_a13.c */; };
 		7CD8FC423022AADF00AF864E /* utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 7CD8FC3A3022AADF00AF864E /* utils.h */; };
-		7CD8FC433022AADF00AF864E /* momentarius_a13.h in Headers */ = {isa = PBXBuildFile; fileRef = 7CD8FC383022AADF00AF864E /* momentarius_a13.h */; };
-		7CD8FC443022AADF00AF864E /* momentarius_a12.h in Headers */ = {isa = PBXBuildFile; fileRef = 7CD8FC363022AADF00AF864E /* momentarius_a12.h */; };
 		8614E357301AB63E00B1B88C /* DOBootstrapper+zstd.m in Sources */ = {isa = PBXBuildFile; fileRef = 8614E356301AB63E00B1B88C /* DOBootstrapper+zstd.m */; };
 		8C029F432B4DFD5D0071DE58 /* DOExploitManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C029F422B4DFD5D0071DE58 /* DOExploitManager.m */; };
 		8C029F462B4DFD910071DE58 /* DOBootstrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C029F452B4DFD910071DE58 /* DOBootstrapper.m */; };
@@ -453,9 +451,7 @@
 		2F11A328301C006D00C1C9F0 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk/System/Library/Frameworks/IOSurface.framework; sourceTree = DEVELOPER_DIR; };
 		2F11A32A301C007500C1C9F0 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
 		51AB98D92BBF44390042EA7B /* libpartial.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpartial.a; path = Dopamine/Dependencies/libpartial.a; sourceTree = "<group>"; };
-		7CD8FC363022AADF00AF864E /* momentarius_a12.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = momentarius_a12.h; sourceTree = "<group>"; };
 		7CD8FC373022AADF00AF864E /* momentarius_a12.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = momentarius_a12.c; sourceTree = "<group>"; };
-		7CD8FC383022AADF00AF864E /* momentarius_a13.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = momentarius_a13.h; sourceTree = "<group>"; };
 		7CD8FC393022AADF00AF864E /* momentarius_a13.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = momentarius_a13.c; sourceTree = "<group>"; };
 		7CD8FC3A3022AADF00AF864E /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
 		7CD8FC3B3022AADF00AF864E /* utils.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = utils.c; sourceTree = "<group>"; };
@@ -949,9 +945,7 @@
 		2F11A320301BFE5200C1C9F0 /* momentarius */ = {
 			isa = PBXGroup;
 			children = (
-				7CD8FC363022AADF00AF864E /* momentarius_a12.h */,
 				7CD8FC373022AADF00AF864E /* momentarius_a12.c */,
-				7CD8FC383022AADF00AF864E /* momentarius_a13.h */,
 				7CD8FC393022AADF00AF864E /* momentarius_a13.c */,
 				7CD8FC3A3022AADF00AF864E /* utils.h */,
 				7CD8FC3B3022AADF00AF864E /* utils.c */,
@@ -1361,8 +1355,6 @@
 			files = (
 				2F11A327301BFED300C1C9F0 /* momentarius.h in Headers */,
 				7CD8FC423022AADF00AF864E /* utils.h in Headers */,
-				7CD8FC433022AADF00AF864E /* momentarius_a13.h in Headers */,
-				7CD8FC443022AADF00AF864E /* momentarius_a12.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2119,9 +2111,6 @@
 				042479AB2B66916B0082581B /* DOModalTransitionScale.m in Sources */,
 				2F11A325301BFE9200C1C9F0 /* momentarius.c in Sources */,
 				04DD0B352B7BA38C0055DE4F /* DOLicenseViewController.m in Sources */,
-				7CD8FC3C3022AADF00AF864E /* utils.c in Sources */,
-				7CD8FC3D3022AADF00AF864E /* momentarius_a12.c in Sources */,
-				7CD8FC3E3022AADF00AF864E /* momentarius_a13.c in Sources */,
 				042479AA2B66916B0082581B /* DOModalTransitionPush.m in Sources */,
 				8CB4087D301FFB130097E18B /* clock_alarm.c in Sources */,
 				0443A9B12B79D9C10014C933 /* DOPSListItemsController.m in Sources */,
