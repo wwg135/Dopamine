@@ -21,7 +21,16 @@ uint64_t IOSurfaceClient_get_surface(uint64_t surfaceClient)
 
 uint64_t IOSurfaceSendRight_get_surface(uint64_t surfaceSendRight)
 {
-	return kread_ptr(surfaceSendRight + 0x18);	
+	if (gPrimitives.krwMinSafeReadSize > 0x8) {
+		uint32_t zoneSize = 0x30;
+		uint64_t readOffset = zoneSize - gPrimitives.krwMinSafeReadSize;
+
+		uint8_t buf[gPrimitives.krwMinSafeReadSize];
+		kreadbuf(surfaceSendRight + readOffset, &buf[0], gPrimitives.krwMinSafeReadSize);
+		return UNSIGN_PTR(*(uint64_t *)(&buf[0x18 - readOffset]));
+	} else {
+		return kread_ptr(surfaceSendRight + 0x18);
+	}
 }
 
 uint64_t IOSurface_get_ranges(uint64_t surface)
@@ -93,7 +102,6 @@ uint64_t IOSurface_port_getSendRight(mach_port_t surfaceMachPort)
 {
 	uint64_t surfaceSendRight = task_get_ipc_port_kobject(task_self(), surfaceMachPort);
 	if (koffsetof(IOMachPort, object)) {
-		// make sure we read inside the zone bounds
 		if (gPrimitives.krwMinSafeReadSize > 0x8) {
 			uint32_t zoneSize = koffsetof(IOMachPort, object) + 0x8; // object is the last field in IOMachPort
 			uint64_t readOffset = zoneSize - gPrimitives.krwMinSafeReadSize;
