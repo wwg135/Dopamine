@@ -55,7 +55,7 @@ CS_SuperBlob *load_signature(int fd, const fsignatures_t *fs)
 		return NULL;
 	}
 	CS_SuperBlob *superblob = (CS_SuperBlob *)addr;
-	if (OSSwapBigToHostInt32(superblob->length) != superblobSize) {
+	if (OSSwapBigToHostInt32(superblob->length) > superblobSize) {
 		vm_deallocate(mach_task_self(), addr, superblobSize);
 		return NULL;
 	}
@@ -63,38 +63,63 @@ CS_SuperBlob *load_signature(int fd, const fsignatures_t *fs)
 	return superblob;
 }
 
+unsigned code_directory_rank(const CS_CodeDirectory *cd)
+{
+	// The supported hash types, ranked from least to most preferred. From XNU's
+	// bsd/kern/ubc_subr.c.
+	static uint32_t rankedHashTypes[] = {
+		CS_HASHTYPE_SHA160_160,
+		CS_HASHTYPE_SHA256_160,
+		CS_HASHTYPE_SHA256_256,
+		CS_HASHTYPE_SHA384_384,
+	};
+	// Define the rank of the code directory as its index in the array plus one.
+	uint8_t type = cd->hashType;
+	for (unsigned i = 0; i < sizeof(rankedHashTypes) / sizeof(rankedHashTypes[0]); i++) {
+		if (rankedHashTypes[i] == type) {
+			return (i + 1);
+		}
+	}
+	return 0;
+}
+
 int superblob_find_cdflags(const CS_SuperBlob *superblob, off_t *cdflagsOffOut)
 {
-    const uint8_t *base = (const uint8_t *)superblob;
-    uint32_t super_len  = OSSwapBigToHostInt32(superblob->length);
-    uint32_t count      = OSSwapBigToHostInt32(superblob->count);
+	const uint8_t *base = (const uint8_t *)superblob;
+	uint32_t superLen  = OSSwapBigToHostInt32(superblob->length);
+	uint32_t count      = OSSwapBigToHostInt32(superblob->count);
  
-    size_t index_bytes = (size_t)count * sizeof(CS_BlobIndex);
-    if (super_len < sizeof(CS_SuperBlob) || index_bytes > super_len - sizeof(CS_SuperBlob)) {
-        return -1;
-    }
+	size_t indexBytes = (size_t)count * sizeof(CS_BlobIndex);
+	if (superLen < sizeof(CS_SuperBlob) || indexBytes > superLen - sizeof(CS_SuperBlob)) {
+		return -1;
+	}
+	
+	// Find best ranked code directory
+	const CS_BlobIndex *bestCdIndex = NULL;
+	int bestCdRank = 0;
+	for (uint32_t i = 0; i < count; i++) {
+		uint32_t type     = OSSwapBigToHostInt32(superblob->index[i].type);
+		uint32_t cdOffset = OSSwapBigToHostInt32(superblob->index[i].offset);
  
-    for (uint32_t i = 0; i < count; i++) {
-        uint32_t type      = OSSwapBigToHostInt32(superblob->index[i].type);
-        uint32_t cd_offset = OSSwapBigToHostInt32(superblob->index[i].offset);
- 
-        if (type != CSSLOT_CODEDIRECTORY) {
-            continue;
-        }
-        if (cd_offset > super_len || super_len - cd_offset < sizeof(CS_CodeDirectory)) {
-            return -1;
-        }
- 
-        const CS_CodeDirectory *cd = (const CS_CodeDirectory *)(base + cd_offset);
-        if (OSSwapBigToHostInt32(cd->magic) != CSMAGIC_CODEDIRECTORY) {
-            return -1;
-        }
- 
-        *cdflagsOffOut = (off_t)cd_offset + (off_t)offsetof(CS_CodeDirectory, flags);
-        return 0;
-    }
- 
-    return -1;
+		if (type == CSSLOT_CODEDIRECTORY || ((CSSLOT_ALTERNATE_CODEDIRECTORIES <= type && type < CSSLOT_ALTERNATE_CODEDIRECTORY_LIMIT))) {
+			if (cdOffset > superLen || superLen - cdOffset < sizeof(CS_CodeDirectory)) {
+				return -1;
+			}
+
+			const CS_CodeDirectory *cd = (const CS_CodeDirectory *)(base + cdOffset);
+			if (OSSwapBigToHostInt32(cd->magic) == CSMAGIC_CODEDIRECTORY) {
+				int cdRank = code_directory_rank(cd);
+				if (cdRank > bestCdRank) {
+					bestCdIndex = &superblob->index[i];
+					bestCdRank = cdRank;
+				}
+			}
+		}
+	}
+	if (!bestCdIndex) return -1;
+
+	*cdflagsOffOut = (off_t)OSSwapBigToHostInt32(bestCdIndex->offset) + (off_t)offsetof(CS_CodeDirectory, flags);
+	return 0;
 }
 
 int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5, void *arg6, void *arg7, void *arg8)
@@ -137,7 +162,7 @@ int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg
 						}
 						else {
 							superblob = (CS_SuperBlob *)siginfo.signature.fs_blob_start;
-							if (siginfo.signature.fs_blob_size != OSSwapBigToHostInt32(superblob->length)) {
+							if (OSSwapBigToHostInt32(superblob->length) > siginfo.signature.fs_blob_size) {
 								superblob = NULL;
 							}
 						}
@@ -151,7 +176,7 @@ int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg
 										// If coming from F_ADDSIGS, it could be that the signature is mapped read-only
 										// To ensure it is read write (so we can add CS_ADHOC), we need to copy it
 										vm_address_t addr = 0;
-										if (vm_allocate(mach_task_self(), &addr, OSSwapBigToHostInt32(superblob->length), VM_FLAGS_ANYWHERE) == 0) {
+										if (vm_allocate(mach_task_self(), &addr, siginfo.signature.fs_blob_size, VM_FLAGS_ANYWHERE) == 0) {
 											memcpy((void *)addr, superblob, OSSwapBigToHostInt32(superblob->length));
 											superblob = (CS_SuperBlob *)addr;
 											superblobNeedsFree = true;
@@ -168,15 +193,20 @@ int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg
 										siginfo.signature.fs_blob_start = (void *)superblob;
 
 										// Get everything done here: Trust modified signature and attach it
-										r = jbclient_mach_trust_file(fd, &siginfo);
+										jbclient_mach_trust_file(fd, &siginfo);
 										r = (int)msyscall_errno(0x5C, fd, F_ADDSIGS, &siginfo.signature, 0, 0, 0, 0, 0);
+										if (r == 0) {
+											// Since we are replacing a call to F_FILESIGS_RETURN (the emphasis is on the RETURN) with F_ADDSIGS
+											// and there is no equivalent "RETURN" for that, we need to set the return value ourselves to satisfy dyld
+											((fsignatures_t *)arg1)->fs_file_start = (off_t)((fsignatures_t *)arg1)->fs_blob_start;
+										}
 										isFinished = true;
 									}
 								}
 							}
 
 							if (superblobNeedsFree) {
-								vm_deallocate(mach_task_self(), (vm_address_t)superblob, OSSwapBigToHostInt32(superblob->length));
+								vm_deallocate(mach_task_self(), (vm_address_t)superblob, siginfo.signature.fs_blob_size);
 							}
 						}
 
