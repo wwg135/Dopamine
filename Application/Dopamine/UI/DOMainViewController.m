@@ -203,7 +203,7 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if ([jailbreaker contiguousMappingWorkaroundNeeded]) {
-            UIAlertController *contiguousMappingWorkaroundAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Respring Required") message:DOLocalizedString(@"The selected Kernel exploit requires a creating a contiguous memory mapping which on this device is only possible with a special workaround that performs a respring. After the respring is done, reopen the Dopamine app and press \"Jailbreak\" again") preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *contiguousMappingWorkaroundAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Respring Required") message:DOLocalizedString(@"The selected Kernel exploit requires creating a contiguous memory mapping which on this device is only possible with a special workaround that performs a respring. After the respring is done, reopen the Dopamine app and press \"Jailbreak\" again") preferredStyle:UIAlertControllerStyleAlert];
             
             UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Cancel") style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
                 exit(0);
