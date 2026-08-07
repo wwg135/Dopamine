@@ -122,6 +122,42 @@ int superblob_find_cdflags(const CS_SuperBlob *superblob, off_t *cdflagsOffOut)
 	return 0;
 }
 
+bool superblob_is_adhoc_signed(const CS_SuperBlob *superblob)
+{
+	const uint8_t *base = (const uint8_t *)superblob;
+	uint32_t superLen  = OSSwapBigToHostInt32(superblob->length);
+	uint32_t count      = OSSwapBigToHostInt32(superblob->count);
+ 
+	size_t indexBytes = (size_t)count * sizeof(CS_BlobIndex);
+	if (superLen < sizeof(CS_SuperBlob) || indexBytes > superLen - sizeof(CS_SuperBlob)) {
+		return -1;
+	}
+	
+	// Find signature slot
+	const CS_GenericBlob *wrapperBlob = NULL;
+	for (uint32_t i = 0; i < count; i++) {
+		uint32_t type     = OSSwapBigToHostInt32(superblob->index[i].type);
+		uint32_t cdOffset = OSSwapBigToHostInt32(superblob->index[i].offset);
+ 
+		if (type == CSSLOT_SIGNATURESLOT) {
+			if (cdOffset > superLen || superLen - cdOffset < sizeof(CS_CodeDirectory)) {
+				return true;
+			}
+
+			wrapperBlob = (const CS_GenericBlob *)((uintptr_t)superblob + cdOffset);
+			break;
+		}
+	}
+
+	if (wrapperBlob) {
+		if (OSSwapBigToHostInt32(wrapperBlob->length) > 8) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5, void *arg6, void *arg7, void *arg8)
 {
 	// Disable LV bypass if this process does not have a bootstrap port
@@ -168,39 +204,41 @@ int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg
 						}
 
 						if (superblob) {
-							off_t cdFlagsOffset = 0;
-							if (superblob_find_cdflags(superblob, &cdFlagsOffset) == 0) {
-								uint32_t *cdFlagsPtr = (uint32_t *)((uintptr_t)superblob + cdFlagsOffset);
-								if (!(OSSwapBigToHostInt32(*cdFlagsPtr) & CS_ADHOC)) {
-									if (!isFile) {
-										// If coming from F_ADDSIGS, it could be that the signature is mapped read-only
-										// To ensure it is read write (so we can add CS_ADHOC), we need to copy it
-										vm_address_t addr = 0;
-										if (vm_allocate(mach_task_self(), &addr, siginfo.signature.fs_blob_size, VM_FLAGS_ANYWHERE) == 0) {
-											memcpy((void *)addr, superblob, OSSwapBigToHostInt32(superblob->length));
-											superblob = (CS_SuperBlob *)addr;
-											superblobNeedsFree = true;
+							if (superblob_is_adhoc_signed(superblob)) {
+								off_t cdFlagsOffset = 0;
+								if (superblob_find_cdflags(superblob, &cdFlagsOffset) == 0) {
+									uint32_t *cdFlagsPtr = (uint32_t *)((uintptr_t)superblob + cdFlagsOffset);
+									if (!(OSSwapBigToHostInt32(*cdFlagsPtr) & CS_ADHOC)) {
+										if (!isFile) {
+											// If coming from F_ADDSIGS, it could be that the signature is mapped read-only
+											// To ensure it is read write (so we can add CS_ADHOC), we need to copy it
+											vm_address_t addr = 0;
+											if (vm_allocate(mach_task_self(), &addr, siginfo.signature.fs_blob_size, VM_FLAGS_ANYWHERE) == 0) {
+												memcpy((void *)addr, superblob, OSSwapBigToHostInt32(superblob->length));
+												superblob = (CS_SuperBlob *)addr;
+												superblobNeedsFree = true;
+											}
 										}
-									}
 
-									if (superblobNeedsFree) {
-										// If we don't have a copy of the superblob at this point, all bets are off
+										if (superblobNeedsFree) {
+											// If we don't have a copy of the superblob at this point, all bets are off
 
-										cdFlagsPtr = (uint32_t *)((uintptr_t)superblob + cdFlagsOffset);
-										*cdFlagsPtr |= OSSwapHostToBigInt32(CS_ADHOC);
+											cdFlagsPtr = (uint32_t *)((uintptr_t)superblob + cdFlagsOffset);
+											*cdFlagsPtr |= OSSwapHostToBigInt32(CS_ADHOC);
 
-										siginfo.source = SIGNATURE_SOURCE_PROC;
-										siginfo.signature.fs_blob_start = (void *)superblob;
+											siginfo.source = SIGNATURE_SOURCE_PROC;
+											siginfo.signature.fs_blob_start = (void *)superblob;
 
-										// Get everything done here: Trust modified signature and attach it
-										jbclient_mach_trust_file(fd, &siginfo);
-										r = (int)msyscall_errno(0x5C, fd, F_ADDSIGS, &siginfo.signature, 0, 0, 0, 0, 0);
-										if (r == 0) {
-											// Since we are replacing a call to F_FILESIGS_RETURN (the emphasis is on the RETURN) with F_ADDSIGS
-											// and there is no equivalent "RETURN" for that, we need to set the return value ourselves to satisfy dyld
-											((fsignatures_t *)arg1)->fs_file_start = (off_t)((fsignatures_t *)arg1)->fs_blob_start;
+											// Get everything done here: Trust modified signature and attach it
+											jbclient_mach_trust_file(fd, &siginfo);
+											r = (int)msyscall_errno(0x5C, fd, F_ADDSIGS, &siginfo.signature, 0, 0, 0, 0, 0);
+											if (r == 0) {
+												// Since we are replacing a call to F_FILESIGS_RETURN (the emphasis is on the RETURN) with F_ADDSIGS
+												// and there is no equivalent "RETURN" for that, we need to set the return value ourselves to satisfy dyld
+												((fsignatures_t *)arg1)->fs_file_start = (off_t)((fsignatures_t *)arg1)->fs_blob_start;
+											}
+											isFinished = true;
 										}
-										isFinished = true;
 									}
 								}
 							}
