@@ -73,6 +73,7 @@ struct jbserver_mach_msg_checkin {
 struct jbserver_mach_msg_checkin_reply {
 	struct jbserver_mach_msg_reply base;
 	bool fullyDebugged;
+	bool forceCSAdhoc;
 	char jbRootPath[PATH_MAX];
 	char bootUUID[37];
 	char sandboxExtensions[2000];

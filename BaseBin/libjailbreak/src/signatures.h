@@ -5,6 +5,7 @@
 #include <choma/Fat.h>
 
 typedef enum {
+	SIGNATURE_SOURCE_ALLOCATION,
 	SIGNATURE_SOURCE_FILE,
 	SIGNATURE_SOURCE_PROC,
 } signature_source_t;
@@ -20,4 +21,6 @@ bool code_signature_calculate_adhoc_cdhash(CS_SuperBlob *superblob, cdhash_t cdh
 void fat_collect_untrusted_cdhashes(Fat *fat, cdhash_t **cdhashesOut, uint32_t *cdhashCountOut);
 void file_collect_untrusted_cdhashes(int fd, cdhash_t **cdhashesOut, uint32_t *cdhashCountOut);
 void file_collect_untrusted_cdhashes_by_path(const char *path, cdhash_t **cdhashesOut, uint32_t *cdhashCountOut);
+void file_collect_signatures(int fd, struct siginfo **sigInfosOut, uint32_t *sigInfoCountOut);
+int trust_signatures(int pid, int fd, struct siginfo *sigInfos, uint32_t sigInfoCount);
 #endif

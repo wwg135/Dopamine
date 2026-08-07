@@ -359,7 +359,7 @@ __attribute__((constructor)) static void initializer(void)
 	if (parse_dyldhook_jbinfo(&JB_RootPath, &JB_BootUUID, &JB_SandboxExtensions, &gFullyDebugged) != 0) {
 		// If under any circumstances dyldhook has *not* performed a check-in, do it now
 		// This code path is taken inside xpcproxy on iOS 16, because launchd apparently no longer passes it a bootstrap port
-		if (jbclient_process_checkin(&JB_RootPath, &JB_BootUUID, &JB_SandboxExtensions, &gFullyDebugged) == 0) {
+		if (jbclient_process_checkin(&JB_RootPath, &JB_BootUUID, &JB_SandboxExtensions, &gFullyDebugged, NULL) == 0) {
 			consume_tokenized_sandbox_extensions(JB_SandboxExtensions);
 		}
 		else {

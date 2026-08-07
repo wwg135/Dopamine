@@ -160,6 +160,29 @@ struct system_info {
 		} filedesc;
 
 		struct {
+			uint64_t glob;
+		} fileproc;
+
+		struct {
+			uint64_t data;
+		} fileglob;
+
+		struct {
+			uint64_t un;
+		} vnode;
+
+		struct {
+			uint64_t cs_blobs;
+		} ubc_info;
+
+		struct {
+			uint64_t next;
+			uint64_t cpu_type;
+			uint64_t cpu_subtype;
+			uint64_t base_offset;
+		} cs_blob;
+
+		struct {
 			uint32_t rw;
 			uint32_t ref;
 			uint32_t uid;
@@ -484,6 +507,19 @@ extern struct system_info gSystemInfo;
 	iterator(ctx, kernelStruct.task_token_ro_data.audit_token); \
 	\
 	iterator(ctx, kernelStruct.filedesc.ofiles_start); \
+	\
+	iterator(ctx, kernelStruct.fileproc.glob); \
+	\
+	iterator(ctx, kernelStruct.fileglob.data); \
+	\
+	iterator(ctx, kernelStruct.vnode.un); \
+	\
+	iterator(ctx, kernelStruct.ubc_info.cs_blobs); \
+	\
+	iterator(ctx, kernelStruct.cs_blob.next); \
+	iterator(ctx, kernelStruct.cs_blob.cpu_type); \
+	iterator(ctx, kernelStruct.cs_blob.cpu_subtype); \
+	iterator(ctx, kernelStruct.cs_blob.base_offset); \
 	\
 	iterator(ctx, kernelStruct.ucred.rw); \
 	iterator(ctx, kernelStruct.ucred.ref); \

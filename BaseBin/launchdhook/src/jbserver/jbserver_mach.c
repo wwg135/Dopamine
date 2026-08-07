@@ -5,7 +5,7 @@
 #include <sys/proc_info.h>
 extern int fileport_makefd (mach_port_t port);
 
-int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut);
+int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut, bool *forceCSAdhocOut);
 int systemwide_fork_fix(audit_token_t *parentToken, uint64_t childPid);
 int systemwide_trust_file(audit_token_t *processToken, int rfd, struct siginfo *siginfo, size_t siginfoSize);
 
@@ -64,7 +64,7 @@ int jbserver_received_mach_message(audit_token_t *auditToken, struct jbserver_ma
 		
 		char *jbRootPath = NULL, *bootUUID = NULL, *sandboxExtensions = NULL;
 		bool fullyDebugged = false;
-		int result = systemwide_process_checkin(auditToken, &jbRootPath, &bootUUID, &sandboxExtensions, &reply->fullyDebugged);
+		int result = systemwide_process_checkin(auditToken, &jbRootPath, &bootUUID, &sandboxExtensions, &reply->fullyDebugged, &reply->forceCSAdhoc);
 
 		reply->base.msg.magic         = jbsMachMsg->magic;
 		reply->base.msg.action        = jbsMachMsg->action;

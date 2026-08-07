@@ -145,7 +145,7 @@ int jbclient_trust_file_by_path(const char *path)
 	return r;
 }
 
-int jbclient_process_checkin(char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
+int jbclient_process_checkin(char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut, bool *forceCSAdhocOut)
 {
 	xpc_object_t xreply = jbserver_xpc_send(JBS_DOMAIN_SYSTEMWIDE, JBS_SYSTEMWIDE_PROCESS_CHECKIN, NULL);
 	if (xreply) {
@@ -157,6 +157,7 @@ int jbclient_process_checkin(char **rootPathOut, char **bootUUIDOut, char **sand
 		if (bootUUIDOut) *bootUUIDOut = bootUUID ? strdup(bootUUID) : NULL;
 		if (sandboxExtensionsOut) *sandboxExtensionsOut = sandboxExtensions ? strdup(sandboxExtensions) : NULL;
 		if (fullyDebuggedOut) *fullyDebuggedOut = xpc_dictionary_get_bool(xreply, "fully-debugged");
+		if (forceCSAdhocOut) *forceCSAdhocOut = xpc_dictionary_get_bool(xreply, "force-cs-adhoc");
 		xpc_release(xreply);
 		return result;
 	}

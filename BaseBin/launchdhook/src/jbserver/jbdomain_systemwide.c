@@ -89,48 +89,6 @@ static int systemwide_get_boot_uuid(char **bootUUIDOut)
 	return 0;
 }
 
-CS_SuperBlob *siginfo_resolve_superblob(struct siginfo *siginfo, int pid, int fd)
-{
-	if (!siginfo) return NULL;
-	if (siginfo->signature.fs_blob_size == 0) return NULL;
-
-	size_t superblobSize = siginfo->signature.fs_blob_size;
-	CS_SuperBlob *superblob = malloc(superblobSize);
-	if (!superblob) return NULL;
-
-	bool success = false;
-
-	switch (siginfo->source) {
-		case SIGNATURE_SOURCE_FILE: {
-			uintptr_t superblobStart = siginfo->signature.fs_file_start + (uintptr_t)siginfo->signature.fs_blob_start;
-			uintptr_t superblobEnd   = superblobStart + superblobSize;
-			struct stat st = {};
-
-        	if (fstat(fd, &st) != 0) break;
-			if (superblobEnd > st.st_size) break;
-			if (lseek(fd, superblobStart, SEEK_SET) != superblobStart) break;
-			if (read(fd, superblob, superblobSize) != superblobSize) break;
-
-			success = true;
-		}
-		case SIGNATURE_SOURCE_PROC: {
-			uint64_t proc = proc_find(pid);
-
-			if (!proc) break;
-			if (proc_vreadbuf(proc, siginfo->signature.fs_blob_start, superblob, superblobSize) != 0) break;
-
-			success = true;
-		}
-	}
-
-	if (!success) {
-		free(superblob);
-		superblob = NULL;
-	}
-
-	return superblob;
-}
-
 int systemwide_trust_file(audit_token_t *processToken, int rfd, struct siginfo *siginfo, size_t siginfoSize)
 {
 	if (siginfo && siginfoSize != sizeof(struct siginfo)) return -1;
@@ -162,36 +120,36 @@ int systemwide_trust_file(audit_token_t *processToken, int rfd, struct siginfo *
 		}
 	}
 
-	cdhash_t *cdhashes = NULL;
-	uint32_t cdhashesCount = 0;
+	struct siginfo *sigInfos = NULL;
+	uint32_t sigInfoCount = 0;
+	int r = 0;
 
 	if (siginfo) {
-		// If we were passed a siginfo, get the cdhash of the superblob from the siginfo
-		CS_SuperBlob *superblob = siginfo_resolve_superblob(siginfo, pid, fd);
-		if (superblob) {
-			cdhash_t cdhash;
-			if (code_signature_calculate_adhoc_cdhash(superblob, cdhash)) {
-				if (!is_cdhash_trustcached(cdhash)) {
-					cdhashes = malloc(sizeof(cdhash_t));
-					cdhashesCount = 1;
-					memcpy(&cdhashes[0], &cdhash, sizeof(cdhash_t));
-				}
-			}
-			free(superblob);
-		}
+		sigInfoCount = 1;
+		sigInfos = malloc(sizeof(struct siginfo));
+		memcpy(&sigInfos[0], siginfo, sizeof(struct siginfo));
 	}
 	else {
-		// If we weren't passed a siginfo, get cdhashes of all slices
-		file_collect_untrusted_cdhashes(fd, &cdhashes, &cdhashesCount);
-	}
-	
-	if (cdhashes && cdhashesCount > 0) {
-		jb_trustcache_add_cdhashes(cdhashes, cdhashesCount);
-		free(cdhashes);
+		file_collect_signatures(fd, &sigInfos, &sigInfoCount);
 	}
 
+	if (sigInfoCount > 0) {
+		r = trust_signatures(pid, fd, sigInfos, sigInfoCount);
+		
+		// Free allocated signatures
+		for (uint32_t i = 0; i < sigInfoCount; i++) {
+			if (sigInfos[i].source == SIGNATURE_SOURCE_ALLOCATION) {
+				free(sigInfos[i].signature.fs_blob_start);
+			}
+		}
+	}
+
+	if (sigInfos) {
+		free(sigInfos);
+	}
+	
 	close(fd);
-	return 0;
+	return r;
 }
 
 int systemwide_trust_file_by_path(const char *path)
@@ -203,7 +161,7 @@ int systemwide_trust_file_by_path(const char *path)
 	return r;
 }
 
-int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut)
+int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut, bool *forceCSAdhocOut)
 {
 	// Fetch process info
 	pid_t pid = audit_token_to_pid(*processToken);
@@ -247,6 +205,9 @@ int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, 
 		}
 	}
 	*fullyDebuggedOut = fullyDebugged;
+
+	// CS_ADHOC needs to be forced in dyld's fcntl hook on SPTM devices
+	*forceCSAdhocOut = (ksymbol(SPTMArgs) != 0);
 
 	// Allow invalid pages
 	cs_allow_invalid(proc, fullyDebugged);
@@ -597,6 +558,7 @@ struct jbserver_domain gSystemwideDomain = {
 				{ .name = "boot-uuid", .type = JBS_TYPE_STRING, .out = true },
 				{ .name = "sandbox-extensions", .type = JBS_TYPE_STRING, .out = true },
 				{ .name = "fully-debugged", .type = JBS_TYPE_BOOL, .out = true },
+				{ .name = "force-cs-adhoc", .type = JBS_TYPE_BOOL, .out = true },
 				{ 0 },
 			},
 		},

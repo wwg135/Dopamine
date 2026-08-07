@@ -94,6 +94,24 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	// filedesc
 	gSystemInfo.kernelStruct.filedesc.ofiles_start = 0x20;
 
+	// fileproc
+	gSystemInfo.kernelStruct.fileproc.glob = 0x10;
+
+	// fileglob
+	gSystemInfo.kernelStruct.fileglob.data = 0x38;
+
+	// vnode
+	gSystemInfo.kernelStruct.vnode.un = 0x78;
+
+	// ubc_info
+	gSystemInfo.kernelStruct.ubc_info.cs_blobs = 0x50;
+
+	// cs_blob
+	gSystemInfo.kernelStruct.cs_blob.next        = 0x0;
+	gSystemInfo.kernelStruct.cs_blob.cpu_type    = 0x8;
+	gSystemInfo.kernelStruct.cs_blob.cpu_subtype = 0xc;
+	gSystemInfo.kernelStruct.cs_blob.base_offset = 0x18;
+
 	// task
 	gSystemInfo.kernelStruct.task.map     = 0x28;
 	gSystemInfo.kernelStruct.task.threads = 0x60;
@@ -240,6 +258,11 @@ void jbinfo_initialize_hardcoded_offsets(void)
 			gSystemInfo.kernelStruct.proc_ro.ucred       = 0x20;
 			gSystemInfo.kernelStruct.proc_ro.task_tokens = 0x40;
 
+			// cs_blob
+			gSystemInfo.kernelStruct.cs_blob.cpu_type    = 0x18;
+			gSystemInfo.kernelStruct.cs_blob.cpu_subtype = 0x1c;
+			gSystemInfo.kernelStruct.cs_blob.base_offset = 0x28;
+
 			// task_token_ro_data
 			gSystemInfo.kernelStruct.task_token_ro_data.audit_token = 0x8;
 
@@ -283,6 +306,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 					gSystemInfo.kernelStruct.proc_ro.syscall_filter_mask = 0x28;
 					gSystemInfo.kernelStruct.proc_ro.mach_trap_filter_mask = 0x68;
 					gSystemInfo.kernelStruct.proc_ro.mach_kobj_filter_mask = 0x70;
+
+					// filedesc
+					gSystemInfo.kernelStruct.filedesc.ofiles_start = 0x28;
 
 					// socket
 					gSystemInfo.kernelStruct.socket.usecount = 0x22c;
@@ -392,6 +418,9 @@ void jbinfo_initialize_hardcoded_offsets(void)
 										gSystemInfo.kernelStruct.pmap.wx_allowed = 0xC2 + pmapEl2Adjust;
 										gSystemInfo.kernelStruct.pmap.type       = 0xC9 + pmapEl2Adjust;
 									}
+
+									// proc
+									gSystemInfo.kernelStruct.proc.fd = 0xD0;
 
 									// IOSurface
 									gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x40;

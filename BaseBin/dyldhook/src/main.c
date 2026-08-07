@@ -26,6 +26,11 @@ char *jbinfo_get_jbroot(void)
 	return jbInfo->jbRootPath;
 }
 
+bool jbinfo_should_force_cs_adhoc(void)
+{
+	return jbInfo->forceCSAdhoc;
+}
+
 void consume_tokenized_sandbox_extensions(char *sandboxExtensions)
 {
 	if (sandboxExtensions[0] == '\0') return;
@@ -53,7 +58,7 @@ void dyldhook_perform_checkin(void)
 
 	// Tell jbserver (in launchd) that this process exists
 	// This will, amongst other things, disable page validation, which allows instruction hooks to be applied later
-	if (jbclient_mach_process_checkin(jbRootPathPtr, bootUUIDPtr, sandboxExtensionsPtr, &jbInfo->fullyDebugged) == 0) {
+	if (jbclient_mach_process_checkin(jbRootPathPtr, bootUUIDPtr, sandboxExtensionsPtr, &jbInfo->fullyDebugged, &jbInfo->forceCSAdhoc) == 0) {
 		if (gDyldHookLog) {
 			_simple_dprintf(2, "Performed checkin [%s %s %s]\n", jbRootPathPtr, bootUUIDPtr, sandboxExtensionsPtr);
 		}

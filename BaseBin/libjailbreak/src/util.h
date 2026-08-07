@@ -48,6 +48,8 @@ uint64_t kptr_sign(uint64_t kaddr, uint64_t pointer, uint16_t salt);
 
 void proc_allow_all_syscalls(uint64_t proc);
 void proc_remove_msg_filter(uint64_t proc);
+uint64_t proc_get_vnode_for_fd(uint64_t proc, int fd);
+int fd_attach_signature(int fd, fsignatures_t *signature);
 void proc_ucred_update(uint64_t proc, uint64_t newUcred);
 int proc_ucred_update_content(uint64_t proc, const char *procPath, uid_t uid, gid_t gid, uid_t ruid, gid_t rgid, gid_t groups[NGROUPS_MAX]);
 
