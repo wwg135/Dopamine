@@ -202,19 +202,22 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 
 - (BOOL)isSPTM
 {
-    io_registry_entry_t memory_map = IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen/memory-map");
-    if (memory_map == IO_OBJECT_NULL)   return NO;
+    if (@available(iOS 17.0, *)) {
+        io_registry_entry_t memory_map = IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/chosen/memory-map");
+        if (memory_map == IO_OBJECT_NULL)   return NO;
 
-    CFArrayRef keys = (CFArrayRef)IORegistryEntryCreateCFProperty(memory_map, CFSTR(kIORegistryEntryPropertyKeysKey), kCFAllocatorDefault, 0);
-    IOObjectRelease(memory_map);
-    if (!keys)  return NO;
+        CFArrayRef keys = (CFArrayRef)IORegistryEntryCreateCFProperty(memory_map, CFSTR(kIORegistryEntryPropertyKeysKey), kCFAllocatorDefault, 0);
+        IOObjectRelease(memory_map);
+        if (!keys)  return NO;
 
-    CFRange range = CFRangeMake(0, CFArrayGetCount(keys));
+        CFRange range = CFRangeMake(0, CFArrayGetCount(keys));
 
-    bool isSPTM = CFArrayContainsValue(keys, range, CFSTR("SPTM")) && CFArrayContainsValue(keys, range, CFSTR("TXM"));
-    CFRelease(keys);
+        bool isSPTM = CFArrayContainsValue(keys, range, CFSTR("SPTM")) && CFArrayContainsValue(keys, range, CFSTR("TXM"));
+        CFRelease(keys);
 
-    return isSPTM;
+        return isSPTM;
+    }
+    return false;
 }
 
 - (NSString *)versionSupportString
