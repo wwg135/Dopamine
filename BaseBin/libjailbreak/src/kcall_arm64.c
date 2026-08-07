@@ -111,6 +111,9 @@ int arm64_kcall_init(void)
 	if (host_is_arm64e()) return -1;
 
 	if (!gPrimitives.kalloc_local) return -1;
+
+	// Disabled on 16+ until further notice
+	if (__builtin_available(iOS 16, *)) return -1;
 	
 	// When doing an OTA update from 2.0.x to >=2.1, we will not have offsets for kcall yet so we can't initialize it
 	if (!koffsetof(thread, machine_contextData)) return -1;
