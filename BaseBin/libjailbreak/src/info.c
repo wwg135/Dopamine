@@ -298,7 +298,7 @@ void jbinfo_initialize_hardcoded_offsets(void)
 					gSystemInfo.kernelStruct.proc.svuid   =  0x3C;
 					gSystemInfo.kernelStruct.proc.svgid   =  0x40;
 					gSystemInfo.kernelStruct.proc.pid     =  0x60;
-					gSystemInfo.kernelStruct.proc.fd      =  0xD8;
+					gSystemInfo.kernelStruct.proc.fd      =  0xD0;
 					gSystemInfo.kernelStruct.proc.flag    = 0x25C;
 					gSystemInfo.kernelStruct.proc.textvp  = 0x350;
 
@@ -418,9 +418,6 @@ void jbinfo_initialize_hardcoded_offsets(void)
 										gSystemInfo.kernelStruct.pmap.wx_allowed = 0xC2 + pmapEl2Adjust;
 										gSystemInfo.kernelStruct.pmap.type       = 0xC9 + pmapEl2Adjust;
 									}
-
-									// proc
-									gSystemInfo.kernelStruct.proc.fd = 0xD0;
 
 									// IOSurface
 									gSystemInfo.kernelStruct.IOSurface.memoryDescriptor = 0x40;
