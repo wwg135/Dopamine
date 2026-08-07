@@ -7,12 +7,6 @@
 
 #import "DOPSListController.h"
 #import "DOThemeManager.h"
-#import <objc/runtime.h>
-
-void (*setOnTintColor_orig)(id self, SEL sel, id color) = NULL;
-void setOnTintColor_hook(id self, SEL sel, id color) {
-    setOnTintColor_orig(self, sel, [UIColor colorWithRed: 71.0/255.0 green: 169.0/255.0 blue: 135.0/255.0 alpha: 1.0]);
-}
 
 @interface DOPSListController ()
 
@@ -22,6 +16,7 @@ void setOnTintColor_hook(id self, SEL sel, id color) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     [_table setSeparatorColor:[UIColor clearColor]];
     [_table setBackgroundColor:[UIColor clearColor]];
     [DOPSListController setupViewControllerStyle:self];
@@ -37,13 +32,13 @@ void setOnTintColor_hook(id self, SEL sel, id color) {
     vc.view.layer.masksToBounds = YES;
     vc.view.layer.cornerCurve = kCACornerCurveContinuous;
     
-    [UISwitch appearanceWhenContainedInInstancesOfClasses:@[[vc class]]].onTintColor = [UIColor colorWithRed: 71.0/255.0 green: 169.0/255.0 blue: 135.0/255.0 alpha: 1.0];
-
     if (@available(iOS 19.0, *)) {
-        // workaround for tintColor being reset on switches
-        Method method = class_getInstanceMethod(NSClassFromString(@"UISwitchModernVisualElement"), @selector(setOnTintColor:));
-        const char *encoding = method_getTypeEncoding(method);
-        setOnTintColor_orig = (void *)class_replaceMethod(NSClassFromString(@"UISwitchModernVisualElement"), @selector(setOnTintColor:), (IMP)setOnTintColor_hook, encoding);
+        // Apple broke the method below by reimplementing some Preferences.framework classes in SwiftUI 🤮
+        // Now onTintColor is only implemented when the cell is initialized but gets reset to the stock color when the cell is reused
+        // I tried hard to fix it but failed in the end, so we will need to just use the stock tint color on iOS 26.0+
+    }
+    else {
+        [UISwitch appearanceWhenContainedInInstancesOfClasses:@[[vc class]]].onTintColor = [UIColor colorWithRed: 71.0/255.0 green: 169.0/255.0 blue: 135.0/255.0 alpha: 1.0];
     }
 }
 
