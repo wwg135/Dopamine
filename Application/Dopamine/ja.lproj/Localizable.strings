@@ -41,7 +41,7 @@
 "Settings_Tweak_Injection" = "Tweak Injection";
 "Settings_iDownload" = "iDownload (開発者用シェル)";
 "Settings_Verbose_Logs" = "詳細ログ";
-"Settings_Apps_JIT" = "アプリでJITを有効化";
+"Settings_Apps_JIT" = "アプリでのJITを有効";
 "Settings_Jetsam_Multiplier" = "Jetsam倍率";
 
 // Settings Buttons
@@ -61,7 +61,7 @@
 "Section_Exploits" = "Exploits";
 "Section_Boot_Logo" = "Boot Logo";
 "Jetsam_Description" = "Jetsamは、メモリ使用量が指定された上限を超えたプロセスを自動的に終了させるシステム機能です。多数のTweakをインストールしている場合、プロセスが起動直後にこの上限を超えてしまい、クラッシュループ状態に陥ることがあります。ここでは、メモリ上限が設定されたすべてのプロセスに適用する倍率を選択できます。多数のTweakを導入した際にクラッシュループが発生したり、システムの動作が不安定になったりする場合は、この倍率を上げてください。システム全体のメモリ使用量への影響を最小限に抑えるため、システムが安定して動作する範囲内で、できる限り低い倍率を選択することをおすすめします。";
-"Enabled" = "有効化";
+"Enabled" = "有効";
 "Custom_Boot_Logo" = "Custom Boot Logo";
 "Select_Image" = "イメージを選択";
 
