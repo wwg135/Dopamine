@@ -614,7 +614,7 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
         [[DOUIManager sharedInstance] sendLog:@"Downloading Kernel" debug:NO];
         NSString *kernelcachePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/kernelcache"];
         if (![[NSFileManager defaultManager] fileExistsAtPath:kernelcachePath]) {
-            if (grab_kernelcache(kernelcachePath) == false) return nil;
+            if (grab_images([NSHomeDirectory() stringByAppendingPathComponent:@"Documents"]) == false) return nil;
         }
         return kernelcachePath;
     }
@@ -628,6 +628,11 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
     }
     
     NSString *sptmInDocsPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/sptm.img4"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:sptmInDocsPath]) {
+        return sptmInDocsPath;
+    }
+    
+    sptmInDocsPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/sptm.im4p"];
     if ([[NSFileManager defaultManager] fileExistsAtPath:sptmInDocsPath]) {
         return sptmInDocsPath;
     }
@@ -650,6 +655,11 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
     }
     
     NSString *txmInDocsPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/txm.img4"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:txmInDocsPath]) {
+        return txmInDocsPath;
+    }
+    
+    txmInDocsPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/txm.im4p"];
     if ([[NSFileManager defaultManager] fileExistsAtPath:txmInDocsPath]) {
         return txmInDocsPath;
     }
