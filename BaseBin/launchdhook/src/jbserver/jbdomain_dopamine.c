@@ -5,6 +5,42 @@
 #include <libjailbreak/libjailbreak.h>
 #include <libproc.h>
 
+static char *read_file_to_string(const char *path) {
+    FILE *fp = fopen(path, "rb");
+    if (!fp) {
+        return NULL;
+    }
+
+    if (fseek(fp, 0, SEEK_END) != 0) {
+        fclose(fp);
+        return NULL;
+    }
+    long size = ftell(fp);
+    if (size < 0) {
+        fclose(fp);
+        return NULL;
+    }
+    rewind(fp);
+
+    char *buffer = malloc((size_t)size + 1);
+    if (!buffer) {
+        fclose(fp);
+        return NULL;
+    }
+
+    size_t read_bytes = fread(buffer, 1, (size_t)size, fp);
+    fclose(fp);
+
+    if (read_bytes != (size_t)size) {
+        free(buffer);
+        return NULL;
+    }
+
+    buffer[size] = '\0';
+    return buffer;
+}
+
+
 bool dopamine_domain_allowed(audit_token_t clientToken)
 {
 	char path[PATH_MAX];
@@ -12,8 +48,9 @@ bool dopamine_domain_allowed(audit_token_t clientToken)
 	return is_dopamine_app(path);
 }
 
-bool dopamine_is_jailbroken(void)
+bool dopamine_is_jailbroken(char **outVersion)
 {
+	*outVersion = read_file_to_string(JBROOT_PATH("/basebin/.version"));
 	return true;
 }
 
@@ -76,6 +113,7 @@ struct jbserver_domain gDopamineDomain = {
 		{
 			.handler = dopamine_is_jailbroken,
 			.args = (jbserver_arg[]){
+				{ .name = "version", .type = JBS_TYPE_STRING, .out = true },
 				{ 0 },
 			},
 		},

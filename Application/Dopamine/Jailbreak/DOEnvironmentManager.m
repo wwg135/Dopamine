@@ -253,12 +253,22 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
     return trollstoreInstallation;
 }
 
-- (BOOL)isJailbroken
+- (void)updateJailbreakState
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _isJailbroken = jbclient_dopamine_is_jailbroken();
+        char *jbVersionC = NULL;
+        _isJailbroken = jbclient_dopamine_is_jailbroken(&jbVersionC);
+        if (jbVersionC) {
+            _jailbrokenVersion = [NSString stringWithUTF8String:jbVersionC];
+            free(jbVersionC);
+        }
     });
+}
+
+- (BOOL)isJailbroken
+{
+    [self updateJailbreakState];
     return _isJailbroken;
 }
 
@@ -279,15 +289,9 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 
 - (NSString *)jailbrokenVersion
 {
-    if (!self.isJailbroken) return nil;
-
-    __block NSString *version;
-    [self runAsRoot:^{
-        [self runUnsandboxed:^{
-            version = [NSString stringWithContentsOfFile:JBROOT_PATH(@"/basebin/.version") encoding:NSUTF8StringEncoding error:nil];
-        }];
-    }];
-    return version;
+    [self updateJailbreakState];
+    if (!_isJailbroken) return nil;
+    return _jailbrokenVersion;
 }
 
 - (NSString *)systemVersion

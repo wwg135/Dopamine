@@ -208,7 +208,7 @@ bool should_enable_tweaks(void)
 		}
 	}
 
-	if (jbclient_dopamine_is_jailbroken()) {
+	if (jbclient_dopamine_is_jailbroken(NULL)) {
 		// Probe whether we are the Dopamine app
 		// Only the Dopamine app is allowed to contact this domain
 		// In this case we want to disable tweak injection to prevent jailbreak detections etc messing with the app functionality
