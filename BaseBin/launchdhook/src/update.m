@@ -198,6 +198,11 @@ void jbupdate_finalize_stage2(const char *prevVersion, const char *newVersion)
 		reboot(0);
 	}
 
+	if (strcmp(prevVersion, "3.0") < 0 && strcmp(newVersion, "3.0") >= 0) {
+		// Dopamine 3.0 changed PPLRW_USER_MAPPING_OFFSET and a jbupdate from 2.x to >=3.x is therefore unsupported
+		reboot(0);
+	}
+
 	// Legacy, this file is no longer used
 	if (!access(JBROOT_PATH("/basebin/.idownloadd_enabled"), F_OK)) {
 		remove(JBROOT_PATH("/basebin/.idownloadd_enabled"));
