@@ -724,13 +724,6 @@
 			);
 			target = 2F11A313301BFDAE00C1C9F0 /* momentarius */;
 		};
-		3165CFD93020A516002737DA /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			publicHeaders = (
-				Titan.h,
-			);
-			target = 3165CFCE3020A516002737DA /* Titan */;
-		};
 		8C3B2DF8301BC05200C979A6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -744,7 +737,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3165CFD03020A516002737DA /* Titan */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (3165CFD93020A516002737DA /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Titan; sourceTree = "<group>"; };
+		3165CFD03020A516002737DA /* Titan */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Titan; sourceTree = "<group>"; };
 		8C3B2DEF301BC05200C979A6 /* ClearSword */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (8C3B2DF8301BC05200C979A6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 2F11A31F301BFDAF00C1C9F0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ClearSword; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
