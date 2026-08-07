@@ -14,6 +14,7 @@
 #import "DOUpdateViewController.h"
 #import "DOLogCrashViewController.h"
 #import <pthread.h>
+#import <sys/sysctl.h>
 #import <libjailbreak/libjailbreak.h>
 
 @interface DOMainViewController ()
@@ -203,18 +204,28 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if ([jailbreaker contiguousMappingWorkaroundNeeded]) {
-            UIAlertController *contiguousMappingWorkaroundAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Respring Required") message:DOLocalizedString(@"The selected Kernel exploit requires creating a contiguous memory mapping which on this device is only possible with a special workaround that performs a respring. After the respring is done, reopen the Dopamine app and press \"Jailbreak\" again") preferredStyle:UIAlertControllerStyleAlert];
+            
+            cpu_subtype_t cpuFamily = 0;
+            size_t cpuFamilySize = sizeof(cpuFamily);
+            sysctlbyname("hw.cpufamily", &cpuFamily, &cpuFamilySize, NULL, 0);
+            NSString *workaroundMessage = DOLocalizedString(@"Respring_Required_Message");
+            if (cpuFamily == CPUFAMILY_ARM_TYPHOON) {
+                workaroundMessage = [workaroundMessage stringByAppendingString:[NSString stringWithFormat:@"\n\n%@", DOLocalizedString(@"Respring_Required_Notice_A8")]];
+            }
+
+            UIAlertController *contiguousMappingWorkaroundAlertController = [UIAlertController alertControllerWithTitle:DOLocalizedString(@"Respring_Required") message:workaroundMessage preferredStyle:UIAlertControllerStyleAlert];
             
             UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Cancel") style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
                 exit(0);
             }];
             
-            UIAlertAction *workaroundAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Apply Workaround") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UIAlertAction *workaroundAction = [UIAlertAction actionWithTitle:DOLocalizedString(@"Apply_Workaround") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 [jailbreaker applyContiguousMappingWorkaround];
             }];
             
             [contiguousMappingWorkaroundAlertController addAction:cancelAction];
             [contiguousMappingWorkaroundAlertController addAction:workaroundAction];
+            contiguousMappingWorkaroundAlertController.preferredAction = workaroundAction;
 
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self presentViewController:contiguousMappingWorkaroundAlertController animated:YES completion:nil];

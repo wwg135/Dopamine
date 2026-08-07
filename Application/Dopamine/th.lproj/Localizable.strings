@@ -89,6 +89,12 @@
 /*None*/
 /*Recommended*/
 
+// DarkSword Workaround
+/*Respring_Required*/
+/*Respring_Required_Message*/
+/*Respring_Required_Notice_A8*/
+/*Apply_Workaround*/
+
 // Credits
 "Credits_Button_Discord" = "Discord";
 "Credits_Button_License" = "Licenses";
