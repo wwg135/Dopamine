@@ -297,7 +297,7 @@ int systemwide_process_checkin(audit_token_t *processToken, char **rootPathOut, 
 				}
 			}
 
-			if (__builtin_available(iOS 17.4, *)) {
+			if (__builtin_available(iOS 17.0, *)) {
 				if (customTrust <= pmap_cs_trust_string_to_int("PMAP_CS_APP_STORE")) {
 					proc_csflags_clear(proc, CS_PLATFORM_BINARY);
 
