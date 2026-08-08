@@ -26,7 +26,7 @@
 #import <libjailbreak/translation.h>
 #import <libjailbreak/signatures.h>
 #import <libjailbreak/trustcache.h>
-#import <libjailbreak/kalloc_pt.h>
+#import <libjailbreak/primitives_IOSurface.h>
 #import <libjailbreak/physrw.h>
 #import <libjailbreak/physrw_pte.h>
 #import <libjailbreak/info.h>
@@ -81,7 +81,7 @@ void init_libjailbreak(void)
 	signal_krw_done();
 #endif
 
-	libjailbreak_kalloc_pt_init();
+	libjailbreak_IOSurface_primitives_init();
 }
 
 void install_basebin_gen(void)

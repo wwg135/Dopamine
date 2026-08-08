@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "physrw.h"
 #include "physrw_pte.h"
-#include "kalloc_pt.h"
 #include "primitives_IOSurface.h"
 #include "info.h"
 #include "translation.h"
@@ -29,9 +28,6 @@ int jbclient_initialize_primitives_internal(bool physrwPTE)
 			}
 			libjailbreak_translation_init();
 			libjailbreak_IOSurface_primitives_init();
-			if (__builtin_available(iOS 16.0, *)) {
-				libjailbreak_kalloc_pt_init();
-			}
 			if (gPrimitives.kalloc_local) {
 				if (host_is_arm64e()) {
 					if (jbinfo(usesPACBypass)) {

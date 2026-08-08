@@ -25,7 +25,6 @@
 #import <libjailbreak/util.h>
 #import <libjailbreak/trustcache.h>
 #import <libjailbreak/trustcache_fs.h>
-#import <libjailbreak/kalloc_pt.h>
 #import <libjailbreak/jbserver_boomerang.h>
 #import <libjailbreak/signatures.h>
 #import <libjailbreak/jbclient_xpc.h>
@@ -219,10 +218,6 @@ typedef NS_ENUM(NSInteger, JBErrorCode) {
         if ([pplBypass load] != 0) {[pacBypass cleanup]; [kernelExploit cleanup]; return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedLoadingExploit userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Failed to load PPL bypass: %s", dlerror()]}];};
         if ([pplBypass run] != 0) {[pacBypass cleanup]; [kernelExploit cleanup]; return [NSError errorWithDomain:JBErrorDomain code:JBErrorCodeFailedExploitation userInfo:@{NSLocalizedDescriptionKey:@"Failed to bypass PPL"}];}
         // At this point we presume the PPL bypass gave us unrestricted phys write primitives
-    }
-    if (!gPrimitives.kalloc_global) {
-        // IOSurface kallocs don't work on iOS 16+, use leaked page tables as allocations instead
-        libjailbreak_kalloc_pt_init();
     }
     
     if (![DOEnvironmentManager sharedManager].isArm64e) {
