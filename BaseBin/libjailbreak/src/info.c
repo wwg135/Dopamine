@@ -20,8 +20,10 @@ void jbinfo_initialize_hardcoded_offsets(void)
 	struct utsname name;
 	uname(&name);
 	char *darwinVersion = name.release;
-	uint64_t xnuMajor = 0, xnuMinor = 0;
-	sscanf(strstr(name.version, "xnu-"), "xnu-%llu.%llu.%*s", &xnuMajor, &xnuMinor);
+	uint64_t xnuMajor = 0, xnuMinor = 0, xnuMinorMinor = 0;
+	if (sscanf(strstr(name.version, "xnu-"), "xnu-%llu.%llu.%llu~%*s", &xnuMajor, &xnuMinor, &xnuMinorMinor) != 3) {
+		sscanf(strstr(name.version, "xnu-"), "xnu-%llu.%llu.%*s", &xnuMajor, &xnuMinor);
+	}
 
 	bool isArm64e = host_is_arm64e();
 
@@ -474,8 +476,8 @@ void jbinfo_initialize_hardcoded_offsets(void)
 													gSystemInfo.kernelStruct.task.task_can_transfer_memory_ownership = 0x548;
 												}
 												
-												// iOS 18.1+
-												if (strcmp(darwinVersion, "24.1.0") >= 0) {
+												// iOS 18.1+ (beta 5 and up)
+												if (strcmp(darwinVersion, "24.1.0") >= 0 && (xnuMajor > 11215 || (xnuMajor == 11215 && xnuMinor == 40 && xnuMinorMinor >= 59))) {
 													// No more size
 													gSystemInfo.kernelStruct.trustcache.size        = 0x0;
 													gSystemInfo.kernelStruct.trustcache.fileptr     = 0x18;
