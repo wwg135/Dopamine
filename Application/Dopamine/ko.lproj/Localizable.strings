@@ -42,6 +42,7 @@
 "Settings_iDownload" = "iDownload (개발자 셸)";
 "Settings_Verbose_Logs" = "상세 로그";
 "Settings_Apps_JIT" = "앱에서 JIT 사용 허용";
+"Settings_Allow_Old_arm64e_ABI_Libraries" = "레거시 arm64e 라이브러리 허용";
 "Settings_Jetsam_Multiplier" = "Jetsam 메모리 한도 배수";
 
 // Settings Buttons
@@ -59,7 +60,11 @@
 "Section_Actions" = "작업";
 "Section_Customization" = "커스텀";
 "Section_Exploits" = "익스플로잇";
+"Section_Boot_Logo" = "부팅 로고";
 "Jetsam_Description" = "Jetsam은 메모리 사용량이 지정된 한도를 초과하는 프로세스를 자동으로 종료하는 시스템 기능입니다. 많은 트윅이 설치된 경우 이 한도가 시작 시에 초과되어 프로세스가 계속해서 충돌할 수 있습니다. 여기에서는 메모리 한도가 적용된 모든 프로세스의 메모리 한도를 배수로 늘릴 수 있습니다. 시스템이 충돌하거나 많은 트윅 설치로 이상한 동작이 발생하면 이 설정을 높이세요. 시스템 전체의 메모리 사용량에 부정적인 영향을 주지 않도록, 시스템이 안정적으로 작동하는 가장 낮은 옵션을 선택하는 것이 좋습니다.";
+"Enabled" = "활성화";
+"Custom_Boot_Logo" = "사용자 지정 부팅 로고";
+"Select_Image" = "이미지 선택";
 
 // Settings Alerts
 "Alert_Tweak_Injection_Toggled_Title" = "Userspace 재시작이 필요합니다.";
@@ -92,11 +97,11 @@
 "Recommended" = "권장됨";
 
 // DarkSword Workaround
-/*Respring_Required*/
-/*Respring_Required_Message*/
-/*Respring_Required_Notice_A8*/
-/*Apply_Workaround*/
-/*Respring_Cancel*/
+"Respring_Required" = "리스프링 필요";
+"Respring_Required_Message" = "선택한 커널 익스플로잇을 사용하려면 연속 메모리 매핑을 생성해야 합니다. 이 기기에서는 리스프링을 수행하는 특별한 해결 방법을 통해서만 이 작업이 가능합니다. 리스프링이 완료되면 Dopamine 앱을 다시 열고 \"탈옥\"을 다시 누르세요.";
+"Respring_Required_Notice_A8" = "이 기기에서는 해결 방법이 매번 성공하지 않을 수 있습니다. 이 알림이 더 이상 표시되지 않을 때까지 여러 번 적용해야 할 수도 있습니다.";
+"Apply_Workaround" = "해결 방법 적용";
+"Respring_Cancel" = "취소";
 
 // Credits
 "Credits_Button_Discord" = "디스코드";
