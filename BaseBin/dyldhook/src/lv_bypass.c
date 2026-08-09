@@ -83,7 +83,7 @@ unsigned code_directory_rank(const CS_CodeDirectory *cd)
 	return 0;
 }
 
-int superblob_find_cdflags(const CS_SuperBlob *superblob, off_t *cdflagsOffOut)
+int superblob_find_cdflags_and_team_id(const CS_SuperBlob *superblob, off_t *cdflagsOffOut, off_t *teamIDOffOut)
 {
 	const uint8_t *base = (const uint8_t *)superblob;
 	uint32_t superLen  = OSSwapBigToHostInt32(superblob->length);
@@ -119,6 +119,10 @@ int superblob_find_cdflags(const CS_SuperBlob *superblob, off_t *cdflagsOffOut)
 	if (!bestCdIndex) return -1;
 
 	*cdflagsOffOut = (off_t)OSSwapBigToHostInt32(bestCdIndex->offset) + (off_t)offsetof(CS_CodeDirectory, flags);
+	if (teamIDOffOut) {
+		uint32_t version = *(uint32_t *)((uintptr_t)superblob + (off_t)OSSwapBigToHostInt32(bestCdIndex->offset) + (off_t)offsetof(CS_CodeDirectory, version));
+		*teamIDOffOut = (version >= 0x20200) ? ((off_t)OSSwapBigToHostInt32(bestCdIndex->offset) + (off_t)offsetof(CS_CodeDirectory, teamOffset)) : 0;
+	}
 	return 0;
 }
 
@@ -206,9 +210,21 @@ int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg
 						if (superblob) {
 							if (superblob_is_adhoc_signed(superblob)) {
 								off_t cdFlagsOffset = 0;
-								if (superblob_find_cdflags(superblob, &cdFlagsOffset) == 0) {
+								off_t teamIdOffset = 0;
+								if (superblob_find_cdflags_and_team_id(superblob, &cdFlagsOffset, &teamIdOffset) == 0) {
+									bool hasTeamId = false;
+									if (teamIdOffset) {
+										uint32_t *teamOffsetPtr = (uint32_t *)((uintptr_t)superblob + teamIdOffset);
+										hasTeamId = (bool)OSSwapBigToHostInt32(*teamOffsetPtr);
+									}
+
 									uint32_t *cdFlagsPtr = (uint32_t *)((uintptr_t)superblob + cdFlagsOffset);
-									if (!(OSSwapBigToHostInt32(*cdFlagsPtr) & CS_ADHOC)) {
+									if (!!(OSSwapBigToHostInt32(*cdFlagsPtr) & CS_ADHOC) == hasTeamId) {
+										// According to TXM, either CS_ADHOC or TeamID is fine
+										// Both or neither are not
+										// Neither: We give it CS_ADHOC
+										// Both: We strip CS_ADHOC
+
 										if (!isFile) {
 											// If coming from F_ADDSIGS, it could be that the signature is mapped read-only
 											// To ensure it is read write (so we can add CS_ADHOC), we need to copy it
@@ -222,9 +238,16 @@ int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg
 
 										if (superblobNeedsFree) {
 											// If we don't have a copy of the superblob at this point, all bets are off
-
 											cdFlagsPtr = (uint32_t *)((uintptr_t)superblob + cdFlagsOffset);
-											*cdFlagsPtr |= OSSwapHostToBigInt32(CS_ADHOC);
+
+											if (hasTeamId) {
+												// Has both TeamID and CS_ADHOC, strip CS_ADHOC
+												*cdFlagsPtr &= ~(OSSwapHostToBigInt32(CS_ADHOC));
+											}
+											else {
+												// Has neither TeamID or CS_ADHOC, add CS_ADHOC
+												*cdFlagsPtr |= OSSwapHostToBigInt32(CS_ADHOC);
+											}
 
 											siginfo.source = SIGNATURE_SOURCE_PROC;
 											siginfo.signature.fs_blob_start = (void *)superblob;

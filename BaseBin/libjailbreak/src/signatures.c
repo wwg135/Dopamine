@@ -258,10 +258,29 @@ int trust_signatures(int pid, int fd, struct siginfo *sigInfos, uint32_t sigInfo
 					if (bestCDBlob) {
 						if (ksymbol(SPTMArgs)) {
 							uint32_t flags = csd_code_directory_get_flags(bestCDBlob);
-							if (!(flags & CS_ADHOC)) {
+							bool hasTeamId = false;
+							char *teamId = csd_code_directory_copy_team_id(bestCDBlob, NULL);
+							if (teamId) {
+								free(teamId);
+								hasTeamId = true;
+							}
+
+							if (!!(flags & CS_ADHOC) == hasTeamId) {
+								// According to TXM, either CS_ADHOC or TeamID is fine
+								// Both or neither are not
+								// Neither: We give it CS_ADHOC
+								// Both: We strip CS_ADHOC
+
 								if (curSigInfo->source == SIGNATURE_SOURCE_ALLOCATION) {
-									csd_code_directory_set_flags(bestCDBlob, flags | CS_ADHOC);
-									
+									if (hasTeamId) {
+										// Has both TeamID and CS_ADHOC, strip CS_ADHOC
+										csd_code_directory_set_flags(bestCDBlob, flags & ~CS_ADHOC);
+									}
+									else {
+										// Has neither TeamID or CS_ADHOC, add CS_ADHOC
+										csd_code_directory_set_flags(bestCDBlob, flags | CS_ADHOC);
+									}
+
 									free(curSigInfo->signature.fs_blob_start);
 									superblob = csd_superblob_encode(decodedSuperblob);
 									curSigInfo->signature.fs_blob_start = superblob;
@@ -270,6 +289,8 @@ int trust_signatures(int pid, int fd, struct siginfo *sigInfos, uint32_t sigInfo
 									sigInfosToAttach[sigInfosToAttachCount++] = curSigInfo;
 								}
 								else {
+									// If the signature does not reside inside our own address space, there is nothing we can do
+									// Such a signature should have been caught by dyldhook so in reality this code path will probably never fire
 									csd_superblob_free(decodedSuperblob);
 									free(cdhashes);
 									free(sigInfosToAttach);
