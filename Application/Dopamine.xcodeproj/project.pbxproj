@@ -737,7 +737,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3165CFD03020A516002737DA /* Titan */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Titan; sourceTree = "<group>"; };
 		8C3B2DEF301BC05200C979A6 /* ClearSword */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (8C3B2DF8301BC05200C979A6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 2F11A31F301BFDAF00C1C9F0 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ClearSword; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -1323,7 +1322,6 @@
 			isa = PBXGroup;
 			children = (
 				8C7198172ABF0E82003C6658 /* Dopamine */,
-				3165CFD03020A516002737DA /* Titan */,
 				8C7198162ABF0E82003C6658 /* Products */,
 				8C029F642B4E2E7D0071DE58 /* Frameworks */,
 			);
@@ -1644,9 +1642,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				3165CFD03020A516002737DA /* Titan */,
 			);
 			name = Titan;
 			packageProductDependencies = (
