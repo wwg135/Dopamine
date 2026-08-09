@@ -155,7 +155,27 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
     NSError *error = nil;
 
     [self locateJailbreakRoot];
-    
+
+    // DOPACLEAN logic to move a corrupted dopamine directory to a different path to at least make jailbreaking work again
+    // if (gSystemInfo.jailbreakInfo.rootPath) {
+    //     NSString *randomizedJailbreakPath = [NSString stringWithUTF8String:gSystemInfo.jailbreakInfo.rootPath].stringByDeletingLastPathComponent;
+    //     NSString *characterSet = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    //     NSUInteger stringLen = 6;
+    //     NSMutableString *randomString = [NSMutableString stringWithCapacity:stringLen];
+    //     for (NSUInteger i = 0; i < stringLen; i++) {
+    //         NSUInteger randomIndex = arc4random_uniform((uint32_t)[characterSet length]);
+    //         unichar randomCharacter = [characterSet characterAtIndex:randomIndex];
+    //         [randomString appendFormat:@"%C", randomCharacter];
+    //     }
+        
+    //     NSString *activePrebootPath = [self activePrebootPath];
+    //     NSString *orphanedName = [NSString stringWithFormat:@"orphaned-%@", randomString];
+    //     NSString *orphanedPath = [activePrebootPath stringByAppendingPathComponent:orphanedName];
+    //     [[NSFileManager defaultManager] moveItemAtPath:randomizedJailbreakPath toPath:orphanedPath error:nil];
+    // }
+
+    // return [NSError errorWithDomain:@"Cleaned" code:1 userInfo:nil];
+
     if (!gSystemInfo.jailbreakInfo.rootPath || _bootstrapNeedsMigration) {
         [_bootstrapper ensurePrivatePrebootIsWritable];
 
