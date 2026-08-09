@@ -112,7 +112,7 @@ int jbclient_mach_fork_fix(pid_t childPid)
 	return (int)reply->base.status;
 }
 
-int jbclient_mach_trust_file(int fd, struct siginfo *siginfo)
+int jbclient_mach_trust_file(int fd, struct siginfo *siginfo, bool attach)
 {
 	struct jbserver_mach_msg_trust_fd msg;
 	msg.base.hdr.msgh_size = sizeof(msg);
@@ -125,6 +125,7 @@ int jbclient_mach_trust_file(int fd, struct siginfo *siginfo)
 	if (siginfo) {
 		memcpy(&msg.siginfo, siginfo, sizeof(struct siginfo));
 	}
+	msg.attach = attach;
 
 	size_t replySize = sizeof(struct jbserver_mach_msg_trust_fd_reply) + MAX_TRAILER_SIZE;
 	uint8_t replyU[replySize];

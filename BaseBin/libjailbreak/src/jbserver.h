@@ -93,6 +93,7 @@ struct jbserver_mach_msg_trust_fd {
 	int64_t fd;
 	bool siginfoPopulated;
 	struct siginfo siginfo;
+	bool attach;
 };
 
 struct jbserver_mach_msg_trust_fd_reply {

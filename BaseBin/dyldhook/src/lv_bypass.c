@@ -253,8 +253,7 @@ int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg
 											siginfo.signature.fs_blob_start = (void *)superblob;
 
 											// Get everything done here: Trust modified signature and attach it
-											jbclient_mach_trust_file(fd, &siginfo);
-											r = (int)msyscall_errno(0x5C, fd, F_ADDSIGS, &siginfo.signature, 0, 0, 0, 0, 0);
+											r = jbclient_mach_trust_file(fd, &siginfo, true);
 											if (r == 0) {
 												// Since we are replacing a call to F_FILESIGS_RETURN (the emphasis is on the RETURN) with F_ADDSIGS
 												// and there is no equivalent "RETURN" for that, we need to set the return value ourselves to satisfy dyld
@@ -277,7 +276,7 @@ int HOOK(__fcntl)(int fd, int cmd, void *arg1, void *arg2, void *arg3, void *arg
 					}
 				}
 
-				jbclient_mach_trust_file(fd, arg1 ? &siginfo : NULL);
+				jbclient_mach_trust_file(fd, arg1 ? &siginfo : NULL, false);
 				break;
 			}
 		}

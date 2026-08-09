@@ -13,7 +13,7 @@ xpc_object_t jbserver_xpc_send(uint64_t domain, uint64_t action, xpc_object_t xa
 
 char *jbclient_get_jbroot(void);
 char *jbclient_get_boot_uuid(void);
-int jbclient_trust_file(int fd, struct siginfo *siginfo);
+int jbclient_trust_file(int fd, struct siginfo *siginfo, bool attach);
 int jbclient_trust_file_by_path(const char *path);
 int jbclient_process_checkin(char **rootPathOut, char **bootUUIDOut, char **sandboxExtensionsOut, bool *fullyDebuggedOut, bool *forceCSAdhocOut);
 int jbclient_fork_fix(uint64_t childPid);
