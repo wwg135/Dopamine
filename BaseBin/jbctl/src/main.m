@@ -50,6 +50,17 @@ int main(int argc, char* argv[])
 		setuid(0);
 	}
 
+	if (argc > 2) {
+		if (!strcmp(argv[argc-2], "--waitfor")) {
+			// When the Dopamine app spawns jbctl it needs to clean up it's own ucred before jbctl does the requested action
+			// For this it will attach a pipe fd and write to it once the cleanup is done, so we need to wait until that write happens
+			int fd = atoi(argv[argc-1]);
+			int r = 0;
+			read(fd, &r, sizeof(r));
+			close(fd);
+		}
+	}
+
 	const char *rootPath = jbclient_get_jbroot();
 	if (rootPath) {
 		gSystemInfo.jailbreakInfo.rootPath = strdup(rootPath);

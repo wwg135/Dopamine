@@ -31,6 +31,7 @@
 
 int reboot3(uint64_t flags, ...);
 CFPropertyListRef MGCopyAnswer(CFStringRef);
+extern char **environ;
 
 @implementation DOEnvironmentManager
 
@@ -359,6 +360,53 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
     }
 }
 
+- (int)spawnRootJbctlAsRootWithArgs:(NSArray *)args
+{
+    int waitPipe[2];
+    pipe(waitPipe);
+
+    char **argBuf = malloc((args.count + 4) * sizeof(char *));
+    argBuf[0] = strdup(JBROOT_PATH("/basebin/jbctl"));
+    int i = 1;
+    for (NSString *arg in args) {
+        argBuf[i++] = strdup(arg.UTF8String);
+    }
+    argBuf[i++] = strdup("--waitfor");
+    argBuf[i++] = strdup("3");
+    argBuf[i++] = NULL;
+
+    posix_spawn_file_actions_t act;
+	posix_spawn_file_actions_init(&act);
+	posix_spawn_file_actions_adddup2(&act, waitPipe[0], 3);
+
+    __block int pid = 0;
+    __block int r = -1;
+
+    [self runAsRoot:^{
+        [self runUnsandboxed:^{
+            r = posix_spawn(&pid, argBuf[0], &act, NULL, (char *const *)argBuf, (char *const *)environ);
+        }];
+        // We *NEED* to leave this block on iOS 17+ to avoid a panic, --waitfor ensures this always happens
+    }];
+
+    posix_spawn_file_actions_destroy(&act);
+    for (int y = 0; y < i; y++) {
+        free(argBuf[y]);
+    }
+    free(argBuf);
+
+    if (r == 0) {
+        // We left the root/unsandbox block, now resume jbctl by writing to pipe
+        char w = 'w';
+        write(waitPipe[1], &w, sizeof(w));
+    }
+
+    close(waitPipe[0]);
+    close(waitPipe[1]);
+
+    return r;
+}
+
 - (int)runTrollStoreAction:(NSString *)action
 {
     if (![self isInstalledThroughTrollStore]) return -1;
@@ -371,30 +419,12 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 
 - (void)respring
 {
-    [self runAsRoot:^{
-        __block int pid = 0;
-        [self runUnsandboxed:^{
-            int r = exec_cmd_suspended(&pid, JBROOT_PATH("/basebin/jbctl"), "respring", NULL);
-            if (r == 0) {
-                kill(pid, SIGCONT);
-            }
-        }];
-        // We *NEED* to leave this block on iOS 17+ to avoid a panic, I added a usleep(10000) in jbctl to make sure this always happens
-    }];
+    [self spawnRootJbctlAsRootWithArgs:@[@"respring"]];
 }
 
 - (void)rebootUserspace
 {
-    [self runAsRoot:^{
-        [self runUnsandboxed:^{
-            int pid = -1;
-            int r = exec_cmd_suspended(&pid, JBROOT_PATH("/basebin/jbctl"), "reboot_userspace", NULL);
-            if (r == 0) {
-                kill(pid, SIGCONT);
-            }
-        }];
-        // We *NEED* to leave this block on iOS 17+ to avoid a panic, I added a usleep(10000) in jbctl to make sure this always happens
-    }];
+    [self spawnRootJbctlAsRootWithArgs:@[@"reboot_userspace"]];
 }
 
 - (void)refreshJailbreakApps
@@ -454,14 +484,7 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 
 - (void)updateJailbreakFromTIPA:(NSString *)tipaPath
 {
-    [self runAsRoot:^{
-        [self runUnsandboxed:^{
-            pid_t pid = 0;
-            if (exec_cmd_suspended(&pid, JBROOT_PATH("/basebin/jbctl"), "update", "tipa", tipaPath.fileSystemRepresentation, NULL) == 0) {
-                kill(pid, SIGCONT);
-            }
-        }];
-    }];
+    [self spawnRootJbctlAsRootWithArgs:@[@"update", @"tipa", tipaPath]];
 }
 
 - (BOOL)isTweakInjectionEnabled
@@ -565,16 +588,16 @@ CFPropertyListRef MGCopyAnswer(CFStringRef);
 {
     int r = 0;
     if (mounted != [self isFakelibMounted]) {
-        const char *arg = mounted ? "mount" : "unmount";
-        r = exec_cmd(JBROOT_PATH("/basebin/jbctl"), "internal", "fakelib", arg, NULL);
+        NSString *arg = mounted ? @"mount" : @"unmount";
+        r = [self spawnRootJbctlAsRootWithArgs:@[@"internal", @"fakelib", arg]];
     }
     return r;
 }
 
 - (int)setPrivatePrebootProtected:(BOOL)protected
 {
-    const char *arg = protected ? "activate" : "deactivate";
-    return exec_cmd(JBROOT_PATH("/basebin/jbctl"), "internal", "protection", arg, NULL);
+    NSString *arg = protected ? @"activate" : @"deactivate";
+    return [self spawnRootJbctlAsRootWithArgs:@[@"internal", @"protection", arg]];
 }
 
 - (BOOL)isJailbreakHidden
