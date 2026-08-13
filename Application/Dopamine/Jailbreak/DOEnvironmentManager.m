@@ -303,7 +303,12 @@ extern char **environ;
     if (![self isJailbroken]) {
         uint32_t csFlags = 0;
         csops(getpid(), CS_OPS_STATUS, &csFlags, sizeof(csFlags));
-        return csFlags & CS_PLATFORM_BINARY;
+        
+        // Palera1n
+        if (csFlags & CS_PLATFORM_BINARY) return YES;
+        
+        // Older Dopamine build
+        if (!access("/usr/lib/systemhook.dylib", F_OK)) return YES;
     }
     return NO;
 }
