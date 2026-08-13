@@ -61,12 +61,31 @@ void _trustcache_list_enumerate(void (^enumerateBlock)(uint64_t tcKaddr, bool *s
 int trustcache_list_insert(uint64_t tcToInsert)
 {
 	if (!tcToInsert) return -1;
-	uint64_t previousStartTC = _trustcache_list_get_start();
-	kwrite64(tcToInsert + koffsetof(trustcache, nextptr), previousStartTC);
-	if (koffsetof(trustcache, prevptr)) {
-		kwrite64(previousStartTC + koffsetof(trustcache, prevptr), tcToInsert);
+
+	if (ksymbol(SPTMArgs)) {
+		// On SPTM/TXM devices, our allocations are read-only by TXM so it cannot write to the prevptr field 
+		// Since TXM will only add trust caches to the start of the list, we simply add ours to the end
+		// We avoid a panic when loading a new trustcache, since we guarantee the first trustcache in the list is always writable
+
+		__block uint64_t lastTC = 0;
+		_trustcache_list_enumerate(^(uint64_t tcKaddr, bool *stop) {
+			lastTC = tcKaddr;
+		});
+
+		if (koffsetof(trustcache, prevptr)) {
+			kwrite64(tcToInsert + koffsetof(trustcache, prevptr), lastTC);
+		}
+		kwrite64(lastTC + koffsetof(trustcache, nextptr), tcToInsert);
 	}
-	_trustcache_list_set_start(tcToInsert);
+	else {
+		uint64_t previousStartTC = _trustcache_list_get_start();
+		kwrite64(tcToInsert + koffsetof(trustcache, nextptr), previousStartTC);
+		if (koffsetof(trustcache, prevptr)) {
+			kwrite64(previousStartTC + koffsetof(trustcache, prevptr), tcToInsert);
+		}
+		_trustcache_list_set_start(tcToInsert);
+	}
+
 	return 0;
 }
 
@@ -327,6 +346,11 @@ int trustcache_file_upload(trustcache_file_v1 *tc)
 
 	uint64_t tcKaddr = 0;
 	if (kalloc(&tcKaddr, tcSize) != 0) return -1;
+
+	// kalloc is not guaranteed to be zeroed, make sure trustcache head is zeroed
+	char nullBuf[ksizeof(trustcache)];
+	memset(nullBuf, 0, sizeof(nullBuf));
+	kwritebuf(tcKaddr, nullBuf, sizeof(nullBuf));
 
 	uint64_t tcFileKaddr = tcKaddr + ksizeof(trustcache);
 	kwritebuf(tcFileKaddr, tc, tcSize - ksizeof(trustcache));
