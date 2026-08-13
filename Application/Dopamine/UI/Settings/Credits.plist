@@ -62,7 +62,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Developers</string>
+			<string>开发者</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -113,7 +113,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>UI and Design</string>
+			<string>UI 设计</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -146,7 +146,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Credits</string>
+			<string>感谢</string>
 		</dict>
 		<dict>
 			<key>cell</key>
