@@ -651,7 +651,7 @@ void *boomerang_server(struct boomerang_info *info)
     }
     
     // After the launchd hook is initialized, we need to make the app believe the device is jailbroken
-    [[DOEnvironmentManager sharedManager] setJailbroken:YES];
+    [[DOEnvironmentManager sharedManager] setJailbroken:YES withVersion:[NSString stringWithContentsOfFile:JBROOT_PATH(@"/basebin/.version") encoding:NSUTF8StringEncoding error:nil]];
     
     // Now that we can, protect important system files by bind mounting on top of them
     // This will be always be done during the userspace reboot

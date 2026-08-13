@@ -293,9 +293,10 @@ extern char **environ;
     return _isJailbroken;
 }
 
-- (void)setJailbroken:(BOOL)jailbroken
+- (void)setJailbroken:(BOOL)jailbroken withVersion:(NSString *)version
 {
     _isJailbroken = jailbroken;
+    if (_isJailbroken) _jailbrokenVersion = version;
 }
 
 - (BOOL)isJailbrokenWithOtherJailbreak
@@ -365,10 +366,12 @@ extern char **environ;
     }
 }
 
-- (int)spawnRootJbctlAsRootWithArgs:(NSArray *)args
+- (int)spawnJbctlAsRootWithArgs:(NSArray *)args
 {
-    int waitPipe[2];
-    pipe(waitPipe);
+    bool needsLegacySolution = false;
+    if (self.jailbrokenVersion) {
+        needsLegacySolution = (strcmp(self.jailbrokenVersion.UTF8String, "3.0.5") < 0);
+    }
 
     char **argBuf = malloc((args.count + 4) * sizeof(char *));
     argBuf[0] = strdup(JBROOT_PATH("/basebin/jbctl"));
@@ -376,13 +379,27 @@ extern char **environ;
     for (NSString *arg in args) {
         argBuf[i++] = strdup(arg.UTF8String);
     }
-    argBuf[i++] = strdup("--waitfor");
-    argBuf[i++] = strdup("3");
-    argBuf[i++] = NULL;
 
-    posix_spawn_file_actions_t act;
+    if (!needsLegacySolution) {
+        argBuf[i++] = strdup("--waitfor");
+        argBuf[i++] = strdup("3");
+    }
+    argBuf[i++] = NULL;
+    
+    posix_spawn_file_actions_t act = NULL;
 	posix_spawn_file_actions_init(&act);
-	posix_spawn_file_actions_adddup2(&act, waitPipe[0], 3);
+    posix_spawnattr_t attr = NULL;
+    posix_spawnattr_init(&attr);
+     
+    int waitPipe[2];
+    
+    if (!needsLegacySolution) {
+        pipe(waitPipe);
+        posix_spawn_file_actions_adddup2(&act, waitPipe[0], 3);
+    }
+    else {
+        posix_spawnattr_setflags(&attr, POSIX_SPAWN_START_SUSPENDED);
+    }
 
     __block int pid = 0;
     __block int r = -1;
@@ -390,6 +407,11 @@ extern char **environ;
     [self runAsRoot:^{
         [self runUnsandboxed:^{
             r = posix_spawn(&pid, argBuf[0], &act, NULL, (char *const *)argBuf, (char *const *)environ);
+            if (needsLegacySolution) {
+                // Legacy solution is a gamble, which is why it was removed and superseeded by --waitfor
+                // But if jailbroken with <3.0.5, jbctl doesn't support --waitfor yet
+                kill(pid, SIGCONT);
+            }
         }];
         // We *NEED* to leave this block on iOS 17+ to avoid a panic, --waitfor ensures this always happens
     }];
@@ -400,14 +422,16 @@ extern char **environ;
     }
     free(argBuf);
 
-    if (r == 0) {
-        // We left the root/unsandbox block, now resume jbctl by writing to pipe
-        char w = 'w';
-        write(waitPipe[1], &w, sizeof(w));
-    }
+    if (!needsLegacySolution) {
+        if (r == 0) {
+            // We left the root/unsandbox block, now resume jbctl by writing to pipe
+            char w = 'w';
+            write(waitPipe[1], &w, sizeof(w));
+        }
 
-    close(waitPipe[0]);
-    close(waitPipe[1]);
+        close(waitPipe[0]);
+        close(waitPipe[1]);
+    }
 
     return r;
 }
@@ -424,12 +448,12 @@ extern char **environ;
 
 - (void)respring
 {
-    [self spawnRootJbctlAsRootWithArgs:@[@"respring"]];
+    [self spawnJbctlAsRootWithArgs:@[@"respring"]];
 }
 
 - (void)rebootUserspace
 {
-    [self spawnRootJbctlAsRootWithArgs:@[@"reboot_userspace"]];
+    [self spawnJbctlAsRootWithArgs:@[@"reboot_userspace"]];
 }
 
 - (void)refreshJailbreakApps
@@ -489,7 +513,7 @@ extern char **environ;
 
 - (void)updateJailbreakFromTIPA:(NSString *)tipaPath
 {
-    [self spawnRootJbctlAsRootWithArgs:@[@"update", @"tipa", tipaPath]];
+    [self spawnJbctlAsRootWithArgs:@[@"update", @"tipa", tipaPath]];
 }
 
 - (BOOL)isTweakInjectionEnabled
@@ -594,7 +618,7 @@ extern char **environ;
     int r = 0;
     if (mounted != [self isFakelibMounted]) {
         NSString *arg = mounted ? @"mount" : @"unmount";
-        r = [self spawnRootJbctlAsRootWithArgs:@[@"internal", @"fakelib", arg]];
+        r = [self spawnJbctlAsRootWithArgs:@[@"internal", @"fakelib", arg]];
     }
     return r;
 }
@@ -602,7 +626,7 @@ extern char **environ;
 - (int)setPrivatePrebootProtected:(BOOL)protected
 {
     NSString *arg = protected ? @"activate" : @"deactivate";
-    return [self spawnRootJbctlAsRootWithArgs:@[@"internal", @"protection", arg]];
+    return [self spawnJbctlAsRootWithArgs:@[@"internal", @"protection", arg]];
 }
 
 - (BOOL)isJailbreakHidden
