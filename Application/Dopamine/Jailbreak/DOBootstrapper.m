@@ -389,10 +389,6 @@ NSString *const bootstrapErrorDomain = @"BootstrapErrorDomain";
         
         JBFixMobilePermissions();
 
-        // Add setuid bit to jbctl
-        // Allows us in the end to reboot userspace after we're already mobile
-        chmod(JBROOT_PATH("/basebin/jbctl"), S_ISUID | 0755);
-
         completion(nil);
     };
     
