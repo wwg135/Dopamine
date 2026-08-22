@@ -53,7 +53,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"ซ่อนเจลเบรค\" ซ่อนไฟล์ที่เกี่ยวกับเจลเบรคต่างๆจนกว่าจะทำการเจลเบรคใหม่";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"ซ่อนเจลเบรค\" ปิดการทำงานของเจลเบรคบางส่วนเพื่อทำให้การตรวจจับยากขึ้น แต่อาจจะมีประสิทธิภาพไม่เต็มที่";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "ตั้งค่าเจลเบรค";
 "Section_Actions" = "Actions";
 "Section_Customization" = "การปรับแต่ง";

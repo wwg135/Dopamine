@@ -54,7 +54,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "“隐藏越狱” 将在下次越狱前移除部分可能导致越狱检测的文件。";
-"Hint_Hide_Jailbreak_Jailbroken" = "“隐藏越狱” 将禁用部分越狱功能以提升检测越狱的难度，不过这并不能完全防止应用检测到越狱。";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "越狱设置";
 "Section_Actions" = "操作";
 "Section_Customization" = "自定义";

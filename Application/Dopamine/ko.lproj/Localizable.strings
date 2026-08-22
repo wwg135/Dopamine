@@ -55,7 +55,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"탈옥 숨기기\"는 다음 탈옥까지 일시적으로 탈옥 관련 파일을 제거합니다.";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"탈옥 숨기기\"는 탈옥 기능을 부분적으로 비활성화하여 탐지를 더 어렵게 만듭니다. 하지만 완벽하게 우회되지 않으며, 모든 것을 숨길 수는 없습니다.";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "탈옥 설정";
 "Section_Actions" = "작업";
 "Section_Customization" = "커스텀";

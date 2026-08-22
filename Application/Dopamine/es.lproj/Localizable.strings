@@ -55,7 +55,7 @@
 
 // Sugerencias de ajustes
 "Hint_Hide_Jailbreak" = "\"Ocultar jailbreak\" elimina temporalmente los archivos relacionados con el jailbreak hasta el próximo rejailbreak";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"Ocultar jailbreak\" desactiva parcialmente el jailbreak e intenta dificultar su detección. Sin embargo, no es totalmente eficaz y no oculta todo.";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "Ajustes de jailbreak";
 "Section_Actions" = "Acciones";
 "Section_Customization" = "Personalización";

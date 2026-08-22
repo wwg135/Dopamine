@@ -53,7 +53,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Скрыть джейлбрейк\" временно удаляет файлы, связанные с джейлбрейком, до следующего джейлбрейка";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"Скрыть джейлбрейк\" частично отключает джейлбрейк и стремится сделать обнаружение более сложным. Однако это не совсем эффективно и скрывает не всё.";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "Настройки джейлбрейка";
 "Section_Actions" = "Действия";
 "Section_Customization" = "Кастомизация";

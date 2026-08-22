@@ -53,7 +53,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"إخفاء الجيلبريك\" يقوم بإزالة الملفات المتعلقة بالجيلبريك مؤقتًا حتى تفعيل الجيلبريك القادم.";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"إخفاء الجيلبريك\" يعطل الجيلبريك جزئيًا ويجعل كشفه أكثر صعوبة. ومع ذلك، فإن هذه الخاصية ليست فعالة ١٠٠٪؜ ولا تخفي كل شيء.";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "إعدادات الجيلبريك";
 "Section_Actions" = "الإجراءات";
 "Section_Customization" = "التخصيص";
