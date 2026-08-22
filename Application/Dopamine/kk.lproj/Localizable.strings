@@ -106,6 +106,7 @@
 /*Initializing Protection*/
 /*Loading BaseBin TrustCache*/
 /*Applying Bind Mount*/
+/*Rebuilding Icon Cache*/
 /*Removing Jailbreak*/
 /*Elevating Privileges*/
 /*Cleaning Up Exploits*/

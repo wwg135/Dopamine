@@ -106,6 +106,7 @@
 "Initializing Protection" = "Инициализация защиты";
 "Loading BaseBin TrustCache" = "Получение кэша доверия BaseBin";
 "Applying Bind Mount" = "Применение монтирования с привязкой";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "Удаление джейлбрейка";
 "Elevating Privileges" = "Повышение прав";
 "Cleaning Up Exploits" = "Очистка эксплоитов";

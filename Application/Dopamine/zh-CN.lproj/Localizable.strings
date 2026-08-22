@@ -108,6 +108,7 @@
 "Initializing Protection" = "初始化保护";
 "Loading BaseBin TrustCache" = "将基础套件加载至信任缓存（TrustCache）";
 "Applying Bind Mount" = "应用绑定挂载";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "移除越狱";
 "Elevating Privileges" = "提升权限";
 "Cleaning Up Exploits" = "清理环境";

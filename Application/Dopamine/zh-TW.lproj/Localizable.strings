@@ -113,6 +113,7 @@
 "Initializing Protection" = "正在初始化保護";
 "Loading BaseBin TrustCache" = "正在載入 BaseBin TrustCache";
 "Applying Bind Mount" = "正在套用 Bind Mount";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "正在移除越獄";
 "Elevating Privileges" = "正在提升權限";
 "Cleaning Up Exploits" = "正在清理漏洞利用";

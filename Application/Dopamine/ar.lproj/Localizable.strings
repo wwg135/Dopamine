@@ -106,6 +106,7 @@
 /*Initializing Protection*/
 "Loading BaseBin TrustCache" = "تحميل BaseBin TrustCache";
 "Applying Bind Mount" = "تطبيق Bind Mount";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "إزالة الجيلبريك";
 "Elevating Privileges" = "رفع الامتيازات";
 "Cleaning Up Exploits" = "تحسين أداء الثغرات";

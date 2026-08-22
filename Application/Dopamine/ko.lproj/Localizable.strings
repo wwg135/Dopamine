@@ -113,6 +113,7 @@
 "Initializing Protection" = "보호 초기화 중";
 "Loading BaseBin TrustCache" = "베이스 바이너리 신뢰 캐시 로드 중";
 "Applying Bind Mount" = "바인드 마운트 적용 중";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "탈옥 제거 중";
 "Elevating Privileges" = "권한 상승 중";
 "Cleaning Up Exploits" = "익스플로잇 정리 중";

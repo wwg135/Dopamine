@@ -113,6 +113,7 @@
 "Initializing Protection" = "Inicializando protección";
 "Loading BaseBin TrustCache" = "Cargando TrustCache de BaseBin";
 "Applying Bind Mount" = "Aplicando bind mount";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "Eliminando jailbreak";
 "Elevating Privileges" = "Elevando privilegios";
 "Cleaning Up Exploits" = "Limpiando exploits";
