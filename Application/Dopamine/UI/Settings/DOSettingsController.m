@@ -273,7 +273,6 @@
             }
 
             if (envManager.isBootstrapped) {
-                PSSpecifier *lastActionSpecifier;
                 PSSpecifier *actionsGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
                 actionsGroupSpecifier.name = DOLocalizedString(@"Section_Actions");
                 [specifiers addObject:actionsGroupSpecifier];
@@ -304,7 +303,6 @@
                     else
                         [reinstallPackageManagersSpecifier setProperty:@"shippingbox" forKey:@"image"];
                     [reinstallPackageManagersSpecifier setProperty:@"reinstallPackageManagersPressed" forKey:@"action"];
-                    lastActionSpecifier = reinstallPackageManagersSpecifier;
                     [specifiers addObject:reinstallPackageManagersSpecifier];
                 }
 
@@ -325,7 +323,6 @@
                         [hideUnhideJailbreakSpecifier setProperty:@"eye.slash" forKey:@"image"];
                     }
                     [hideUnhideJailbreakSpecifier setProperty:@"hideUnhideJailbreakPressed" forKey:@"action"];
-                    lastActionSpecifier = hideUnhideJailbreakSpecifier;
                     [specifiers addObject:hideUnhideJailbreakSpecifier];
                 }
 
@@ -340,12 +337,11 @@
                     [removeJailbreakSpecifier setProperty:buttonHeight forKey:@"height"];
                     [removeJailbreakSpecifier setProperty:@"trash" forKey:@"image"];
                     [removeJailbreakSpecifier setProperty:@"removeJailbreakPressed" forKey:@"action"];
-                    lastActionSpecifier = removeJailbreakSpecifier;
                     [specifiers addObject:removeJailbreakSpecifier];
                 }
                 
                 if (hideJailbreakButtonShown) {
-                    [lastActionSpecifier setProperty:DOLocalizedString(envManager.isJailbroken ? @"Hint_Hide_Jailbreak_Jailbroken" : @"Hint_Hide_Jailbreak") forKey:@"footerText"];
+                    [actionsGroupSpecifier setProperty:DOLocalizedString(envManager.isJailbroken ? @"Hint_Hide_Jailbreak_Jailbroken" : @"Hint_Hide_Jailbreak") forKey:@"footerText"];
                 }
             }
         }
