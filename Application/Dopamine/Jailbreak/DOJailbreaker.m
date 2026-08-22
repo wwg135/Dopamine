@@ -530,8 +530,8 @@ void *boomerang_server(struct boomerang_info *info)
 
 - (NSError *)removeJailbreak
 {
-    if (@available(iOS 18.4, *)) {
-        // On iOS 18.4+, jailbreak apps persist on the home screen even when unjailbroken
+    if (@available(iOS 18.0, *)) {
+        // On iOS 18+, jailbreak apps persist on the home screen even after a reboot into unjailbroken state
         // So we need to remove them from icon cache before deleting the bootstrap
         [[DOUIManager sharedInstance] sendLog:DOLocalizedString(@"Rebuilding Icon Cache") debug:NO];
         [[DOEnvironmentManager sharedManager] rebuildIconCache];
