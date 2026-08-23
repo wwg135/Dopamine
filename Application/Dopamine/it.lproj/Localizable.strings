@@ -53,7 +53,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Nascondi il Jailbreak\" rimuove temporaneamente i file relativi al jailbreak fino al rejailbreak";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"Nascondi il Jailbreak\" disabilita parzialmente il jailbreak e tenta di rendere più difficile il rilevamento del jailbreak. Tuttavia, non è del tutto efficace e non nasconde tutto.";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "Impostazioni Jailbreak";
 "Section_Actions" = "Azioni";
 "Section_Customization" = "Personalizzazione";
@@ -102,6 +102,7 @@
 "Initializing Protection" = "Inizializzo la Proteczione";
 "Loading BaseBin TrustCache" = "Carico BaseBin TrustCache";
 "Applying Bind Mount" = "Applico Bind Mount";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "Rimuovo il Jailbreak";
 "Elevating Privileges" = "Elevo i Privilegi";
 "Cleaning Up Exploits" = "Pulisco gli Exploit";

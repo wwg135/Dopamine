@@ -53,7 +53,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Ocultar o Jailbreak\" remove temporariamente os arquivos do Jailbreak até a próxima execução";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"Ocultar o Jailbreak\" desabilita parcialmente o Jailbreak e tenta deixá-lo mais difícil de ser detectado. Entretando, não é completamente efetivo.";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 /*Section_Jailbreak_Settings*/
 /*Section_Actions*/
 /*Section_Customization*/
@@ -99,6 +99,7 @@
 /*Initializing Protection*/
 /*Loading BaseBin TrustCache*/
 /*Applying Bind Mount*/
+/*Rebuilding Icon Cache*/
 /*Removing Jailbreak*/
 /*Elevating Privileges*/
 /*Cleaning Up Exploits*/

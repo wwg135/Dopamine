@@ -55,7 +55,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "「隱藏越獄」會暫時移除越獄相關檔案，直到下次重新越獄為止";
-"Hint_Hide_Jailbreak_Jailbroken" = "在越獄狀態下，「隱藏越獄」會停用部分越獄功能，讓越獄偵測變得更加困難。但此功能並非完全有效，也無法完全隱藏越獄痕跡。";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "越獄設定";
 "Section_Actions" = "操作";
 "Section_Customization" = "自訂";
@@ -113,6 +113,7 @@
 "Initializing Protection" = "正在初始化保護";
 "Loading BaseBin TrustCache" = "正在載入 BaseBin TrustCache";
 "Applying Bind Mount" = "正在套用 Bind Mount";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "正在移除越獄";
 "Elevating Privileges" = "正在提升權限";
 "Cleaning Up Exploits" = "正在清理漏洞利用";

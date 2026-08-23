@@ -53,7 +53,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Itago ang Jailbreak\" pansamantalang itatago ang mga file na nauugnay sa Jailbreak hanggang sa susunod na re-jailbreak";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"Itago ang Jailbreak\" bahagyang hindi paganahin ang Jailbreak at naglalayong gawing mas mahirap ang pagtuklas nito. Gayunpaman, hindi ito ganap na epektibo at hindi ma-itago ang lahat.";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "Mga Settings ng Jailbreak";
 "Section_Actions" = "Mga Aksyon";
 "Section_Customization" = "Mga Customization";
@@ -106,6 +106,7 @@
 /*Initializing Protection*/
 "Loading BaseBin TrustCache" = "Nilo-load ang BaseBin TrustCache";
 "Applying Bind Mount" = "Paglalapat ng Bind Mount";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "Tinatatanggal ang Jailbreak";
 "Elevating Privileges" = "Pagtataas ng mga Privileges";
 "Cleaning Up Exploits" = "Paglilinis ng mga Exploits";

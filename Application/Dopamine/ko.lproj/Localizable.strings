@@ -6,7 +6,7 @@
 
 // Jailbreak Button
 "Button_Jailbreak_Title" = "탈옥";
-"Status_Title_Jailbroken" = "탈옥되었습니다";
+"Status_Title_Jailbroken" = "탈옥됨";
 "Unsupported" = "지원되지 않음";
 
 // Action Menu
@@ -29,7 +29,7 @@
 "Changelog_Unavailable_Text" = "변경 로그 없음";
 
 // Removed Jailbreak Alert
-"Removed_Jailbreak_Alert_Title" = "탈옥이 제거되었습니다.";
+"Removed_Jailbreak_Alert_Title" = "탈옥이 제거됨";
 "Removed_Jailbreak_Alert_Message" = "탈옥을 성공적으로 제거했습니다. 기기를 재시작하는 것이 권장됩니다.";
 "Button_Close" = "닫기";
 
@@ -55,7 +55,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"탈옥 숨기기\"는 다음 탈옥까지 일시적으로 탈옥 관련 파일을 제거합니다.";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"탈옥 숨기기\"는 탈옥 기능을 부분적으로 비활성화하여 탐지를 더 어렵게 만듭니다. 하지만 완벽하게 우회되지 않으며, 모든 것을 숨길 수는 없습니다.";
+"Hint_Hide_Jailbreak_Jailbroken" = "\"탈옥 숨기기\"는 일부 탈옥 탐지를 우회하기 위해 탈옥을 일시적으로 비활성화하는 데 사용할 수 있습니다. 완전히 효과적이지는 않으며 모든 흔적을 숨기지는 못하지만, 기기를 재부팅 후 아직 다시 탈옥하지 않은 상태와 비슷하게 만들어 줍니다. RootHide를 대신할 수 있는 적절한 대체 수단은 아닙니다. 이 옵션은 문제를 일으킬 수 있어 별도의 지원이 제공되지 않으며, 사용에 따른 책임은 본인에게 있습니다.";
 "Section_Jailbreak_Settings" = "탈옥 설정";
 "Section_Actions" = "작업";
 "Section_Customization" = "커스텀";
@@ -67,7 +67,7 @@
 "Select_Image" = "이미지 선택";
 
 // Settings Alerts
-"Alert_Tweak_Injection_Toggled_Title" = "Userspace 재시작이 필요합니다.";
+"Alert_Tweak_Injection_Toggled_Title" = "Userspace 재시작 필요";
 "Alert_Tweak_Injection_Toggled_Body" = "변경 사항을 적용하려면 Userspace를 재시작해야 합니다. 지금 재시작하시겠습니까?";
 "Alert_Tweak_Injection_Toggled_Reboot_Now" = "지금 재시작";
 "Alert_Tweak_Injection_Toggled_Reboot_Later" = "나중에";
@@ -77,15 +77,15 @@
 "Alert_Change_Mobile_Password_Body" = "기기의 \"mobile\" 사용자 비밀번호를 설정하세요. 이 비밀번호는 sudo를 사용하여 루트 권한에 접근할 때 필요합니다. 루트 비밀번호를 설정하려면 터미널 앱에서 \"sudo passwd root\" 명령을 실행하세요.";
 "Password_Placeholder" = "비밀번호";
 "Repeat_Password_Placeholder" = "비밀번호 확인";
-"Password_Auth_Required" = "\"mobile\"비밀번호를 변경하려면 인증이 필요합니다.";
+"Password_Auth_Required" = "\"mobile\" 비밀번호를 변경하려면 인증이 필요합니다.";
 "Button_Change" = "변경";
 "Button_Cancel" = "취소";
 "Button_Continue" = "계속";
 
 // Duplicate Apps Errors
-"Duplicate_Apps_Error_Dopamine_App" = "Dopamine 앱 디렉터리(\"%@\")에 동일한 식별자(\"%@\")를 가진 앱이 여러 개 있습니다. 진행할 수 없습니다.";
-"Duplicate_Apps_Error_User_App" = "Dopamine 앱 디렉터리(\"%@\")에 식별자 \"%@\"를 가진 앱이 있지만, 시스템에 동일한 앱이 별도로 설치되어 있습니다. 진행할 수 없습니다.";
-"Duplicate_Apps_Error_Icon_Cache" = "Dopamine 앱 디렉터리(\"%@\")에 식별자 \"%@\"를 가진 앱이 있지만, 아이콘 캐시에 다른 경로(\"%@\")로 등록되어 있습니다. 진행할 수 없습니다.";
+"Duplicate_Apps_Error_Dopamine_App" = "식별자 \"%@\"를 가진 앱이 Dopamine 앱 디렉터리(\"%@\") 안에 여러 개 있습니다. 진행할 수 없습니다.";
+"Duplicate_Apps_Error_User_App" = "식별자 %@를 가진 앱이 Dopamine 앱 디렉터리(\"%@\")에 있지만, 시스템에도 별도로 설치되어 있습니다. 진행할 수 없습니다.";
+"Duplicate_Apps_Error_Icon_Cache" = "식별자 \"%@\"를 가진 앱이 Dopamine 앱 디렉터리(\"%@\")에 있지만, 아이콘 캐시에는 다른 경로(\"%@\")로 등록되어 있습니다. 진행할 수 없습니다.";
 
 // Settings Lists
 "Theme" = "테마";
@@ -113,6 +113,7 @@
 "Initializing Protection" = "보호 초기화 중";
 "Loading BaseBin TrustCache" = "베이스 바이너리 신뢰 캐시 로드 중";
 "Applying Bind Mount" = "바인드 마운트 적용 중";
+"Rebuilding Icon Cache" = "아이콘 캐시 재구성 중";
 "Removing Jailbreak" = "탈옥 제거 중";
 "Elevating Privileges" = "권한 상승 중";
 "Cleaning Up Exploits" = "익스플로잇 정리 중";

@@ -53,7 +53,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Απόκρυψη Jailbreak\" Αφαιρεί προσωρινά τα αρχεία που σχετίζονται με το jailbreak μέχρι το απόμενο jailbreak";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"Απόκρυψη Jailbreak\" απενεργοποιεί μερικώς το jailbreak στοχεύοντας να κάνει την ανίχνευση του δυσκολότερη. Ωστόσο, δεν είναι απολύτως αποτελεσματικό και δεν το αποκρύπτει ολικώς.";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 /*Section_Jailbreak_Settings*/
 /*Section_Actions*/
 /*Section_Customization*/
@@ -106,6 +106,7 @@
 /*Initializing Protection*/
 /*Loading BaseBin TrustCache*/
 /*Applying Bind Mount*/
+/*Rebuilding Icon Cache*/
 /*Removing Jailbreak*/
 /*Elevating Privileges*/
 /*Cleaning Up Exploits*/

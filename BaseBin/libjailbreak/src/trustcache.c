@@ -327,7 +327,7 @@ int trustcache_file_upload(trustcache_file_v1 *tc)
 		uint64_t prevTcSize = ksizeof(trustcache) + sizeof(trustcache_file_v1) + (prevTcLength * sizeof(trustcache_entry_v1));
 		if (prevTcSize == tcSize) {
 			// If size is the same this is simple, just replace the file data
-			kwritebuf(prevTcFile, tc, tcSize);
+			kwritebuf(prevTcFile, tc, tcSize - ksizeof(trustcache));
 			return 0;
 		}
 		else {

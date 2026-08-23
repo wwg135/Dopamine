@@ -53,7 +53,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "「隱藏越獄」將在下次越獄前臨時移除越獄相關的文件";
-"Hint_Hide_Jailbreak_Jailbroken" = "已越獄時，「隱藏越獄」將部分禁用越獄功能以增加探測越獄的難度。但是，這並非總是有效，也沒有隱藏所有東西。";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 /*Section_Jailbreak_Settings*/
 /*Section_Actions*/
 /*Section_Customization*/
@@ -106,6 +106,7 @@
 /*Initializing Protection*/
 /*Loading BaseBin TrustCache*/
 /*Applying Bind Mount*/
+/*Rebuilding Icon Cache*/
 /*Removing Jailbreak*/
 /*Elevating Privileges*/
 /*Cleaning Up Exploits*/

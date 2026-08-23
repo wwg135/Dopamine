@@ -55,7 +55,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Hide Jailbreak\" temporarily removes jailbreak-related files until the next rejailbreak";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"Hide Jailbreak\" partially disables the jailbreak and aims to make detection more challenging. However, it is not entirely effective and does not conceal everything.";
+"Hint_Hide_Jailbreak_Jailbroken" = "\"Hide Jailbreak\" can be used to temporarily disable the jailbreak to get past certain jailbreak detection methods. It is not entirely effective and does not conceal everything, but should get the device to a similar state as to the state it is in after a reboot before rejailbreaking. It is not an adaquent replacement or substitute for RootHide. No support is offered for this option as it can cause issues, use it on your own risk.";
 "Section_Jailbreak_Settings" = "Jailbreak Settings";
 "Section_Actions" = "Actions";
 "Section_Customization" = "Customization";
@@ -113,6 +113,7 @@
 "Initializing Protection" = "Initializing Protection";
 "Loading BaseBin TrustCache" = "Loading BaseBin TrustCache";
 "Applying Bind Mount" = "Applying Bind Mount";
+"Rebuilding Icon Cache" = "Rebuilding Icon Cache";
 "Removing Jailbreak" = "Removing Jailbreak";
 "Elevating Privileges" = "Elevating Privileges";
 "Cleaning Up Exploits" = "Cleaning Up Exploits";

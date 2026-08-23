@@ -54,7 +54,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Jailbreakを隠す\"は、次のjailbreakの実行までjailbreak関連のファイルを一時的に隠します";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"Jailbreakを隠す\"は、jailbreakを部分的に無効にして、jailbreak検出をより困難にすることを目的としています。しかし、この機能ではすべてを完全に隠せるわけではありません。";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "Jailbreak Settings";
 "Section_Actions" = "Actions";
 "Section_Customization" = "Customization";
@@ -112,6 +112,7 @@
 "Initializing Protection" = "Initializing Protection";
 "Loading BaseBin TrustCache" = "Loading BaseBin TrustCache";
 "Applying Bind Mount" = "Applying Bind Mount";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "Removing Jailbreak";
 "Elevating Privileges" = "Elevating Privileges";
 "Cleaning Up Exploits" = "Cleaning Up Exploits";

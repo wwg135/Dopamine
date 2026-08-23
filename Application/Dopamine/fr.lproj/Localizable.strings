@@ -53,7 +53,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "Le mode \"Jailbreak masqué\" enlève temporairement les fichiers liés au jailbreak jusqu'au prochain jailbreak.";
-"Hint_Hide_Jailbreak_Jailbroken" = "Le mode \"Jailbreak masqué\" désactive partiellement le jailbreak et vise à rendre la détection plus difficile. Cependant, il n'est pas entièrement efficace et ne cache pas tout.";
+/*Hint_Hide_Jailbreak_Jailbroken*/
 "Section_Jailbreak_Settings" = "Paramètres du jailbreak";
 "Section_Actions" = "Actions";
 "Section_Customization" = "Personnalisation";
@@ -106,6 +106,7 @@
 /*Initializing Protection*/
 "Loading BaseBin TrustCache" = "Chargement des signatures";
 "Applying Bind Mount" = "Montage du disque virtuel";
+/*Rebuilding Icon Cache*/
 "Removing Jailbreak" = "Suppression du jailbreak";
 "Elevating Privileges" = "Elévation des privilèges";
 "Cleaning Up Exploits" = "Nettoyage des exploits";

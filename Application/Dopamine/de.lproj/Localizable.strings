@@ -55,7 +55,7 @@
 
 // Settings Hints
 "Hint_Hide_Jailbreak" = "\"Jailbreak verstecken\" entfernt die Jailbreak Dateien temporär bis zum nächsten Jailbreak";
-"Hint_Hide_Jailbreak_Jailbroken" = "\"Jailbreak verstecken\" deaktiviert den Jailbreak teilweise und versucht das Erkennen des Jailbreaks zu erschweren. Es ist allerdings nicht 100% effektiv und verbirgt aktuell nicht alles.";
+"Hint_Hide_Jailbreak_Jailbroken" = "\"Jailbreak verstecken\" kann benutzt werden um den Jailbreak temporär zu deaktivieren. Dies ist nützlich, um bestimmte Jailbreak Detection Methoden zu umgehen. Es ist nicht 100% effektiv und verbirgt nicht alles, es sollte das Gerät aber in einen Zustand bringen, der dem Zustand nach einem Reboot vor dem erneuten Jailbreaken ähnelt. Es ist kein adäquater Ersatz für RootHide. Diese Option kommt ohne jeglichen Support und kann zu Problemen führen, Verwendung auf eigene Gefahr.";
 "Section_Jailbreak_Settings" = "Jailbreak Einstellungen";
 "Section_Actions" = "Aktionen";
 "Section_Customization" = "Design";
@@ -113,6 +113,7 @@
 "Initializing Protection" = "Initialisiere Schutz";
 "Loading BaseBin TrustCache" = "Lade BaseBin TrustCache";
 "Applying Bind Mount" = "Wende Bind Mount an";
+"Rebuilding Icon Cache" = "Aktualisiere Icon Cache";
 "Removing Jailbreak" = "Entferne Jailbreak";
 "Elevating Privileges" = "Erhöhe Berechtigungen";
 "Cleaning Up Exploits" = "Räume Exploits auf";
