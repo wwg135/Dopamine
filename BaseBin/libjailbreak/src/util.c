@@ -180,7 +180,7 @@ uint32_t sptm_frame_get_refcnt_off(uint64_t frame)
 	}
 	else {
 		if (typeIdx == 8 || typeIdx == 17 || typeIdx == 18 || typeIdx == 31) {
-        	refcnt_off = koffsetof(sptm_frame, nested_refcnt);
+			refcnt_off = koffsetof(sptm_frame, nested_refcnt);
 		}
 		else if (typeIdx == 9 || typeIdx == 19 || typeIdx == 20 || typeIdx == 32) {
 			refcnt_off = koffsetof(sptm_frame, mapping_refcnt);
@@ -967,6 +967,35 @@ int jbctl_earlyboot(mach_port_t earlyBootServer, ...)
 	posix_spawnattr_destroy(&attr);
 	if (r != 0) return r;
 	return cmd_wait_for_exit(spawnedPid);
+}
+
+void walk_backtrace(bool (^block)(int frame_index, unw_word_t pc, unw_word_t offset, const char *symbol_name))
+{
+	unw_cursor_t cursor;
+	unw_context_t context;
+
+	unw_getcontext(&context);
+	unw_init_local(&cursor, &context);
+
+	int frame_index = 0;
+
+	while (unw_step(&cursor) > 0) {
+		unw_word_t offset, pc;
+		unw_get_reg(&cursor, UNW_REG_IP, &pc);
+		if (pc == 0) break;
+
+		char sym[256];
+		if (unw_get_proc_name(&cursor, sym, sizeof(sym), &offset) != 0) {
+			sym[0] = '\0';
+			offset = 0;
+		}
+
+		if (!block(frame_index, pc, offset, sym)) {
+			break;
+		}
+
+		frame_index++;
+	}
 }
 
 void proc_ucred_update(uint64_t proc, uint64_t newUcred)

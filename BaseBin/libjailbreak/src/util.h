@@ -5,6 +5,7 @@
 #include "jbclient_xpc.h"
 #include "jbroot.h"
 #include <spawn.h>
+#include <libunwind.h>
 
 #define POSIX_SPAWN_PERSONA_FLAGS_OVERRIDE 1
 extern int posix_spawnattr_set_persona_np(const posix_spawnattr_t* __restrict, uid_t, uint32_t);
@@ -74,6 +75,8 @@ int exec_cmd_root(const char *binary, ...);
 int exec_cmd_env(char **envp, const char *binary, ...);
 
 int jbctl_earlyboot(mach_port_t earlyBootServer, ...);
+
+void walk_backtrace(bool (^block)(int frame_index, unw_word_t pc, unw_word_t offset, const char *symbol_name));
 
 #define exec_cmd_trusted(x, args ...) ({ \
     jbclient_trust_file_by_path(x); \
