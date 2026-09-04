@@ -454,4 +454,9 @@
     }];
 }
 
+- (UITargetedPreview *)contextMenuInteraction:(UIContextMenuInteraction *)interaction previewForHighlightingMenuWithConfiguration:(UIContextMenuConfiguration *)configuration
+{
+    return nil;
+}
+
 @end
