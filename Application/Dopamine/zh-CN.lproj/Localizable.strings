@@ -53,8 +53,8 @@
 "Button_Change_Mobile_Password" = "修改 “mobile” 密码";
 
 // Settings Hints
-"Hint_Hide_Jailbreak" = "“隐藏越狱” 将在下次越狱前移除部分可能导致越狱检测的文件。";
-/*Hint_Hide_Jailbreak_Jailbroken*/
+"Hint_Hide_Jailbreak" = "\"隐藏越狱\" 将在下次越狱前移除部分可能导致越狱检测的文件。";
+"Hint_Hide_Jailbreak_Jailbroken" = "\"隐藏越狱\"功能可临时关闭越狱环境，以此绕过部分越狱检测机制。该功能并非百分百有效，也无法隐藏全部越狱痕迹，但能让设备状态近似于重启后、重新越狱之前*的状态。它并不能完全替代RootHide。该功能不提供技术支持，使用后可能引发各类问题，请自行承担使用风险。";
 "Section_Jailbreak_Settings" = "越狱设置";
 "Section_Actions" = "操作";
 "Section_Customization" = "自定义";
@@ -76,7 +76,7 @@
 "Alert_Change_Mobile_Password_Body" = "这将会在你的设备上修改 “mobile” 密码，此密码可用于使用 sudo 命令。如需设置 “root” 密码，请在 shell 中使用命令 “sudo passwd root”。";
 "Password_Placeholder" = "密码";
 "Repeat_Password_Placeholder" = "重复密码";
-/*Password_Auth_Required*/
+"Password_Auth_Required" = "修改设备密码需要进行身份验证";
 "Button_Change" = "修改";
 "Button_Cancel" = "取消";
 "Button_Continue" = "继续";
@@ -96,11 +96,11 @@
 "Recommended" = "推荐";
 
 // DarkSword Workaround
-/*Respring_Required*/
-/*Respring_Required_Message*/
-/*Respring_Required_Notice_A8*/
-/*Apply_Workaround*/
-/*Respring_Cancel*/
+"Respring_Required" = "需要注销重启";
+"Respring_Required_Message" = "所选的内核漏洞需要创建一块连续内存映射，在本设备上只能通过一套特殊兼容方案实现，该方案会执行桌面注销重启。注销重启完成后，请重新打开 Dopamine 应用，再次点击\"越狱\"。";
+"Respring_Required_Notice_A8" = "你的设备上该兼容方案并非每次都能生效，你可能需要多次执行，直到不再弹出此提示框。";
+"Apply_Workaround" = "执行兼容方案";
+"Respring_Cancel" = "取消";
 
 // Credits
 "Credits_Button_Discord" = "Discord";
