@@ -433,7 +433,11 @@
     if (![innerStack isKindOfClass:[UIStackView class]]) return;
     if (innerStack.arrangedSubviews.count < 3) return;
 
-    UIControl *targetBtn = innerStack.arrangedSubviews[2];
+    UIButton *targetBtn = (UIButton *)innerStack.arrangedSubviews[2];
+    if (![targetBtn isKindOfClass:[UIButton class]])
+    {
+        return;
+    }
 
     UIAction *rebootAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(UIAction * _Nonnull action) {
         [self fadeToBlack:^{
