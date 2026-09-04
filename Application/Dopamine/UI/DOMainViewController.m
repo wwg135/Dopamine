@@ -111,9 +111,8 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         UIView *item = [self findItem:@"reboot-userspace" view:actionView];
         if(item){
-            UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressReboot:)];
-            longPress.minimumPressDuration = 0.35;
-            [item addGestureRecognizer:longPress];
+            UIContextMenuInteraction *interaction = [[UIContextMenuInteraction alloc] initWithDelegate:self];
+            [item addInteraction:interaction];
         }
     });
 
@@ -438,23 +437,20 @@
     return nil;
 }
 
-- (void)longPressReboot:(UILongPressGestureRecognizer *)gesture {
-    if(gesture.state != UIGestureRecognizerStateBegan) return;
-    UIImpactFeedbackGenerator *feed = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
-    [feed impactOccurred];
+- (nullable UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction configurationForMenuAtLocation:(CGPoint)location
+{
+    UIImage *iconImg = [UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]];
     
-    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    [sheet addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAction *rebootAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:iconImg identifier:@"reboot" handler:^(UIAction * _Nonnull action) {
         [self fadeToBlack:^{
             [[DOEnvironmentManager sharedManager] reboot];
         }];
-    }]];
+    }];
     
-    if(sheet.popoverPresentationController){
-        sheet.popoverPresentationController.sourceView = gesture.view;
-        sheet.popoverPresentationController.sourceRect = gesture.view.bounds;
-    }
-    [self presentViewController:sheet animated:YES completion:nil];
+    UIMenu *subMenu = [UIMenu menuWithChildren:@[fullRebootAction]];
+    return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu * _Nullable(__kindof UIContextMenuConfiguration * _Nonnull config) {
+        return subMenu;
+    }];
 }
 
 @end
