@@ -456,7 +456,10 @@
 
 - (UITargetedPreview *)contextMenuInteraction:(UIContextMenuInteraction *)interaction previewForHighlightingMenuWithConfiguration:(UIContextMenuConfiguration *)configuration
 {
-    return nil;
+    UIView *transparentView = [[UIView alloc] initWithFrame:CGRectZero];
+    transparentView.backgroundColor = [UIColor clearColor];
+    UITargetedPreview *preview = [[UITargetedPreview alloc] initWithView:transparentView];
+    return preview;
 }
 
 @end
