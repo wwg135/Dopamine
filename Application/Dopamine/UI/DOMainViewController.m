@@ -108,6 +108,15 @@
     
     [stackView addArrangedSubview: actionView];
 
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIView *item = [self findItem:@"reboot-userspace" view:actionView];
+        if(item){
+            UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressReboot:)];
+            longPress.minimumPressDuration = 0.35;
+            [item addGestureRecognizer:longPress];
+        }
+    });
+
     [NSLayoutConstraint activateConstraints:@[
         [actionView.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor],
         [actionView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor],
@@ -418,6 +427,34 @@
 {
     _hideHomeIndicator = hideHomeIndicator;
     [self setNeedsUpdateOfHomeIndicatorAutoHidden];
+}
+
+- (UIView *)findItem:(NSString *)key view:(UIView *)root {
+    for(UIView *v in root.subviews){
+        if([[v valueForKey:@"actionIdentifier"] isEqualToString:key]) return v;
+        UIView *res = [self findItem:key view:v];
+        if(res) return res;
+    }
+    return nil;
+}
+
+- (void)longPressReboot:(UILongPressGestureRecognizer *)gesture {
+    if(gesture.state != UIGestureRecognizerStateBegan) return;
+    UIImpactFeedbackGenerator *feed = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
+    [feed impactOccurred];
+    
+    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    [sheet addAction:[UIAlertAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self fadeToBlack:^{
+            [[DOEnvironmentManager sharedManager] reboot];
+        }];
+    }]];
+    
+    if(sheet.popoverPresentationController){
+        sheet.popoverPresentationController.sourceView = gesture.view;
+        sheet.popoverPresentationController.sourceRect = gesture.view.bounds;
+    }
+    [self presentViewController:sheet animated:YES completion:nil];
 }
 
 @end
