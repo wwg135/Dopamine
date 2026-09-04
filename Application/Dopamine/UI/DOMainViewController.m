@@ -447,7 +447,7 @@
         }];
     }];
     
-    UIMenu *subMenu = [UIMenu menuWithChildren:@[fullRebootAction]];
+    UIMenu *subMenu = [UIMenu menuWithChildren:@[rebootAction]];
     return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu * _Nullable(__kindof UIContextMenuConfiguration * _Nonnull config) {
         return subMenu;
     }];
