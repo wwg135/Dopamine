@@ -24,6 +24,7 @@
 @property DOActionMenuButton *updateButton;
 @property(nonatomic) BOOL hideStatusBar;
 @property(nonatomic) BOOL hideHomeIndicator;
+@property (nonatomic, weak) DOActionMenuView *actionMenuRef;
 
 @end
 
@@ -105,18 +106,9 @@
             [self.navigationController pushViewController:[[DOCreditsViewController alloc] init] animated:YES];
         }]
     ] delegate:self];
-    
-    [stackView addArrangedSubview: actionView];
 
-    /*
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        UIView *item = [self findItem:@"reboot-userspace" view:actionView];
-        if(item){
-            UIContextMenuInteraction *interaction = [[UIContextMenuInteraction alloc] initWithDelegate:self];
-            [item addInteraction:interaction];
-        }
-    });
-    */
+    self.actionMenuRef = actionView;
+    [stackView addArrangedSubview: actionView];
 
     [NSLayoutConstraint activateConstraints:@[
         [actionView.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor],
@@ -430,13 +422,20 @@
     [self setNeedsUpdateOfHomeIndicatorAutoHidden];
 }
 
-- (UIView *)findItem:(NSString *)key view:(UIView *)root {
-    for(UIView *v in root.subviews){
-        if([[v valueForKey:@"actionIdentifier"] isEqualToString:key]) return v;
-        UIView *res = [self findItem:key view:v];
-        if(res) return res;
-    }
-    return nil;
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    static BOOL didAttach = NO;
+    if (didAttach) return;
+    didAttach = YES;
+
+    UIStackView *innerStack = self.actionMenuRef.subviews.firstObject;
+    if (![innerStack isKindOfClass:[UIStackView class]]) return;
+    if (innerStack.arrangedSubviews.count < 3) return;
+
+    UIView *targetBtn = innerStack.arrangedSubviews[2];
+    UIContextMenuInteraction *interaction = [[UIContextMenuInteraction alloc] initWithDelegate:self];
+    [targetBtn addInteraction:interaction];
 }
 
 - (nullable UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction configurationForMenuAtLocation:(CGPoint)location
