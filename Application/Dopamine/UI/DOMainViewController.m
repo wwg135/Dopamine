@@ -425,41 +425,25 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    static BOOL didAttach = NO;
-    if (didAttach) return;
-    didAttach = YES;
+    static BOOL didBind = NO;
+    if (didBind) return;
+    didBind = YES;
 
     UIStackView *innerStack = self.actionMenuRef.subviews.firstObject;
     if (![innerStack isKindOfClass:[UIStackView class]]) return;
     if (innerStack.arrangedSubviews.count < 3) return;
 
-    UIView *targetBtn = innerStack.arrangedSubviews[2];
-    UIContextMenuInteraction *interaction = [[UIContextMenuInteraction alloc] initWithDelegate:self];
-    [targetBtn addInteraction:interaction];
-}
+    UIControl *targetBtn = innerStack.arrangedSubviews[2];
 
-- (nullable UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction configurationForMenuAtLocation:(CGPoint)location
-{
-    UIImage *iconImg = [UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]];
-    
-    UIAction *rebootAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:iconImg identifier:@"reboot" handler:^(UIAction * _Nonnull action) {
+    UIAction *rebootAction = [UIAction actionWithTitle:DOLocalizedString(@"Menu_Reboot_Title") image:[UIImage systemImageNamed:@"arrow.clockwise.circle.fill" withConfiguration:[DOGlobalAppearance smallIconImageConfiguration]] identifier:@"reboot" handler:^(UIAction * _Nonnull action) {
         [self fadeToBlack:^{
             [[DOEnvironmentManager sharedManager] reboot];
         }];
     }];
-    
-    UIMenu *subMenu = [UIMenu menuWithChildren:@[rebootAction]];
-    return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
-        return subMenu;
-    }];
-}
 
-- (UITargetedPreview *)contextMenuInteraction:(UIContextMenuInteraction *)interaction previewForHighlightingMenuWithConfiguration:(UIContextMenuConfiguration *)configuration
-{
-    UIPreviewParameters *params = [[UIPreviewParameters alloc] init];
-    params.backgroundColor = UIColor.clearColor;
-    UITargetedPreview *preview = [[UITargetedPreview alloc] initWithView:interaction.view parameters:params];
-    return preview;
+    UIMenu *longPressMenu = [UIMenu menuWithChildren:@[rebootAction]];
+    targetBtn.menu = longPressMenu;
+    targetBtn.showsMenuAsPrimaryAction = NO;
 }
 
 @end
